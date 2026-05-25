@@ -1,0 +1,43 @@
+﻿event_name;sport;date;city;country;address;latitude;longitude;distance;description;event_url;data_source
+Köln Marathon;Running;04.10.2026;Köln;Deutschland;L111, 50679 Köln;50.940.133;6.974.559;Marathon;Generali Köln Marathon;https://generali-koeln-marathon.de/anmeldung/;Google Suche; image
+Berlin Marathon;Running;27.09.2026;Berlin;Deutschland;Großer Stern 1, 10557 Berlin;52.514.427;13.347.967;Marathon;BMW Berlin Marathon;https://www.bmw-berlin-marathon.com/;Google Suche
+Köln Triathlon;Triathlon;06.09.2026;Köln;Deutschland;Rheinparkweg 1, 50679 Köln;50.946.031;8.972.348;Sprint, Olympic, Middle ;Köln Triathlon;https://www.koeln-triathlon.com/;Google Suche
+Ironman Hamburg;Triathlon;07.06.2026;Hamburg;Deutschland;Jungfernstieg 53, 20354 Hamburg;53.553.482;9.992.181;Full;IRONMAN Hamburg European Championship;https://www.ironman.com/races/im-hamburg;Google Suche
+Sörmlands 100;Ultramarathon;12.11.2026;Nykoping;Schweden;Öster-Malma, 611 91 Björnlunda, Schweden;58.953.481;17.155.667;100 km;Sörmlands 100km Trail Ultra
+;https://www.sormlands100.com/100-km;Google Suche
+Münster Marathon;Running;13.09.2026;Münster;Deutschland;Schlosspl. 2, 48149 Münster;51.963.572;7.616.127;Marathon;Volksbank Münster Marathon
+;https://www.volksbank-muenster-marathon.de/_rubric/index.php?rubric=Home%20DE;Google Suche
+Hamburg Marathon;Running;25.04.2027;Hamburg;Deutschland;Karolinenstraße 45, 20357 Hamburg;53.558.521;9.969.898;Marathon;Haspa Marathon Hamburg;https://www.haspa-marathon-hamburg.de;Chat-GPT Daten
+Frankfurt Marathon;Running;25.10.2026;Frankfurt am Main;Deutschland;Friedrich-Ebert-Anlage, 60327 Frankfurt;50.110.924;8.652.381;Marathon;Mainova Frankfurt Marathon;https://www.frankfurt-marathon.com;Chat-GPT Daten
+München Marathon;Running;11.10.2026;München;Deutschland;Spiridon-Louis-Ring 21, 80809 München;48.171.222;11.546.133;Marathon;GENERALI München Marathon;https://www.generalimuenchenmarathon.de;Chat-GPT Daten
+Düsseldorf Marathon;Running;26.04.2026;Düsseldorf;Deutschland;Joseph-Beuys-Ufer, 40479 Düsseldorf;51.233.334;6.772.222;Marathon;Düsseldorf Marathon;https://www.duesseldorfmarathon.de;Chat-GPT Daten
+Hannover Marathon;Running;19.04.2026;Hannover;Deutschland;Friedrichswall 1, 30159 Hannover;52.367.593;9.733.222;Marathon;ADAC Marathon Hannover;https://www.marathon-hannover.de;Chat-GPT Daten
+Leipzig Marathon;Running;19.04.2026;Leipzig;Deutschland;Am Sportforum 2, 04105 Leipzig;51.345.556;12.348.056;Marathon;Leipzig Marathon;https://www.leipzigmarathon.de;Chat-GPT Daten
+Bonn Marathon;Running;19.04.2026;Bonn;Deutschland;Rathenauufer, 53113 Bonn;50.737.430;7.098.207;Marathon;Deutsche Post Marathon Bonn;https://www.deutschepostmarathonbonn.de/;Chat-GPT Daten
+Freiburg Marathon;Running;12.04.2026;Freiburg;Deutschland;Messe Freiburg, 79108 Freiburg;47.997.791;7.842.609;Marathon;MEIN FREIBURG MARATHON;https://www.mein-freiburgmarathon.de;Chat-GPT Daten
+Dresden Marathon;Running;25.10.2026;Dresden;Deutschland;Ostra-Ufer 2, 01067 Dresden;51.054.732;13.726.249;Marathon;Dresden Marathon;https://www.dresden-marathon.com;Chat-GPT Daten
+Bremen Marathon;Running;04.10.2026;Bremen;Deutschland;Bürgerweide, 28209 Bremen;53.081.944;8.813.889;Marathon;swb Marathon Bremen;https://www.swb-marathon.de;Chat-GPT Daten
+Regensburg Marathon;Running;17.05.2026;Regensburg;Deutschland;D.-Martin-Luther-Straße 2, 93047 Regensburg;49.013.432;12.101.624;Marathon;Regensburg Marathon;https://www.regensburg-marathon.de;Chat-GPT Daten
+Ulm Marathon;Running;27.09.2026;Ulm;Deutschland;Münsterplatz, 89073 Ulm;48.398.410;9.991.550;Marathon;Einstein Marathon Ulm;https://www.einsteinmarathon.de;Chat-GPT Daten
+Kiel Marathon;Running;01.03.2026;Kiel;Deutschland;Kiellinie 70, 24105 Kiel;54.338.253;10.145.374;Marathon;Kiel Marathon;https://www.kiel-marathon.de;Chat-GPT Daten
+Ruhr Marathon;Running;10.05.2026;Gelsenkirchen;Deutschland;Parkallee 1, 45891 Gelsenkirchen;51.554.722;7.067.222;Marathon;Vivawest-Marathon Ruhr;https://www.vivawest-marathon.de;Chat-GPT Daten
+Potsdam Lauf;Running;07.06.2026;Potsdam;Deutschland;Luisenplatz, 14471 Potsdam;52.398.861;13.048.861;Half Marathon;Potsdamer Schlösserlauf Halbmarathon;https://www.schlösserlauf.de;Chat-GPT Daten
+Halbmarathon Berlin;Running;29.03.2026;Berlin;Deutschland;Karl-Marx-Allee, 10178 Berlin;52.521.918;13.413.215;Half Marathon;Generali Berliner Halbmarathon;https://www.generali-berliner-halbmarathon.de;Chat-GPT Daten
+Hamburg Halbmarathon;Running;28.06.2026;Hamburg;Deutschland;Reeperbahn, 20359 Hamburg;53.550.278;9.966.111;Half Marathon;Hella Halbmarathon Hamburg;https://www.hella-hamburg-halbmarathon.de;Chat-GPT Daten
+Köln Halbmarathon;Running;04.10.2026;Köln;Deutschland;Ottoplatz, 50679 Köln;50.942.278;6.958.281;Half Marathon;Generali Köln Halbmarathon;https://www.koeln-marathon.de;Chat-GPT Daten
+Stuttgart Lauf;Running;21.06.2026;Stuttgart;Deutschland;Mercedesstraße 87, 70372 Stuttgart;48.792.222;9.232.778;Half Marathon;Stuttgart-Lauf Halbmarathon;https://www.stuttgart-lauf.de;Chat-GPT Daten
+Rennsteiglauf;Ultramarathon;22.05.2027;Schmiedefeld;Deutschland;Vesserstraße 19, 98711 Schmiedefeld;50.607.222;10.809.722;73.9 km, Marathon;GutsMuths Rennsteiglauf Supermarathon;https://www.rennsteiglauf.de;Chat-GPT Daten
+Zugspitz Ultratrail;Ultramarathon;20.06.2026;Garmisch-Partenkirchen;Deutschland;Richard-Strauss-Platz 1, 82467 Garmisch-Partenkirchen;47.492.500;11.095.556;86 km, 107 km, 69 km, 44 km, 29 km;Salomon Zugspitz Ultratrail;https://www.zugspitz-ultratrail.com;Chat-GPT Daten
+Alb Marathon;Ultramarathon;25.10.2026;Schwäbisch Gmünd;Deutschland;Marktplatz, 73525 Schwäbisch Gmünd;48.800.833;9.798.611;50 km, 25 km;Alb Marathon Schwäbisch Gmünd;https://www.albmarathon.de;Chat-GPT Daten
+Thüringen Ultra;Ultramarathon;04.07.2026;Fröttstädt;Deutschland;Bahnhofstraße 1, 99880 Hörsel;50.945.000;10.565.278;100 km;Thüringen Ultra;http://www.thueringenultra.de/startseite/index.php;Chat-GPT Daten
+Challenge Roth;Triathlon;05.07.2026;Roth;Deutschland;Otto-Schrimpff-Straße 12, 91154 Roth;49.247.500;11.091.111;Full;DATEV Challenge Roth;https://www.challenge-roth.com;Chat-GPT Daten
+Ironman Frankfurt;Triathlon;28.06.2026;Frankfurt am Main;Deutschland;Mainkai, 60311 Frankfurt;50.110.278;8.682.222;Full;Ironman European Championship Frankfurt;https://www.ironman.com/im-frankfurt;Chat-GPT Daten
+Ironman 70.3 Duisburg;Triathlon;30.08.2026;Duisburg;Deutschland;Kruppstraße 30, 47055 Duisburg;51.426.389;6.776.389;Middle ;Ironman 70.3 Duisburg;https://www.ironman.com/im703-duisburg;Chat-GPT Daten
+Allgäu Triathlon;Triathlon;16.08.2026;Immenstadt;Deutschland;Seepromenade, 87509 Immenstadt;47.560.833;10.220.833;Middle ;Allgäu Triathlon Mitteldistanz;https://www.allgaeu-triathlon.de;Chat-GPT Daten
+Ostseeman;Triathlon;02.08.2026;Glücksburg;Deutschland;Sandwigstraße 1, 24960 Glücksburg;54.834.444;9.548.056;Middle , Full;Ostseeman Triathlon;https://www.ostseeman.de;Chat-GPT Daten
+Berlin Triathlon ;Triathlon;06.06.2026;Berlin;Deutschland;Straße am Borsigturm, 13507 Berlin;52.576.944;13.287.222;Sprint, Olympic, Middle ;Berlin Triathlon;https://www.berlin-triathlon.de;Chat-GPT Daten
+Spreewald Marathon;Running;15.04.2027;Burg (Spreewald);Deutschland;Hauptstraße 1, 03096 Burg;51.834.444;14.148.333;10km, Half Marathon, Marathon;Spreewald Marathon;https://www.spreewaldmarathon.de;Chat-GPT Daten
+Kassel Marathon;Running;20.09.2026;Kassel;Deutschland;Damaschkestraße 35, 34121 Kassel;51.312.778;9.479.722;10km, Half Marathon, Marathon;Kassel Marathon;https://www.kassel-marathon.de;Chat-GPT Daten
+Chemnitz Marathon;Running;17.05.2026;Chemnitz;Deutschland;Theaterplatz, 09111 Chemnitz;50.832.222;12.925.278;10km, Half Marathon, Marathon;Chemnitz Marathon;https://www.chemnitz-marathon.de;Chat-GPT Daten
+Oberelbe Marathon;Running;25.04.2027;Königstein;Deutschland;Elbufer 1, 01824 Königstein;50.917.500;14.072.500;10km, Half Marathon, Marathon;Oberelbe Marathon;https://www.oberelbe-marathon.de;Chat-GPT Daten
+Magdeburg Marathon;Running;04.10.2026;Magdeburg;Deutschland;Heinz-Krügel-Platz 1, 39114 Magdeburg;52.131.667;11.636.944;10km, Half Marathon, Marathon;Magdeburg Marathon;https://www.magdeburg-marathon.eu;Chat-GPT Daten

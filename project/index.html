@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sports Event Map</title>
+
+  <!-- LEAFLET CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <!-- DEIN CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- TOPBAR -->
+<div id="topbar">
+
+  <div id="topbar-left">
+
+    <button id="toggleSidebar">
+      ☰
+    </button>
+
+  </div>
+
+  <div id="topbar-center">
+
+    <h1>
+      Sports Event Explorer
+    </h1>
+
+    <div id="topbar-search">
+
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Suche dein nächstes Sportevent..."
+      />
+
+    </div>
+
+  </div>
+
+</div>
+
+  <!-- MAIN APP -->
+  <div id="app">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+
+      <!-- SIDEBAR HEADER -->
+      <div id="sidebar-header">
+
+        <select id="sortSelect">
+
+           <option value="default">
+  Sortieren
+       </option>
+
+      <option value="name">
+Alphabetisch
+  </option>
+  <option value="date">
+Nach Datum
+  </option>
+  </select>
+  <select id="dateFilter">
+  <option value="all">
+Alle Events
+  </option>
+  <option value="upcoming">
+Upcoming
+  </option>
+  </select>
+
+        <!-- FILTERS -->
+        <div id="filters">
+
+          <button
+            class="filter-chip active"
+            data-filter="All"
+          >
+            All
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Running"
+          >
+            Running
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Triathlon"
+          >
+            Triathlon
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Ultramarathon"
+          >
+            Ultramarathon
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- EVENT LIST -->
+      <div id="eventList"></div>
+
+    </div>
+
+    <!-- MAP -->
+    <div id="map"></div>
+    <!-- FLOATING ACTIONS -->
+<div id="floatingActions">
+
+  <button id="locateBtn">
+    📍
+  </button>
+
+  <button id="favoritesBtn">
+    ⭐
+  </button>
+
+</div>
+
+   
+
+       <!-- EVENT DRAWER -->
+    <div id="eventDrawer">
+
+         <div id="drawerContent">
+
+         <div class="drawer-placeholder">
+
+      Select an event to view details.
+
+    </div>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- LEAFLET -->
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- MARKER CLUSTER -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+/>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+/>
+
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- PAPAPARSE -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <!-- JS FILES -->
+ <script src="js/events.js"></script>
+ <script src="js/map.js"></script>
+ <script src="js/search.js"></script>
+ <script src="js/app.js"></script>
+
+</body>
+
+</html>

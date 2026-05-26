@@ -1,10 +1,4 @@
-let events = [];
-
-let favorites =
-  JSON.parse(
-    localStorage.getItem("favorites")
-  ) || [];
-
+state.events = [];
 
 // LOAD CSV
 function loadEvents(callback) {
@@ -21,9 +15,8 @@ function loadEvents(callback) {
 
       console.log(results.data);
 
-      events = results.data;
-
-      callback(events);
+      state.events = results.data;
+      callback(state.events);
 
     }
 
@@ -82,55 +75,85 @@ function renderEventList(events) {
     div.dataset.name =
       event.event_name;
 
+      let imageUrl = "";
 
-    div.innerHTML = `
+if (event.sport === "Running") {
 
-      <div class="event-top">
+  imageUrl =
+    "https://images.unsplash.com/photo-1547347298-4074fc3086f0?q=80&w=1200&auto=format&fit=crop";
 
-        <div class="event-title">
-          ${event.event_name}
-        </div>
+}
 
-        <div
-          class="favorite-btn"
-          onclick="
-            event.stopPropagation();
-            toggleFavorite(
-              '${event.event_name}'
-            )
-          "
-        >
-          ${
-            favorites.includes(
-              event.event_name
-            )
-            ? "❤️"
-            : "🤍"
-          }
-        </div>
+else if (event.sport === "Triathlon") {
 
-      </div>
+  imageUrl =
+    "https://images.unsplash.com/photo-1518611012118-696072aa579a?q=80&w=1200&auto=format&fit=crop";
+
+}
+
+else {
+
+  imageUrl =
+    "https://images.unsplash.com/photo-1486218119243-13883505764c?q=80&w=1200&auto=format&fit=crop";
+
+}
 
 
-      <div class="event-meta">
-        📍 ${event.city}, ${event.country}
-      </div>
+div.innerHTML = `
 
-      <div class="event-meta">
-        📅 ${event.date}
-      </div>
+  <div
+    class="event-image"
+    style="
+      background-image:
+      url('${imageUrl}');
+    "
+  ></div>
 
-      <div class="event-distance">
-        ${event.distance}
-      </div>
+  <div class="event-top">
 
-      <div class="event-sport">
-        ${event.sport}
-      </div>
+    <div class="event-title">
+      ${event.event_name}
+    </div>
 
-    `;
+    <div
+      class="favorite-btn"
+      onclick="
+        event.stopPropagation();
+        toggleFavorite(
+          '${event.event_name}'
+        )
+      "
+    >
+      ${
+        favorites.includes(
+          event.event_name
+        )
+        ? "❤️"
+        : "🤍"
+      }
+    </div>
 
+  </div>
 
+  <div class="event-meta">
+    📍 ${event.city}, ${event.country}
+  </div>
+
+  <div class="event-meta">
+    📅 ${event.date}
+  </div>
+
+  <div class="event-distance">
+    ${event.distance}
+  </div>
+
+  <div class="event-sport">
+    ${event.sport}
+  </div>
+
+`;
+
+ 
     // HOVER
     div.addEventListener(
       "mouseenter",

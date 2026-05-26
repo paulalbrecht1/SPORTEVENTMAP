@@ -22,57 +22,31 @@ toggleBtn.addEventListener("click", () => {
 // FAVORITES VIEW
 let showingFavorites = false;
 
-document
-  .getElementById("favoritesBtn")
-  .addEventListener("click", () => {
+document.getElementById("favoritesBtn")
+.addEventListener("click", () => {
 
-    showingFavorites =
-      !showingFavorites;
+  state.showingFavorites = !state.showingFavorites;
 
-    const btn =
-      document.getElementById(
-        "favoritesBtn"
-      );
+  const btn = document.getElementById("favoritesBtn");
 
-    if (showingFavorites) {
+  btn.classList.toggle("active", state.showingFavorites);
 
-      btn.classList.add("active");
+  let filtered = Array.from(state.markers.values());
 
-      const filtered =
-        allMarkers.filter(item =>
-          favorites.includes(
-            item.data.event_name
-          )
-        );
+  if (state.showingFavorites) {
+    filtered = filtered.filter(item =>
+      state.favorites.has(item.data.event_name)
+    );
+  }
 
-      markerLayer.clearLayers();
+  markerLayer.clearLayers();
 
-      filtered.forEach(item => {
-
-        markerLayer.addLayer(
-          item.marker
-        );
-
-      });
-
-      renderEventList(
-        filtered.map(
-          item => item.data
-        )
-      );
-
-    }
-
-    else {
-
-      btn.classList.remove("active");
-
-      applyFilters();
-
-    }
-
+  filtered.forEach(item => {
+    markerLayer.addLayer(item.marker);
   });
 
+  renderEventList(filtered.map(i => i.data));
+});
 
 // LOCATE USER
 document

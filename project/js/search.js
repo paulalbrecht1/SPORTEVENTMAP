@@ -84,151 +84,91 @@ function initSearch() {
 
 }
 
-
 function applyFilters(zoom = false) {
 
   const searchValue =
-    document
-      .getElementById(
-        "searchInput"
-      )
-      .value
-      .toLowerCase();
+    document.getElementById("searchInput")
+      .value.toLowerCase();
+
+  const sort =
+    document.getElementById("sortSelect").value;
+
+  const dateFilter =
+    document.getElementById("dateFilter").value;
+
+  // 👉 WICHTIG: stabile Datenbasis
+  let filtered = Array.from(state.markers.values());
 
   // SEARCH + SPORT FILTER
-  let filtered =
-    allMarkers.filter(item => {
+  filtered = filtered.filter(item => {
 
-      const event = item.data;
+    const event = item.data;
 
-      const searchable =
-        `
-        ${event.event_name}
-        ${event.city}
-        ${event.country}
-        ${event.sport}
-        `
+    const searchable =
+      `${event.event_name} ${event.city} ${event.country} ${event.sport}`
         .toLowerCase();
 
-      const matchesSearch =
-        searchable.includes(
-          searchValue
-        );
+    const matchesSearch =
+      searchable.includes(searchValue);
 
-      const matchesFilter =
-        currentFilter === "All"
-        ||
-        event.sport === currentFilter;
+    const matchesSport =
+      currentFilter === "All" ||
+      event.sport === currentFilter;
 
-      return (
-        matchesSearch &&
-        matchesFilter
-      );
-
-    });
-
+    return matchesSearch && matchesSport;
+  });
 
   // DATE FILTER
-  const dateFilter =
-    document.getElementById(
-      "dateFilter"
-    ).value;
-
   if (dateFilter === "upcoming") {
 
     const now = new Date();
 
-    filtered =
-      filtered.filter(item => {
-
-        const eventDate =
-          new Date(item.data.date);
-
-        return eventDate >= now;
-
-      });
+    filtered = filtered.filter(item => {
+      return new Date(item.data.date) >= now;
+    });
 
   }
-
 
   // SORT
-  const sort =
-    document.getElementById(
-      "sortSelect"
-    ).value;
-
   if (sort === "name") {
-
     filtered.sort((a, b) =>
-
-      a.data.event_name.localeCompare(
-        b.data.event_name
-      )
-
+      a.data.event_name.localeCompare(b.data.event_name)
     );
-
   }
 
-
-  // RESET MARKERS
+  // MAP UPDATE
   markerLayer.clearLayers();
 
-  // ADD FILTERED MARKERS
   filtered.forEach(item => {
-
-    markerLayer.addLayer(
-      item.marker
-    );
-
+    markerLayer.addLayer(item.marker);
   });
 
+  // LIST UPDATE
+  renderEventList(filtered.map(i => i.data));
 
-  // UPDATE LIST
-  renderEventList(
-    filtered.map(
-      item => item.data
-    )
-  );
-
-
-  // AUTO ZOOM
+  // ZOOM LOGIC
   if (zoom && filtered.length > 0) {
 
-    // SINGLE EVENT
     if (filtered.length === 1) {
 
       map.flyTo(
         filtered[0].marker.getLatLng(),
         12,
-        {
-          duration: 1
-        }
+        { duration: 1 }
       );
 
       return;
-
     }
 
-    // MULTIPLE EVENTS
     const bounds =
       L.latLngBounds(
-
-        filtered.map(item =>
-
-          item.marker.getLatLng()
-
-        )
-
+        filtered.map(item => item.marker.getLatLng())
       );
 
     map.flyToBounds(bounds, {
-
       padding: [80, 80],
-
       duration: 1
-
     });
-
   }
-
 }
+

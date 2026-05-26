@@ -234,13 +234,17 @@ body {
 }
 
 .event-top {
+
   display: flex;
 
   justify-content: space-between;
 
   align-items: center;
 
-  margin-bottom: 12px;
+  gap: 12px;
+
+  margin-bottom: 10px;
+
 }
 
 .event-sport {
@@ -662,13 +666,21 @@ body {
 
 .favorite-btn {
 
-  margin-left: auto;
+  font-size: 22px;
 
   cursor: pointer;
 
-  font-size: 18px;
+  transition: 0.2s;
 
-  color: #9ca3af;
+  line-height: 1;
+
+  flex-shrink: 0;
+
+}
+
+.favorite-btn:hover {
+
+  transform: scale(1.15);
 
 }
 
@@ -776,5 +788,107 @@ body {
     width: 90%;
 
   }
+
+}
+
+#favoritesBtn.active {
+
+  background: #ef4444;
+
+  color: white;
+
+}
+
+/* EVENT IMAGE */
+
+.event-image {
+
+  width: 100%;
+
+  height: 150px;
+
+  border-radius: 16px;
+
+  background-size: cover;
+
+  background-position: center;
+
+  margin-bottom: 14px;
+
+}
+
+/* FAVORITE BUTTON */
+
+.favorite-btn {
+
+  cursor: pointer;
+
+  font-size: 20px;
+
+  transition: 0.2s;
+
+}
+
+.favorite-btn:hover {
+
+  transform: scale(1.15);
+
+}
+
+/* SPORT BADGE */
+
+.event-sport {
+
+  display: inline-block;
+
+  margin-top: 12px;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  background: #fee2e2;
+
+  color: #b91c1c;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+}
+
+/* CARD */
+
+.event-card {
+
+  overflow: hidden;
+
+}
+
+/* SMOOTHER */
+
+.event-card:hover {
+
+  transform: translateY(-5px);
+
+}
+
+.marker-cluster-small,
+.marker-cluster-medium,
+.marker-cluster-large {
+
+  background: rgba(220,38,38,0.18);
+
+}
+
+.marker-cluster div {
+
+  background: #dc2626;
+
+  color: white;
+
+  font-weight: bold;
+
+  border-radius: 50%;
 
 }

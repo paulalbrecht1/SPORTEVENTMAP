@@ -28,6 +28,7 @@
     "review:beta": "node tools/create-beta-review-queue.js",
     "audit:anon": "node tests/live-anon-access-audit.mjs",
     "test:static": "node tests/static-beta-smoke.test.mjs",
+    "test:event-detail": "node tests/event-detail-toggle.test.mjs",
     "test:rls": "node tests/rls-security.test.mjs",
     "test:e2e:install": "node tests/e2e/install-browsers.mjs",
     "test:e2e": "node tests/e2e/run-playwright.mjs",

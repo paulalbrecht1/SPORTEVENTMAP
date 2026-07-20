@@ -653,7 +653,8 @@ function detailIcon(name) {
     info: '<circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/>',
     question: '<path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.2 1-1.7 1.6-1.7 3.2"/><path d="M12 17h.01"/><circle cx="12" cy="12" r="9"/>',
     map: '<path d="m9 18-5 2V6l5-2 6 2 5-2v14l-5 2-6-2Z"/><path d="M9 4v14M15 6v14"/>',
-    star: '<path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/>'
+    star: '<path d="m12 3 2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8-4.3-4.1 5.9-.9L12 3Z"/>',
+    external: '<path d="M14 5h5v5M19 5l-8 8"/><path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/>'
   };
 
   return `<span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false">${paths[name] || paths.info}</svg></span>`;
@@ -1681,13 +1682,6 @@ function getEventGuideContext(event, richDetails = null) {
 function buildEventTeaser(event, richDetails = null) {
   const editorial =
     getRichDetailsSection(richDetails, "editorial");
-  const course =
-    getRichDetailsSection(richDetails, "course");
-  const travel =
-    getRichDetailsSection(richDetails, "travel");
-  const context =
-    getEventGuideContext(event, richDetails);
-
   if (isUsefulRichValue(editorial.seo_summary)) {
     return plainDetailText(editorial.seo_summary);
   }
@@ -1696,19 +1690,12 @@ function buildEventTeaser(event, richDetails = null) {
     return plainDetailText(editorial.why_this_event_stands_out);
   }
 
-  if (context.isTriathlon) {
-    return `${clean(event.event_name)} is a ${plainDetailText(course.main_distance || event.distance, "triathlon")} in ${clean(event.city)}, where swim, bike, run logistics and race-day timing matter as much as raw fitness.`;
-  }
+  const location =
+    [clean(event.city), clean(event.country)]
+      .filter(Boolean)
+      .join(", ");
 
-  if (context.isTrail || context.isUltra) {
-    return `${clean(event.event_name)} is listed as an endurance race in ${clean(event.city)} where terrain, weather and verified cutoff information should guide planning.`;
-  }
-
-  if (context.isMarathon) {
-    return `${clean(event.event_name)} is a road-running goal race in ${clean(event.city)}; compare timing, registration status and course character before placing it in your season.`;
-  }
-
-  return `${clean(event.event_name)} is listed in ${clean(event.city)}, ${clean(event.country)} with ${plainDetailText(event.distance, "distance details pending")}. Verify the official organizer page before committing.`;
+  return `Explore ${clean(event.event_name)}${location ? ` in ${location}` : ""}, including race distances, registration details, course information and everything needed to plan it as part of your season.`;
 }
 
 function keyFactCard(iconName, label, value, fallback = "Not yet verified") {
@@ -2159,11 +2146,15 @@ const DETAIL_TRANSLATIONS = {
     "detail.backToMap": "Back to map",
     "detail.language": "Language",
     "detail.favorite": "Save Favorite",
-    "detail.addSeason": "Add to Season",
-    "detail.savedSeason": "Saved in Season",
+    "detail.addSeason": "+ Add to Season",
+    "detail.addingSeason": "Adding\u2026",
+    "detail.savedSeason": "\u2713 Added to Season",
+    "detail.removeSeason": "Remove from Season",
+    "detail.removingSeason": "Removing\u2026",
     "detail.addedSeason": "Added to your Season Planner.",
-    "detail.alreadySeason": "This event is already in your Season Planner.",
+    "detail.removedSeason": "Removed from your Season Planner.",
     "detail.saveUnavailable": "Could not save this event right now.",
+    "detail.removeUnavailable": "Could not remove this event right now.",
     "detail.officialWebsite": "Official website",
     "detail.verifyOrganizer": "Verify final race details on the official organizer website before booking or registering.",
     "detail.overview": "Overview",
@@ -2258,11 +2249,15 @@ const DETAIL_TRANSLATIONS = {
     "detail.backToMap": "Zur\u00fcck zur Karte",
     "detail.language": "Sprache",
     "detail.favorite": "Favorit speichern",
-    "detail.addSeason": "Zur Saison hinzuf\u00fcgen",
-    "detail.savedSeason": "In Saison gespeichert",
+    "detail.addSeason": "+ Zur Saison hinzuf\u00fcgen",
+    "detail.addingSeason": "Wird hinzugef\u00fcgt\u2026",
+    "detail.savedSeason": "\u2713 Zur Saison hinzugef\u00fcgt",
+    "detail.removeSeason": "Aus Saison entfernen",
+    "detail.removingSeason": "Wird entfernt\u2026",
     "detail.addedSeason": "Event wurde deinem Saisonplaner hinzugef\u00fcgt.",
-    "detail.alreadySeason": "Dieses Event ist bereits in deinem Saisonplaner.",
+    "detail.removedSeason": "Event wurde aus deinem Saisonplaner entfernt.",
     "detail.saveUnavailable": "Dieses Event konnte gerade nicht gespeichert werden.",
+    "detail.removeUnavailable": "Dieses Event konnte gerade nicht entfernt werden.",
     "detail.officialWebsite": "Offizielle Website",
     "detail.verifyOrganizer": "Pr\u00fcfe finale Renndetails vor Buchung oder Anmeldung immer auf der offiziellen Veranstalterseite.",
     "detail.overview": "\u00dcbersicht",
@@ -3215,9 +3210,11 @@ function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website
           ${renderStatusBadge(status)}
           <p class="event-detail-status-note" ${detailI18nAttr("detail.verifyOrganizer")}>${escapeHtml(detailTranslation("detail.verifyOrganizer"))}</p>
         </div>
-        <button class="event-detail-secondary" id="addDetailEventToSeason" type="button" ${detailI18nAttr("detail.addSeason")}>${escapeHtml(detailTranslation("detail.addSeason"))}</button>
+        <div class="event-detail-action-group">
+          <button class="event-detail-secondary" id="addDetailEventToSeason" type="button" aria-pressed="false">${escapeHtml(detailTranslation("detail.addSeason"))}</button>
+          ${website ? `<a class="event-detail-primary" href="${website}" target="_blank" rel="noopener noreferrer"><span ${detailI18nAttr("detail.officialWebsite")}>${escapeHtml(detailTranslation("detail.officialWebsite"))}</span>${detailIcon("external")}</a>` : ""}
+        </div>
         <p class="event-detail-action-status" id="detailActionStatus" role="status" aria-live="polite"></p>
-        ${website ? `<a class="event-detail-primary" href="${website}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr("detail.officialWebsite")}>${escapeHtml(detailTranslation("detail.officialWebsite"))}</a>` : ""}
       </div>
     </section>`;
 }
@@ -3671,7 +3668,7 @@ function buildRaceGuideNavigation(sections) {
   return `
     <nav class="event-detail-tabs race-guide-tabs" aria-label="Event detail sections">
       ${sections.map(section => `
-        <a href="#${section.id}">${detailIcon(section.icon)}<span ${detailI18nAttr(section.labelKey)}>${escapeHtml(detailTranslation(section.labelKey))}</span></a>`).join("")}
+        <a href="#${section.id}" data-detail-section="${section.id}">${detailIcon(section.icon)}<span ${detailI18nAttr(section.labelKey)}>${escapeHtml(detailTranslation(section.labelKey))}</span></a>`).join("")}
     </nav>`;
 }
 
@@ -3806,10 +3803,8 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   ${buildDetailI18nScript()}
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    (function () {
-      var seasonButton = document.getElementById("addDetailEventToSeason");
-      var actionStatus = document.getElementById("detailActionStatus");
-      var detailEvent = ${escapeJson({
+    window.sportEventMapDetailConfig = {
+      event: ${escapeJson({
         event_key: eventKey,
         event_slug: slug,
         event_name: clean(event.event_name),
@@ -3821,149 +3816,12 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
         event_url: clean(event.event_url),
         latitude: clean(event.latitude),
         longitude: clean(event.longitude)
-      })};
-      var actionFallbacks = ${escapeJson({
-        en: {
-          "detail.addSeason": DETAIL_TRANSLATIONS.en["detail.addSeason"],
-          "detail.savedSeason": DETAIL_TRANSLATIONS.en["detail.savedSeason"],
-          "detail.addedSeason": DETAIL_TRANSLATIONS.en["detail.addedSeason"],
-          "detail.alreadySeason": DETAIL_TRANSLATIONS.en["detail.alreadySeason"],
-          "detail.saveUnavailable": DETAIL_TRANSLATIONS.en["detail.saveUnavailable"]
-        },
-        de: {
-          "detail.addSeason": DETAIL_TRANSLATIONS.de["detail.addSeason"],
-          "detail.savedSeason": DETAIL_TRANSLATIONS.de["detail.savedSeason"],
-          "detail.addedSeason": DETAIL_TRANSLATIONS.de["detail.addedSeason"],
-          "detail.alreadySeason": DETAIL_TRANSLATIONS.de["detail.alreadySeason"],
-          "detail.saveUnavailable": DETAIL_TRANSLATIONS.de["detail.saveUnavailable"]
-        }
-      })};
-      var lastStatusKey = "";
-      var lastStatusTone = "";
-
-      function getLanguage() {
-        try {
-          return localStorage.getItem("sportEventMapLanguage") === "de" ? "de" : "en";
-        } catch (_error) {
-          return "en";
-        }
-      }
-
-      function translate(key) {
-        if (window.sportEventMapDetailI18n && window.sportEventMapDetailI18n.translate) {
-          return window.sportEventMapDetailI18n.translate(key);
-        }
-
-        var language = getLanguage();
-        var labels = actionFallbacks[language] || actionFallbacks.en;
-        return labels[key] || actionFallbacks.en[key] || key;
-      }
-
-      function getSeasonKey() {
-        if (detailEvent.event_key) {
-          return String(detailEvent.event_key).toLowerCase();
-        }
-
-        return [
-          detailEvent.event_name,
-          detailEvent.date,
-          detailEvent.city
-        ].filter(Boolean).join("|").toLowerCase();
-      }
-
-      function readFavorites() {
-        try {
-          var raw = localStorage.getItem("favorites");
-          var parsed = raw ? JSON.parse(raw) : [];
-          return Array.isArray(parsed) ? parsed : [];
-        } catch (_error) {
-          return [];
-        }
-      }
-
-      function normalizeFavoriteKey(item) {
-        if (typeof item === "string") {
-          return item.toLowerCase();
-        }
-
-        if (item && typeof item === "object") {
-          return String(item.event_key || item.key || "").toLowerCase();
-        }
-
-        return "";
-      }
-
-      function isSavedInSeason(favorites) {
-        var seasonKey = getSeasonKey();
-        return favorites.some(function (item) {
-          return normalizeFavoriteKey(item) === seasonKey;
-        });
-      }
-
-      function setButtonState(isSaved) {
-        if (!seasonButton) {
-          return;
-        }
-
-        var labelKey = isSaved ? "detail.savedSeason" : "detail.addSeason";
-        seasonButton.classList.toggle("is-season-saved", isSaved);
-        seasonButton.setAttribute("aria-pressed", isSaved ? "true" : "false");
-        seasonButton.setAttribute("data-detail-i18n", labelKey);
-        seasonButton.textContent = translate(labelKey);
-      }
-
-      function setStatus(key, tone) {
-        lastStatusKey = key;
-        lastStatusTone = tone || "";
-
-        if (!actionStatus) {
-          return;
-        }
-
-        actionStatus.textContent = translate(key);
-        actionStatus.dataset.tone = lastStatusTone;
-      }
-
-      function addToSeason() {
-        try {
-          var favorites = readFavorites();
-
-          if (isSavedInSeason(favorites)) {
-            setButtonState(true);
-            setStatus("detail.alreadySeason", "info");
-            return;
-          }
-
-          favorites.push(getSeasonKey());
-          localStorage.setItem("favorites", JSON.stringify(favorites));
-          localStorage.setItem("lastSeasonPlannerAdd", JSON.stringify({
-            event_key: getSeasonKey(),
-            event_slug: detailEvent.event_slug,
-            event_name: detailEvent.event_name,
-            added_at: new Date().toISOString()
-          }));
-          setButtonState(true);
-          setStatus("detail.addedSeason", "success");
-        } catch (error) {
-          console.warn("Could not save event to season planner.", error);
-          setStatus("detail.saveUnavailable", "error");
-        }
-      }
-
-      if (seasonButton) {
-        setButtonState(isSavedInSeason(readFavorites()));
-        seasonButton.addEventListener("click", addToSeason);
-      }
-
-      window.addEventListener("sport-event-map-detail-languagechange", function () {
-        setButtonState(isSavedInSeason(readFavorites()));
-
-        if (lastStatusKey) {
-          setStatus(lastStatusKey, lastStatusTone);
-        }
-      });
-    })();
+      })}
+    };
   </script>
+  <script src="../../js/config.js"></script>
+  <script defer src="../../js/supabase-loader.js" data-supabase-src="../../js/event-detail-supabase.js"></script>
+  <script defer src="../../js/event-detail.js"></script>
   ${mapScript(event)}
 </body>
 </html>

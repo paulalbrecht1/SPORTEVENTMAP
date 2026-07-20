@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+staged_files="$(git diff --cached --name-only --diff-filter=ACMR)"
+blocked_files=""
+
+for file in $staged_files; do
+  case "$file" in
+    .env.example)
+      ;;
+    .env|.env.*|*/.env|*/.env.*|js/config.js|data/imports/private/*|*.pem|*.key|*.p12|*.pfx)
+      blocked_files="${blocked_files}${blocked_files:+
+}$file"
+      ;;
+  esac
+done
+
+if [ -n "$blocked_files" ]; then
+  printf '%s\n' "Commit blocked: private or machine-local files are staged:" >&2
+  printf '%s\n' "$blocked_files" >&2
+  exit 1
+fi
+
+secret_pattern='(sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|(api_secret|service_role|private_key)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']{8,}["'"'])'
+
+secret_files="$(git grep --cached -I -l -E "$secret_pattern" -- . 2>/dev/null || true)"
+
+if [ -n "$secret_files" ]; then
+  printf '%s\n' "Commit blocked: possible secrets found in staged files:" >&2
+  printf '%s\n' "$secret_files" >&2
+  exit 1
+fi
+
+exit 0

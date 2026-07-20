@@ -1,0 +1,1810 @@
+[
+  {
+    "event_slug": "bmw-berlin-marathon-2026",
+    "event_name": "BMW Berlin Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2026": "205",
+        "fee_2025": "205",
+        "currency": "EUR",
+        "registration_status": "Lottery closed; alternative entries may be available",
+        "registration_deadline": "2025-11-06",
+        "registration_deadline_note": "Official registration page lists 2025-11-06; official FAQ lists 2025-11-05.",
+        "start_time": "09:15",
+        "start_waves": "09:15 A-D; 09:45 E-F; 10:10 G-H; 10:40 J-K",
+        "cutoff": "6:15 h from crossing the start line; km 33 by 15:50; km 38 by 16:35.",
+        "elevation": "Very little elevation gain; exact total gain/loss needs review.",
+        "source_url": "https://www.bmw-berlin-marathon.com/en/registration/registration-information/",
+        "course_source_url": "https://www.bmw-berlin-marathon.com/en/your-race/course/",
+        "race_day_source_url": "https://www.bmw-berlin-marathon.com/en/your-race/race-day-for-runners",
+        "last_checked": "2026-07-06",
+        "confidence": "high",
+        "verification_status": "verified_core_fields",
+        "review_note": "Core marathon fields are verified from official sources. Exact elevation gain/loss remains needs_review."
+      }
+    ],
+    "last_checked": "2026-07-06",
+    "verification_status": "verified_core_fields"
+  },
+  {
+    "event_slug": "generali-koln-marathon-2026",
+    "event_name": "Generali Köln Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "130",
+        "fee_note": "2026 fee is listed from the referenced source and should be rechecked before registration.",
+        "registration_status": "Registration open",
+        "registration_opens": "Open now",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "To be confirmed",
+        "elevation": "Flat city course",
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "95",
+        "fee_note": "2026 fee is listed from the referenced source and should be rechecked before registration.",
+        "registration_status": "Registration open",
+        "registration_opens": "Open now",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "To be confirmed",
+        "elevation": "Flat city course",
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Relay Marathon",
+        "distance": "42.195 km relay",
+        "fee_2025": "Unavailable",
+        "fee_2026": "199",
+        "fee_note": "2026 fee is listed from the referenced source and should be rechecked before registration.",
+        "registration_status": "Registration open",
+        "registration_opens": "Open now",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "To be confirmed",
+        "elevation": "Flat city course",
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "School Marathon",
+        "distance": "42.195 km relay",
+        "fee_2025": "Unavailable",
+        "fee_2026": "50",
+        "fee_note": "2026 fee is listed from the referenced source and should be rechecked before registration.",
+        "registration_status": "Registration open",
+        "registration_opens": "Open now",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "To be confirmed",
+        "elevation": "Flat city course",
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Kids Run",
+        "distance": "Kids run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "9",
+        "fee_note": "2026 fee is listed from the referenced source and should be rechecked before registration.",
+        "registration_status": "Registration open",
+        "registration_opens": "Open now",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "To be confirmed",
+        "elevation": "Flat city course",
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "haspa-marathon-hamburg-2027",
+    "event_name": "Haspa Marathon Hamburg",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://haspa-marathon-hamburg.de/",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://haspa-marathon-hamburg.de/",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Relay",
+        "distance": "Marathon relay",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://haspa-marathon-hamburg.de/",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "mainova-frankfurt-marathon-2026",
+    "event_name": "Mainova Frankfurt Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.frankfurt-marathon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "marathon-munchen-by-brooks-2026",
+    "event_name": "Marathon München by Brooks",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://marathonmuenchen.org/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://marathonmuenchen.org/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "10K",
+        "distance": "10 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://marathonmuenchen.org/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "adac-marathon-hannover-2027",
+    "event_name": "ADAC Marathon Hannover",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.marathon-hannover.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.marathon-hannover.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "10K",
+        "distance": "10 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.marathon-hannover.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "uniper-marathon-dusseldorf-2027",
+    "event_name": "uniper Marathon Düsseldorf",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.uniper-duesseldorfmarathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.uniper-duesseldorfmarathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "vienna-city-marathon-2027",
+    "event_name": "Vienna City Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.vienna-marathon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.vienna-marathon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "valencia-marathon-trinidad-alfonso-zurich-2026",
+    "event_name": "Valencia Marathon Trinidad Alfonso Zurich",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.valenciaciudaddelrunning.com/en/marathon/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "tcs-amsterdam-marathon-2026",
+    "event_name": "TCS Amsterdam Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.tcsamsterdammarathon.eu/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "adidas-stockholm-marathon-2027",
+    "event_name": "adidas Stockholm Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.stockholmmarathon.se/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "edp-lisbon-marathon-2026",
+    "event_name": "EDP Lisbon Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://maratonalisboa.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://maratonalisboa.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "8K",
+        "distance": "8 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://maratonalisboa.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "valencia-half-marathon-trinidad-alfonso-zurich-2026",
+    "event_name": "Valencia Half Marathon Trinidad Alfonso Zurich",
+    "categories": [
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.valenciaciudaddelrunning.com/en/half/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "generali-berlin-half-marathon-2027",
+    "event_name": "Generali Berlin Half Marathon",
+    "categories": [
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.generali-berliner-halbmarathon.de/en/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "london-marathon-2027",
+    "event_name": "London Marathon",
+    "categories": [
+      {
+        "category_name": "Public Ballot",
+        "distance": "Marathon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.londonmarathonevents.co.uk/london-marathon",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-25"
+      }
+    ]
+  },
+  {
+    "event_slug": "nn-marathon-rotterdam-2026",
+    "event_name": "NN Marathon Rotterdam",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://nnmarathonrotterdam.nl/en/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "schneider-electric-marathon-de-paris-2026",
+    "event_name": "Schneider Electric Marathon de Paris",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.schneiderelectricparismarathon.com/en",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "vodafone-prague-marathon-2026",
+    "event_name": "Vodafone Prague Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.runczech.com/en/events/vodafone-prague-marathon-2026",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "barcelona-marathon-2027",
+    "event_name": "Barcelona Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.zurichmaratobarcelona.es/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "rome-marathon-2027",
+    "event_name": "Rome Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.runromethemarathon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "madrid-marathon-2027",
+    "event_name": "Madrid Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://rocknrollmadridrun.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://rocknrollmadridrun.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "10K",
+        "distance": "10 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://rocknrollmadridrun.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "dublin-marathon-2026",
+    "event_name": "Dublin Marathon",
+    "categories": [
+      {
+        "category_name": "Marathon",
+        "distance": "42.195 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://irishlifedublinmarathon.ie/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "hermannslauf-bielefeld-2026",
+    "event_name": "Hermannslauf Bielefeld",
+    "categories": [
+      {
+        "category_name": "Hermannslauf",
+        "distance": "31.1 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official page confirms date and course distance; entry fee was not published in the project data.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "11:00",
+        "cutoff": "To be confirmed",
+        "elevation": "~550 m",
+        "source_url": "https://hermannslauf.de/",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "zugspitz-ultratrail-2026",
+    "event_name": "Zugspitz Ultratrail",
+    "categories": [
+      {
+        "category_name": "ZUT100",
+        "distance": "107 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and sold-out status; entry fee is not published in the project data.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "20:00",
+        "cutoff": "27 h",
+        "elevation": "5280 m+",
+        "source_url": "https://zugspitz.utmb.world/races/zut100",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Ehrwald Trail",
+        "distance": "74 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and sold-out status; entry fee is not published in the project data.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "21:00",
+        "cutoff": "17 h",
+        "elevation": "3000 m+",
+        "source_url": "https://zugspitz.utmb.world/races/ehrwald-trail",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Leutasch Trail",
+        "distance": "69 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and sold-out status; entry fee is not published in the project data.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "05:00",
+        "cutoff": "16 h",
+        "elevation": "3140 m+",
+        "source_url": "https://zugspitz.utmb.world/races/leutasch-trail",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Mittenwald Trail",
+        "distance": "44 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and sold-out status; entry fee is not published in the project data.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "07:00",
+        "cutoff": "10 h",
+        "elevation": "2110 m+",
+        "source_url": "https://zugspitz.utmb.world/races/mittenwald-trail",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Garmisch-Partenkirchen Trail",
+        "distance": "29 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts; registration status and entry fee are not published in the project data.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "10:00",
+        "cutoff": "7 h",
+        "elevation": "1565 m+",
+        "source_url": "https://zugspitz.utmb.world/races/garmisch-partenkirchen-trail",
+        "source_label": "Official race page",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "hoka-utmb-mont-blanc-2026",
+    "event_name": "HOKA UTMB Mont-Blanc",
+    "categories": [
+      {
+        "category_name": "UTMB",
+        "distance": "174 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts; entry fee is not published in the project data.",
+        "registration_status": "Registrations closed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "17:45",
+        "cutoff": "46 h 45 min",
+        "elevation": "9900 m+",
+        "source_url": "https://montblanc.utmb.world/races/utmb",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "CCC",
+        "distance": "101 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts; entry fee is not published in the project data.",
+        "registration_status": "Registrations closed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "09:00",
+        "cutoff": "26 h 30 min",
+        "elevation": "6050 m+",
+        "source_url": "https://montblanc.utmb.world/races/ccc",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "TDS",
+        "distance": "145 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts; registration status and entry fee are not published in the project data.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "23:50",
+        "cutoff": "44 h 55 min",
+        "elevation": "9500 m+",
+        "source_url": "https://montblanc.utmb.world/races/tds",
+        "source_label": "Official race page",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "OCC",
+        "distance": "60 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts; entry fee is not published in the project data.",
+        "registration_status": "Registrations closed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "08:15",
+        "cutoff": "14 h 30 min",
+        "elevation": "3500 m+",
+        "source_url": "https://montblanc.utmb.world/races/occ",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2026",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "mozart-100-by-utmb-2027",
+    "event_name": "Mozart 100 by UTMB",
+    "categories": [
+      {
+        "category_name": "Mozart 100",
+        "distance": "119 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and opening-soon status; entry fee is not published in the project data.",
+        "registration_status": "Opening soon",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "05:00",
+        "cutoff": "23 h",
+        "elevation": "5700 m+",
+        "source_url": "https://mozart.utmb.world/races/mozart100",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2027",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "mozart Ultra",
+        "distance": "72 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and opening-soon status; entry fee is not published in the project data.",
+        "registration_status": "Opening soon",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "08:00",
+        "cutoff": "20 h",
+        "elevation": "3300 m+",
+        "source_url": "https://mozart.utmb.world/races/mozartultra",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2027",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "mozart Marathon",
+        "distance": "44 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and opening-soon status; entry fee is not published in the project data.",
+        "registration_status": "Opening soon",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "10:30",
+        "cutoff": "14 h",
+        "elevation": "1600 m+",
+        "source_url": "https://mozart.utmb.world/races/mozartmarathon",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2027",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "mozart Half Marathon",
+        "distance": "28 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official race page verifies route facts and opening-soon status; entry fee is not published in the project data.",
+        "registration_status": "Opening soon",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "11:30",
+        "cutoff": "13 h",
+        "elevation": "1100 m+",
+        "source_url": "https://mozart.utmb.world/races/mozarthalf",
+        "source_label": "Official race page",
+        "verification_status": "Verified 2027",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "transvulcania-2027",
+    "event_name": "Transvulcania",
+    "categories": [
+      {
+        "category_name": "Ultramarathon",
+        "distance": "Ultra distance",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://transvulcania.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Marathon",
+        "distance": "Marathon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://transvulcania.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "Half Marathon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://transvulcania.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Vertical Kilometer",
+        "distance": "Vertical KM",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://transvulcania.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "100-meilen-berlin-mauerweglauf-2026",
+    "event_name": "100 Meilen Berlin — Mauerweglauf",
+    "categories": [
+      {
+        "category_name": "100 Meilen Berlin",
+        "distance": "100 miles / 161 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.100meilen.de",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "challenge-roth-2026",
+    "event_name": "Challenge Roth",
+    "categories": [
+      {
+        "category_name": "Long Distance Triathlon",
+        "distance": "3.8 km swim / 180 km bike / 42.2 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.challenge-roth.com/de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-hamburg-european-championship-2026",
+    "event_name": "IRONMAN Hamburg European Championship",
+    "categories": [
+      {
+        "category_name": "General Entry",
+        "distance": "Full distance",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Organizer uses inventory-based pricing; exact fee should be checked on the official registration page.",
+        "registration_status": "Sold out",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "race_cutoff": "Not yet verified",
+        "withdrawal_deadline": "45 days withdrawal deadline",
+        "cutoff": "Not yet verified",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im-hamburg/register",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-29"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-frankfurt-2026",
+    "event_name": "IRONMAN Frankfurt",
+    "categories": [
+      {
+        "category_name": "General Entry",
+        "distance": "Full distance",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Official registration page shows sold-out inventory-based pricing, but no public fee value is exposed.",
+        "registration_status": "Sold out",
+        "registration_opens": "2025-07-03",
+        "registration_deadline": "Not published yet",
+        "start_time": "2025 reference: Pro start 06:20; age-group rolling start 06:35-07:00",
+        "race_cutoff": "2025 reference: 22:00 finish line cutoff",
+        "cutoff": "2025 reference: 22:00 finish line cutoff",
+        "swim_cutoff": "Not yet verified",
+        "bike_cutoff": "Not yet verified",
+        "run_cutoff": "Not yet verified",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im-frankfurt",
+        "source_label": "Official event website",
+        "verification_status": "Partially verified",
+        "last_checked": "2026-06-29"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-70-3-duisburg-2026",
+    "event_name": "IRONMAN 70.3 Duisburg",
+    "categories": [
+      {
+        "category_name": "IRONMAN 70.3",
+        "distance": "1.9 km swim / 90 km bike / 21.1 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im703-duisburg",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-70-3-leipzig-2026",
+    "event_name": "IRONMAN 70.3 Leipzig",
+    "categories": [
+      {
+        "category_name": "IRONMAN 70.3",
+        "distance": "1.9 km swim / 90 km bike / 21.1 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im703-leipzig",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-70-3-erkner-2026",
+    "event_name": "IRONMAN 70.3 Erkner",
+    "categories": [
+      {
+        "category_name": "IRONMAN 70.3",
+        "distance": "1.9 km swim / 90 km bike / 21.1 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im703-erkner",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-kaernten-klagenfurt-austria-2026",
+    "event_name": "IRONMAN Kaernten-Klagenfurt Austria",
+    "categories": [
+      {
+        "category_name": "IRONMAN",
+        "distance": "3.8 km swim / 180 km bike / 42.2 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im-austria",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-copenhagen-2026",
+    "event_name": "IRONMAN Copenhagen",
+    "categories": [
+      {
+        "category_name": "IRONMAN",
+        "distance": "3.8 km swim / 180 km bike / 42.2 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im-copenhagen",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-switzerland-thun-2026",
+    "event_name": "IRONMAN Switzerland Thun",
+    "categories": [
+      {
+        "category_name": "IRONMAN",
+        "distance": "3.8 km swim / 180 km bike / 42.2 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.ironman.com/races/im-switzerland",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "challenge-almere-amsterdam-2026",
+    "event_name": "Challenge Almere-Amsterdam",
+    "categories": [
+      {
+        "category_name": "Long Distance Triathlon",
+        "distance": "3.8 km swim / 180 km bike / 42.2 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://challenge-almere.com/challenge-almere-amsterdam/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "challenge-peguera-mallorca-2026",
+    "event_name": "Challenge Peguera Mallorca",
+    "categories": [
+      {
+        "category_name": "Middle Distance Triathlon",
+        "distance": "1.9 km swim / 90 km bike / 21.1 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://challenge-mallorca.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "challenge-kaiserwinkl-walchsee-2026",
+    "event_name": "Challenge Kaiserwinkl-Walchsee",
+    "categories": [
+      {
+        "category_name": "Middle Distance Triathlon",
+        "distance": "1.9 km swim / 90 km bike / 21.1 km run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://challenge-walchsee.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Aquabike",
+        "distance": "Swim / bike",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://challenge-walchsee.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Swim and Run",
+        "distance": "Swim / run",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://challenge-walchsee.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "bielefelder-triathlon-2026",
+    "event_name": "Bielefelder Triathlon",
+    "categories": [
+      {
+        "category_name": "Sprint",
+        "distance": "Sprint triathlon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.triathlon-bielefeld.de/anmeldung",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Relay",
+        "distance": "Relay",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.triathlon-bielefeld.de/anmeldung",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Youth",
+        "distance": "Youth race",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.triathlon-bielefeld.de/anmeldung",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "koln-triathlon-2026",
+    "event_name": "Köln Triathlon",
+    "categories": [
+      {
+        "category_name": "Sprint",
+        "distance": "Sprint triathlon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.koeln-triathlon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Olympic",
+        "distance": "Olympic distance",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.koeln-triathlon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Middle Distance",
+        "distance": "Middle distance",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.koeln-triathlon.com/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "suzuki-world-triathlon-hamburg-2026-2026",
+    "event_name": "SUZUKI World Triathlon Hamburg 2026",
+    "categories": [
+      {
+        "category_name": "Triathlon",
+        "distance": "Triathlon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "http://hamburg.triathlon.org/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "frankfurt-city-triathlon-2026",
+    "event_name": "Frankfurt City Triathlon",
+    "categories": [
+      {
+        "category_name": "Triathlon",
+        "distance": "Triathlon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "http://www.frankfurt-city-triathlon.de",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "o-see-challenge-dm-cross-triathlon-xterra-2026",
+    "event_name": "O-SEE Challenge/DM Cross Triathlon/XTERRA",
+    "categories": [
+      {
+        "category_name": "Cross Triathlon / XTERRA",
+        "distance": "Cross triathlon",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "http://www.o-see-challenge.de",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "barmer-currex-alsterlauf-hamburg-2026",
+    "event_name": "BARMER CURREX Alsterlauf Hamburg",
+    "categories": [
+      {
+        "category_name": "10K",
+        "distance": "10 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.alsterlauf-hamburg.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "5K",
+        "distance": "5 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.alsterlauf-hamburg.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "hella-hamburg-halbmarathon-2026",
+    "event_name": "hella hamburg halbmarathon",
+    "categories": [
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.hamburg-halbmarathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "haspa-halbmarathon-hamburg-2027",
+    "event_name": "Haspa Halbmarathon Hamburg",
+    "categories": [
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://haspa-marathon-hamburg.de/halbmarathon/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "kolner-halbmarathon-2026",
+    "event_name": "Kölner Halbmarathon",
+    "categories": [
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://koelner-halbmarathon.de/",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  },
+  {
+    "event_slug": "sportscheck-run-munchen-2026",
+    "event_name": "SportScheck RUN München",
+    "categories": [
+      {
+        "category_name": "5K",
+        "distance": "5 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.sportscheck.com/run.html",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "10K",
+        "distance": "10 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.sportscheck.com/run.html",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      },
+      {
+        "category_name": "Half Marathon",
+        "distance": "21.0975 km",
+        "fee_2025": "Unavailable",
+        "fee_2026": "Not published yet",
+        "fee_note": "Fee has not been verified from a public source yet.",
+        "registration_status": "To be confirmed",
+        "registration_opens": "To be confirmed",
+        "registration_deadline": "Not published yet",
+        "start_time": "To be confirmed",
+        "cutoff": "Unavailable",
+        "elevation": "Unavailable",
+        "source_url": "https://www.sportscheck.com/run.html",
+        "source_label": "Official event website",
+        "verification_status": "To be confirmed",
+        "last_checked": "2026-06-27"
+      }
+    ]
+  }
+]

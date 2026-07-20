@@ -1,0 +1,41 @@
+{
+  "name": "sport-event-map",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "python -m http.server 4173",
+    "check": "node tools/check-publish-readiness.js",
+    "sitemap": "node tools/generate-sitemap.js",
+    "prepare-package": "node tools/create-publish-package.js",
+    "dedupe": "node tools/dedupe-events-csv.js --input data/events.csv --out data/events.deduped.csv",
+    "duplicates:review": "node tools/find-duplicate-candidates.js",
+    "build-events": "node tools/build-event-table.js",
+    "geocode": "node tools/geocode-geoapify-batch.js --input data/events.csv --out data/events.geoapify.csv --limit 1000",
+    "audit:dates": "node tools/audit-event-dates.js",
+    "audit:events": "node tools/audit-event-dates.js && node tools/audit-event-geo.js",
+    "audit:geo": "node tools/audit-event-geo.js",
+    "audit:pins": "node tools/audit-event-geo.js",
+    "audit:layout": "node tools/check-responsive-layout.js",
+    "test:responsive": "node tools/check-responsive-layout.js",
+    "qa:layout": "node tools/check-responsive-layout.js",
+    "qa:responsive": "node tools/qa-responsive.js",
+    "audit:event-knowledge": "node tools/audit-event-knowledge.js",
+    "enrich:event-knowledge": "node tools/enrich-event-knowledge.js",
+    "research:event-knowledge": "node tools/research-event-knowledge.js",
+    "export:event-details": "node tools/export-event-detail-database.js",
+    "status-check": "node tools/verify-official-registration-pages.js data/events.csv data/events.status-checked.csv data/imports/review/events.status-review.csv data/imports/review/events.status-report.json 2000 6 12000",
+    "batch:validate": "node tools/validate-event-batch.js",
+    "review:beta": "node tools/create-beta-review-queue.js",
+    "audit:anon": "node tests/live-anon-access-audit.mjs",
+    "test:static": "node tests/static-beta-smoke.test.mjs",
+    "test:rls": "node tests/rls-security.test.mjs",
+    "test:e2e:install": "node tests/e2e/install-browsers.mjs",
+    "test:e2e": "node tests/e2e/run-playwright.mjs",
+    "test:e2e:headed": "node tests/e2e/run-playwright.mjs --headed",
+    "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
+    "test:all": "npm run check && npm run test:static && npm run audit:layout && npm run test:e2e"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
+  }
+}

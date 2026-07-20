@@ -1,0 +1,3066 @@
+{
+  "generated_at": "2026-07-03T10:22:18.752Z",
+  "source": "research:event-knowledge",
+  "total_tasks": 25,
+  "policy": {
+    "publish_directly": false,
+    "required_manual_review": true,
+    "public_rule": "Only accepted and verified records may later be exported with is_public=true."
+  },
+  "research_status": {
+    "job_id": "research-1783074138056",
+    "status": "completed",
+    "scope": "high",
+    "limit": 1,
+    "current_event": "",
+    "processed_events": 1,
+    "total_events": 1,
+    "found_fields": 1,
+    "errors": [],
+    "started_at": "2026-07-03T10:22:18.056Z",
+    "completed_at": "2026-07-03T10:22:18.749Z"
+  },
+  "tasks": [
+    {
+      "event_slug": "07-stadtholz-marathon-2026",
+      "event_name": "07. Stadtholz Marathon",
+      "date": "20.07.2026",
+      "city": "Rheda-Wiedenbrück",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.100-marathon-club.de/de/termine?page=3"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.100-marathon-club.de/de/termine?page=3",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.100-marathon-club.de/de/termine?page=3",
+          "suggested_value": "https://www.100-marathon-club.de/de/termine?page=3",
+          "source_url": "https://www.100-marathon-club.de/de/termine?page=3",
+          "source_title": "Lauftermine | 100MC",
+          "confidence": 0.72,
+          "verification_status": "needs_review",
+          "last_checked": "2026-07-03",
+          "source_excerpt": "Official/source URL from event database.",
+          "note": "Auto-researched candidate for sources. Manual review required before publishing."
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "07-stadtholz-marathon-2026",
+          "event_name": "07. Stadtholz Marathon",
+          "sport_type": "Running",
+          "date": "20.07.2026",
+          "city": "Rheda-Wiedenbrück",
+          "country": "Germany",
+          "official_website": "https://www.100-marathon-club.de/de/termine?page=3",
+          "registration_url": "https://www.100-marathon-club.de/de/termine?page=3",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {},
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [],
+        "faq": []
+      },
+      "created_at": "2026-07-03T10:22:18.748Z",
+      "event_id": "07-stadtholz-marathon-2026",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.100-marathon-club.de/de/termine?page=3",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "07-stadtholz-marathon-2026",
+          "event_slug": "07-stadtholz-marathon-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "event_id": "07-stadtholz-marathon-2026",
+          "event_slug": "07-stadtholz-marathon-2026",
+          "field_name": "sources",
+          "suggested_value": "https://www.100-marathon-club.de/de/termine?page=3",
+          "value": "https://www.100-marathon-club.de/de/termine?page=3",
+          "source_url": "https://www.100-marathon-club.de/de/termine?page=3",
+          "source_title": "Lauftermine | 100MC",
+          "confidence": 0.72,
+          "verification_status": "needs_review",
+          "last_checked": "2026-07-03",
+          "source_excerpt": "Official/source URL from event database.",
+          "note": "Auto-researched candidate for sources. Manual review required before publishing."
+        }
+      ]
+    },
+    {
+      "event_slug": "1-hannover-backyard-ultra-2026",
+      "event_name": "1. Hannover Backyard Ultra",
+      "date": "08.08.2026",
+      "city": "Hannover",
+      "country": "Germany",
+      "sport": "Ultramarathon",
+      "distance": "6.7 km, Backyard Ultra",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+        "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "source_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "1-hannover-backyard-ultra-2026",
+          "event_name": "1. Hannover Backyard Ultra",
+          "sport_type": "Ultramarathon",
+          "date": "08.08.2026",
+          "city": "Hannover",
+          "country": "Germany",
+          "official_website": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "registration_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.491Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "1-hannover-backyard-ultra-2026",
+          "event_slug": "1-hannover-backyard-ultra-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "source_url": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "1-hannover-backyard-ultra-2026",
+          "event_slug": "1-hannover-backyard-ultra-2026",
+          "suggested_value": "https://hannover-runners.de/sportangebot/veranstaltungen/hannover-backyard-ultra/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "1-westerwalder-backyard-ultra-2026",
+      "event_name": "1. Westerwälder Backyard Ultra",
+      "date": "05.06.2026",
+      "city": "Westerwald",
+      "country": "Germany",
+      "sport": "Ultramarathon",
+      "distance": "6.7 km, Backyard Ultra",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+        "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "source_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "1-westerwalder-backyard-ultra-2026",
+          "event_name": "1. Westerwälder Backyard Ultra",
+          "sport_type": "Ultramarathon",
+          "date": "05.06.2026",
+          "city": "Westerwald",
+          "country": "Germany",
+          "official_website": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "registration_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.491Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "1-westerwalder-backyard-ultra-2026",
+          "event_slug": "1-westerwalder-backyard-ultra-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "source_url": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "1-westerwalder-backyard-ultra-2026",
+          "event_slug": "1-westerwalder-backyard-ultra-2026",
+          "suggested_value": "https://katjas-laufzeit.de/westerwaelder-backyard-ultra-2026-ausschreibung/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "10-teiche-marathon-2026",
+      "event_name": "10 Teiche Marathon",
+      "date": "12.09.2026",
+      "city": "Hahnenklee",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "5 km, 10 km, Half Marathon, Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+        "https://www.harzer-wanderwochen.de/10-teiche-marathon"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "source_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "10-teiche-marathon-2026",
+          "event_name": "10 Teiche Marathon",
+          "sport_type": "Running",
+          "date": "12.09.2026",
+          "city": "Hahnenklee",
+          "country": "Germany",
+          "official_website": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "registration_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.492Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "10-teiche-marathon-2026",
+          "event_slug": "10-teiche-marathon-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "source_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "10-teiche-marathon-2026",
+          "event_slug": "10-teiche-marathon-2026",
+          "suggested_value": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "10-teiche-marathon-goslar-2026",
+      "event_name": "10-Teiche-Marathon - Goslar",
+      "date": "12.09.2026",
+      "city": "Goslar",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "5 km, 10 km, Half Marathon, Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.hahnenklee.de/spass/harzerwanderwochen",
+        "https://running.life/de/termine/teiche-marathon-hahnenklee"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-18",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "source_url": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-18",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "10-teiche-marathon-goslar-2026",
+          "event_name": "10-Teiche-Marathon - Goslar",
+          "sport_type": "Running",
+          "date": "12.09.2026",
+          "city": "Goslar",
+          "country": "Germany",
+          "official_website": "https://www.hahnenklee.de/spass/harzerwanderwochen",
+          "registration_url": "https://www.hahnenklee.de/spass/harzerwanderwochen",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+            "source_type": "official",
+            "last_verified": "2026-06-18",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.492Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-18",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "10-teiche-marathon-goslar-2026",
+          "event_slug": "10-teiche-marathon-goslar-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "source_url": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-18",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "10-teiche-marathon-goslar-2026",
+          "event_slug": "10-teiche-marathon-goslar-2026",
+          "suggested_value": "https://running.life/de/termine/teiche-marathon-hahnenklee",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "10-saarschleifenland-lauf-2026",
+      "event_name": "10. SaarschleifenLand-Lauf",
+      "date": "06.09.2026",
+      "city": "Merzig",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "5 km, 10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.merziger-sport-freizeitverein.de/",
+        "https://www.merziger-sport-freizeitverein.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.merziger-sport-freizeitverein.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.merziger-sport-freizeitverein.de/",
+          "source_url": "https://www.merziger-sport-freizeitverein.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.merziger-sport-freizeitverein.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "10-saarschleifenland-lauf-2026",
+          "event_name": "10. SaarschleifenLand-Lauf",
+          "sport_type": "Running",
+          "date": "06.09.2026",
+          "city": "Merzig",
+          "country": "Germany",
+          "official_website": "https://www.merziger-sport-freizeitverein.de/",
+          "registration_url": "https://www.merziger-sport-freizeitverein.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.merziger-sport-freizeitverein.de/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.492Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.merziger-sport-freizeitverein.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "10-saarschleifenland-lauf-2026",
+          "event_slug": "10-saarschleifenland-lauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.merziger-sport-freizeitverein.de/",
+          "source_url": "https://www.merziger-sport-freizeitverein.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "10-saarschleifenland-lauf-2026",
+          "event_slug": "10-saarschleifenland-lauf-2026",
+          "suggested_value": "https://www.merziger-sport-freizeitverein.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "100-meilen-berlin-mauerweglauf-2026",
+      "event_name": "100 Meilen Berlin — Mauerweglauf",
+      "date": "15.08.2026",
+      "city": "Berlin",
+      "country": "Germany",
+      "sport": "Ultramarathon",
+      "distance": "100 Miles / 161 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.100meilen.de",
+        "https://www.100meilen.de"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.100meilen.de",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.100meilen.de",
+          "source_url": "https://www.100meilen.de",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.100meilen.de",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "100-meilen-berlin-mauerweglauf-2026",
+          "event_name": "100 Meilen Berlin — Mauerweglauf",
+          "sport_type": "Ultramarathon",
+          "date": "15.08.2026",
+          "city": "Berlin",
+          "country": "Germany",
+          "official_website": "https://www.100meilen.de",
+          "registration_url": "https://www.100meilen.de",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.100meilen.de",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.492Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.100meilen.de",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "100-meilen-berlin-mauerweglauf-2026",
+          "event_slug": "100-meilen-berlin-mauerweglauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.100meilen.de",
+          "source_url": "https://www.100meilen.de",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "100-meilen-berlin-mauerweglauf-2026",
+          "event_slug": "100-meilen-berlin-mauerweglauf-2026",
+          "suggested_value": "https://www.100meilen.de",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "12-cross-against-cancer-2026",
+      "event_name": "12. Cross against Cancer",
+      "date": "13.09.2026",
+      "city": "Homburg",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "5 km, 10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+        "https://www.miteinander-gegen-krebs.de/cross-against-cancer"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "source_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "12-cross-against-cancer-2026",
+          "event_name": "12. Cross against Cancer",
+          "sport_type": "Running",
+          "date": "13.09.2026",
+          "city": "Homburg",
+          "country": "Germany",
+          "official_website": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "registration_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.493Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "12-cross-against-cancer-2026",
+          "event_slug": "12-cross-against-cancer-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "source_url": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "12-cross-against-cancer-2026",
+          "event_slug": "12-cross-against-cancer-2026",
+          "suggested_value": "https://www.miteinander-gegen-krebs.de/cross-against-cancer",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "13-heilwald-marathon-2026",
+      "event_name": "13. Heilwald Marathon",
+      "date": "24.07.2026",
+      "city": "Bad Lippspringe",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+        "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "source_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "13-heilwald-marathon-2026",
+          "event_name": "13. Heilwald Marathon",
+          "sport_type": "Running",
+          "date": "24.07.2026",
+          "city": "Bad Lippspringe",
+          "country": "Germany",
+          "official_website": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "registration_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.493Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "13-heilwald-marathon-2026",
+          "event_slug": "13-heilwald-marathon-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "source_url": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "13-heilwald-marathon-2026",
+          "event_slug": "13-heilwald-marathon-2026",
+          "suggested_value": "https://www.marathonsammlerberndneumann.com/marathonveranstaltungen/heilwald/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "14-stadtlauf-des-tsv-neustadt-2026",
+      "event_name": "14. Stadtlauf des TSV Neustadt",
+      "date": "07.06.2026",
+      "city": "Neustadt am Rübenberge",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+        "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "source_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "14-stadtlauf-des-tsv-neustadt-2026",
+          "event_name": "14. Stadtlauf des TSV Neustadt",
+          "sport_type": "Running",
+          "date": "07.06.2026",
+          "city": "Neustadt am Rübenberge",
+          "country": "Germany",
+          "official_website": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "registration_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.493Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "14-stadtlauf-des-tsv-neustadt-2026",
+          "event_slug": "14-stadtlauf-des-tsv-neustadt-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "source_url": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "14-stadtlauf-des-tsv-neustadt-2026",
+          "event_slug": "14-stadtlauf-des-tsv-neustadt-2026",
+          "suggested_value": "https://www.tsv-neustadt.net/service/stadtlauf-tsv-neustadt",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "15-brunsberglauf-2026",
+      "event_name": "15. Brunsberglauf",
+      "date": "06.09.2026",
+      "city": "Buchholz in der Nordheide",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 11.7 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.brunsberglauf.de/",
+        "https://www.brunsberglauf.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.brunsberglauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.brunsberglauf.de/",
+          "source_url": "https://www.brunsberglauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.brunsberglauf.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "15-brunsberglauf-2026",
+          "event_name": "15. Brunsberglauf",
+          "sport_type": "Running",
+          "date": "06.09.2026",
+          "city": "Buchholz in der Nordheide",
+          "country": "Germany",
+          "official_website": "https://www.brunsberglauf.de/",
+          "registration_url": "https://www.brunsberglauf.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.brunsberglauf.de/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.493Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.brunsberglauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "15-brunsberglauf-2026",
+          "event_slug": "15-brunsberglauf-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.brunsberglauf.de/",
+          "source_url": "https://www.brunsberglauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "15-brunsberglauf-2026",
+          "event_slug": "15-brunsberglauf-2026",
+          "suggested_value": "https://www.brunsberglauf.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "15-fullestrand-ultramarathon-2026",
+      "event_name": "15. Fullestrand-Ultramarathon",
+      "date": "13.06.2026",
+      "city": "Hesse",
+      "country": "Germany",
+      "sport": "Ultramarathon",
+      "distance": "50 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+        "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "source_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "15-fullestrand-ultramarathon-2026",
+          "event_name": "15. Fullestrand-Ultramarathon",
+          "sport_type": "Ultramarathon",
+          "date": "13.06.2026",
+          "city": "Hesse",
+          "country": "Germany",
+          "official_website": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "registration_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.494Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "15-fullestrand-ultramarathon-2026",
+          "event_slug": "15-fullestrand-ultramarathon-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "source_url": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "15-fullestrand-ultramarathon-2026",
+          "event_slug": "15-fullestrand-ultramarathon-2026",
+          "suggested_value": "https://laufwerk-kassel.webnode.page/lwk/fullestrand-ultra/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "17-klingenthal-salzkotten-marathon-2026",
+      "event_name": "17. Klingenthal Salzkotten Marathon",
+      "date": "07.06.2026",
+      "city": "Paderborn",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Marathon, Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://salzkotten-marathon.de/",
+        "https://salzkotten-marathon.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://salzkotten-marathon.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://salzkotten-marathon.de/",
+          "source_url": "https://salzkotten-marathon.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://salzkotten-marathon.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "17-klingenthal-salzkotten-marathon-2026",
+          "event_name": "17. Klingenthal Salzkotten Marathon",
+          "sport_type": "Running",
+          "date": "07.06.2026",
+          "city": "Paderborn",
+          "country": "Germany",
+          "official_website": "https://salzkotten-marathon.de/",
+          "registration_url": "https://salzkotten-marathon.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://salzkotten-marathon.de/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.494Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://salzkotten-marathon.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "17-klingenthal-salzkotten-marathon-2026",
+          "event_slug": "17-klingenthal-salzkotten-marathon-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://salzkotten-marathon.de/",
+          "source_url": "https://salzkotten-marathon.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "17-klingenthal-salzkotten-marathon-2026",
+          "event_slug": "17-klingenthal-salzkotten-marathon-2026",
+          "suggested_value": "https://salzkotten-marathon.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "2-jenaer-backyard-ultra-2026",
+      "event_name": "2. Jenaer Backyard Ultra",
+      "date": "06.06.2026",
+      "city": "Jena",
+      "country": "Germany",
+      "sport": "Ultramarathon",
+      "distance": "6.7 km, Backyard Ultra",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://jenaerbackyardultra.de/",
+        "https://jenaerbackyardultra.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://jenaerbackyardultra.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://jenaerbackyardultra.de/",
+          "source_url": "https://jenaerbackyardultra.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://jenaerbackyardultra.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "2-jenaer-backyard-ultra-2026",
+          "event_name": "2. Jenaer Backyard Ultra",
+          "sport_type": "Ultramarathon",
+          "date": "06.06.2026",
+          "city": "Jena",
+          "country": "Germany",
+          "official_website": "https://jenaerbackyardultra.de/",
+          "registration_url": "https://jenaerbackyardultra.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://jenaerbackyardultra.de/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.494Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://jenaerbackyardultra.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "2-jenaer-backyard-ultra-2026",
+          "event_slug": "2-jenaer-backyard-ultra-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://jenaerbackyardultra.de/",
+          "source_url": "https://jenaerbackyardultra.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "2-jenaer-backyard-ultra-2026",
+          "event_slug": "2-jenaer-backyard-ultra-2026",
+          "suggested_value": "https://jenaerbackyardultra.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "20-muggelsee-halbmarathon-2026",
+      "event_name": "20. Müggelsee-Halbmarathon",
+      "date": "18.10.2026",
+      "city": "Müggelsee-Gebiet",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://ww-sport.de/mueggelsee_hm/",
+        "https://ww-sport.de/mueggelsee_hm/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://ww-sport.de/mueggelsee_hm/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://ww-sport.de/mueggelsee_hm/",
+          "source_url": "https://ww-sport.de/mueggelsee_hm/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://ww-sport.de/mueggelsee_hm/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "20-muggelsee-halbmarathon-2026",
+          "event_name": "20. Müggelsee-Halbmarathon",
+          "sport_type": "Running",
+          "date": "18.10.2026",
+          "city": "Müggelsee-Gebiet",
+          "country": "Germany",
+          "official_website": "https://ww-sport.de/mueggelsee_hm/",
+          "registration_url": "https://ww-sport.de/mueggelsee_hm/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://ww-sport.de/mueggelsee_hm/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.494Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://ww-sport.de/mueggelsee_hm/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "20-muggelsee-halbmarathon-2026",
+          "event_slug": "20-muggelsee-halbmarathon-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://ww-sport.de/mueggelsee_hm/",
+          "source_url": "https://ww-sport.de/mueggelsee_hm/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "20-muggelsee-halbmarathon-2026",
+          "event_slug": "20-muggelsee-halbmarathon-2026",
+          "suggested_value": "https://ww-sport.de/mueggelsee_hm/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "21-wutzseelauf-2026",
+      "event_name": "21. Wutzseelauf",
+      "date": "11.10.2026",
+      "city": "Lindow",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+        "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "source_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "21-wutzseelauf-2026",
+          "event_name": "21. Wutzseelauf",
+          "sport_type": "Running",
+          "date": "11.10.2026",
+          "city": "Lindow",
+          "country": "Germany",
+          "official_website": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "registration_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.494Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "21-wutzseelauf-2026",
+          "event_slug": "21-wutzseelauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "source_url": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "21-wutzseelauf-2026",
+          "event_slug": "21-wutzseelauf-2026",
+          "suggested_value": "https://www.esab-ausbildung.de/startseite/wutzseelauf-lindow/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "24-stunden-burginsellauf-delmenhorst-2026",
+      "event_name": "24-Stunden-Burginsellauf Delmenhorst",
+      "date": "27.06.2026",
+      "city": "Delmenhorst",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "24h Ultramarathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.24-lauf.de/",
+        "https://www.24-lauf.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.24-lauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.24-lauf.de/",
+          "source_url": "https://www.24-lauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.24-lauf.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "24-stunden-burginsellauf-delmenhorst-2026",
+          "event_name": "24-Stunden-Burginsellauf Delmenhorst",
+          "sport_type": "Running",
+          "date": "27.06.2026",
+          "city": "Delmenhorst",
+          "country": "Germany",
+          "official_website": "https://www.24-lauf.de/",
+          "registration_url": "https://www.24-lauf.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.24-lauf.de/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.495Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.24-lauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "24-stunden-burginsellauf-delmenhorst-2026",
+          "event_slug": "24-stunden-burginsellauf-delmenhorst-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.24-lauf.de/",
+          "source_url": "https://www.24-lauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "24-stunden-burginsellauf-delmenhorst-2026",
+          "event_slug": "24-stunden-burginsellauf-delmenhorst-2026",
+          "suggested_value": "https://www.24-lauf.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "25-benther-berg-lauf-2026",
+      "event_name": "25. Benther-Berg-Lauf",
+      "date": "03.10.2026",
+      "city": "Ronnenberg-Benthe",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+        "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "source_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "25-benther-berg-lauf-2026",
+          "event_name": "25. Benther-Berg-Lauf",
+          "sport_type": "Running",
+          "date": "03.10.2026",
+          "city": "Ronnenberg-Benthe",
+          "country": "Germany",
+          "official_website": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "registration_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.495Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "25-benther-berg-lauf-2026",
+          "event_slug": "25-benther-berg-lauf-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "source_url": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "25-benther-berg-lauf-2026",
+          "event_slug": "25-benther-berg-lauf-2026",
+          "suggested_value": "https://vsv-benthe.de/vsv-sportarten/benther-berg-lauf/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "28-hiddestorfer-rubenlauf-2026",
+      "event_name": "28. Hiddestorfer Rübenlauf",
+      "date": "20.09.2026",
+      "city": "Hiddestorf",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.ruebenlauf.de/",
+        "https://www.ruebenlauf.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.ruebenlauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.ruebenlauf.de/",
+          "source_url": "https://www.ruebenlauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.ruebenlauf.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "28-hiddestorfer-rubenlauf-2026",
+          "event_name": "28. Hiddestorfer Rübenlauf",
+          "sport_type": "Running",
+          "date": "20.09.2026",
+          "city": "Hiddestorf",
+          "country": "Germany",
+          "official_website": "https://www.ruebenlauf.de/",
+          "registration_url": "https://www.ruebenlauf.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.ruebenlauf.de/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.495Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.ruebenlauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "28-hiddestorfer-rubenlauf-2026",
+          "event_slug": "28-hiddestorfer-rubenlauf-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.ruebenlauf.de/",
+          "source_url": "https://www.ruebenlauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "28-hiddestorfer-rubenlauf-2026",
+          "event_slug": "28-hiddestorfer-rubenlauf-2026",
+          "suggested_value": "https://www.ruebenlauf.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "30-lauf-um-den-arendsee-2026",
+      "event_name": "30. Lauf um den Arendsee",
+      "date": "30.08.2026",
+      "city": "Saxony-Anhalt",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+        "https://kersten-friedrich-events.com/lauf-um-den-arendsee/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "source_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "30-lauf-um-den-arendsee-2026",
+          "event_name": "30. Lauf um den Arendsee",
+          "sport_type": "Running",
+          "date": "30.08.2026",
+          "city": "Saxony-Anhalt",
+          "country": "Germany",
+          "official_website": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "registration_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.495Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "30-lauf-um-den-arendsee-2026",
+          "event_slug": "30-lauf-um-den-arendsee-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "source_url": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "30-lauf-um-den-arendsee-2026",
+          "event_slug": "30-lauf-um-den-arendsee-2026",
+          "suggested_value": "https://kersten-friedrich-events.com/lauf-um-den-arendsee/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "31-geiseltalseelauf-2026",
+      "event_name": "31. Geiseltalseelauf",
+      "date": "03.10.2026",
+      "city": "Braunsbedra",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.geiseltalseelauf.de/",
+        "https://www.geiseltalseelauf.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.geiseltalseelauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.geiseltalseelauf.de/",
+          "source_url": "https://www.geiseltalseelauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.geiseltalseelauf.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "31-geiseltalseelauf-2026",
+          "event_name": "31. Geiseltalseelauf",
+          "sport_type": "Running",
+          "date": "03.10.2026",
+          "city": "Braunsbedra",
+          "country": "Germany",
+          "official_website": "https://www.geiseltalseelauf.de/",
+          "registration_url": "https://www.geiseltalseelauf.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.geiseltalseelauf.de/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.495Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.geiseltalseelauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "31-geiseltalseelauf-2026",
+          "event_slug": "31-geiseltalseelauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.geiseltalseelauf.de/",
+          "source_url": "https://www.geiseltalseelauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "31-geiseltalseelauf-2026",
+          "event_slug": "31-geiseltalseelauf-2026",
+          "suggested_value": "https://www.geiseltalseelauf.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "32-bismarckturmlauf-2026",
+      "event_name": "32. Bismarckturmlauf",
+      "date": "03.10.2026",
+      "city": "Neustadt an der Orla",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "5 km, 10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.bismarckturmlauf-neustadt.de/",
+        "https://www.bismarckturmlauf-neustadt.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.bismarckturmlauf-neustadt.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.bismarckturmlauf-neustadt.de/",
+          "source_url": "https://www.bismarckturmlauf-neustadt.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.bismarckturmlauf-neustadt.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "32-bismarckturmlauf-2026",
+          "event_name": "32. Bismarckturmlauf",
+          "sport_type": "Running",
+          "date": "03.10.2026",
+          "city": "Neustadt an der Orla",
+          "country": "Germany",
+          "official_website": "https://www.bismarckturmlauf-neustadt.de/",
+          "registration_url": "https://www.bismarckturmlauf-neustadt.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.bismarckturmlauf-neustadt.de/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.496Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.bismarckturmlauf-neustadt.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "32-bismarckturmlauf-2026",
+          "event_slug": "32-bismarckturmlauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.bismarckturmlauf-neustadt.de/",
+          "source_url": "https://www.bismarckturmlauf-neustadt.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "32-bismarckturmlauf-2026",
+          "event_slug": "32-bismarckturmlauf-2026",
+          "suggested_value": "https://www.bismarckturmlauf-neustadt.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "35-speller-sparkassen-sommernachtslauf-2026",
+      "event_name": "35. Speller Sparkassen-Sommernachtslauf",
+      "date": "14.08.2026",
+      "city": "Spelle",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+        "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "source_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "35-speller-sparkassen-sommernachtslauf-2026",
+          "event_name": "35. Speller Sparkassen-Sommernachtslauf",
+          "sport_type": "Running",
+          "date": "14.08.2026",
+          "city": "Spelle",
+          "country": "Germany",
+          "official_website": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "registration_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.496Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "35-speller-sparkassen-sommernachtslauf-2026",
+          "event_slug": "35-speller-sparkassen-sommernachtslauf-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "source_url": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "35-speller-sparkassen-sommernachtslauf-2026",
+          "event_slug": "35-speller-sparkassen-sommernachtslauf-2026",
+          "suggested_value": "https://www.scsv.de/abteilung/laufen--leichtathletik/sommernachtslauf",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "36-ratzeburger-adventslauf-2026",
+      "event_name": "36. Ratzeburger Adventslauf",
+      "date": "29.11.2026",
+      "city": "Ratzeburg",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "10 km, Half Marathon",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "https://www.adventslauf.de/",
+        "https://www.adventslauf.de/"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "unclear",
+          "source_url": "https://www.adventslauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "https://www.adventslauf.de/",
+          "source_url": "https://www.adventslauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "https://www.adventslauf.de/",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "36-ratzeburger-adventslauf-2026",
+          "event_name": "36. Ratzeburger Adventslauf",
+          "sport_type": "Running",
+          "date": "29.11.2026",
+          "city": "Ratzeburg",
+          "country": "Germany",
+          "official_website": "https://www.adventslauf.de/",
+          "registration_url": "https://www.adventslauf.de/",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "unclear"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "https://www.adventslauf.de/",
+            "source_type": "official",
+            "last_verified": "2026-06-17",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.496Z",
+      "proposals": [
+        {
+          "value": "unclear",
+          "source_url": "https://www.adventslauf.de/",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "36-ratzeburger-adventslauf-2026",
+          "event_slug": "36-ratzeburger-adventslauf-2026",
+          "suggested_value": "unclear",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "https://www.adventslauf.de/",
+          "source_url": "https://www.adventslauf.de/",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "2026-06-17",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "36-ratzeburger-adventslauf-2026",
+          "event_slug": "36-ratzeburger-adventslauf-2026",
+          "suggested_value": "https://www.adventslauf.de/",
+          "source_title": "Existing review source"
+        }
+      ]
+    },
+    {
+      "event_slug": "38-volkslauf-des-tsv-breuna-2026",
+      "event_name": "38. Volkslauf des TSV Breuna",
+      "date": "06.09.2026",
+      "city": "Hesse",
+      "country": "Germany",
+      "sport": "Running",
+      "distance": "Halbmarathon, 10 km, 5 km",
+      "priority": "high",
+      "completion_score": 0,
+      "missing_fields": [
+        "entry_fee",
+        "registration_status",
+        "registration_deadline",
+        "start_time",
+        "cutoff",
+        "elevation",
+        "course_info",
+        "race_day_info",
+        "travel_info",
+        "weather_info",
+        "statistics",
+        "faq",
+        "sources"
+      ],
+      "research_sources": [
+        "http://www.tsv-breuna.de/leichtathletik",
+        "http://www.tsv-breuna.de/leichtathletik"
+      ],
+      "instructions": [
+        "Use official organizer pages first.",
+        "Add values only when a source_url is available.",
+        "Mark uncertain values as needs_review.",
+        "Keep is_public=false until manual approval in the Admin Knowledge workflow."
+      ],
+      "fields": {
+        "registration_status": {
+          "value": "registration_open",
+          "source_url": "http://www.tsv-breuna.de/leichtathletik",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        "sources": {
+          "value": "http://www.tsv-breuna.de/leichtathletik",
+          "source_url": "http://www.tsv-breuna.de/leichtathletik",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "suggested_value": "http://www.tsv-breuna.de/leichtathletik",
+          "source_title": "Existing review source"
+        }
+      },
+      "supabase_payload": {
+        "details": {
+          "event_slug": "38-volkslauf-des-tsv-breuna-2026",
+          "event_name": "38. Volkslauf des TSV Breuna",
+          "sport_type": "Running",
+          "date": "06.09.2026",
+          "city": "Hesse",
+          "country": "Germany",
+          "official_website": "http://www.tsv-breuna.de/leichtathletik",
+          "registration_url": "http://www.tsv-breuna.de/leichtathletik",
+          "verification_status": "needs_review",
+          "is_public": false,
+          "last_checked": "2026-07-03"
+        },
+        "registration": {
+          "registration_status": "registration_open"
+        },
+        "course": {},
+        "race_day": {},
+        "travel": {},
+        "weather": {},
+        "statistics": {},
+        "editorial": {},
+        "sources": [
+          {
+            "source_label": "Research seed source",
+            "source_url": "http://www.tsv-breuna.de/leichtathletik",
+            "source_type": "official",
+            "last_verified": "02.06.2026",
+            "confidence_score": 0.7,
+            "verification_note": "Seed source from data/events.csv. Use this as the first research source."
+          }
+        ],
+        "faq": []
+      },
+      "created_at": "2026-07-03T09:46:45.496Z",
+      "proposals": [
+        {
+          "value": "registration_open",
+          "source_url": "http://www.tsv-breuna.de/leichtathletik",
+          "confidence": 0.65,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Imported from data/events.csv registration status. Requires manual confirmation before publishing.",
+          "field_name": "registration_status",
+          "event_id": "38-volkslauf-des-tsv-breuna-2026",
+          "event_slug": "38-volkslauf-des-tsv-breuna-2026",
+          "suggested_value": "registration_open",
+          "source_title": "Existing review source"
+        },
+        {
+          "value": "http://www.tsv-breuna.de/leichtathletik",
+          "source_url": "http://www.tsv-breuna.de/leichtathletik",
+          "confidence": 0.7,
+          "verification_status": "needs_review",
+          "last_checked": "02.06.2026",
+          "note": "Seed source from data/events.csv. Use this as the first research source.",
+          "field_name": "sources",
+          "event_id": "38-volkslauf-des-tsv-breuna-2026",
+          "event_slug": "38-volkslauf-des-tsv-breuna-2026",
+          "suggested_value": "http://www.tsv-breuna.de/leichtathletik",
+          "source_title": "Existing review source"
+        }
+      ]
+    }
+  ]
+}

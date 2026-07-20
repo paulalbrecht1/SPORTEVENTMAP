@@ -1,0 +1,423 @@
+[
+  {
+    "category": "Major German Marathons",
+    "official_name": "BMW Berlin Marathon",
+    "city": "Berlin",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Berlin Marathon",
+      "BMW BERLIN-MARATHON"
+    ],
+    "official_website": "https://www.bmw-berlin-marathon.com/",
+    "notes": "Major German marathon; official website should be the SCC/BMW Berlin Marathon site."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Haspa Marathon Hamburg",
+    "city": "Hamburg",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Hamburg Marathon",
+      "Haspa Marathon"
+    ],
+    "official_website": "https://haspa-marathon-hamburg.de/",
+    "notes": "Major German spring marathon."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Mainova Frankfurt Marathon",
+    "city": "Frankfurt am Main",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Frankfurt Marathon",
+      "Mainova Frankfurt"
+    ],
+    "official_website": "https://www.frankfurt-marathon.com/",
+    "notes": "Major German autumn marathon."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Generali Cologne Marathon",
+    "city": "Cologne",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Cologne Marathon",
+      "Köln Marathon",
+      "Koeln Marathon",
+      "Generali Köln Marathon"
+    ],
+    "official_website": "https://www.koeln-marathon.de/",
+    "notes": "Keep one clean record for Cologne Marathon; avoid duplicate naming variants."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Marathon M?nchen by Brooks",
+    "city": "M?nchen",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "M?nchen Marathon",
+      "Munich Marathon",
+      "Marathon M?nchen by Brooks"
+    ],
+    "official_website": "https://marathonmuenchen.org/",
+    "notes": "Major German marathon; current official naming uses Marathon Muenchen by Brooks."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Hannover Marathon",
+    "city": "Hannover",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Hannover Marathon",
+      "Hanover Marathon",
+      "ADAC Marathon Hannover"
+    ],
+    "official_website": "https://www.marathon-hannover.de/",
+    "notes": "Major German marathon."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Düsseldorf Marathon",
+    "city": "Düsseldorf",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Düsseldorf Marathon",
+      "Duesseldorf Marathon"
+    ],
+    "official_website": "https://www.duesseldorf-marathon.de/",
+    "notes": "Priority German marathon; verify current edition and official site before launch."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Leipzig Marathon",
+    "city": "Leipzig",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Leipzig Marathon"
+    ],
+    "official_website": "https://www.leipzigmarathon.de/",
+    "notes": "Important German city marathon."
+  },
+  {
+    "category": "Major German Marathons",
+    "official_name": "Volksbank Münster Marathon",
+    "city": "Münster",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Münster Marathon",
+      "Muenster Marathon",
+      "Volksbank Münster Marathon"
+    ],
+    "official_website": "https://www.volksbank-muenster-marathon.de/",
+    "notes": "Important NRW marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "TCS Amsterdam Marathon",
+    "city": "Amsterdam",
+    "country": "Netherlands",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Amsterdam Marathon",
+      "TCS Amsterdam Marathon"
+    ],
+    "official_website": "https://www.tcsamsterdammarathon.eu/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "NN Marathon Rotterdam",
+    "city": "Rotterdam",
+    "country": "Netherlands",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Rotterdam Marathon",
+      "NN Marathon Rotterdam"
+    ],
+    "official_website": "https://www.nnmarathonrotterdam.org/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "Schneider Electric Marathon de Paris",
+    "city": "Paris",
+    "country": "France",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Paris Marathon",
+      "Marathon de Paris"
+    ],
+    "official_website": "https://www.schneiderelectricparismarathon.com/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "TCS London Marathon",
+    "city": "London",
+    "country": "United Kingdom",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "London Marathon",
+      "TCS London Marathon"
+    ],
+    "official_website": "https://www.tcslondonmarathon.com/",
+    "notes": "World Marathon Majors event."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "Vienna City Marathon",
+    "city": "Vienna",
+    "country": "Austria",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Vienna City Marathon",
+      "Wien Marathon"
+    ],
+    "official_website": "https://www.vienna-marathon.com/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "Prague International Marathon",
+    "city": "Prague",
+    "country": "Czech Republic",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Prague Marathon",
+      "Prague International Marathon"
+    ],
+    "official_website": "https://www.runczech.com/",
+    "notes": "Major European marathon; verify specific event page during review."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "Valencia Marathon Trinidad Alfonso",
+    "city": "Valencia",
+    "country": "Spain",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Valencia Marathon",
+      "Maratón Valencia"
+    ],
+    "official_website": "https://www.valenciaciudaddelrunning.com/en/marathon/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major European Marathons",
+    "official_name": "Copenhagen Marathon",
+    "city": "Copenhagen",
+    "country": "Denmark",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Copenhagen Marathon"
+    ],
+    "official_website": "https://copenhagenmarathon.dk/",
+    "notes": "Major European marathon."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "Jungfrau Marathon",
+    "city": "Interlaken",
+    "country": "Switzerland",
+    "sport_type": "Trail Running",
+    "expected_aliases": [
+      "Jungfrau Marathon"
+    ],
+    "official_website": "https://www.jungfrau-marathon.ch/",
+    "notes": "Important alpine marathon."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "Zermatt Marathon",
+    "city": "Zermatt",
+    "country": "Switzerland",
+    "sport_type": "Trail Running",
+    "expected_aliases": [
+      "Zermatt Marathon",
+      "Gornergrat Zermatt Marathon"
+    ],
+    "official_website": "https://www.zermattmarathon.ch/",
+    "notes": "Important alpine marathon."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "Zugspitz Ultratrail",
+    "city": "Garmisch-Partenkirchen",
+    "country": "Germany",
+    "sport_type": "Ultramarathon",
+    "expected_aliases": [
+      "Zugspitz Ultratrail",
+      "ZUT"
+    ],
+    "official_website": "https://zugspitz-ultratrail.com/",
+    "notes": "Major German trail/ultra event."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "Mozart 100 by UTMB",
+    "city": "Salzburg",
+    "country": "Austria",
+    "sport_type": "Ultramarathon",
+    "expected_aliases": [
+      "Mozart 100",
+      "Mozart 100 by UTMB"
+    ],
+    "official_website": "https://mozart.utmb.world/",
+    "notes": "Major Austrian ultra/trail event."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "Transvulcania",
+    "city": "La Palma",
+    "country": "Spain",
+    "sport_type": "Ultramarathon",
+    "expected_aliases": [
+      "Transvulcania",
+      "Transvulcania Ultramarathon"
+    ],
+    "official_website": "https://transvulcania.com/",
+    "notes": "Major European trail/ultra event."
+  },
+  {
+    "category": "Major trail/ultra events",
+    "official_name": "UTMB Mont-Blanc",
+    "city": "Chamonix",
+    "country": "France",
+    "sport_type": "Ultramarathon",
+    "expected_aliases": [
+      "UTMB",
+      "UTMB Mont-Blanc",
+      "Ultra-Trail du Mont-Blanc"
+    ],
+    "official_website": "https://montblanc.utmb.world/",
+    "notes": "Treat UTMB, CCC and OCC carefully; avoid duplicate event variants unless distances are intentionally separate."
+  },
+  {
+    "category": "Major triathlons",
+    "official_name": "DATEV Challenge Roth",
+    "city": "Roth",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Challenge Roth",
+      "DATEV Challenge Roth"
+    ],
+    "official_website": "https://www.challenge-roth.com/",
+    "notes": "Major long-distance triathlon."
+  },
+  {
+    "category": "Major triathlons",
+    "official_name": "Ironman Hamburg",
+    "city": "Hamburg",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Ironman Hamburg",
+      "IRONMAN Hamburg"
+    ],
+    "official_website": "https://www.ironman.com/im-hamburg",
+    "notes": "Major German Ironman event."
+  },
+  {
+    "category": "Major triathlons",
+    "official_name": "Ironman Frankfurt",
+    "city": "Frankfurt am Main",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Ironman Frankfurt",
+      "IRONMAN Frankfurt",
+      "Ironman European Championship Frankfurt"
+    ],
+    "official_website": "https://www.ironman.com/im-frankfurt",
+    "notes": "Major German Ironman event."
+  },
+  {
+    "category": "Major triathlons",
+    "official_name": "Ironman 70.3 Duisburg",
+    "city": "Duisburg",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Ironman 70.3 Duisburg",
+      "IRONMAN 70.3 Duisburg"
+    ],
+    "official_website": "https://www.ironman.com/im703-duisburg",
+    "notes": "Important NRW middle-distance triathlon."
+  },
+  {
+    "category": "Major triathlons",
+    "official_name": "Ironman 70.3 Erkner",
+    "city": "Erkner",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Ironman 70.3 Erkner",
+      "IRONMAN 70.3 Erkner"
+    ],
+    "official_website": "https://www.ironman.com/im703-erkner",
+    "notes": "Important German middle-distance triathlon."
+  },
+  {
+    "category": "Important German local classics",
+    "official_name": "Hermannslauf Bielefeld",
+    "city": "Bielefeld",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Hermannslauf",
+      "Hermannslauf Bielefeld"
+    ],
+    "official_website": "https://www.hermannslauf.de/",
+    "notes": "Priority local classic around Bielefeld."
+  },
+  {
+    "category": "Regionally important events around NRW/Bielefeld",
+    "official_name": "Bielefelder Triathlon",
+    "city": "Bielefeld",
+    "country": "Germany",
+    "sport_type": "Triathlon",
+    "expected_aliases": [
+      "Bielefelder Triathlon",
+      "Bielefeld Triathlon"
+    ],
+    "official_website": "https://www.bielefelder-triathlon.de/",
+    "notes": "Regional priority event."
+  },
+  {
+    "category": "Regionally important events around NRW/Bielefeld",
+    "official_name": "Paderborner Osterlauf",
+    "city": "Paderborn",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "Paderborner Osterlauf",
+      "Osterlauf Paderborn"
+    ],
+    "official_website": "https://www.paderborner-osterlauf.de/",
+    "notes": "Important regional road running classic."
+  },
+  {
+    "category": "Regionally important events around NRW/Bielefeld",
+    "official_name": "inSchildesche Lauf",
+    "city": "Bielefeld",
+    "country": "Germany",
+    "sport_type": "Running",
+    "expected_aliases": [
+      "inSchildesche Lauf",
+      "Schildesche Lauf",
+      "Bielefeld Schildesche"
+    ],
+    "official_website": "https://www.inschildesche.de/",
+    "notes": "Regional Bielefeld priority; verify exact event page and current registration link."
+  }
+]

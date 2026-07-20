@@ -1,0 +1,1623 @@
+[
+  {
+    "event_slug": "bmw-berlin-marathon-2026",
+    "event_name": "BMW Berlin Marathon",
+    "data_version": "20260706-berlin-marathon-detail",
+    "priority": "high",
+    "verification_status": "verified_core_fields",
+    "last_checked": "2026-07-06",
+    "next_check": "2026-07-13",
+    "check_frequency": "weekly; every few days from late August, daily during race week",
+    "source_note": "Core fields are based on official BMW BERLIN-MARATHON/SCC EVENTS pages and should be rechecked shortly before race week because schedule, expo and race-day details may be subject to change.",
+    "basis": {
+      "official_name": "BMW BERLIN-MARATHON 2026",
+      "event_series": "BMW BERLIN-MARATHON",
+      "sport_type": "Running",
+      "category": "Road marathon",
+      "region": "Berlin",
+      "country": "Germany",
+      "organizer": "SCC EVENTS",
+      "official_website": "https://www.bmw-berlin-marathon.com/en/",
+      "registration_url": "https://www.bmw-berlin-marathon.com/en/registration/registration-information/",
+      "event_status": "Scheduled",
+      "event_date": "2026-09-27",
+      "display_date": "Sunday, 27 September 2026",
+      "city": "Berlin",
+      "start_finish_area": "Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern",
+      "distance_summary": "42.195 km",
+      "teaser": "The BMW BERLIN-MARATHON is one of the world's defining city marathons: a World Marathon Major with a flat, fast course, deep record history and an iconic finish near the Brandenburg Gate.",
+      "data_quality_note": "Core event, registration, course and race-day fields are verified from official sources. Exact elevation gain/loss, 2025 finisher count, average finish time and DNF rate remain marked for review."
+    },
+    "registration": {
+      "registration_status": "Lottery closed; alternative entries may be available through charity, tour operators, running camps and other guaranteed-entry routes.",
+      "registration_open_date": "2025-09-25",
+      "registration_close_date": "2025-11-06",
+      "registration_deadline": "2025-11-06 on the official registration information page; the official FAQ lists 2025-11-05, so this date should be kept with a verification note.",
+      "entry_fee_current_year": "205 EUR",
+      "entry_fee_min": "205 EUR",
+      "entry_fee_max": "205 EUR",
+      "currency": "EUR",
+      "price_tiers": [
+        "Regular marathon entry: 205 EUR.",
+        "Clothing bag drop-off can be booked during registration for an additional fee; otherwise runners receive a finisher poncho."
+      ],
+      "lottery_available": true,
+      "charity_entries": true,
+      "tour_operator_entries": true,
+      "running_camp_entries": true,
+      "sold_out_status": "Lottery closed",
+      "transfer_possible": "No. Race entries are personal and cannot be transferred to another person or to another year.",
+      "refund_policy": "No refund of the participation fee is offered under the official policy. The organizer recommends race cancellation insurance. Pregnancy may allow a goodwill deferral for up to three years with proof.",
+      "official_registration_url": "https://www.bmw-berlin-marathon.com/en/registration/registration-information/",
+      "minimum_age": "18 years on race day",
+      "verification_note": "The official registration page lists the 2026 lottery window as 25 September to 6 November 2025, while the FAQ lists 5 November 2025 as the end date."
+    },
+    "course": {
+      "distances": [
+        "Marathon"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road city marathon",
+      "course_character": "Berlin is an extremely fast, broad and flat asphalt course with very high personal-best potential. It runs through central Berlin and combines elite performance conditions with a large international city-marathon atmosphere.",
+      "surface": "Asphalt / paved city roads",
+      "elevation_gain": "Very little elevation gain; exact official total gain/loss is not yet verified.",
+      "elevation_loss": "Not yet verified",
+      "start_location": "Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern",
+      "finish_location": "Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern",
+      "start_finish_same_place": true,
+      "course_format": "Large Berlin city loop",
+      "point_to_point": false,
+      "gpx_url": "https://www.bmw-berlin-marathon.com/en/your-race/course/",
+      "course_map_url": "https://www.bmw-berlin-marathon.com/en/your-race/course/",
+      "elevation_profile_url": "https://www.bmw-berlin-marathon.com/en/your-race/course/",
+      "personal_best_potential": "Very high",
+      "pb_potential": "very_high",
+      "beginner_friendly": "Yes, with proper marathon training",
+      "difficulty_rating": "Physically approachable for a major marathon because the course is flat, but demanding because of crowd density, scale, pacing discipline and the 6:15 h cutoff.",
+      "crowd_support_rating": "Very high",
+      "aid_stations": "15 official refreshment stations. Water is listed at km 5, 12, 17.5, 22.5, 27.5, 32.5, 34.5, 38 and 40. Water, fruit, tea and Maurten Drink Mix 160 are listed at km 9, 15, 20, 25, 30 and 36. Maurten Gel 100 is listed at km 27.5. Refill stations are available for personal hydration systems.",
+      "cutoff": "6:15 h from crossing the start line",
+      "risk_notes": "The main risks are crowding in early kilometres, pacing too aggressively on a fast course, late-September weather variability and possible warmth if conditions are more summer-like than autumnal.",
+      "course_record_male": "2:01:09 - Eliud Kipchoge, 2022",
+      "course_record_female": "2:11:53 - Tigist Assefa, 2023"
+    },
+    "race_day": {
+      "race_day": "Sunday, 27 September 2026",
+      "start_time": "09:15 for runners",
+      "start_time_details": "Handbikers and wheelchair athletes start before the runner field. Runners start from 09:15.",
+      "wave_start": "Wave 1 A-D: 09:15; Wave 2 E-F: 09:45; Wave 3 G-H: 10:10; Wave 4 J-K: 10:40.",
+      "start_waves": [
+        {
+          "wave": "A-D",
+          "time": "09:15"
+        },
+        {
+          "wave": "E-F",
+          "time": "09:45"
+        },
+        {
+          "wave": "G-H",
+          "time": "10:10"
+        },
+        {
+          "wave": "J-K",
+          "time": "10:40"
+        }
+      ],
+      "total_cutoff": "6:15 h from crossing the start line. Runners must reach km 33 by 15:50 and km 38 by 16:35. The official finish closes at 17:15.",
+      "intermediate_cutoffs": [
+        {
+          "location": "km 33",
+          "time": "15:50"
+        },
+        {
+          "location": "km 38",
+          "time": "16:35"
+        },
+        {
+          "location": "finish",
+          "time": "17:15"
+        }
+      ],
+      "start_area": "Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern",
+      "finish_area": "Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern",
+      "bib_pickup_info": "Race materials must be collected personally at the Marathon Expo with Start Card and photo ID. Pickup by another person is not possible.",
+      "expo": "Marathon Expo at Flughafen Tempelhof, Platz der Luftbruecke 5, 12101 Berlin. Listed hours: Thursday 24 September 2026 15:00-20:00, Friday 25 September 2026 10:00-20:00, Saturday 26 September 2026 09:00-19:00; recheck shortly before race week.",
+      "bag_drop": "Clothing bag drop-off is only available if booked during registration. Runners without bag drop receive a finisher poncho.",
+      "toilets": "Sanitary facilities are included in the official service package.",
+      "medical": "Medical care is included in the official service package.",
+      "showers": "Showers and changing tents are included in the official service package.",
+      "timing_system": "MIKA TAG disposable transponder",
+      "tracking": "Official app/tracking is included in the service package.",
+      "pacers_available": "Yes. Pacers are listed in all four start waves. Wave 1: 3:00, 3:15, 3:30. Wave 2: 3:00, 3:15, 3:30, 3:45. Wave 3: 3:30, 3:45, 4:00, 4:15. Wave 4: 3:45, 4:00, 4:15, 4:30, 4:45, 5:00.",
+      "aid_stations": "15 refreshment stations with water, fruit, tea, Maurten Drink Mix 160 and Maurten Gel 100 according to the official course information.",
+      "cutoff_consequence": "Runners behind the cutoff may have to leave the official course or use the broom bus. A finish after cutoff may mean no official time, medal or finish-area services.",
+      "self_catering": "Personal self-catering can be submitted at the start/finish area according to the official race-day information.",
+      "verification_note": "Race-day, expo and service details should be checked again shortly before the event because official pages mark some information as subject to change."
+    },
+    "travel": {
+      "nearest_train_station": "Berlin Hauptbahnhof",
+      "nearest_airport": "Berlin Brandenburg Airport (BER)",
+      "public_transport_info": "The organizer recommends travelling to the start/finish area by public transport. Nearby stops include U Bundestag and Berlin Hauptbahnhof. The race bib is listed as valid for public transport in fare zone ABC from 24 to 27 September 2026; details are expected with the Start Card.",
+      "parking_info": "Public parking is not recommended. No parking is listed for the Expo at Tempelhof, and race-weekend road closures and traffic disruption are expected.",
+      "expo_location": "Flughafen Tempelhof, Platz der Luftbruecke 5, 12101 Berlin",
+      "accommodation_info": "Book accommodation early. Practical areas include Mitte, Tiergarten, the main station area, Potsdamer Platz or locations with direct U-Bahn/S-Bahn access to the start area.",
+      "race_day_access_note": "Use U-Bahn and S-Bahn on race day. Expect road closures, crowding around the start/finish zone and longer walking routes near security areas.",
+      "recommended_arrival": "Arrive at least one day before the race; earlier is better if you want a calmer Expo pickup and start-area preparation."
+    },
+    "weather": {
+      "typical_weather": "Late September in Berlin can range from cool autumn conditions to late-summer warmth.",
+      "average_temperature": "Historic Berlin Marathon race-day context is around 13.5 C on average; exact source URL still needs review.",
+      "average_high_temperature": "About 19.5 C for Berlin in September",
+      "average_low_temperature": "About 9.5 C for Berlin in September",
+      "rainfall_risk": "Moderate; Berlin September climate context is roughly 8 rain days and about 51 mm precipitation, needs source review.",
+      "wind_risk": "Low to medium",
+      "heat_factor": "Medium",
+      "best_conditions_note": "Cool, dry and low-wind conditions are ideal.",
+      "planning_tip": "Bring an old layer for the start area, test hydration in training and adjust pacing if the day becomes warm.",
+      "verification_note": "Weather and climate numbers are planning context and should not be treated as a race-day forecast."
+    },
+    "statistics": {
+      "participant_count": "Approximately 60,000 athletes expected across runners, wheelchair athletes, handbikers and inline skaters.",
+      "countries_represented": "Around 160 countries expected",
+      "finisher_count": "Needs review",
+      "average_finish_time": "Needs review",
+      "dnf_rate": "Needs review",
+      "last_winner_male": "Sabastian Sawe",
+      "last_winner_female": "Rosemary Wanjiru",
+      "last_winning_time_male": "2:02:16 (2025)",
+      "last_winning_time_female": "2:21:05 (2025)",
+      "fastest_german_male_2025": "Hendrik Pfeiffer, 2:09:14",
+      "fastest_german_female_2025": "Fabienne Koenigstein, 2:22:17",
+      "course_record_male": "2:01:09 - Eliud Kipchoge, 2022",
+      "course_record_female": "2:11:53 - Tigist Assefa, 2023",
+      "historic_significance": "Berlin is part of the Abbott World Marathon Majors and is one of the most important record courses in marathon running.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, but final acceptance is subject to B.A.A. verification.",
+      "world_major": true,
+      "world_athletics_label": "World Athletics Elite Platinum Label context / current-year label should be reviewed before publication."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "The BMW BERLIN-MARATHON is one of the most important marathons in the world. It combines World Marathon Major status, an exceptionally fast course, international elite fields, huge participation numbers and one of the most iconic finish areas in running. Berlin matters because marathon history has been rewritten here repeatedly, including world-record performances and landmark elite races.",
+      "course_character": "The course is flat, broad, fast and built for personal bests. It runs through central Berlin and balances performance conditions with large-city marathon energy. For ambitious road runners, Berlin is one of the strongest marathon choices in the world for attacking a new PB.",
+      "atmosphere": "International, loud, professionally organized and very large. The event has a clear World-Major feel with many spectators, many nations and a high sporting level.",
+      "good_fit_for": "Runners chasing personal bests, fast road runners, World Marathon Major collectors, ambitious marathon debutants and athletes who want a large international city-marathon experience.",
+      "not_ideal_for": "Runners looking for a small family-style event, trail character, spontaneous registration or a quiet course. The lottery and high demand also make the event harder to plan without a guaranteed entry route.",
+      "insider_tips": "Collect race materials early at the Expo, book accommodation early, use public transport, check your start wave and pacer options in advance, bring throwaway clothing for the start wait and test hydration before race day.",
+      "seo_summary": "The BMW BERLIN-MARATHON 2026 takes place on 27 September 2026. The marathon covers 42.195 kilometres through Berlin and is considered one of the fastest marathon courses in the world. Start and finish are on Straße des 17. Juni near the Brandenburg Gate."
+    },
+    "faq": [
+      {
+        "question": "When is the Berlin Marathon 2026?",
+        "answer": "The BMW BERLIN-MARATHON 2026 takes place on Sunday, 27 September 2026."
+      },
+      {
+        "question": "Where are the start and finish?",
+        "answer": "Start and finish are on Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern."
+      },
+      {
+        "question": "When do the runners start?",
+        "answer": "Runners start from 09:15 in four waves: 09:15, 09:45, 10:10 and 10:40."
+      },
+      {
+        "question": "What is the cutoff time?",
+        "answer": "The cutoff is 6:15 hours from crossing the start line. Runners must also reach km 33 by 15:50 and km 38 by 16:35."
+      },
+      {
+        "question": "Is Berlin good for a personal best?",
+        "answer": "Yes. Berlin is officially described as the flattest course among the Abbott World Marathon Majors and has a long history of extremely fast performances."
+      },
+      {
+        "question": "Are pacers available?",
+        "answer": "Yes. Pacers are listed in all four start waves, with target times from 3:00 to 5:00 hours depending on the wave."
+      },
+      {
+        "question": "How does registration work?",
+        "answer": "Regular entry is handled through a lottery. For 2026, the lottery window ran from late September to early November 2025. After the lottery, alternative routes may include charity entries, tour operators and running camps."
+      },
+      {
+        "question": "Can the race entry be transferred?",
+        "answer": "No. The official registration information states that entries are personal and cannot be transferred to another person or another year."
+      },
+      {
+        "question": "Can I get a refund if I cannot race?",
+        "answer": "The official policy states that the participation fee is not refunded. The organizer recommends race cancellation insurance."
+      },
+      {
+        "question": "Where do runners pick up race materials?",
+        "answer": "Race materials must be collected personally at the Marathon Expo with Start Card and photo ID. Pickup by another person is not possible."
+      }
+    ],
+    "sources": [
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/",
+        "source_type": "official",
+        "source_label": "BMW BERLIN-MARATHON official website",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.96
+      },
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/registration/registration-information/",
+        "source_type": "official_registration",
+        "source_label": "Official registration information",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.96,
+        "verification_note": "Used for lottery window, fee context, eligibility, time limit, refund and transfer policy."
+      },
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/your-race/course/",
+        "source_type": "official_course",
+        "source_label": "Official course information",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.96,
+        "verification_note": "Used for course character, refreshment stations, GPX/course-map references and elevation-context note."
+      },
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/your-race/race-day-for-runners",
+        "source_type": "official_race_day",
+        "source_label": "Official race-day information for runners",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.96,
+        "verification_note": "Used for start waves, cutoff, pacers, public transport, bag-drop and finish logistics."
+      },
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/preparation/event-faq",
+        "source_type": "official_faq",
+        "source_label": "Official event FAQ",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.92,
+        "verification_note": "Used for race material pickup, Expo hours, cutoff details, toilets, medical and pacer references."
+      },
+      {
+        "source_url": "https://www.bmw-berlin-marathon.com/en/your-race/results",
+        "source_type": "official_results",
+        "source_label": "Official results page",
+        "last_verified": "2026-07-06",
+        "confidence_score": 0.82,
+        "verification_note": "Used as the preferred official reference for historical results; individual result statistics remain review fields where not fully aggregated."
+      }
+    ]
+  },
+  {
+    "event_slug": "mainova-frankfurt-marathon-2026",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "Mainova Frankfurt Marathon 2026",
+      "event_series": "Mainova Frankfurt Marathon",
+      "sport_type": "Running",
+      "category": "Road marathon",
+      "region": "Hesse",
+      "country": "Germany",
+      "organizer": "motion events GmbH",
+      "official_website": "https://www.frankfurt-marathon.com/en/",
+      "registration_url": "https://www.frankfurt-marathon.com/en/",
+      "event_status": "Scheduled",
+      "event_date": "2026-10-25",
+      "display_date": "Sunday, 25 October 2026",
+      "city": "Frankfurt am Main",
+      "start_finish_area": "Friedrich-Ebert-Anlage / Messe Frankfurt and Festhalle Frankfurt",
+      "distance_summary": "42.195 km",
+      "teaser": "A fast autumn city marathon in Frankfurt with skyline branding, a strong international field and the famous Festhalle indoor finish.",
+      "data_quality_note": "Official homepage confirms the 2026 date, registration call-to-action, fast-course positioning, competition menu and several event statistics. Exact 2026 start waves and cutoffs remain for final runner-information review."
+    },
+    "registration": {
+      "registration_status": "Registration open",
+      "currency": "EUR",
+      "lottery_available": false,
+      "official_registration_url": "https://www.frankfurt-marathon.com/en/",
+      "registration_deadline": "Not yet verified",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Open at last check",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "minimum_age": "Not yet verified",
+      "verification_note": "The official homepage exposes a 2026 registration link, but the current public crawl did not expose complete fee-tier and deadline details."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Relay",
+        "Mini-Marathon",
+        "Shock-headed Peter Run"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road marathon",
+      "course_character": "Fast Frankfurt city course with skyline sections and one of Germany's most distinctive finishes inside Festhalle Frankfurt.",
+      "surface": "Road / asphalt",
+      "elevation_gain": "Not yet verified",
+      "start_location": "Friedrich-Ebert-Anlage / Messe Frankfurt area",
+      "finish_location": "Festhalle Frankfurt",
+      "start_finish_same_place": false,
+      "course_format": "Frankfurt city loop with Festhalle finish",
+      "point_to_point": false,
+      "course_map_url": "https://www.frankfurt-marathon.com/en/",
+      "personal_best_potential": "High",
+      "pb_potential": "high",
+      "beginner_friendly": "Yes, with marathon preparation and large-city race logistics",
+      "difficulty_rating": "Fast road marathon; logistical difficulty comes mainly from field size, start-area timing and late-October weather.",
+      "crowd_support_rating": "High",
+      "aid_stations": "Not yet verified for 2026",
+      "cutoff": "Not yet verified",
+      "risk_notes": "Pacing too aggressively on a fast course, late-October temperature swings and crowded early kilometres are the main planning risks."
+    },
+    "race_day": {
+      "race_day": "Sunday, 25 October 2026",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "Not yet verified",
+      "start_area": "Friedrich-Ebert-Anlage / Messe Frankfurt area",
+      "finish_area": "Festhalle Frankfurt",
+      "bib_pickup_info": "To be confirmed from final 2026 runner information.",
+      "expo": "marathonmall / race-week programme listed by the official site; final opening hours need review.",
+      "timing_system": "Official race timing",
+      "tracking": "Not yet verified",
+      "aid_stations": "Not yet verified for 2026",
+      "verification_note": "Race-day start times, cutoff and expo hours should be checked again when the final 2026 athlete information is available."
+    },
+    "travel": {
+      "nearest_train_station": "Frankfurt (Main) Hauptbahnhof",
+      "nearest_airport": "Frankfurt Airport (FRA)",
+      "public_transport_info": "The Messe/Festhalle area is close to Frankfurt Hauptbahnhof and is normally practical by S-Bahn, U-Bahn or tram.",
+      "parking_info": "Use public transport where possible; race-weekend road closures and Messe traffic can make driving inefficient.",
+      "expo_location": "Messe Frankfurt / marathonmall context to be verified",
+      "accommodation_info": "Useful areas include Messe, Hauptbahnhof, Westend, Innenstadt and locations with direct S-Bahn/U-Bahn access.",
+      "race_day_access_note": "Plan extra time around Messe, Friedrich-Ebert-Anlage and Festhalle because roads around the race area may be restricted.",
+      "recommended_arrival": "Arrive at least one day before the marathon for bib pickup and race-day logistics."
+    },
+    "weather": {
+      "typical_weather": "Late October in Frankfurt is usually autumnal: often cool, sometimes wet or windy, with conditions that can be good for marathon racing if temperatures stay low.",
+      "average_temperature": "Planning context: cool autumn conditions; exact climate values not yet sourced.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Low to medium",
+      "heat_factor": "Low to medium",
+      "best_conditions_note": "Cool, dry and low-wind weather is ideal for Frankfurt's fast course.",
+      "planning_tip": "Bring a warm layer for the start area and be ready to adjust pacing if wind or rain arrives."
+    },
+    "statistics": {
+      "participant_count": "27,052 runners in all competitions according to the official homepage context",
+      "finisher_count": "Not yet verified for latest edition",
+      "last_winner_male": "Not yet verified",
+      "last_winner_female": "Not yet verified",
+      "course_record_male": "2:03:42 - Wilson Kipsang, 2011",
+      "course_record_female": "2:17:25 - Hawi Feysa, 2024",
+      "historic_significance": "The official site positions Frankfurt among the fastest marathons worldwide and highlights the 2011 Wilson Kipsang performance.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Frankfurt is one of Germany's strongest autumn marathon choices: fast enough for ambitious PB attempts, large enough for real city-marathon energy and memorable because the finish leads into the Festhalle.",
+      "course_character": "The route is built around a fast city-marathon profile rather than scenic difficulty. It suits disciplined pacing and runners who want reliable road-marathon conditions.",
+      "atmosphere": "International, urban and performance-oriented, with a particularly emotional indoor finish.",
+      "good_fit_for": "PB-focused marathoners, autumn A-race planners, relay teams and runners who want a major German city marathon outside Berlin.",
+      "not_ideal_for": "Runners seeking a small field, trail terrain or very simple arrival logistics.",
+      "insider_tips": "Book accommodation near Messe, Hauptbahnhof or a direct public-transport line, keep the first kilometres controlled and save emotional energy for the Festhalle finish.",
+      "seo_summary": "The Mainova Frankfurt Marathon 2026 takes place on 25 October 2026. The road marathon covers 42.195 kilometres through Frankfurt and is known for a fast city course and the Festhalle finish."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.frankfurt-marathon.com/en/",
+        "source_type": "official",
+        "source_label": "Official Mainova Frankfurt Marathon website",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.92,
+        "verification_note": "Official homepage confirms 25 October 2026, registration link, competition menu, fast-course wording, Festhalle finish context and event statistics."
+      }
+    ],
+    "event_name": "Mainova Frankfurt Marathon",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until race month; weekly in October",
+    "source_note": "Core date, registration, course character and organizer facts are based on the official Mainova Frankfurt Marathon website. Race-day schedule and cutoff values should be rechecked when the final 2026 runner information is published.",
+    "faq": [
+      {
+        "question": "When is the Mainova Frankfurt Marathon 2026?",
+        "answer": "It is scheduled for Sunday, 25 October 2026."
+      },
+      {
+        "question": "Is registration open?",
+        "answer": "Yes, the official website exposes registration for 2026 at the latest check. Final fees and deadlines should be verified on the organizer site."
+      },
+      {
+        "question": "What distance is the main race?",
+        "answer": "The main race is the marathon distance of 42.195 kilometres."
+      },
+      {
+        "question": "Is Frankfurt a fast marathon?",
+        "answer": "Yes. The official site describes the course as fast and highlights Frankfurt's international speed reputation."
+      },
+      {
+        "question": "Where is the finish?",
+        "answer": "The marathon is known for its finish inside Festhalle Frankfurt."
+      },
+      {
+        "question": "Who organizes the event?",
+        "answer": "The event is organized by motion events GmbH."
+      }
+    ]
+  },
+  {
+    "event_slug": "generali-koln-marathon-2026",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "Generali Koeln Marathon 2026",
+      "event_series": "Generali Koeln Marathon",
+      "sport_type": "Running",
+      "category": "Road running event weekend",
+      "region": "North Rhine-Westphalia",
+      "country": "Germany",
+      "organizer": "Koelner AusdauerSport GmbH",
+      "official_website": "https://generali-koeln-marathon.de/",
+      "registration_url": "https://generali-koeln-marathon.de/",
+      "event_status": "Scheduled",
+      "event_date": "2026-10-04",
+      "display_date": "Sunday, 4 October 2026",
+      "city": "Koeln",
+      "start_finish_area": "Start in Deutz, finish at Koelner Dom",
+      "distance_summary": "Marathon, half marathon, relay marathon, school marathon and kids run",
+      "teaser": "A flat and fast Cologne race weekend with start in Deutz, a cathedral finish and several race formats for different experience levels.",
+      "data_quality_note": "Official homepage confirms date, registration CTA, listed fees, categories, start, finish, route character and aid-station count. Exact start schedule and cutoff remain for runner-info review."
+    },
+    "registration": {
+      "registration_status": "Registration open",
+      "entry_fee_min": "9 EUR",
+      "entry_fee_max": "199 EUR",
+      "entry_fee_current_year": "Marathon 130 EUR; half marathon 95 EUR",
+      "currency": "EUR",
+      "price_tiers": [
+        "Marathon 130 EUR",
+        "Half marathon 95 EUR",
+        "Relay marathon 199 EUR",
+        "School marathon 50 EUR",
+        "Kids run 9 EUR"
+      ],
+      "lottery_available": false,
+      "sold_out_status": "Open at last check",
+      "official_registration_url": "https://generali-koeln-marathon.de/",
+      "registration_deadline": "Not yet verified",
+      "transfer_possible": "Startplatzboerse is listed on the official site; detailed transfer rules need review.",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Prices are visible on the official homepage; detailed terms should be checked in the registration flow or official AGB."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Half Marathon",
+        "Relay Marathon",
+        "School Marathon",
+        "Kids Run",
+        "Shake Out Run"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road running event weekend",
+      "course_character": "Flat and fast route from Deutz to the cathedral, passing Cologne districts such as Rodenkirchen, Lindenthal, Ehrenfeld and Nippes.",
+      "surface": "Road / asphalt",
+      "start_location": "Deutz",
+      "finish_location": "Koelner Dom",
+      "start_finish_same_place": false,
+      "course_format": "Cologne city course",
+      "personal_best_potential": "Medium to high",
+      "pb_potential": "medium_high",
+      "beginner_friendly": "Yes, especially with half marathon, relay, school marathon and kids run formats.",
+      "difficulty_rating": "Moderate for a city marathon; the course is flat, but field size and city logistics require planning.",
+      "crowd_support_rating": "High",
+      "aid_stations": "11 aid stations for the marathon and 6 for the half marathon according to the official homepage.",
+      "cutoff": "Not yet verified",
+      "risk_notes": "October weather, city crowds and pacing discipline on a flat course are the main planning factors."
+    },
+    "race_day": {
+      "race_day": "Sunday, 4 October 2026",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "Not yet verified",
+      "start_area": "Deutz",
+      "finish_area": "Koelner Dom",
+      "bib_pickup_info": "Expo is listed by the official website; final bib pickup details need review.",
+      "expo": "Official site lists Expo as a race-weekend section; exact 2026 hours not yet verified.",
+      "timing_system": "Official race timing",
+      "aid_stations": "11 marathon aid stations and 6 half-marathon aid stations according to the official homepage."
+    },
+    "travel": {
+      "nearest_train_station": "Koeln Hauptbahnhof / Koeln Messe-Deutz",
+      "nearest_airport": "Cologne Bonn Airport (CGN)",
+      "public_transport_info": "The start in Deutz and finish near the cathedral are both well connected by public transport.",
+      "parking_info": "Public transport is recommended because start/finish areas and bridge crossings may be affected by road closures.",
+      "expo_location": "To be confirmed from official Expo information",
+      "accommodation_info": "Useful areas include Innenstadt, Deutz, Altstadt and districts with direct Stadtbahn or S-Bahn access.",
+      "race_day_access_note": "Plan for crowds around Deutz, the Rhine bridges and the cathedral finish area.",
+      "recommended_arrival": "Arrive at least one day before the race to handle bib pickup and city logistics."
+    },
+    "weather": {
+      "typical_weather": "Early October in Cologne is usually mild autumn weather, with possible rain and variable wind.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Low to medium",
+      "heat_factor": "Low to medium",
+      "best_conditions_note": "Cool, dry weather makes the flat course especially attractive for PB attempts.",
+      "planning_tip": "Bring layers for pre-start waiting and check race-week rain/wind forecasts before choosing shoes and clothing."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified for 2026",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "The official homepage positions the marathon as Germany's number 4 and highlights the flat, fast city route.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Cologne is a practical and atmospheric NRW race weekend: flat route, several distances, strong city identity and a memorable finish at the cathedral.",
+      "course_character": "The course is built for rhythm. It is not a mountain or trail challenge; the appeal is city atmosphere, flat pacing and a finish with a major landmark.",
+      "atmosphere": "Urban, lively and local, with strong Cologne identity and many spectators.",
+      "good_fit_for": "Marathoners, half-marathon runners, relay teams, families and NRW athletes planning an autumn race.",
+      "not_ideal_for": "Runners who want trail terrain, solitude or a very small event.",
+      "insider_tips": "Use public transport, compare hotel options on both sides of the Rhine and treat the cathedral finish area as crowded after the race.",
+      "seo_summary": "The Generali Koeln Marathon 2026 takes place on 4 October 2026. The event offers marathon, half marathon, relay marathon, school marathon and kids run formats on a flat Cologne city course."
+    },
+    "sources": [
+      {
+        "source_url": "https://generali-koeln-marathon.de/",
+        "source_type": "official",
+        "source_label": "Official Generali Koeln Marathon homepage",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.95,
+        "verification_note": "Official homepage confirms 4 October 2026, registration CTA, competition prices, flat and fast course, Deutz start, Koelner Dom finish and aid-station counts."
+      }
+    ],
+    "event_name": "Generali Koeln Marathon",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until race month; weekly in September",
+    "source_note": "Core fields are based on the official Generali Koeln Marathon homepage. Start times, final cutoffs and race-week details should be rechecked before publication close to October.",
+    "faq": [
+      {
+        "question": "When is the Generali Koeln Marathon 2026?",
+        "answer": "It is scheduled for Sunday, 4 October 2026."
+      },
+      {
+        "question": "Which races are offered?",
+        "answer": "The official site lists marathon, half marathon, relay marathon, school marathon, kids run and shake out run."
+      },
+      {
+        "question": "How much does registration cost?",
+        "answer": "At last check, the homepage listed marathon 130 EUR, half marathon 95 EUR, relay marathon 199 EUR, school marathon 50 EUR and kids run 9 EUR."
+      },
+      {
+        "question": "Where is the start?",
+        "answer": "The official homepage lists the start in Deutz."
+      },
+      {
+        "question": "Where is the finish?",
+        "answer": "The finish is listed at Koelner Dom."
+      },
+      {
+        "question": "Is the course fast?",
+        "answer": "Yes. The official homepage describes the route as flat and fast."
+      }
+    ]
+  },
+  {
+    "event_slug": "haspa-marathon-hamburg-2027",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "Haspa Marathon Hamburg 2027",
+      "event_series": "Haspa Marathon Hamburg",
+      "sport_type": "Running",
+      "category": "Road marathon",
+      "region": "Hamburg",
+      "country": "Germany",
+      "organizer": "Marathon Hamburg Veranstaltungs GmbH",
+      "official_website": "https://haspa-marathon-hamburg.de/",
+      "registration_url": "https://haspa-marathon-hamburg.de/en/race-info-marathon/",
+      "event_status": "Scheduled",
+      "event_date": "2027-04-25",
+      "display_date": "Sunday, 25 April 2027",
+      "city": "Hamburg",
+      "start_finish_area": "Hamburg Messe / Karolinenstrasse area",
+      "distance_summary": "Marathon, half marathon and relay",
+      "teaser": "A major German spring marathon with race-weekend logistics around Hamburg Messe and a six-hour post-start closing window.",
+      "data_quality_note": "Official race-info page confirms 2027 date, race-kit pickup, venue, public-transport recommendation, race-day pickup fee, showers and finish closing rule."
+    },
+    "registration": {
+      "registration_status": "Registration open for marathon; half marathon demand should be checked separately",
+      "currency": "EUR",
+      "official_registration_url": "https://haspa-marathon-hamburg.de/en/race-info-marathon/",
+      "registration_deadline": "Not yet verified",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Half marathon availability needs separate verification",
+      "transfer_possible": "Bib numbers are non-transferable according to the official race-info page.",
+      "refund_policy": "Cancellation insurance is offered during registration; detailed withdrawal rules should be checked in official terms.",
+      "verification_note": "Race-day pickup is available only with a pre-booked time slot and a 10 EUR fee according to official race information."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Half Marathon",
+        "Marathon Relay"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road marathon",
+      "surface": "Road / asphalt",
+      "course_character": "Large Hamburg spring city marathon with start/finish logistics around Hamburg Messe and a course designed for a broad participant field.",
+      "start_location": "Hamburg Messe / Karolinenstrasse area",
+      "finish_location": "Hamburg Messe / Karolinenstrasse area",
+      "start_finish_same_place": true,
+      "course_format": "Hamburg city loop",
+      "personal_best_potential": "Medium to high",
+      "pb_potential": "medium_high",
+      "beginner_friendly": "Yes, with proper marathon preparation and attention to logistics.",
+      "difficulty_rating": "Moderate; the main difficulty is marathon distance plus large-event logistics and spring weather variability.",
+      "crowd_support_rating": "High",
+      "aid_stations": "Not yet verified from current crawl",
+      "cutoff": "The marathon and relay marathon officially end 6 hours after the last runner has passed the start line."
+    },
+    "race_day": {
+      "race_day": "Sunday, 25 April 2027",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "6 hours after the last runner has passed the starting line",
+      "start_area": "Hamburg Messe / event area",
+      "finish_area": "Hamburg Messe / event area",
+      "bib_pickup_info": "Race kit pick-up takes place Friday 23 April 2027, 12:00-19:00 and Saturday 24 April 2027, 09:00-19:00 at Marathon Hamburg Expo, Hall A3, Hamburg Messe. Race-day pickup requires a booked time slot and 10 EUR fee.",
+      "expo": "Marathon Hamburg Expo, Hall A3 at Hamburg Messe",
+      "bag_drop": "To be confirmed",
+      "showers": "Changing rooms and showers are available in the shower area of the Athletes Area in Exhibition Hall B6.",
+      "timing_system": "Timing checkpoints are located along the course.",
+      "aid_stations": "Not yet verified",
+      "cutoff_consequence": "Finish closing rule applies six hours after the last runner crosses the start."
+    },
+    "travel": {
+      "nearest_train_station": "Hamburg Dammtor / Hamburg Hauptbahnhof",
+      "nearest_airport": "Hamburg Airport (HAM)",
+      "public_transport_info": "Official race information strongly recommends public transport because parking around the event area is very limited and road closures are expected.",
+      "parking_info": "Nearly no parking facilities around the event area according to official race information.",
+      "expo_location": "Hamburg Messe, Hall A3",
+      "accommodation_info": "The event hotel context highlights the Dammtor / Messe area; central accommodation with U-Bahn or S-Bahn access is practical.",
+      "race_day_access_note": "Use U-Bahn/S-Bahn and plan extra walking time around Hamburg Messe, Planten un Blomen and road-closure zones.",
+      "recommended_arrival": "Arrive by Saturday at the latest for regular race-kit pickup; Friday arrival is calmer."
+    },
+    "weather": {
+      "typical_weather": "Late April in Hamburg can be cool, breezy and changeable, with rain possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Medium",
+      "heat_factor": "Low",
+      "best_conditions_note": "Cool and dry spring weather is ideal; wind can matter on exposed city sections.",
+      "planning_tip": "Prepare a pre-start layer and check wind/rain forecasts before race weekend."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified for 2027",
+      "finisher_count": "Not yet verified",
+      "course_record_male": "Needs review",
+      "course_record_female": "Needs review",
+      "historic_significance": "The 2027 edition is listed by the official race-info page as the 41st Haspa Marathon Hamburg.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Hamburg is one of the strongest spring marathon options in Germany: large, established and early enough in the season for athletes planning a spring peak.",
+      "course_character": "The appeal is a big-city road marathon rather than technical terrain. Weather and logistics matter more than elevation.",
+      "atmosphere": "Large, northern German city-marathon atmosphere with a busy Expo and central event area.",
+      "good_fit_for": "Spring marathoners, relay teams and athletes who want a major German race before summer.",
+      "not_ideal_for": "Runners who dislike large expo logistics or need guaranteed parking close to the start.",
+      "insider_tips": "Stay near Messe/Dammtor or on a direct public-transport line, pick up the kit Friday or Saturday if possible and avoid depending on car access.",
+      "seo_summary": "The Haspa Marathon Hamburg 2027 takes place on 25 April 2027. Official race information lists race-kit pickup at Hamburg Messe and a six-hour finish closing rule after the last runner starts."
+    },
+    "sources": [
+      {
+        "source_url": "https://haspa-marathon-hamburg.de/en/race-info-marathon/",
+        "source_type": "official",
+        "source_label": "Official Haspa Marathon Hamburg race-info page",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.95,
+        "verification_note": "Official page confirms the 41st edition on 25 April 2027, race-kit pickup hours, venue, public-transport recommendation, non-transferable bibs, showers and the six-hour finish closing rule."
+      }
+    ],
+    "event_name": "Haspa Marathon Hamburg",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until winter; weekly from March 2027",
+    "source_note": "Core 2027 race-day, expo, venue and cutoff fields are based on the official Haspa Marathon Hamburg race-info page.",
+    "faq": [
+      {
+        "question": "When is the Haspa Marathon Hamburg 2027?",
+        "answer": "The 41st Haspa Marathon Hamburg is scheduled for Sunday, 25 April 2027."
+      },
+      {
+        "question": "Where is race-kit pickup?",
+        "answer": "Race kit pickup is at Marathon Hamburg Expo, Hall A3, Hamburg Messe, on Friday 23 April and Saturday 24 April 2027."
+      },
+      {
+        "question": "Is race-day pickup possible?",
+        "answer": "Yes, but only with a pre-booked time slot through the booking portal and a 10 EUR fee according to official race information."
+      },
+      {
+        "question": "What is the finish closing rule?",
+        "answer": "The marathon and relay marathon officially end six hours after the last runner has passed the starting line."
+      },
+      {
+        "question": "Should I use public transport?",
+        "answer": "Yes. The official race information strongly recommends public transport because parking is very limited and road closures are expected."
+      },
+      {
+        "question": "Are showers available?",
+        "answer": "Yes. The official race-info page lists changing rooms and showers in Exhibition Hall B6."
+      }
+    ]
+  },
+  {
+    "event_slug": "marathon-munchen-by-brooks-2026",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "MARATHON MUENCHEN by Brooks 2026",
+      "event_series": "MARATHON MUENCHEN by Brooks",
+      "sport_type": "Running",
+      "category": "Road running event weekend",
+      "region": "Bavaria",
+      "country": "Germany",
+      "organizer": "Laufstatt Event gGmbH",
+      "official_website": "https://marathonmuenchen.org/en/",
+      "registration_url": "https://marathonmuenchen.org/en/",
+      "event_status": "Scheduled",
+      "event_date": "2026-10-11",
+      "display_date": "Sunday, 11 October 2026",
+      "city": "Muenchen",
+      "start_finish_area": "Olympiapark",
+      "distance_summary": "Marathon, half marathon, 10 KM Run and relay",
+      "teaser": "A Munich city-running weekend with start and finish in Olympiapark and a route through landmarks including Marienplatz, English Garden and Werksviertel.",
+      "data_quality_note": "Official site confirms date, ongoing registration, competition menu, route highlights and 2025 participation record. Final race-day start schedule and cutoffs remain for review."
+    },
+    "registration": {
+      "registration_status": "Registration open",
+      "currency": "EUR",
+      "official_registration_url": "https://marathonmuenchen.org/en/",
+      "registration_deadline": "Not yet verified",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Open at last check; half marathon was reported as close to selling out in official news.",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official homepage states that registration for 2026 is ongoing; detailed fees were not exposed in the public crawl."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Half Marathon",
+        "10 KM Run",
+        "Marathon Relay",
+        "Kids Run",
+        "Dallmayr Coffee Run"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road running event weekend",
+      "surface": "Road / asphalt",
+      "course_character": "One-lap Munich course with start and finish in Olympiapark and route highlights such as Siegestor, Marienplatz, English Garden and Werksviertel.",
+      "start_location": "Olympiapark",
+      "finish_location": "Olympiapark",
+      "start_finish_same_place": true,
+      "course_format": "Munich city loop",
+      "personal_best_potential": "Medium",
+      "pb_potential": "medium",
+      "beginner_friendly": "Yes, with 10 km, half marathon, relay and kids formats.",
+      "difficulty_rating": "Moderate; more urban-experience oriented than a pure fastest-course race.",
+      "crowd_support_rating": "High",
+      "aid_stations": "Not yet verified for 2026",
+      "cutoff": "Not yet verified",
+      "iconic_sections": [
+        "Olympiapark",
+        "Siegestor",
+        "Marienplatz",
+        "English Garden",
+        "Werksviertel"
+      ]
+    },
+    "race_day": {
+      "race_day": "Sunday, 11 October 2026",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "Not yet verified",
+      "start_area": "Olympiapark",
+      "finish_area": "Olympiapark",
+      "bib_pickup_info": "To be confirmed from final 2026 runner information.",
+      "expo": "To be confirmed",
+      "timing_system": "Official race timing"
+    },
+    "travel": {
+      "nearest_train_station": "Muenchen Hauptbahnhof",
+      "nearest_airport": "Munich Airport (MUC)",
+      "public_transport_info": "Olympiapark is accessible by Munich public transport; use U-Bahn/S-Bahn planning on race day.",
+      "parking_info": "Public transport is recommended because road closures and Olympiapark event traffic can affect driving.",
+      "accommodation_info": "Useful areas include Olympiapark, Schwabing, Maxvorstadt, Hauptbahnhof and locations on direct U-Bahn lines.",
+      "race_day_access_note": "Plan extra time around Olympiapark and central route areas such as Marienplatz.",
+      "recommended_arrival": "Arrive at least one day before the race to handle bib pickup and city logistics."
+    },
+    "weather": {
+      "typical_weather": "Mid-October in Munich is usually cool autumn weather, with rain possible and colder mornings than many western German city races.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Low to medium",
+      "heat_factor": "Low",
+      "best_conditions_note": "Cool, dry weather is ideal; morning layers can matter in Olympiapark.",
+      "planning_tip": "Bring a warm layer for pre-start waiting and check whether rain or cold affects clothing choice."
+    },
+    "statistics": {
+      "participant_count": "28,500 participants in 2025 according to official news",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "The 2025 event set a new participation record for the city according to official news.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Munich is a strong autumn choice for runners who want a full city experience, several race formats and a finish in Olympiapark rather than a purely flat PB machine.",
+      "course_character": "The course mixes sightseeing and urban energy: Olympiapark, Marienplatz, English Garden and Werksviertel create a more place-specific race identity.",
+      "atmosphere": "Urban, energetic and increasingly community-oriented after the revised concept.",
+      "good_fit_for": "Runners wanting a Bavarian autumn marathon, half marathon, 10 km race or relay in a large city setting.",
+      "not_ideal_for": "Athletes whose only priority is the flattest and fastest possible marathon course.",
+      "insider_tips": "Book near Olympiapark or on a direct U-Bahn line, watch official updates for half-marathon capacity and plan clothing for a cool morning.",
+      "seo_summary": "The MARATHON MUENCHEN by Brooks 2026 takes place on 11 October 2026. The event offers marathon, half marathon, 10 KM Run and relay formats with start and finish in Olympiapark."
+    },
+    "sources": [
+      {
+        "source_url": "https://marathonmuenchen.org/en/",
+        "source_type": "official",
+        "source_label": "Official Marathon Muenchen website",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.94,
+        "verification_note": "Official homepage confirms 11 October 2026, ongoing registration, competition menu, route through Munich neighborhoods, start/finish in Olympiapark and official route highlights."
+      }
+    ],
+    "event_name": "Marathon Muenchen by Brooks",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until September; weekly during race month",
+    "source_note": "Core fields are based on the official Marathon Muenchen by Brooks website. Final start times, cutoff values and race-week pickup details should be rechecked before October.",
+    "faq": [
+      {
+        "question": "When is MARATHON MUENCHEN by Brooks 2026?",
+        "answer": "It is scheduled for Sunday, 11 October 2026."
+      },
+      {
+        "question": "Is registration open?",
+        "answer": "Yes. The official homepage states that registration for 2026 is ongoing."
+      },
+      {
+        "question": "Which race formats are offered?",
+        "answer": "The official site lists marathon, half marathon, 10 KM Run, marathon relay and additional family/weekend runs."
+      },
+      {
+        "question": "Where are start and finish?",
+        "answer": "The official homepage lists start and finish in Olympiapark."
+      },
+      {
+        "question": "What are route highlights?",
+        "answer": "Official route highlights include Olympiapark, Siegestor, Marienplatz, English Garden and Werksviertel."
+      },
+      {
+        "question": "Is it beginner-friendly?",
+        "answer": "Yes for prepared runners, especially because there are 10 km, half marathon and relay options in addition to the marathon."
+      }
+    ]
+  },
+  {
+    "event_slug": "adac-marathon-hannover-2027",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "ADAC Marathon Hannover 2027",
+      "event_series": "ADAC Marathon Hannover",
+      "sport_type": "Running",
+      "category": "Road running event weekend",
+      "region": "Lower Saxony",
+      "country": "Germany",
+      "organizer": "eichels GmbH",
+      "official_website": "https://www.marathon-hannover.de/",
+      "registration_url": "https://www.marathon-hannover.de/",
+      "event_status": "Scheduled",
+      "event_date": "2027-04-11",
+      "display_date": "Sunday, 11 April 2027",
+      "city": "Hannover",
+      "start_finish_area": "Trammplatz / Neues Rathaus area",
+      "distance_summary": "Marathon, half marathon, relay marathon and 10 KM",
+      "teaser": "A broad northern German spring race weekend with marathon, half marathon, relay and 10 km options.",
+      "data_quality_note": "Official site confirms the new edition on 11 April 2027 and links registration. Detailed 2027 pricing, start times and cutoff values still need later verification."
+    },
+    "registration": {
+      "registration_status": "Registration open",
+      "currency": "EUR",
+      "official_registration_url": "https://www.marathon-hannover.de/",
+      "registration_deadline": "Not yet verified",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Open at last check",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official homepage links Anmeldung ADAC Marathon 2027; detailed terms and fees should be reviewed in the registration flow."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Half Marathon",
+        "Relay Marathon",
+        "10 KM"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road running event weekend",
+      "surface": "Road / asphalt",
+      "course_character": "Large Hannover road-running event with broad race menu and city-course character.",
+      "start_location": "Trammplatz / Neues Rathaus area",
+      "finish_location": "Trammplatz / Neues Rathaus area",
+      "start_finish_same_place": true,
+      "course_format": "Hannover city course",
+      "personal_best_potential": "Medium to high",
+      "pb_potential": "medium_high",
+      "beginner_friendly": "Yes, with half marathon, relay and 10 km alternatives.",
+      "difficulty_rating": "Moderate; the event is accessible for prepared runners, with typical spring-weather and city-logistics considerations.",
+      "crowd_support_rating": "High",
+      "aid_stations": "Not yet verified",
+      "cutoff": "Not yet verified"
+    },
+    "race_day": {
+      "race_day": "Sunday, 11 April 2027",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "Not yet verified",
+      "start_area": "Trammplatz / Neues Rathaus area",
+      "finish_area": "Trammplatz / Neues Rathaus area",
+      "bib_pickup_info": "To be confirmed from final 2027 participant information.",
+      "expo": "Not yet verified",
+      "timing_system": "Official race timing"
+    },
+    "travel": {
+      "nearest_train_station": "Hannover Hauptbahnhof",
+      "nearest_airport": "Hannover Airport (HAJ)",
+      "public_transport_info": "The city-centre event area is practical by public transport from Hannover Hauptbahnhof.",
+      "parking_info": "Use public transport where possible because city-centre road closures are likely on race day.",
+      "accommodation_info": "Useful areas include Mitte, Hauptbahnhof, Maschsee and locations with direct Stadtbahn access.",
+      "race_day_access_note": "Plan extra time around Trammplatz, Friedrichswall and city-centre closures.",
+      "recommended_arrival": "Arrive at least one day before the race for bib pickup once final details are published."
+    },
+    "weather": {
+      "typical_weather": "Early April in Hannover can be cool and variable, with rain and wind possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Medium",
+      "heat_factor": "Low",
+      "best_conditions_note": "Cool, dry spring weather is ideal for racing.",
+      "planning_tip": "Prepare for cool pre-start conditions and check wind/rain forecasts before race weekend."
+    },
+    "statistics": {
+      "participant_count": "33,857 registered athletes in 2026 according to official news",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "Official 2026 news describes a record festival with course records over marathon, half marathon and 10 km.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Hannover is especially useful for spring planning: it offers several distances, a large event feel and a central northern German location.",
+      "course_character": "A road-running city event rather than a destination trail race, with broad appeal across marathon, half marathon, relay and 10 km.",
+      "atmosphere": "Large, regional and established, with strong city-centre race-weekend energy.",
+      "good_fit_for": "Northern German runners planning an April marathon or half marathon, relay teams and 10 km runners.",
+      "not_ideal_for": "Athletes seeking mountain terrain, trail surfaces or a very small field.",
+      "insider_tips": "Watch the official site for detailed 2027 participant info and consider staying near Hauptbahnhof or a direct Stadtbahn line.",
+      "seo_summary": "The ADAC Marathon Hannover 2027 is scheduled for 11 April 2027. The event offers marathon, half marathon, relay marathon and 10 km options in Hannover."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.marathon-hannover.de/",
+        "source_type": "official",
+        "source_label": "Official ADAC Marathon Hannover website",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.9,
+        "verification_note": "Official site confirms the new edition on 11 April 2027, registration link, organizer details and 2026 participation/news context."
+      }
+    ],
+    "event_name": "ADAC Marathon Hannover",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "medium_high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until winter; weekly from March 2027",
+    "source_note": "Core 2027 date, registration CTA, organizer and 2026 participation context are based on the official ADAC Marathon Hannover site.",
+    "faq": [
+      {
+        "question": "When is ADAC Marathon Hannover 2027?",
+        "answer": "The official homepage announces the next edition for Sunday, 11 April 2027."
+      },
+      {
+        "question": "Is registration available?",
+        "answer": "Yes. The official homepage links registration for ADAC Marathon 2027."
+      },
+      {
+        "question": "Which distances are relevant?",
+        "answer": "The project and official navigation cover marathon, half marathon, relay marathon and 10 km formats."
+      },
+      {
+        "question": "Who organizes the race?",
+        "answer": "The official site lists eichels GmbH as organizer."
+      },
+      {
+        "question": "How big is the event?",
+        "answer": "Official 2026 news reports 33,857 registered athletes across the event weekend."
+      },
+      {
+        "question": "Are 2027 start times confirmed?",
+        "answer": "Not yet in the current local detail data; they should be checked when final participant information is published."
+      }
+    ]
+  },
+  {
+    "event_slug": "uniper-marathon-dusseldorf-2027",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "Uniper Duesseldorf Marathon 2027",
+      "event_series": "Uniper Duesseldorf Marathon",
+      "sport_type": "Running",
+      "category": "Road running event weekend",
+      "region": "North Rhine-Westphalia",
+      "country": "Germany",
+      "organizer": "D.LIVE",
+      "official_website": "https://www.uniper-duesseldorfmarathon.de/",
+      "registration_url": "https://www.uniper-duesseldorfmarathon.de/",
+      "event_status": "Scheduled",
+      "event_date": "2027-04-18",
+      "display_date": "Sunday, 18 April 2027",
+      "city": "Duesseldorf",
+      "start_finish_area": "Duesseldorf city course with finish directly on the Rhine",
+      "distance_summary": "Marathon, half marathon, relay, Bambini and Kids Cup",
+      "teaser": "A spring city marathon in Duesseldorf with marathon, half marathon, relay and kids formats plus a finish directly on the Rhine.",
+      "data_quality_note": "Official homepage confirms registration call-to-action, race categories and Rhine finish positioning. Exact start/cutoff values require later verification."
+    },
+    "registration": {
+      "registration_status": "Registration open",
+      "currency": "EUR",
+      "official_registration_url": "https://www.uniper-duesseldorfmarathon.de/",
+      "registration_deadline": "Not yet verified",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Open at last check",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official homepage links 2027 registration via Datasport; detailed fee tiers were not visible in the crawl."
+    },
+    "course": {
+      "distances": [
+        "Marathon",
+        "Half Marathon",
+        "Marathon Relay",
+        "Bambini",
+        "Kids Cup"
+      ],
+      "main_distance": "42.195 km",
+      "course_type": "Road running event weekend",
+      "surface": "Road / asphalt",
+      "course_character": "Duesseldorf city-running event with music/spectator positioning and a finish directly on the Rhine.",
+      "finish_location": "Directly on the Rhine",
+      "start_finish_same_place": "Not yet verified",
+      "course_format": "Duesseldorf city course",
+      "personal_best_potential": "Medium",
+      "pb_potential": "medium",
+      "beginner_friendly": "Yes, with half marathon, relay and kids categories.",
+      "difficulty_rating": "Moderate; final course detail and cutoff should be verified before race-specific pacing guidance.",
+      "crowd_support_rating": "High",
+      "aid_stations": "Not yet verified",
+      "cutoff": "Not yet verified"
+    },
+    "race_day": {
+      "race_day": "Sunday, 18 April 2027",
+      "start_time": "To be confirmed",
+      "wave_start": "To be confirmed",
+      "total_cutoff": "Not yet verified",
+      "start_area": "To be confirmed",
+      "finish_area": "Directly on the Rhine",
+      "bib_pickup_info": "To be confirmed from final 2027 participant information.",
+      "expo": "Not yet verified",
+      "timing_system": "Official race timing"
+    },
+    "travel": {
+      "nearest_train_station": "Duesseldorf Hauptbahnhof",
+      "nearest_airport": "Duesseldorf Airport (DUS)",
+      "public_transport_info": "Use public transport for central Duesseldorf and Rhine-side race areas.",
+      "parking_info": "Driving into the race area is likely to be affected by road closures; use public transport where possible.",
+      "accommodation_info": "Useful areas include Altstadt, Stadtmitte, MedienHafen and locations near U-Bahn/S-Bahn access.",
+      "race_day_access_note": "Plan extra time around Rhine-side finish areas and central road closures.",
+      "recommended_arrival": "Arrive at least one day before the race once pickup details are published."
+    },
+    "weather": {
+      "typical_weather": "Mid-April in Duesseldorf is usually spring-like but variable, with rain and wind possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Medium",
+      "heat_factor": "Low",
+      "best_conditions_note": "Cool and dry weather is ideal for a spring city marathon.",
+      "planning_tip": "Prepare for rain and wind, especially around open Rhine-side sections."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified for 2027",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "The relaunched Duesseldorf marathon positions itself around a city festival and Rhine finish.",
+      "boston_qualifier": "Likely yes for eligible certified marathon performances, subject to B.A.A. rules and final verification."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Duesseldorf fills a useful NRW spring-marathon slot and combines marathon, half marathon, relay and family events in one city weekend.",
+      "course_character": "The current official messaging emphasizes city atmosphere and the Rhine finish more than hard performance metrics.",
+      "atmosphere": "Urban, music-oriented and spectator-focused.",
+      "good_fit_for": "NRW runners planning a spring marathon or half marathon, relay teams and families.",
+      "not_ideal_for": "Athletes who need fully published cutoff/start-time details far in advance.",
+      "insider_tips": "Use public transport, monitor Datasport/organizer updates for prices and start times and choose accommodation with easy Rhine/city-centre access.",
+      "seo_summary": "The Uniper Duesseldorf Marathon 2027 is scheduled for 18 April 2027. The event offers marathon, half marathon, relay and kids races with a finish directly on the Rhine."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.uniper-duesseldorfmarathon.de/",
+        "source_type": "official",
+        "source_label": "Official Uniper Duesseldorf Marathon website",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.9,
+        "verification_note": "Official homepage confirms registration call-to-action, race categories and finish directly on the Rhine."
+      }
+    ],
+    "event_name": "Uniper Duesseldorf Marathon",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "medium_high",
+    "next_check": "2026-07-24",
+    "check_frequency": "biweekly until winter; weekly from March 2027",
+    "source_note": "Core fields are based on the official Uniper Duesseldorf Marathon homepage. Final race-day schedule and cutoffs should be checked once participant information is complete.",
+    "faq": [
+      {
+        "question": "When is the Uniper Duesseldorf Marathon 2027?",
+        "answer": "The event is listed locally for Sunday, 18 April 2027 and the official homepage links 2027 registration."
+      },
+      {
+        "question": "Is registration open?",
+        "answer": "Yes. The official homepage links to 2027 registration."
+      },
+      {
+        "question": "Which race formats are offered?",
+        "answer": "The homepage describes marathon, half marathon, relay, Bambini and Kids Cup options."
+      },
+      {
+        "question": "Where is the finish?",
+        "answer": "The official homepage describes the finish as directly on the Rhine."
+      },
+      {
+        "question": "Are start times confirmed?",
+        "answer": "Not yet in the current detail data; final race-day timing should be checked on the official site."
+      },
+      {
+        "question": "Is it beginner-friendly?",
+        "answer": "Yes for prepared runners, especially because half marathon, relay and kids formats are available."
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-hamburg-european-championship-2026",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "IRONMAN Hamburg European Championship 2026",
+      "event_series": "IRONMAN Hamburg European Championship",
+      "sport_type": "Triathlon",
+      "category": "Full-distance triathlon",
+      "region": "Hamburg",
+      "country": "Germany",
+      "organizer": "IRONMAN",
+      "official_website": "https://www.ironman.com/races/im-hamburg",
+      "registration_url": "https://www.ironman.com/races/im-hamburg",
+      "event_status": "Scheduled",
+      "event_date": "2026-06-07",
+      "display_date": "Sunday, 7 June 2026",
+      "city": "Hamburg",
+      "start_finish_area": "Hamburg city course / Jungfernstieg context",
+      "distance_summary": "3.8 km swim, 180 km bike, 42.2 km run",
+      "teaser": "A sold-out full-distance IRONMAN in Hamburg with European Championship positioning and a flat bike/run profile.",
+      "data_quality_note": "Official IRONMAN page confirms 7 June 2026, sold-out registration and registration opening date. Final athlete-guide details, cutoffs and transition logistics require review."
+    },
+    "registration": {
+      "registration_status": "Registration sold out",
+      "registration_open_date": "2025-06-05 14:00 CEST",
+      "currency": "EUR",
+      "price_tiers": "Inventory-based pricing; public fee value not exposed in the crawl.",
+      "lottery_available": false,
+      "sold_out_status": "Sold out",
+      "official_registration_url": "https://www.ironman.com/races/im-hamburg",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official IRONMAN page shows Registration Sold Out for the 7 June 2026 event."
+    },
+    "course": {
+      "distances": [
+        "3.8 km swim",
+        "180 km bike",
+        "42.2 km run"
+      ],
+      "main_distance": "Full-distance triathlon",
+      "course_type": "Long-distance triathlon",
+      "surface": "Lake swim, road bike, road run",
+      "swim_distance": "3.8 km",
+      "bike_distance": "180 km",
+      "run_distance": "42.2 km",
+      "course_character": "Full-distance IRONMAN in a Hamburg city setting with flat bike and run indicators on the official page.",
+      "start_location": "Hamburg / swim start to be verified from athlete guide",
+      "finish_location": "Hamburg / finish to be verified from athlete guide",
+      "personal_best_potential": "Medium to high for experienced long-distance triathletes if conditions are favourable.",
+      "beginner_friendly": "No, best for experienced long-distance triathletes.",
+      "difficulty_rating": "High",
+      "crowd_support_rating": "High",
+      "cutoff": "Not yet verified from athlete guide",
+      "risk_notes": "Open-water swim conditions, long flat bike pacing, nutrition discipline and potential early-summer heat are key risks."
+    },
+    "race_day": {
+      "race_day": "Sunday, 7 June 2026",
+      "start_time": "To be confirmed from athlete guide",
+      "total_cutoff": "Not yet verified",
+      "swim_cutoff": "Not yet verified",
+      "bike_cutoff": "Not yet verified",
+      "run_cutoff": "Not yet verified",
+      "bib_pickup_info": "To be confirmed from final IRONMAN athlete guide.",
+      "expo": "IRONMAN race-week context; final schedule to be verified.",
+      "timing_system": "IRONMAN timing",
+      "medical": "IRONMAN race medical services; final athlete-guide details to be verified."
+    },
+    "travel": {
+      "nearest_train_station": "Hamburg Hauptbahnhof",
+      "nearest_airport": "Hamburg Airport (HAM)",
+      "public_transport_info": "Use public transport for central Hamburg race-week movements and expect extensive event logistics.",
+      "parking_info": "Driving close to transition/finish areas may be restricted; check athlete guide and city traffic updates.",
+      "accommodation_info": "Book early near central Hamburg or transit lines with easy access to transition and finish areas.",
+      "race_day_access_note": "Supporter logistics should be planned around swim, bike transition, run course and finish access.",
+      "recommended_arrival": "Arrive several days before the race for bike check-in, briefing and transition setup."
+    },
+    "weather": {
+      "typical_weather": "Early June in Hamburg can be mild to warm, with wind and rain possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Medium",
+      "heat_factor": "Medium",
+      "best_conditions_note": "Calm water, low wind and mild temperatures are ideal for a full-distance race.",
+      "planning_tip": "Prepare for changing conditions across swim, bike and marathon, and test nutrition in similar weather."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "IRONMAN Hamburg carries European Championship positioning on the official race page.",
+      "world_championship_slots": "Needs review from official athlete guide / slot allocation page."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "IRONMAN Hamburg is one of Germany's flagship full-distance triathlons: city setting, strong spectator appeal and sold-out demand.",
+      "course_character": "A full-distance race where execution matters more than novelty: efficient swim, disciplined flat-bike pacing and controlled marathon energy.",
+      "atmosphere": "Large, international and high-stakes, with IRONMAN event structure and championship context.",
+      "good_fit_for": "Experienced long-distance triathletes targeting a full IRONMAN in Germany.",
+      "not_ideal_for": "Beginners, athletes without long-distance preparation or anyone still needing an entry after sell-out.",
+      "insider_tips": "Track athlete-guide updates, plan supporter transport carefully and practise nutrition for a flat bike followed by a full marathon.",
+      "seo_summary": "IRONMAN Hamburg European Championship 2026 takes place on 7 June 2026. The full-distance triathlon is sold out and covers 3.8 km swim, 180 km bike and 42.2 km run."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.ironman.com/races/im-hamburg",
+        "source_type": "official",
+        "source_label": "Official IRONMAN Hamburg race page",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.92,
+        "verification_note": "Official page confirms registration sold out, 7 June 2026 race date and 5 June 2025 registration opening time."
+      }
+    ],
+    "event_name": "IRONMAN Hamburg European Championship",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-17",
+    "check_frequency": "weekly until race day",
+    "source_note": "Core date and registration fields are based on the official IRONMAN Hamburg race page. Athlete-guide cutoffs and operational details should be rechecked from final IRONMAN documents.",
+    "faq": [
+      {
+        "question": "When is IRONMAN Hamburg 2026?",
+        "answer": "The official IRONMAN page lists Sunday, 7 June 2026."
+      },
+      {
+        "question": "Is registration still open?",
+        "answer": "No. The official page shows Registration Sold Out."
+      },
+      {
+        "question": "When did registration open?",
+        "answer": "The official page lists 5 June 2025 at 14:00 CEST."
+      },
+      {
+        "question": "What distance is the race?",
+        "answer": "It is a full-distance triathlon: 3.8 km swim, 180 km bike and 42.2 km run."
+      },
+      {
+        "question": "Is it beginner-friendly?",
+        "answer": "No. It is best suited to experienced long-distance triathletes."
+      },
+      {
+        "question": "Are final cutoffs verified?",
+        "answer": "Not yet in the local detail data; final cutoffs should be checked in the official athlete guide."
+      }
+    ]
+  },
+  {
+    "event_slug": "ironman-frankfurt-2026",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "IRONMAN Frankfurt 2026",
+      "event_series": "IRONMAN Frankfurt",
+      "sport_type": "Triathlon",
+      "category": "Full-distance triathlon",
+      "region": "Hesse",
+      "country": "Germany",
+      "organizer": "IRONMAN",
+      "official_website": "https://www.ironman.com/races/im-frankfurt",
+      "registration_url": "https://www.ironman.com/races/im-frankfurt",
+      "event_status": "Scheduled",
+      "event_date": "2026-06-28",
+      "display_date": "Sunday, 28 June 2026",
+      "city": "Frankfurt",
+      "start_finish_area": "Frankfurt / Mainkai finish context",
+      "distance_summary": "3.8 km swim, 180 km bike, 42.2 km run",
+      "teaser": "A sold-out full-distance IRONMAN in Frankfurt with European Championship context, lake swim, rolling bike course and flat run profile.",
+      "data_quality_note": "Official IRONMAN page confirms 28 June 2026, registration sold out and registration opening date. Final athlete-guide details, cutoffs and transition logistics require review."
+    },
+    "registration": {
+      "registration_status": "Registration sold out",
+      "registration_open_date": "2025-07-03",
+      "currency": "EUR",
+      "price_tiers": "Inventory-based pricing; public fee value not exposed in the crawl.",
+      "lottery_available": false,
+      "sold_out_status": "Sold out",
+      "official_registration_url": "https://www.ironman.com/races/im-frankfurt",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official IRONMAN page shows Registration Sold Out for the 28 June 2026 event."
+    },
+    "course": {
+      "distances": [
+        "3.8 km swim",
+        "180 km bike",
+        "42.2 km run"
+      ],
+      "main_distance": "Full-distance triathlon",
+      "course_type": "Long-distance triathlon",
+      "surface": "Lake swim, rolling road bike, flat road run",
+      "swim_distance": "3.8 km",
+      "bike_distance": "180 km",
+      "run_distance": "42.2 km",
+      "course_character": "Full-distance IRONMAN with lake swim, rolling bike profile and flat run profile according to official page indicators.",
+      "start_location": "Lake swim start to be verified from athlete guide",
+      "finish_location": "Frankfurt / Mainkai context",
+      "personal_best_potential": "Medium for experienced athletes; bike pacing and heat management can be decisive.",
+      "beginner_friendly": "No, best for experienced long-distance triathletes.",
+      "difficulty_rating": "High",
+      "crowd_support_rating": "High",
+      "cutoff": "Not yet verified from athlete guide",
+      "risk_notes": "Late-June heat, rolling bike pacing and marathon fueling discipline are the main planning risks."
+    },
+    "race_day": {
+      "race_day": "Sunday, 28 June 2026",
+      "start_time": "To be confirmed from athlete guide",
+      "total_cutoff": "Not yet verified",
+      "swim_cutoff": "Not yet verified",
+      "bike_cutoff": "Not yet verified",
+      "run_cutoff": "Not yet verified",
+      "bib_pickup_info": "To be confirmed from final IRONMAN athlete guide.",
+      "expo": "IRONMAN race-week context; final schedule to be verified.",
+      "timing_system": "IRONMAN timing",
+      "medical": "IRONMAN race medical services; final athlete-guide details to be verified."
+    },
+    "travel": {
+      "nearest_train_station": "Frankfurt (Main) Hauptbahnhof",
+      "nearest_airport": "Frankfurt Airport (FRA)",
+      "public_transport_info": "Frankfurt has strong rail and airport access, but transition and finish logistics should be planned from the athlete guide.",
+      "parking_info": "Driving near transition/finish areas may be restricted; check athlete-guide traffic information.",
+      "accommodation_info": "Book early near central Frankfurt, the finish area or transit links to transition.",
+      "race_day_access_note": "Supporter logistics should be planned around split locations for swim, bike, run and finish.",
+      "recommended_arrival": "Arrive several days before race day for check-in, briefing, bike check-in and transition setup."
+    },
+    "weather": {
+      "typical_weather": "Late June in Frankfurt can be warm to hot, with summer storms possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Low to medium",
+      "heat_factor": "High",
+      "best_conditions_note": "Mild temperatures and low wind are ideal; heat can strongly affect the marathon.",
+      "planning_tip": "Practise heat management, hydration and sodium strategy before race day."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "IRONMAN Frankfurt is one of Germany's flagship full-distance triathlon events and carries European Championship context.",
+      "world_championship_slots": "Needs review from official athlete guide / slot allocation page."
+    },
+    "editorial": {
+      "why_this_event_stands_out": "IRONMAN Frankfurt is a serious season-defining race: full distance, big-city finish, championship context and demanding summer execution.",
+      "course_character": "The race is less about raw speed than complete discipline across three sports, especially with rolling bike terrain and possible late-June heat.",
+      "atmosphere": "International, intense and high-profile, with strong city-finish energy.",
+      "good_fit_for": "Experienced triathletes targeting a full-distance A-race in Germany.",
+      "not_ideal_for": "Beginners, athletes not prepared for long-distance heat management or anyone still seeking a regular entry after sell-out.",
+      "insider_tips": "Track athlete-guide updates, prepare heat strategy early and separate race-week logistics for swim start, transitions and finish.",
+      "seo_summary": "IRONMAN Frankfurt 2026 takes place on 28 June 2026. The full-distance triathlon is sold out and covers 3.8 km swim, 180 km bike and 42.2 km run."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.ironman.com/races/im-frankfurt",
+        "source_type": "official",
+        "source_label": "Official IRONMAN Frankfurt race page",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.92,
+        "verification_note": "Official page confirms registration sold out, 28 June 2026 race date and 3 July 2025 registration opening date."
+      }
+    ],
+    "event_name": "IRONMAN Frankfurt",
+    "data_version": "20260710-priority-detail-wave-1",
+    "priority": "high",
+    "next_check": "2026-07-17",
+    "check_frequency": "weekly until race day",
+    "source_note": "Core date and registration fields are based on the official IRONMAN Frankfurt race page. Athlete-guide cutoffs and transition logistics require final document review.",
+    "faq": [
+      {
+        "question": "When is IRONMAN Frankfurt 2026?",
+        "answer": "The official IRONMAN page lists Sunday, 28 June 2026."
+      },
+      {
+        "question": "Is registration still open?",
+        "answer": "No. The official page shows Registration Sold Out."
+      },
+      {
+        "question": "When did registration open?",
+        "answer": "The official page lists 3 July 2025."
+      },
+      {
+        "question": "What distance is the race?",
+        "answer": "It is a full-distance triathlon: 3.8 km swim, 180 km bike and 42.2 km run."
+      },
+      {
+        "question": "What is the biggest planning risk?",
+        "answer": "Late-June heat and nutrition/pacing discipline can be decisive, especially on the marathon."
+      },
+      {
+        "question": "Are final cutoffs verified?",
+        "answer": "Not yet in the local detail data; final cutoffs should be checked in the official athlete guide."
+      }
+    ]
+  },
+  {
+    "event_slug": "challenge-roth-2027",
+    "verification_status": "verified_official_source",
+    "last_checked": "2026-07-10",
+    "basis": {
+      "official_name": "DATEV Challenge Roth 2027",
+      "event_series": "DATEV Challenge Roth",
+      "sport_type": "Triathlon",
+      "category": "Long-distance triathlon",
+      "region": "Bavaria",
+      "country": "Germany",
+      "organizer": "Challenge Roth",
+      "official_website": "https://www.challenge-roth.com/de/",
+      "registration_url": "https://www.challenge-roth.com/de/",
+      "event_status": "Scheduled",
+      "event_date": "2027-07-04",
+      "display_date": "Sunday, 4 July 2027",
+      "city": "Roth",
+      "start_finish_area": "Main-Danube Canal swim start and Roth triathlon stadium finish",
+      "distance_summary": "3.8 km swim, 180 km bike, 42.2 km run",
+      "teaser": "One of Europe's iconic long-distance triathlons returns on 4 July 2027, known for the Main-Danube Canal swim, Solarer Berg and the triathlon stadium finish.",
+      "data_quality_note": "Official homepage confirms the next DATEV Challenge Roth date as 4 July 2027 and confirms the long-distance route identity. Registration, start schedule and cutoff details still need next-edition review."
+    },
+    "registration": {
+      "registration_status": "Next-edition registration to be verified",
+      "currency": "EUR",
+      "official_registration_url": "https://www.challenge-roth.com/de/",
+      "registration_deadline": "Not yet verified for 2027",
+      "entry_fee_current_year": "Not yet verified",
+      "sold_out_status": "Needs review for 2027",
+      "transfer_possible": "Not yet verified",
+      "refund_policy": "Not yet verified",
+      "verification_note": "Official homepage confirms 4 July 2027 as the next event date; registration details should be checked when published."
+    },
+    "course": {
+      "distances": [
+        "3.8 km swim",
+        "180 km bike",
+        "42.2 km run"
+      ],
+      "main_distance": "Long-distance triathlon",
+      "course_type": "Long-distance triathlon",
+      "surface": "Canal swim, road bike, road run",
+      "swim_distance": "3.8 km",
+      "bike_distance": "180 km",
+      "run_distance": "42.2 km",
+      "course_character": "Iconic long-distance triathlon through the Roth triathlon region, including Main-Danube Canal swim, Solarer Berg and triathlon stadium finish.",
+      "start_location": "Main-Danube Canal swim start",
+      "finish_location": "Triathlon stadium finish",
+      "start_finish_same_place": false,
+      "course_format": "Point-to-point style long-distance triathlon logistics across swim, bike and run venues",
+      "iconic_sections": [
+        "Main-Danube Canal swim start",
+        "Solarer Berg",
+        "Triathlon stadium finish"
+      ],
+      "personal_best_potential": "Medium to high for elite and experienced age-group athletes, depending on heat and race execution.",
+      "beginner_friendly": "No, best for experienced long-distance triathletes.",
+      "difficulty_rating": "High",
+      "crowd_support_rating": "Very high",
+      "cutoff": "Not yet verified",
+      "risk_notes": "Heat, crowd energy causing overpacing, bike nutrition and marathon execution are key planning risks."
+    },
+    "race_day": {
+      "race_day": "Sunday, 4 July 2027",
+      "start_time": "To be confirmed for 2027",
+      "total_cutoff": "Not yet verified for 2027",
+      "swim_cutoff": "Not yet verified",
+      "bike_cutoff": "Not yet verified",
+      "run_cutoff": "Not yet verified",
+      "start_area": "Main-Danube Canal",
+      "finish_area": "Triathlon stadium",
+      "bib_pickup_info": "To be confirmed from 2027 athlete information.",
+      "expo": "Challenge Roth race-week context; 2027 details to be verified.",
+      "verification_note": "Race-day date rolled forward to 4 July 2027; start times, check-in schedule and cutoff values should be rechecked from official 2027 athlete information."
+    },
+    "travel": {
+      "nearest_train_station": "Roth",
+      "nearest_airport": "Nuremberg Airport (NUE)",
+      "public_transport_info": "Race-week logistics require planning across Roth, swim start, bike course and finish stadium.",
+      "parking_info": "Use official event guidance because road closures and supporter movements are extensive.",
+      "accommodation_info": "Accommodation in Roth and nearby towns sells out early; Nuremberg can be a practical wider-area base.",
+      "race_day_access_note": "Supporter logistics around Solarer Berg, transition areas and the stadium finish should be planned well ahead.",
+      "recommended_arrival": "Arrive several days before race day for check-in, bike logistics and course familiarisation."
+    },
+    "weather": {
+      "typical_weather": "Early July in Franconia can be warm or hot, with thunderstorms possible.",
+      "rainfall_risk": "Medium",
+      "wind_risk": "Low to medium",
+      "heat_factor": "High",
+      "best_conditions_note": "Mild temperatures, low wind and stable weather are ideal; heat can heavily affect the marathon.",
+      "planning_tip": "Prepare heat, hydration and nutrition strategy early and avoid being pulled above plan by the Solarer Berg atmosphere."
+    },
+    "statistics": {
+      "participant_count": "Not yet verified for 2026",
+      "finisher_count": "Not yet verified",
+      "historic_significance": "Official homepage states the sport festival has been home to triathletes from around the world since 1984.",
+      "course_record_male": "Needs review",
+      "course_record_female": "Needs review"
+    },
+    "editorial": {
+      "why_this_event_stands_out": "Challenge Roth is a bucket-list race because it feels different from a normal long-distance triathlon: Solarer Berg, stadium finish and regional support define the experience.",
+      "course_character": "The race rewards controlled intensity. The energy is huge, but the distance still punishes early overpacing and weak nutrition.",
+      "atmosphere": "Exceptional, emotional and deeply rooted in the region.",
+      "good_fit_for": "Experienced long-distance triathletes seeking a high-atmosphere European goal race.",
+      "not_ideal_for": "Beginners, late planners or athletes who need simple travel and accommodation logistics.",
+      "insider_tips": "Plan accommodation early, map supporter movements in advance and treat heat preparation as a core part of training.",
+      "seo_summary": "DATEV Challenge Roth 2027 takes place on 4 July 2027. The long-distance triathlon covers 3.8 km swim, 180 km bike and 42.2 km run and is known for Solarer Berg and the Roth stadium finish."
+    },
+    "sources": [
+      {
+        "source_url": "https://www.challenge-roth.com/de/",
+        "source_type": "official",
+        "source_label": "Official DATEV Challenge Roth homepage",
+        "last_verified": "2026-07-10",
+        "confidence_score": 0.95,
+        "verification_note": "Official homepage confirms the long-distance format, Main-Danube Canal, Solarer Berg, stadium finish, event history since 1984 and next edition on 4 July 2027."
+      }
+    ],
+    "event_name": "DATEV Challenge Roth",
+    "data_version": "20260710-date-roll-forward",
+    "priority": "high",
+    "next_check": "2026-08-10",
+    "check_frequency": "monthly; weekly once 2027 registration and athlete-guide details are published",
+    "source_note": "The official DATEV Challenge Roth homepage currently promotes the next edition on 4 July 2027. Core route identity is retained from official Challenge Roth information; start times, registration details and athlete-guide cutoffs require follow-up verification.",
+    "faq": [
+      {
+        "question": "When is DATEV Challenge Roth 2027?",
+        "answer": "The official homepage currently states that DATEV Challenge Roth will take place on Sunday, 4 July 2027."
+      },
+      {
+        "question": "What distance is Challenge Roth?",
+        "answer": "The event is a long-distance triathlon with 3.8 km swim, 180 km bike and 42.2 km run."
+      },
+      {
+        "question": "What are the iconic sections?",
+        "answer": "The official homepage highlights the Main-Danube Canal swim start, Solarer Berg and the triathlon stadium finish."
+      },
+      {
+        "question": "Is registration open?",
+        "answer": "Registration details for the next edition still need to be verified on the official site."
+      },
+      {
+        "question": "Is Challenge Roth beginner-friendly?",
+        "answer": "No. It is best suited to experienced long-distance triathletes."
+      },
+      {
+        "question": "What should athletes verify next?",
+        "answer": "Start times, cutoff values, registration details and athlete-guide logistics should be checked when official 2027 information is published."
+      }
+    ]
+  }
+]

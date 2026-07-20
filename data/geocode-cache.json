@@ -1,0 +1,4 @@
+{
+  "note": "Local cache reserved for reviewed geocoding references. The audit also reads existing import caches and never changes events.csv.",
+  "entries": {}
+}

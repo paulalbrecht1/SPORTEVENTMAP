@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title desc">
+  <title id="title">Sport Event Map</title>
+  <desc id="desc">Mountain route icon with a map pin.</desc>
+  <defs>
+    <linearGradient id="pinGradient" x1="31" y1="2" x2="31" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ff5a1f"/>
+      <stop offset="1" stop-color="#ef2f14"/>
+    </linearGradient>
+    <linearGradient id="inkGradient" x1="10" y1="20" x2="54" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#102232"/>
+      <stop offset="1" stop-color="#07131f"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#f8fafc"/>
+  <path
+    d="M12 42.5 23.5 29l6.7 8.1 9.1-13.8L52 43.5v7.1H12v-8.1Z"
+    fill="url(#inkGradient)"
+  />
+  <path
+    d="m19 45.5 9.6-8.7 3.4 5.1 7.1-9.8 11 16.3H19v-2.9Z"
+    fill="#ffffff"
+    opacity=".92"
+  />
+  <path
+    d="M21.5 49.5c6.5-6.3 15-7.1 25-2.7-7.7-1.6-13.5.6-17.7 6.2l-7.3-3.5Z"
+    fill="#f8fafc"
+  />
+  <path
+    d="M32 4c-8.1 0-14.7 6.4-14.7 14.4 0 10 14.7 24.2 14.7 24.2s14.7-14.2 14.7-24.2C46.7 10.4 40.1 4 32 4Zm0 20.1a5.8 5.8 0 1 1 0-11.6 5.8 5.8 0 0 1 0 11.6Z"
+    fill="url(#pinGradient)"
+  />
+</svg>

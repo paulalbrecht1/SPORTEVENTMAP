@@ -1,0 +1,208 @@
+{
+  "generated_at": "2026-06-19T09:39:34.919Z",
+  "events_checked": 994,
+  "exact_duplicates": 0,
+  "likely_duplicates": 2,
+  "same_website_duplicates": 4,
+  "same_coordinates_date_suspicious": 3,
+  "priority_review_list": [
+    {
+      "reason": "similar_name_city_near_date",
+      "confidence": 60,
+      "first": {
+        "event_name": "IRONMAN Vitoria-Gasteiz",
+        "date": "12.07.2026",
+        "city": "Vitoria-Gasteiz",
+        "country": "Spain",
+        "event_url": "https://www.ironman.com/races/im-vitoria",
+        "latitude": "42.8465088",
+        "longitude": "-2.6724025"
+      },
+      "second": {
+        "event_name": "IRONMAN 70.3 Vitoria-Gasteiz",
+        "date": "12.07.2026",
+        "city": "Vitoria-Gasteiz",
+        "country": "Spain",
+        "event_url": "https://www.ironman.com/races/im703-vitoria",
+        "latitude": "42.8465088",
+        "longitude": "-2.6724025"
+      }
+    },
+    {
+      "reason": "similar_name_city_near_date",
+      "confidence": 100,
+      "first": {
+        "event_name": "Haspa Marathon Hamburg",
+        "date": "25.04.2027",
+        "city": "Hamburg",
+        "country": "Germany",
+        "event_url": "https://haspa-marathon-hamburg.de/",
+        "latitude": "53.557504",
+        "longitude": "9.975498"
+      },
+      "second": {
+        "event_name": "Haspa Halbmarathon Hamburg",
+        "date": "25.04.2027",
+        "city": "Hamburg",
+        "country": "Germany",
+        "event_url": "https://haspa-marathon-hamburg.de/halbmarathon/",
+        "latitude": "53.5501721",
+        "longitude": "10.0013165"
+      }
+    },
+    {
+      "reason": "same_website",
+      "confidence": 92,
+      "first": {
+        "event_name": "SportScheck RUN München",
+        "date": "05.07.2026",
+        "city": "München",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "48.1371079",
+        "longitude": "11.5753822"
+      },
+      "second": {
+        "event_name": "SportScheck RUN Nürnberg",
+        "date": "25.10.2026",
+        "city": "Nürnberg",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "49.453872",
+        "longitude": "11.077298"
+      }
+    },
+    {
+      "reason": "same_website",
+      "confidence": 92,
+      "first": {
+        "event_name": "1. Laufchallenge Mellendorfer TV",
+        "date": "23.08.2026",
+        "city": "Hanover",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.3744779",
+        "longitude": "9.7385532"
+      },
+      "second": {
+        "event_name": "10. Charity-Lauf Koldingen",
+        "date": "02.08.2026",
+        "city": "Region Hannover",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.2714193",
+        "longitude": "9.7968916"
+      }
+    },
+    {
+      "reason": "same_website",
+      "confidence": 92,
+      "first": {
+        "event_name": "1. Laufchallenge Mellendorfer TV",
+        "date": "23.08.2026",
+        "city": "Hanover",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.3744779",
+        "longitude": "9.7385532"
+      },
+      "second": {
+        "event_name": "25. Volkslauf um den Altwarmbüchener See",
+        "date": "10.10.2026",
+        "city": "Isernhagen",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.4347962",
+        "longitude": "9.8483711"
+      }
+    },
+    {
+      "reason": "same_website",
+      "confidence": 92,
+      "first": {
+        "event_name": "10. Charity-Lauf Koldingen",
+        "date": "02.08.2026",
+        "city": "Region Hannover",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.2714193",
+        "longitude": "9.7968916"
+      },
+      "second": {
+        "event_name": "25. Volkslauf um den Altwarmbüchener See",
+        "date": "10.10.2026",
+        "city": "Isernhagen",
+        "country": "Germany",
+        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
+        "latitude": "52.4347962",
+        "longitude": "9.8483711"
+      }
+    },
+    {
+      "reason": "same_coordinates_near_date",
+      "confidence": 60,
+      "first": {
+        "event_name": "IRONMAN Vitoria-Gasteiz",
+        "date": "12.07.2026",
+        "city": "Vitoria-Gasteiz",
+        "country": "Spain",
+        "event_url": "https://www.ironman.com/races/im-vitoria",
+        "latitude": "42.8465088",
+        "longitude": "-2.6724025"
+      },
+      "second": {
+        "event_name": "IRONMAN 70.3 Vitoria-Gasteiz",
+        "date": "12.07.2026",
+        "city": "Vitoria-Gasteiz",
+        "country": "Spain",
+        "event_url": "https://www.ironman.com/races/im703-vitoria",
+        "latitude": "42.8465088",
+        "longitude": "-2.6724025"
+      }
+    },
+    {
+      "reason": "same_coordinates_near_date",
+      "confidence": 50,
+      "first": {
+        "event_name": "Schwarzwald Marathon",
+        "date": "10.10.2026",
+        "city": "Bräunlingen",
+        "country": "Germany",
+        "event_url": "https://www.schwarzwaldmarathon.de/",
+        "latitude": "47.9300645",
+        "longitude": "8.448329"
+      },
+      "second": {
+        "event_name": "Internationaler Schwarzwald-Marathon",
+        "date": "11.10.2026",
+        "city": "Bräunlingen",
+        "country": "Germany",
+        "event_url": "http://www.schwarzwald-marathon.de",
+        "latitude": "47.9300645",
+        "longitude": "8.448329"
+      }
+    },
+    {
+      "reason": "same_coordinates_near_date",
+      "confidence": 50,
+      "first": {
+        "event_name": "Esenser Volksbanklauf - 31. Stadtlauf",
+        "date": "31.07.2026",
+        "city": "Friesland",
+        "country": "Germany",
+        "event_url": "https://aeu-esens.de/veranstaltungen/2-volksbanklauf-27-esenser-stadtlauf/",
+        "latitude": "53.6468107",
+        "longitude": "7.6118499"
+      },
+      "second": {
+        "event_name": "Esenser Volksbanklauf",
+        "date": "31.07.2026",
+        "city": "Esens",
+        "country": "Germany",
+        "event_url": "https://www.lt-schafhauserwald.de/esenser-volksbanklauf/",
+        "latitude": "53.6468107",
+        "longitude": "7.6118499"
+      }
+    }
+  ]
+}

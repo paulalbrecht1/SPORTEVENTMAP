@@ -1,0 +1,314 @@
+[
+  {
+    "event_slug": "bmw-berlin-marathon-2026",
+    "sources": [
+      {
+        "label": "Official registration information",
+        "url": "https://www.bmw-berlin-marathon.com/en/registration/registration-information/",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration model", "value": "Lottery allocation for marathon entries" },
+      { "label": "Lottery window", "value": "25 September 2025 to 06 November 2025" },
+      { "label": "2025 entry fee", "value": "€205" },
+      { "label": "Minimum age", "value": "18 years and older" }
+    ],
+    "course_details": [
+      { "label": "Course type", "value": "Road marathon" },
+      { "label": "Course distance", "value": "42.195 km" },
+      { "label": "Organizer note", "value": "World Marathon Majors event with official course security, refreshment points and finisher services included in the race package." }
+    ],
+    "start_times_cutoffs": [
+      { "label": "Overall time limit", "value": "6:15 h from crossing the start line" },
+      { "label": "Start card", "value": "Sent by email in September 2026" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "International major marathon with a large elite field and high-performance road running profile." },
+      { "label": "Best for", "value": "Runners planning a major-city marathon with strong logistics and a large international field." }
+    ],
+    "travel_logistics": [
+      { "label": "Race material", "value": "Collected personally at the MARATHON EXPO at Messe Berlin with start card and picture ID." },
+      { "label": "Public transport", "value": "Race package includes a 4-day public transport ticket for Berlin fare zone ABC." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Late-September marathon; verify race-week weather and start logistics before travel." }
+    ]
+  },
+  {
+    "event_slug": "generali-koln-marathon-2026",
+    "sources": [
+      {
+        "label": "Official event website",
+        "url": "https://generali-koeln-marathon.de/",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration status", "value": "Registration open" },
+      { "label": "Marathon 2026 fee", "value": "€130" },
+      { "label": "Half Marathon 2026 fee", "value": "€95" },
+      { "label": "Relay Marathon 2026 fee", "value": "€199" },
+      { "label": "School Marathon 2026 fee", "value": "€50" },
+      { "label": "Kids Run 2026 fee", "value": "€9" }
+    ],
+    "course_details": [
+      { "label": "Course character", "value": "Flat and fast city course" },
+      { "label": "Start", "value": "Deutz" },
+      { "label": "Finish", "value": "Kölner Dom" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Urban Rhine-city marathon with finish atmosphere at Cologne Cathedral." },
+      { "label": "Best for", "value": "Runners comparing marathon, half marathon and relay options in one event weekend." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Early-October road event; check the official site for final start and travel information." }
+    ]
+  },
+  {
+    "event_slug": "hermannslauf-bielefeld-2026",
+    "sources": [
+      {
+        "label": "Official event website",
+        "url": "https://hermannslauf.de/",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "course_details": [
+      { "label": "Distance", "value": "31.1 km" },
+      { "label": "Route", "value": "From Detmold to Bielefeld" },
+      { "label": "Elevation", "value": "Approximately 550 m elevation gain" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "Start time", "value": "11:00" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Regional classic from the Hermannsdenkmal area toward Bielefeld." },
+      { "label": "Best for", "value": "Runners looking for a demanding local classic with more terrain than a flat road race." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Late-April event; prepare for changing spring conditions and a hilly profile." }
+    ]
+  },
+  {
+    "event_slug": "challenge-roth-2026",
+    "sources": [
+      {
+        "label": "Official course information",
+        "url": "https://www.challenge-roth.com/de/streckeninfo.html",
+        "last_checked": "2026-06-29"
+      },
+      {
+        "label": "Official athlete information",
+        "url": "https://www.challenge-roth.com/de/wichtige-infos-fuer-deinen-start.html",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "course_details": [
+      { "label": "Swim", "value": "3.8 km in the canal" },
+      { "label": "Bike", "value": "180 km two-lap course through the Roth triathlon region" },
+      { "label": "Run", "value": "42.2 km via the canal, Roth market square, Büchenbach and finish in Roth" },
+      { "label": "Iconic section", "value": "Solarer Berg on the bike course" },
+      { "label": "Aid stations", "value": "Bike aid stations approximately every 17.5 km; run aid stations approximately every 2 km" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "Swim start", "value": "06:30" },
+      { "label": "Transition opens", "value": "05:00" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Long-distance triathlon classic with Solarer Berg, strong spectator energy and a stadium finish." },
+      { "label": "Best for", "value": "Experienced long-distance triathletes who want a high-atmosphere race with demanding logistics." },
+      { "label": "Spectator note", "value": "Official course information highlights spectator points along bike and run routes." }
+    ],
+    "travel_logistics": [
+      { "label": "Bib pickup", "value": "Triathlon-Park Roth athlete service: Thursday 10:00-19:00, Friday 10:00-20:00, Saturday 09:00-12:00" },
+      { "label": "Bike check-in", "value": "Saturday 12:30-17:30" },
+      { "label": "Swim-start parking", "value": "Parking fee at swim start listed as €5, donated to charity" }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Long-distance race day with extensive pre-race logistics; check official athlete information before travel." }
+    ]
+  },
+  {
+    "event_slug": "ironman-hamburg-european-championship-2026",
+    "sources": [
+      {
+        "label": "Official IRONMAN race page",
+        "url": "https://www.ironman.com/races/im-hamburg",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration status", "value": "Registration sold out" },
+      { "label": "Registration opening", "value": "05 June 2025 at 14:00 CEST" }
+    ],
+    "course_details": [
+      { "label": "Swim type", "value": "Lake swim" },
+      { "label": "Bike character", "value": "Flat" },
+      { "label": "Run character", "value": "Flat" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "IRONMAN European Championship host in Germany's second-largest city." },
+      { "label": "Best for", "value": "Athletes looking for a major city IRONMAN with strong spectator support." },
+      { "label": "Spectator note", "value": "Official page highlights community support and city atmosphere." }
+    ],
+    "weather_planning": [
+      { "label": "High air temperature", "value": "67°F / 19°C listed on official page" },
+      { "label": "Low air temperature", "value": "48°F / 9°C listed on official page" },
+      { "label": "Average water temperature", "value": "65°F / 18°C listed on official page" }
+    ]
+  },
+  {
+    "event_slug": "ironman-frankfurt-2026",
+    "sources": [
+      {
+        "label": "Official IRONMAN race page",
+        "url": "https://www.ironman.com/races/im-frankfurt",
+        "last_checked": "2026-06-29"
+      },
+      {
+        "label": "Official IRONMAN registration page",
+        "url": "https://www.ironman.com/races/im-frankfurt/register",
+        "last_checked": "2026-06-29"
+      },
+      {
+        "label": "Official IRONMAN event schedule",
+        "url": "https://www.ironman.com/races/im-frankfurt/schedule",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration status", "value": "Registration sold out for 2026" },
+      { "label": "Registration opening", "value": "03 July 2025" },
+      { "label": "2026 entry fee", "value": "Not published on the official public registration page" },
+      { "label": "Pricing model", "value": "Inventory-based pricing; price can change as capacity fills" },
+      { "label": "Withdrawal / transfer note", "value": "IRONMAN withdrawal and transfer requests are separate from race cutoff times and are not displayed as race cutoffs." }
+    ],
+    "course_details": [
+      { "label": "Race format", "value": "Full-distance IRONMAN triathlon" },
+      { "label": "Swim", "value": "Lake swim" },
+      { "label": "Bike character", "value": "Rolling" },
+      { "label": "Run character", "value": "Flat" },
+      { "label": "Official positioning", "value": "IRONMAN European Championship for age group athletes and PRO male athletes" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "2025 reference schedule", "value": "Official schedule states 2026 details will be updated; current schedule is a 2025 reference." },
+      { "label": "Pro start reference", "value": "06:20 at Langener Waldsee" },
+      { "label": "Age-group rolling start reference", "value": "06:35-07:00 at Langener Waldsee" },
+      { "label": "Finish-line cutoff reference", "value": "22:00 at Römerberg" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Long-distance IRONMAN race in Frankfurt with a city-centre finish line and European Championship status." },
+      { "label": "Best for", "value": "Experienced long-distance triathletes who need to plan swim-bike-run logistics, heat exposure and race-week travel carefully." },
+      { "label": "Spectator note", "value": "The official page highlights a legendary finish line in the heart of the old city." }
+    ],
+    "travel_logistics": [
+      { "label": "Race hub reference", "value": "2025 schedule lists Mainkai for registration, expo, run-bag drop-off and Transition 2." },
+      { "label": "Swim start reference", "value": "2025 schedule lists Langener Waldsee for Transition 1 and race start." },
+      { "label": "Finish reference", "value": "2025 schedule lists Römerberg for finish-line activities." },
+      { "label": "Travel access", "value": "Official page highlights Frankfurt airport access." }
+    ],
+    "weather_planning": [
+      { "label": "High air temperature", "value": "83°F / 28°C listed on official page" },
+      { "label": "Low air temperature", "value": "59°F / 15°C listed on official page" },
+      { "label": "Average water temperature", "value": "76°F / 24°C listed on official page" },
+      { "label": "Planning context", "value": "Plan heat management, hydration and race-week logistics carefully for a full-distance summer triathlon." }
+    ]
+  },
+  {
+    "event_slug": "zugspitz-ultratrail-2026",
+    "sources": [
+      {
+        "label": "Official ZUT100 race page",
+        "url": "https://zugspitz.utmb.world/races/zut100",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration status", "value": "Sold out for major listed categories" }
+    ],
+    "course_details": [
+      { "label": "Course type", "value": "Mountain trail / ultra trail" },
+      { "label": "ZUT100", "value": "107 km, 5280 m+ elevation gain" },
+      { "label": "Ehrwald Trail", "value": "74 km, 3000 m+ elevation gain" },
+      { "label": "Leutasch Trail", "value": "69 km, 3140 m+ elevation gain" },
+      { "label": "Mittenwald Trail", "value": "44 km, 2110 m+ elevation gain" },
+      { "label": "Garmisch-Partenkirchen Trail", "value": "29 km, 1565 m+ elevation gain" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "ZUT100", "value": "20:00 start, 27 h cutoff" },
+      { "label": "Ehrwald Trail", "value": "21:00 start, 17 h cutoff" },
+      { "label": "Leutasch Trail", "value": "05:00 start, 16 h cutoff" },
+      { "label": "Mittenwald Trail", "value": "07:00 start, 10 h cutoff" },
+      { "label": "Garmisch-Partenkirchen Trail", "value": "10:00 start, 7 h cutoff" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Alpine trail racing around the Zugspitze with multiple demanding distances." },
+      { "label": "Best for", "value": "Trail runners who need to plan elevation, cutoff windows and mountain-specific preparation." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Mountain weather can change quickly; verify mandatory equipment and race-day updates on the official page." }
+    ]
+  },
+  {
+    "event_slug": "hoka-utmb-mont-blanc-2026",
+    "sources": [
+      {
+        "label": "Official UTMB race pages",
+        "url": "https://montblanc.utmb.world/races/utmb",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "course_details": [
+      { "label": "UTMB", "value": "174 km, 9900 m+ elevation gain" },
+      { "label": "CCC", "value": "101 km, 6050 m+ elevation gain" },
+      { "label": "TDS", "value": "145 km, 9500 m+ elevation gain" },
+      { "label": "OCC", "value": "60 km, 3500 m+ elevation gain" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "UTMB", "value": "17:45 start, 46 h 45 min cutoff" },
+      { "label": "CCC", "value": "09:00 start, 26 h 30 min cutoff" },
+      { "label": "TDS", "value": "23:50 start, 44 h 55 min cutoff" },
+      { "label": "OCC", "value": "08:15 start, 14 h 30 min cutoff" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "Flagship mountain ultra event around Mont Blanc with several iconic race formats." },
+      { "label": "Best for", "value": "Experienced trail and ultra athletes comparing route length, elevation and cutoff demands." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "High-mountain ultra conditions require careful equipment, weather and cutoff planning." }
+    ]
+  },
+  {
+    "event_slug": "mozart-100-by-utmb-2027",
+    "sources": [
+      {
+        "label": "Official Mozart 100 race pages",
+        "url": "https://mozart.utmb.world/races/mozart100",
+        "last_checked": "2026-06-29"
+      }
+    ],
+    "registration_fees": [
+      { "label": "Registration status", "value": "Opening soon" }
+    ],
+    "course_details": [
+      { "label": "Mozart 100", "value": "119 km, 5700 m+ elevation gain" },
+      { "label": "mozart Ultra", "value": "72 km, 3300 m+ elevation gain" },
+      { "label": "mozart Marathon", "value": "44 km, 1600 m+ elevation gain" },
+      { "label": "mozart Half Marathon", "value": "28 km, 1100 m+ elevation gain" }
+    ],
+    "start_times_cutoffs": [
+      { "label": "Mozart 100", "value": "05:00 start, 23 h cutoff" },
+      { "label": "mozart Ultra", "value": "08:00 start, 20 h cutoff" },
+      { "label": "mozart Marathon", "value": "10:30 start, 14 h cutoff" },
+      { "label": "mozart Half Marathon", "value": "11:30 start, 13 h cutoff" }
+    ],
+    "event_highlights": [
+      { "label": "Known for", "value": "UTMB World Series trail event around Salzburg with several mountain-distance options." },
+      { "label": "Best for", "value": "Trail runners comparing a range of distances from half-marathon trail to 100 km ultra." }
+    ],
+    "weather_planning": [
+      { "label": "Planning context", "value": "Early-June alpine trail conditions can vary; verify race-day equipment and weather guidance from the official event page." }
+    ]
+  }
+]

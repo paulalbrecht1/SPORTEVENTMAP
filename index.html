@@ -1,0 +1,3313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Sport Event Map</title>
+
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
+  <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="manifest" href="/site.webmanifest">
+
+  <link rel="preconnect" href="https://unpkg.com" crossorigin />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+
+  <!-- LEAFLET CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <!-- DEIN CSS -->
+  <link rel="stylesheet" href="css/style.css?v=20260720-discovery-controls-v29" />
+</head>
+
+<body>
+
+<div
+  id="betaBanner"
+  class="beta-banner"
+>
+  <div>
+    <strong>BETA VERSION</strong>
+    <span>Sport Event Map is in closed beta. Event data is reviewed continuously, and your feedback helps improve the product.</span>
+  </div>
+  <button
+    type="button"
+    id="betaFeedbackBtn"
+  >
+    Feedback geben
+  </button>
+  <button
+    type="button"
+    id="openWelcomeBtn"
+    class="beta-guide-btn"
+  >
+    Beta guide
+  </button>
+  <button
+    type="button"
+    id="closeBetaBannerBtn"
+    class="beta-close-btn"
+    aria-label="Hide beta banner"
+    title="Hide beta banner"
+  >
+    &times;
+  </button>
+</div>
+
+<section
+  id="landingPage"
+  class="landing-page"
+  aria-label="Sport Event Map landing page"
+>
+  <div class="landing-hero">
+    <div class="landing-brand">
+      <img
+        class="landing-brand-icon"
+        src="assets/brand/sport-event-map-icon.svg"
+        alt=""
+        aria-hidden="true"
+      />
+      <strong>Sport Event Map</strong>
+      <select
+        id="landingLanguageSelect"
+        class="app-language-select"
+        aria-label="Language"
+      >
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+      </select>
+      <nav class="landing-platform-nav" aria-label="Platform navigation">
+        <a href="#/home" data-platform-route="home">Home</a>
+        <a href="#/discovery" data-platform-route="discovery">Discovery</a>
+        <a href="#/events" data-platform-route="events">Event Wiki</a>
+        <a href="#/planner" data-platform-route="planner">Season Planner</a>
+        <a href="#/community" data-platform-route="community">Community</a>
+      </nav>
+    </div>
+
+    <div class="landing-hero-main">
+      <div class="landing-hero-content">
+        <span class="landing-kicker">Sport Event Map</span>
+        <h2>
+          <span>Plan your</span>
+          <span>racing</span>
+          <span>season.</span>
+          <strong>Discover races,<br class="landing-mobile-break"> save favorites<br class="landing-mobile-break"> and build your season.</strong>
+        </h2>
+        <p>
+          Discover running, trail, ultra and triathlon events across Europe. Plan A-, B- and C-races with countdowns, training blocks and realistic recovery windows.
+        </p>
+
+        <div class="landing-hero-actions">
+          <button type="button" id="landingDiscoverBtn">
+            Explore Events
+          </button>
+          <button type="button" id="landingSeasonBtn">
+            Plan Your Season
+          </button>
+          <button type="button" id="landingSubmitHeroBtn">
+            Submit Event
+          </button>
+        </div>
+
+        <div class="landing-proof-strip" aria-label="Platform highlights">
+          <span>
+            <strong>994</strong>
+            curated events
+          </span>
+          <span>
+            <strong>Europe</strong>
+            running, trail & triathlon
+          </span>
+          <span>
+            <strong>Map + Planner</strong>
+            from discovery to race calendar
+          </span>
+        </div>
+
+        <div class="landing-search-section">
+          <div class="landing-search-box">
+            <input
+              type="text"
+              id="landingSearchInput"
+              placeholder="Search by event, city, sport, distance or month..."
+              autocomplete="off"
+            />
+            <button type="button" id="landingSearchBtn">
+              Search
+            </button>
+          </div>
+
+          <div class="landing-popular-searches">
+            <span>Popular searches:</span>
+            <button type="button" data-landing-query="Marathon im Oktober">Marathon im Oktober</button>
+            <button type="button" data-landing-query="Triathlon Hamburg">Triathlon Hamburg</button>
+            <button type="button" data-landing-query="Ultramarathon">Ultramarathon</button>
+            <button type="button" data-landing-query="Trailrunning Alpen">Trailrunning Alpen</button>
+            <button type="button" data-landing-query="Halbmarathon Berlin">Halbmarathon Berlin</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="landing-map-visual" aria-hidden="true">
+        <div class="landing-map-panel">
+          <span class="landing-map-line line-one"></span>
+          <span class="landing-map-line line-two"></span>
+          <span class="landing-map-line line-three"></span>
+          <span class="landing-pin pin-running"></span>
+          <span class="landing-pin pin-trail"></span>
+          <span class="landing-pin pin-triathlon"></span>
+          <span class="landing-pin pin-ultra"></span>
+          <span class="landing-pin pin-city"></span>
+        </div>
+
+        <div class="landing-visual-card events-card">
+        <strong>994</strong>
+        <span>Curated events</span>
+        </div>
+        <div class="landing-visual-card sports-card">
+          <strong>Running &middot; Trail &middot; Triathlon</strong>
+          <span>Germany & Europe</span>
+        </div>
+        <div class="landing-visual-card planner-card">
+          <strong>Season Planner</strong>
+          <span>Countdown &middot; Priorities &middot; Warnings</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-benefits">
+    <article>
+      <span>Map</span>
+      <h3>Discover Events</h3>
+      <p>Find road, trail, ultra and triathlon races by place, date, distance and registration status.</p>
+    </article>
+    <article>
+      <span>Filter</span>
+      <h3>Find Better Timing</h3>
+      <p>Compare race dates and avoid stacking key events too close together.</p>
+    </article>
+    <article>
+      <span>Season</span>
+      <h3>Build Your Season</h3>
+      <p>Organize A-, B- and C-races, track training blocks and keep your calendar realistic.</p>
+    </article>
+  </div>
+
+  <div class="landing-feature landing-screenshot-section">
+    <div>
+      <span>Event discovery</span>
+      <h3>Explore events without losing context</h3>
+      <p>Search, filter and open event details while the map and list stay synchronized.</p>
+    </div>
+    <div class="landing-feature-panel landing-discovery-panel" aria-label="Event discovery highlights">
+      <div class="landing-panel-header">
+        <strong>Discovery engine</strong>
+        <span>Structured filters</span>
+      </div>
+      <div class="landing-panel-grid">
+        <span>Interactive map</span>
+        <strong>994 events</strong>
+        <em>Germany & Europe</em>
+      </div>
+      <div class="landing-panel-row">
+        <span class="landing-status-dot"></span>
+        <strong>Registration Open</strong>
+        <em>Official websites prioritized</em>
+      </div>
+      <div class="landing-panel-tags">
+        <span>Running</span>
+        <span>Trail</span>
+        <span>Triathlon</span>
+        <span>Ultra</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="landing-feature landing-season-section">
+    <div class="landing-feature-panel landing-planner-panel" aria-label="Season planner highlights">
+      <div class="landing-panel-header">
+        <strong>Season overview</strong>
+        <span>Personal plan</span>
+      </div>
+      <div class="landing-countdown-card">
+        <span>Next race</span>
+        <strong>Countdown</strong>
+        <em>Prioritize A / B / C races</em>
+      </div>
+      <div class="landing-mini-chart" aria-hidden="true">
+        <span style="height: 34%"></span>
+        <span style="height: 58%"></span>
+        <span style="height: 42%"></span>
+        <span style="height: 76%"></span>
+        <span style="height: 49%"></span>
+      </div>
+      <div class="landing-panel-row">
+        <span class="landing-warning-dot"></span>
+        <strong>Recovery warnings</strong>
+        <em>Spot races that are too close together</em>
+      </div>
+    </div>
+    <div>
+      <span>Season Planner</span>
+      <h3>Build a season you can actually execute</h3>
+      <ul>
+        <li>Countdown to the next race</li>
+        <li>A/B/C race priorities</li>
+        <li>Monthly race load</li>
+        <li>Recovery warnings for tight spacing</li>
+        <li>Distance and sport distribution</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="landing-return-section">
+    <span>Weekly planning dashboard</span>
+    <h3>Open it before you commit to another race.</h3>
+    <div>
+      <article>
+        <strong>Next race</strong>
+        <p>Keep the next important start date, priority and location visible.</p>
+      </article>
+      <article>
+        <strong>Season overview</strong>
+        <p>Review race load, sport mix, spacing and monthly density in one place.</p>
+      </article>
+      <article>
+        <strong>Training blocks</strong>
+        <p>Spot useful build phases and tight recovery gaps before they surprise you.</p>
+      </article>
+      <article>
+        <strong>Better suggestions</strong>
+        <p>Discover events that fit your current distance, sport and timing profile.</p>
+      </article>
+    </div>
+  </div>
+
+  <div class="landing-quality-section">
+    <span>Data quality</span>
+    <h3>Event data built for planning</h3>
+    <div>
+      <span>Official organizer websites</span>
+      <span>Status checked</span>
+      <span>Date validated</span>
+      <span>Duplicates removed</span>
+      <span>Coordinates reviewed</span>
+    </div>
+  </div>
+
+  <div class="landing-add-event-section">
+    <div>
+      <span>Community data</span>
+      <h3>Missing race?</h3>
+      <p>Submit races with an official website so they can be reviewed before they appear on the map.</p>
+    </div>
+    <button type="button" id="landingAddEventBtn">
+      + Add Event
+    </button>
+  </div>
+
+  <footer class="landing-footer">
+    <div>
+      <strong>Sport Event Map</strong>
+      <span>Discover. Plan. Race. Beta event data may change.</span>
+    </div>
+    <div class="landing-appearance-control" aria-label="Appearance">
+      <div role="group" aria-label="Landing page appearance">
+        <button
+          type="button"
+          class="active"
+          data-landing-theme="system"
+          aria-label="Use system appearance"
+          title="System"
+        >
+          <span aria-hidden="true" class="theme-icon theme-icon-device"></span>
+          <span class="sr-only">System</span>
+        </button>
+        <button
+          type="button"
+          data-landing-theme="light"
+          aria-label="Use light appearance"
+          title="Light"
+        >
+          <span aria-hidden="true" class="theme-icon theme-icon-sun"></span>
+          <span class="sr-only">Light</span>
+        </button>
+        <button
+          type="button"
+          data-landing-theme="dark"
+          aria-label="Use dark appearance"
+          title="Dark"
+        >
+          <span aria-hidden="true" class="theme-icon theme-icon-moon"></span>
+          <span class="sr-only">Dark</span>
+        </button>
+      </div>
+    </div>
+    <nav aria-label="Landing legal links">
+      <a href="imprint.html">Impressum</a>
+      <a href="privacy.html">Datenschutz</a>
+      <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
+    </nav>
+  </footer>
+</section>
+
+  <!-- TOPBAR -->
+<div id="topbar">
+
+  <div id="topbar-left">
+
+  <button
+    id="toggleSidebar"
+    type="button"
+    data-testid="discovery-panel-toggle"
+    aria-label="Events &amp; Filter öffnen"
+    aria-controls="sidebar"
+    aria-expanded="false"
+    title="Events &amp; Filter öffnen"
+  >
+    <span class="sidebar-toggle-chevron" aria-hidden="true"></span>
+    <span class="sidebar-toggle-list-icon" aria-hidden="true">
+      <i></i><i></i><i></i>
+    </span>
+    <span class="sidebar-toggle-label">Events &amp; Filter</span>
+  </button>
+
+  <button
+    id="platformMenuBtn"
+    class="platform-menu-btn"
+    type="button"
+    aria-label="Open navigation"
+    aria-controls="platformMobileMenu"
+    aria-expanded="false"
+  >
+    <span aria-hidden="true"></span>
+  </button>
+
+  <a
+    href="index.html#/home"
+    id="brandHomeLink"
+    class="brand"
+    aria-label="Sport Event Map Home"
+  >
+    <img
+      class="brand-icon"
+      src="assets/brand/sport-event-map-icon.svg"
+      alt=""
+      aria-hidden="true"
+    />
+    <span class="brand-name">Sport Event Map</span>
+  </a>
+
+  <button
+    id="mobileFilterBtn"
+    data-testid="filter-open"
+    type="button"
+  >
+    Filters
+  </button>
+
+</div>
+
+  <div id="topbar-center">
+
+    <nav id="platformNav" class="platform-nav" aria-label="Platform navigation">
+      <a href="#/home" data-platform-route="home" data-testid="nav-home">Home</a>
+      <a href="#/discovery" data-platform-route="discovery" data-testid="nav-discovery">Discovery</a>
+      <a href="#/events" data-platform-route="events">Event Wiki</a>
+      <a href="#/planner" data-platform-route="planner" data-testid="nav-season-planner">Season Planner</a>
+      <a href="#/community" data-platform-route="community">Community</a>
+    </nav>
+
+    <div id="topbar-search">
+
+      <input
+        type="text"
+        id="searchInput"
+        data-testid="event-search"
+        placeholder="Find your next race..."
+        autocomplete="off"
+      />
+
+      <div
+        id="searchSuggestions"
+        aria-live="polite"
+      ></div>
+
+    </div>
+
+  </div>
+
+  <div id="topbar-right">
+
+    <div id="topbarProductActions">
+
+      <button
+        id="seasonPlannerBtn"
+        type="button"
+        hidden
+        aria-hidden="true"
+        tabindex="-1"
+      >
+        Season Planner
+      </button>
+
+      <button
+        id="addEventBtn"
+        style="display:none;"
+      >
+        + Add Event
+      </button>
+
+    </div>
+
+    <div id="authArea">
+
+      <select
+        id="topbarLanguageSelect"
+        class="app-language-select"
+        aria-label="Language"
+      >
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+      </select>
+
+      <button
+        id="adminBtn"
+        style="display:none;"
+      >
+        Admin
+      </button>
+
+      <button id="loginBtn">
+        Login
+      </button>
+
+      <button id="registerBtn">
+        Register
+      </button>
+
+      <button
+        id="profileBtn"
+        data-testid="nav-profile"
+        style="display:none;"
+      >
+        Profile
+      </button>
+
+      <button id="feedbackBtn">
+        Feedback
+      </button>
+
+      <button
+        id="logoutBtn"
+        style="display:none;"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="platformMobileOverlay"></div>
+
+<nav
+  id="platformMobileMenu"
+  class="platform-mobile-menu"
+  aria-label="Mobile platform navigation"
+>
+  <div class="platform-mobile-menu-header">
+    <strong>Sport Event Map</strong>
+    <button
+      id="platformMenuCloseBtn"
+      type="button"
+      aria-label="Close navigation"
+    >
+      &times;
+    </button>
+  </div>
+  <a href="#/home" data-platform-route="home">Home</a>
+  <a href="#/discovery" data-platform-route="discovery">Discovery</a>
+  <a href="#/events" data-platform-route="events">Event Wiki</a>
+  <a href="#/planner" data-platform-route="planner">Season Planner</a>
+  <a href="#/community" data-platform-route="community">Community</a>
+  <a href="#/submit" data-platform-route="submit">Event einreichen</a>
+  <a
+    href="#/admin"
+    data-platform-route="admin"
+    data-admin-nav
+    style="display:none;"
+  >Admin</a>
+</nav>
+
+<div id="mobileFilterBackdrop"></div>
+
+<main id="platformPages" class="platform-pages" aria-live="polite">
+  <section
+    id="eventWikiPage"
+    class="platform-page event-wiki-page"
+    data-platform-page="events"
+    aria-labelledby="eventWikiTitle"
+  >
+    <div class="platform-page-shell">
+      <div class="platform-page-hero">
+        <span>Event Wiki</span>
+        <h1 id="eventWikiTitle">Event guides built for race decisions.</h1>
+        <p>
+          Event Wiki is the knowledge area for verified detail information on
+          endurance events, from course profile and cut-off times to race guide
+          links, registration details and planning notes.
+        </p>
+        <div class="platform-page-actions">
+          <a href="#/discovery" data-platform-route="discovery">Explore events on the map</a>
+          <a href="#/submit" data-platform-route="submit">Submit event information</a>
+        </div>
+      </div>
+
+      <div class="platform-feature-grid event-wiki-feature-grid">
+        <article>
+          <span>Course</span>
+          <h2>Course information</h2>
+          <p>Route character, surface, aid stations, pacers and PB potential will be shown in a consistent structure.</p>
+        </article>
+        <article>
+          <span>Cut-offs</span>
+          <h2>Cut-off times</h2>
+          <p>Race-day limits, intermediate cut-offs and triathlon check-in windows will be separated from generic notes.</p>
+        </article>
+        <article>
+          <span>Elevation</span>
+          <h2>Elevation and difficulty</h2>
+          <p>Elevation gain, terrain, wind, heat, technical trails or open-water conditions will be marked when verified.</p>
+        </article>
+        <article>
+          <span>Race guide</span>
+          <h2>Bib pickup and race guide</h2>
+          <p>Start documents, official race guide links, bag drop and medical information will stay close to the event facts.</p>
+        </article>
+        <article>
+          <span>Registration</span>
+          <h2>Registration and prices</h2>
+          <p>Entry status, price phases, lottery rules, sold-out notes and official registration links will remain source-based.</p>
+        </article>
+        <article>
+          <span>Preparation</span>
+          <h2>Experience and planning tips</h2>
+          <p>Event-specific atmosphere, target group, logistics and preparation notes will be added only when they can be checked.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="plannerPage"
+    class="platform-page planner-platform-page"
+    data-platform-page="planner"
+    aria-labelledby="plannerPageTitle"
+  >
+    <div class="platform-page-shell">
+      <div class="platform-page-hero">
+        <span>Season Planner</span>
+        <h1 id="plannerPageTitle">Plane A-, B- und C-Rennen in einem ruhigen Saisonüberblick.</h1>
+        <p>
+          Der bestehende Planner bleibt erhalten und ist jetzt als eigener
+          Plattformbereich erreichbar. Events können aus Discovery und
+          Eventdetails heraus hinzugefügt werden.
+        </p>
+        <div class="platform-page-actions">
+          <button type="button" id="plannerPageOpenBtn">Season Planner öffnen</button>
+          <a href="#/discovery" data-platform-route="discovery">Events für die Saison finden</a>
+        </div>
+      </div>
+
+      <div class="platform-feature-grid">
+        <article>
+          <span>Countdown</span>
+          <h2>Nächstes Rennen sichtbar halten</h2>
+          <p>Der Planner zeigt gespeicherte Events, Countdown, Prioritäten, Notizen, Kalender und Training Blocks.</p>
+        </article>
+        <article>
+          <span>Login</span>
+          <h2>Persönliche Planung schützen</h2>
+          <p>Wenn du nicht eingeloggt bist, bekommst du eine klare Login-Aufforderung statt eines stillen Fehlers.</p>
+        </article>
+        <article>
+          <span>Sync</span>
+          <h2>Supabase bleibt die Quelle für Nutzerpläne</h2>
+          <p>Akzeptierte Planner-Aktionen verwenden weiterhin die bestehende Favoriten- und Supabase-Synchronisierung.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section
+    id="communityPage"
+    class="platform-page community-page"
+    data-platform-page="community"
+    aria-labelledby="communityPageTitle"
+  >
+    <div class="platform-page-shell">
+      <div class="platform-page-hero">
+        <span>Community</span>
+        <h1 id="communityPageTitle">A place for event questions, travel and shared race plans.</h1>
+        <p>
+          Community is planned as a practical layer around events: questions
+          and answers, rideshares, shared lodging, race reports, organizer news
+          and finding people for training or race day.
+        </p>
+        <div class="platform-page-actions">
+          <a href="#/discovery" data-platform-route="discovery">Browse events first</a>
+          <button type="button" id="communitySuggestFeatureBtn">Suggest a community feature</button>
+        </div>
+      </div>
+
+      <div class="community-search-placeholder">
+        <label for="communityEventSearch">Search event</label>
+        <input
+          id="communityEventSearch"
+          type="text"
+          placeholder="e.g. Berlin Marathon, IRONMAN Hamburg, Trail..."
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="platform-feature-grid community-card-grid">
+        <article>
+          <span>Q&A</span>
+          <h2>Questions and answers</h2>
+          <p>Ask event-specific questions about course, cut-off, bib pickup, heat, waves or logistics.</p>
+        </article>
+        <article>
+          <span>Ride share</span>
+          <h2>Find rideshares</h2>
+          <p>Coordinate travel with athletes heading to the same start area or city.</p>
+        </article>
+        <article>
+          <span>Stay</span>
+          <h2>Share lodging or rental cars</h2>
+          <p>Prepare shared hotel, apartment or rental car plans around crowded race weekends.</p>
+        </article>
+        <article>
+          <span>Stories</span>
+          <h2>Race reports</h2>
+          <p>Collect practical experience from athletes who already raced the event.</p>
+        </article>
+        <article>
+          <span>News</span>
+          <h2>Organizer updates</h2>
+          <p>Keep relevant organizer news close to the event instead of spreading it across channels.</p>
+        </article>
+        <article>
+          <span>Buddies</span>
+          <h2>Find training or race buddies</h2>
+          <p>Find people preparing for the same distance, event month or race-day goal.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+  <!-- MAIN APP -->
+  <div id="app">
+
+    <!-- SIDEBAR -->
+    <div id="sidebar">
+
+      <!-- SIDEBAR HEADER -->
+      <div id="sidebar-header">
+
+        <div class="filter-select-card filter-sort-card">
+
+          <label for="sortSelect">
+            Sort
+          </label>
+
+        <select id="sortSelect">
+
+
+     <option value="date" selected> By date </option>
+     <option value="name"> Alphabetical </option>
+  </select>
+
+        </div>
+
+        <div class="filter-select-card filter-date-card">
+
+          <label for="dateFilter">
+            Date
+          </label>
+
+  <select id="dateFilter">
+  <option value="all"> All events </option>
+  <option value="upcoming"> Upcoming </option>
+  <option value="thisYear"> This year </option>
+  <option value="next30"> Next 30 days </option>
+  <option value="custom"> Custom range </option>
+  </select>
+
+  <div id="dateRangeFilter">
+
+    <div class="date-range-title">
+      Date range
+    </div>
+
+    <label>
+      From
+      <input
+        type="date"
+        id="dateFromFilter"
+      />
+    </label>
+
+    <label>
+      To
+      <input
+        type="date"
+        id="dateToFilter"
+      />
+    </label>
+
+    <div class="date-range-actions">
+
+      <button
+        type="button"
+        id="applyDateRangeFilter"
+      >
+        Apply range
+      </button>
+
+      <button
+        type="button"
+        id="clearDateRangeFilter"
+      >
+        Reset
+      </button>
+
+    </div>
+
+  </div>
+
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-accordion filter-sport-card open">
+
+          <button
+            type="button"
+            class="filter-accordion-toggle"
+            aria-expanded="true"
+          >
+            <span>
+              Sport
+            </span>
+          </button>
+
+          <div class="filter-accordion-content">
+
+        <div id="filters">
+
+          <button
+            class="filter-chip active"
+            data-filter="All"
+            data-testid="filter-sport-all"
+          >
+            All
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Running"
+            data-testid="filter-sport-running"
+          >
+            Running
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Triathlon"
+            data-testid="filter-sport-triathlon"
+          >
+            Triathlon
+          </button>
+
+          <button
+            class="filter-chip"
+            data-filter="Ultramarathon"
+            data-testid="filter-sport-ultra"
+          >
+            Ultramarathon
+          </button>
+
+        </div>
+
+          </div>
+
+        </div>
+
+        <div class="filter-accordion filter-dropdown filter-distance-card">
+
+          <button
+            type="button"
+            class="filter-accordion-toggle"
+            aria-expanded="false"
+            id="distanceFilterToggle"
+          >
+            <span>
+              Distance
+            </span>
+
+            <strong id="distanceFilterCount">
+              Any
+            </strong>
+          </button>
+
+          <div class="filter-accordion-content">
+
+        <div id="distanceFilters">
+
+          <div class="distance-filter-group">
+            <span class="distance-filter-group-title">
+              Running
+            </span>
+
+            <div class="distance-filter-options">
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="5k"
+                type="button"
+              >
+                5K
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="10k"
+                type="button"
+              >
+                10K
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="half"
+                type="button"
+              >
+                Half Marathon
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="marathon"
+                type="button"
+              >
+                Marathon
+              </button>
+            </div>
+          </div>
+
+          <div class="distance-filter-group">
+            <span class="distance-filter-group-title">
+              Ultra
+            </span>
+
+            <div class="distance-filter-options">
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="ultra"
+                type="button"
+              >
+                Ultra
+              </button>
+            </div>
+          </div>
+
+          <div class="distance-filter-group">
+            <span class="distance-filter-group-title">
+              Triathlon
+            </span>
+
+            <div class="distance-filter-options">
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="tri-sprint"
+                type="button"
+              >
+                Sprint Tri
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="tri-olympic"
+                type="button"
+              >
+                Olympic Tri
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="tri-middle"
+                type="button"
+              >
+                Middle Tri
+              </button>
+
+              <button
+                class="distance-filter-chip"
+                data-distance-filter="tri-full"
+                type="button"
+              >
+                Full Tri
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+          </div>
+
+        </div>
+
+        <div class="filter-actions-row">
+
+          <button
+            type="button"
+            id="resetFiltersBtn"
+            data-testid="filter-reset"
+          >
+            Reset filters
+          </button>
+
+        </div>
+
+        <div class="filter-group-label active-filter-label">
+          Active filters
+        </div>
+
+        <div id="activeFilterSummary"></div>
+
+      </div>
+
+      <!-- EVENT LIST -->
+      <div id="eventListToolbar">
+
+        <div id="eventListSummary">
+          0 Events
+        </div>
+
+        <button
+          type="button"
+          id="toggleEventCardDensity"
+        >
+          Detailed cards
+        </button>
+
+        <button
+          type="button"
+          id="eventListFavoritesToggle"
+          class="event-list-favorites-toggle"
+          aria-pressed="false"
+        >
+          <span aria-hidden="true">♡</span>
+          Favorites
+        </button>
+
+        <button
+          type="button"
+          id="toggleEventListFullscreen"
+          aria-label="Expand event list"
+          title="Expand event list"
+        >
+          &rarr; List
+        </button>
+
+      </div>
+
+      <div id="eventList" data-testid="event-list"></div>
+
+      <div id="eventListPagination"></div>
+
+    </div>
+
+    <!-- MAP -->
+    <div id="map" data-testid="map"></div>
+
+    <!-- FLOATING ACTIONS -->
+<div id="floatingActions">
+
+  <button
+    id="mapToolsToggle"
+    type="button"
+    title="Kartenwerkzeuge öffnen"
+    aria-label="Kartenwerkzeuge öffnen"
+    aria-controls="mapToolsMenu"
+    aria-expanded="false"
+  ><span class="map-tool-symbol" aria-hidden="true">&#9881;</span><span class="sr-only">Map Tools</span></button>
+
+  <div id="mapToolsMenu" role="toolbar" aria-label="Kartenwerkzeuge">
+
+    <button
+      id="locateBtn"
+      type="button"
+      title="Eigenen Standort anzeigen"
+      aria-label="Eigenen Standort anzeigen"
+    ><span class="map-tool-symbol" aria-hidden="true">&#128205;</span><span class="sr-only">Location</span></button>
+
+    <button
+      id="favoritesBtn"
+      type="button"
+      title="Nur Favoriten anzeigen"
+      aria-label="Nur Favoriten anzeigen"
+    ><span class="map-tool-symbol" aria-hidden="true">&#10084;</span><span class="sr-only">Favorites</span></button>
+
+    <button
+      id="mapStyleBtn"
+      type="button"
+      title="Kartenstil wechseln"
+      aria-label="Kartenstil wechseln"
+    ><span class="map-tool-symbol" aria-hidden="true">&#128506;</span><span class="sr-only">Map style</span></button>
+
+    <select id="mapStyleSelect" aria-label="Map style">
+      <option value="standard"> Standard </option>
+      <option value="light"> Light </option>
+      <option value="outdoor"> Outdoor </option>
+    </select>
+
+  </div>
+
+</div>
+
+   
+
+       <!-- EVENT DRAWER -->
+    <div id="eventDrawer" data-testid="event-drawer">
+
+         <div id="drawerContent">
+
+         <div class="drawer-placeholder">
+
+      Select an event to view details.
+
+    </div>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- LEAFLET -->
+  <script
+    defer
+    src="https://unpkg.com/leaflet/dist/leaflet.js"
+    onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js'"
+  ></script>
+
+  <!-- MARKER CLUSTER -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+/>
+
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+/>
+
+<script
+  defer
+  src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+  onerror="this.onerror=null;this.src='https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js'"
+></script>
+
+  <!-- PAPAPARSE -->
+  <script
+    defer
+    src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"
+    onerror="this.onerror=null;this.src='https://unpkg.com/papaparse@5.4.1/papaparse.min.js'"
+  ></script>
+
+  <!-- JS FILES -->
+
+  <!-- EVENT MODAL -->
+<div id="eventModal">
+
+  <div class="event-modal-card">
+
+    <button id="closeEventModal" aria-label="Close event form">
+      &times;
+    </button>
+
+    <h2>
+      Add Event
+    </h2>
+
+    <label>
+      Event Name <span class="required-marker">*</span>
+      <input id="eventNameInput" placeholder="Berlin Marathon" required />
+    </label>
+
+    <label>
+      Sport <span class="required-marker">*</span>
+      <select id="eventSportInput" required>
+        <option value="">Select sport</option>
+        <option value="Running">Running</option>
+        <option value="Triathlon">Triathlon</option>
+        <option value="Ultramarathon">Ultramarathon</option>
+      </select>
+    </label>
+
+    <label>
+      Date <span class="required-marker">*</span>
+      <input id="eventDateInput" placeholder="06.09.2026" required />
+    </label>
+
+    <label>
+      Address / Venue
+      <input id="eventAddressInput" placeholder="Olympiastadion" />
+    </label>
+
+    <label>
+      City <span class="required-marker">*</span>
+      <input id="eventCityInput" placeholder="Berlin" required />
+    </label>
+
+    <label>
+      Country <span class="required-marker">*</span>
+      <input id="eventCountryInput" placeholder="Germany" required />
+    </label>
+
+    <label>
+      Distance <span class="required-marker">*</span>
+      <input id="eventDistanceInput" placeholder="Marathon" required />
+    </label>
+
+    <label>
+      Event URL <span class="required-marker">*</span>
+      <input id="eventUrlInput" placeholder="https://..." required />
+    </label>
+
+    <div class="event-stats-fields">
+
+      <label>
+        Participants
+        <input
+          id="eventParticipantsInput"
+          type="number"
+          min="0"
+          placeholder="Example: 37000"
+        />
+      </label>
+
+      <label>
+        Course profile
+        <select id="eventCourseTypeInput">
+          <option value="">Select profile</option>
+          <option value="Flat course">Flat course</option>
+          <option value="Rolling course">Rolling course</option>
+          <option value="Hilly course">Hilly course</option>
+          <option value="Elevation gain">Elevation gain</option>
+        </select>
+      </label>
+
+      <label>
+        Elevation gain
+        <input
+          id="eventElevationInput"
+          type="number"
+          min="0"
+          placeholder="Meters"
+        />
+      </label>
+
+      <label>
+        Highlight
+        <input
+          id="eventHighlightInput"
+          placeholder="Example: city finish, scenic trail, fast course"
+        />
+      </label>
+
+    </div>
+
+    <div id="eventSubmitPreview">
+      <strong>Preview</strong>
+      <span>Fill in the event details to preview the submission.</span>
+    </div>
+
+    <div
+      id="eventSubmitStatus"
+      class="event-submit-status"
+      aria-live="polite"
+      hidden
+    ></div>
+
+    <label class="event-honeypot" aria-hidden="true">
+      Website
+      <input
+        id="eventWebsiteInput"
+        tabindex="-1"
+        autocomplete="off"
+      />
+    </label>
+
+    <button id="submitEventBtn">
+      Submit Event
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- AUTH MODAL -->
+<div id="authModal">
+
+  <div class="auth-card">
+
+    <button id="closeAuthModal" aria-label="Close sign-in modal">
+      &times;
+    </button>
+
+    <h2 id="authTitle">
+      Login
+    </h2>
+
+    <label>
+      Email
+      <input
+        type="email"
+        id="authEmail"
+        placeholder="you@example.com"
+      />
+    </label>
+
+    <label>
+      Password
+      <input
+        type="password"
+        id="authPassword"
+        placeholder="Password"
+      />
+    </label>
+
+    <button id="authSubmitBtn">
+      Continue
+    </button>
+
+    <button
+      id="passwordResetBtn"
+      type="button"
+      class="auth-secondary-btn"
+    >
+      Forgot password?
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- PROFILE MODAL -->
+<div id="profileModal">
+
+  <div class="profile-card">
+
+    <button id="closeProfileModal" aria-label="Close profile">
+      &times;
+    </button>
+
+    <div class="profile-header">
+      <span>Profile</span>
+      <h2>
+        Account Settings
+      </h2>
+      <p>
+        Manage your login details and track your race achievements.
+      </p>
+    </div>
+
+    <select
+      id="profileLanguageSelect"
+      class="profile-compat-control"
+      aria-hidden="true"
+      tabindex="-1"
+      hidden
+    >
+      <option value="en">English</option>
+      <option value="de">Deutsch</option>
+    </select>
+
+    <section class="profile-section profile-account-section">
+      <div class="profile-section-heading">
+        <h3>
+          Account
+        </h3>
+        <span>Login</span>
+      </div>
+
+      <div class="profile-account-card">
+        <span>Email address</span>
+        <strong id="profileEmail">-</strong>
+        <p>
+          This is the email connected to your Sport Event Map account.
+        </p>
+      </div>
+
+      <form class="profile-form-grid" id="profileEmailForm">
+        <label>
+          <span>New email address</span>
+          <input
+            type="email"
+            id="profileNewEmail"
+            placeholder="name@example.com"
+            autocomplete="email"
+          />
+        </label>
+        <button
+          type="button"
+          id="profileEmailBtn"
+          class="profile-secondary-btn"
+        >
+          Change Email
+        </button>
+      </form>
+
+      <p class="profile-settings-hint">
+        Email changes may require confirmation through a link sent by Supabase.
+      </p>
+    </section>
+
+    <section class="profile-section profile-achievements-section">
+      <div class="profile-section-heading">
+        <h3>
+          Achievements
+        </h3>
+        <span id="profileCompletedCount">0 races</span>
+      </div>
+
+      <div id="profileAchievementBadges" class="profile-achievement-grid"></div>
+      <div id="profileCompletedEvents" class="profile-completed-list"></div>
+    </section>
+
+    <section class="profile-section profile-completed-archive-section">
+      <div class="profile-section-heading">
+        <h3>
+          Completed Events
+        </h3>
+        <span>Race history</span>
+      </div>
+      <button
+        type="button"
+        id="profileCompletedArchiveToggle"
+        class="profile-secondary-btn"
+        aria-expanded="false"
+        aria-controls="profileCompletedArchivePanel"
+      >
+        <span>View completed events</span>
+        <span class="profile-completed-toggle-chevron" aria-hidden="true"></span>
+      </button>
+      <div
+        id="profileCompletedArchivePanel"
+        class="profile-completed-archive-panel"
+        hidden
+      >
+        <div class="profile-completed-filterbar" id="profileCompletedFilterbar">
+          <button type="button" class="active" data-profile-completed-filter="all">All</button>
+          <button type="button" data-profile-completed-filter="finisher">Finisher</button>
+          <button type="button" data-profile-completed-filter="dnf_dns">DNF/DNS</button>
+          <button type="button" data-profile-completed-filter="with_result">With result</button>
+          <button type="button" data-profile-completed-filter="without_result">Without result</button>
+        </div>
+        <div id="profileCompletedArchiveList" class="profile-completed-archive-list"></div>
+      </div>
+    </section>
+
+    <section class="profile-section profile-security-section">
+      <div class="profile-section-heading">
+        <h3>
+          Password
+        </h3>
+        <span>Security</span>
+      </div>
+      <label>
+        <span class="profile-new-password-label">New Password</span>
+        <input
+          type="password"
+          id="profileNewPassword"
+          placeholder="At least 8 characters"
+        />
+      </label>
+
+      <label>
+        <span class="profile-repeat-password-label">Repeat Password</span>
+        <input
+          type="password"
+          id="profileRepeatPassword"
+          placeholder="Repeat password"
+        />
+      </label>
+
+      <button id="profilePasswordBtn">
+        Update Password
+      </button>
+
+      <button
+        id="profilePasswordResetBtn"
+        class="profile-secondary-btn"
+        type="button"
+      >
+        Send Password Reset Email
+      </button>
+    </section>
+
+    <section class="profile-section profile-logout-section">
+      <div>
+        <h3>
+          Logout
+        </h3>
+        <p class="profile-settings-hint">
+          Sign out on this device. Your saved races and season plan stay connected to your account.
+        </p>
+      </div>
+
+      <button
+        id="profileLogoutBtn"
+        class="profile-danger-btn"
+        type="button"
+      >
+        Logout
+      </button>
+    </section>
+
+  </div>
+
+</div>
+
+
+<div id="seasonPlannerModal" data-testid="season-planner">
+
+  <div class="season-planner-card">
+
+    <button id="closeSeasonPlanner" aria-label="Close season planner">
+      &times;
+    </button>
+
+    <div class="season-planner-header">
+      <span>Season Planning</span>
+      <h2>Your Race Calendar</h2>
+      <p>
+        Organize A-, B- and C-races, track spacing and keep your training calendar realistic.
+      </p>
+    </div>
+
+    <div class="season-tabs">
+      <button type="button" class="season-tab active" data-season-tab="overview" data-testid="planner-tab-overview">Overview</button>
+      <button type="button" class="season-tab" data-season-tab="events" data-testid="planner-tab-events">Events</button>
+      <button type="button" class="season-tab" data-season-tab="calendar" data-testid="planner-tab-calendar">Calendar</button>
+    </div>
+
+    <div class="season-tab-panel active" id="seasonOverviewPanel" data-testid="planner-overview-panel">
+
+      <div class="season-overview-hero">
+        <div class="season-next-card">
+          <span>Next race</span>
+          <strong id="seasonCountdown" data-testid="planner-countdown">No saved upcoming event</strong>
+          <em id="seasonNextEventName"></em>
+          <div class="season-next-meta">
+            <div>
+              <span>Date</span>
+              <strong id="seasonNextDate">-</strong>
+            </div>
+            <div>
+              <span>Location</span>
+              <strong id="seasonNextPlace">-</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="season-kpi-grid">
+          <div>
+            <span>Planned Events</span>
+            <strong id="seasonSavedCount">0</strong>
+          </div>
+
+          <div>
+            <span>Upcoming</span>
+            <strong id="seasonUpcomingCount">0</strong>
+          </div>
+
+          <div class="season-score-kpi">
+            <div class="season-score-heading">
+              <span>Season Score</span>
+              <button
+                type="button"
+                id="seasonScoreInfoBtn"
+                class="season-score-info-btn"
+                title="Click for more information"
+                aria-label="Click for more information about the Season Score"
+              >
+                i
+              </button>
+            </div>
+            <div id="seasonScoreMetric"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="season-countdown-section">
+        <div class="season-section-title">
+          Upcoming Countdowns
+        </div>
+        <div id="seasonCountdownCards"></div>
+      </div>
+
+      <div class="season-health-card">
+        <div class="season-section-title">
+          Season Health
+        </div>
+        <div id="seasonOverviewSummary"></div>
+        <div id="seasonOverviewWarnings"></div>
+      </div>
+
+      <div class="season-cockpit-grid">
+        <div class="season-focus-card">
+          <div class="season-section-title">
+            Priority Focus
+          </div>
+          <div class="season-focus-layout">
+            <div>
+              <span class="season-subtitle">Key races</span>
+              <div id="seasonOverviewARaces"></div>
+            </div>
+            <div>
+              <span class="season-subtitle">Sport mix</span>
+              <div id="seasonOverviewSportMix"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="season-training-card">
+          <div class="season-section-title season-title-with-info">
+            <div class="season-title-copy">
+              <span>Training Block</span>
+              <small>Longest time gap between two upcoming planned races.</small>
+            </div>
+            <button
+              type="button"
+              id="trainingBlockInfoBtn"
+              class="season-score-info-btn"
+              title="Click for more information"
+              aria-label="Click for more information about Training Blocks"
+            >
+              i
+            </button>
+          </div>
+          <div id="seasonTrainingBlock"></div>
+          <div id="seasonTrainingBlocks"></div>
+          <div class="season-training-opportunity">
+            <span class="season-subtitle">Training opportunity</span>
+            <div id="seasonTrainingOpportunity"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="season-recommendation-section">
+        <div class="season-section-title">
+          Recommended Events
+        </div>
+        <div id="seasonRecommendedEvents"></div>
+      </div>
+
+      <div class="season-legacy-hidden">
+        <div id="seasonScheduleWarnings"></div>
+        <div id="seasonSportBreakdown"></div>
+      </div>
+
+    </div>
+
+    <div class="season-tab-panel" id="seasonEventsPanel" data-testid="planner-events-panel">
+      <div class="season-events-workspace">
+        <aside class="season-events-list-panel" aria-label="Planned races">
+          <div class="season-section-title">
+            Planned Races
+          </div>
+          <p>Select a race to edit priority, goals, strategy, logistics and results.</p>
+          <div id="seasonEventList" data-testid="planner-event-list"></div>
+        </aside>
+
+        <section class="season-events-editor-panel" aria-label="Selected race planner">
+          <div id="seasonPriorityList" data-testid="planner-event-editor"></div>
+        </section>
+      </div>
+    </div>
+
+    <div class="season-tab-panel" id="seasonCalendarPanel" data-testid="planner-calendar-panel">
+
+      <div class="season-calendar-section">
+        <div class="season-calendar-header">
+          <div>
+            <div class="season-section-title">
+              Season Calendar
+            </div>
+            <p>Your saved races as a month-by-month season plan with spacing and priority context.</p>
+          </div>
+          <div class="season-calendar-view-toggle">
+            <button type="button" class="active" data-season-calendar-view="month">Month</button>
+            <button type="button" data-season-calendar-view="list">Year</button>
+          </div>
+        </div>
+        <div id="seasonTimeline" data-testid="planner-calendar"></div>
+      </div>
+
+      <div class="season-export-card">
+        <span>Calendar Export & Sync</span>
+        <strong>Download a standard calendar import file for all saved races.</strong>
+        <p>
+          The download is an .ics calendar file, the standard format used by Apple Calendar, Outlook and Google Calendar import.
+        </p>
+        <div class="season-export-actions">
+          <button
+            type="button"
+            id="exportSeasonCalendarBtn"
+          >
+            Download Calendar File
+          </button>
+          <button
+            type="button"
+            id="addNextRaceGoogleBtn"
+          >
+            Add Next Race to Google Calendar
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div id="seasonBalanceInfoModal">
+
+  <div class="season-score-info-card">
+
+    <button id="closeSeasonBalanceInfo" aria-label="Close season balance information">
+      &times;
+    </button>
+
+    <span class="season-score-info-kicker">Season Balance</span>
+    <h2>
+      What Season Balance means
+    </h2>
+    <p>
+      Season Balance describes how demanding your saved race calendar looks overall. It combines race volume, race difficulty, priorities and tight recovery windows into one simple planning signal.
+    </p>
+
+    <div class="season-score-info-grid">
+      <article>
+        <strong>Race difficulty</strong>
+        <p>
+          Shorter races count as lighter load. Marathons, ultras, 70.3 races and full-distance triathlons increase the planning load.
+        </p>
+      </article>
+
+      <article>
+        <strong>Race volume</strong>
+        <p>
+          More saved races increase the load. A busy calendar is not automatically bad, but it needs more careful spacing.
+        </p>
+      </article>
+
+      <article>
+        <strong>Priorities</strong>
+        <p>
+          A-races count more strongly than B-, C- or training races, because they usually need more preparation and recovery focus.
+        </p>
+      </article>
+
+      <article>
+        <strong>Recovery conflicts</strong>
+        <p>
+          If two races are closer together than the recommended recovery window, Season Balance becomes more demanding.
+        </p>
+      </article>
+    </div>
+
+    <p class="season-score-info-note">
+      Use Season Balance as a quick reality check: if it says demanding, review whether every race belongs in your season or whether some should stay as C-races or training events.
+    </p>
+
+  </div>
+
+</div>
+
+<div id="sportMixInfoModal">
+
+  <div class="season-score-info-card">
+
+    <button id="closeSportMixInfo" aria-label="Close race mix information">
+      &times;
+    </button>
+
+    <span class="season-score-info-kicker">Race Mix</span>
+    <h2>
+      How Race Mix helps your planning
+    </h2>
+    <p>
+      Race Mix shows what kind of season you are building. It highlights your dominant sport type and the distances that appear most often in your plan.
+    </p>
+
+    <div class="season-score-info-grid">
+      <article>
+        <strong>Season focus</strong>
+        <p>
+          A clear dominant sport can be useful when you are preparing for one main goal, such as a marathon or triathlon season.
+        </p>
+      </article>
+
+      <article>
+        <strong>Sport distribution</strong>
+        <p>
+          Running, triathlon and ultra events are separated so you can quickly see whether your calendar fits your actual training focus.
+        </p>
+      </article>
+
+      <article>
+        <strong>Distance focus</strong>
+        <p>
+          Repeated distances show what kind of preparation your season demands, for example shorter races, marathons, ultras or triathlon formats.
+        </p>
+      </article>
+    </div>
+
+    <p class="season-score-info-note">
+      Use Race Mix as a quick reality check. If your plan contains very different race types, make sure your training blocks still match the most important goals.
+    </p>
+
+  </div>
+
+</div>
+
+<div id="trainingBlockInfoModal">
+
+  <div class="season-score-info-card">
+
+    <button id="closeTrainingBlockInfo" aria-label="Close training block information">
+      &times;
+    </button>
+
+    <span class="season-score-info-kicker">Training Block</span>
+    <h2>
+      How Training Blocks are read
+    </h2>
+    <p>
+      Training Blocks show the time between two upcoming planned races. Past races are not included, so this stays focused on the season ahead.
+    </p>
+
+    <div class="season-score-info-grid">
+      <article>
+        <strong>Under 7 days</strong>
+        <p>
+          Very tight spacing. This is usually more recovery and logistics than meaningful training.
+        </p>
+      </article>
+
+      <article>
+        <strong>7-21 days</strong>
+        <p>
+          A short block. Useful for recovery, light sharpening or maintaining fitness.
+        </p>
+      </article>
+
+      <article>
+        <strong>22-56 days</strong>
+        <p>
+          A strong planning window. Often enough time for a focused training phase between races.
+        </p>
+      </article>
+
+      <article>
+        <strong>More than 56 days</strong>
+        <p>
+          A longer build phase. Good for base work, a new focus block or preparing for an A-race.
+        </p>
+      </article>
+    </div>
+
+    <p class="season-score-info-note">
+      The goal is not to fill every gap. Good seasons usually alternate races, recovery and focused build phases.
+    </p>
+
+  </div>
+
+</div>
+
+<div id="seasonScoreInfoModal">
+
+  <div class="season-score-info-card">
+
+    <button id="closeSeasonScoreInfo" aria-label="Close season score information">
+      &times;
+    </button>
+
+    <span class="season-score-info-kicker">Season Score</span>
+    <h2>
+      How your season score is calculated
+    </h2>
+    <p>
+      The Season Score is a planning signal from 0 to 100. It is not a medical training metric. It helps you spot whether your race calendar looks realistic, balanced and recoverable.
+    </p>
+
+    <div class="season-score-info-grid">
+      <article>
+        <strong>Recovery windows</strong>
+        <p>
+          Races scheduled too closely together reduce the score. Larger races such as marathons, ultras and triathlons need more recovery time than shorter events.
+        </p>
+      </article>
+
+      <article>
+        <strong>Priority balance</strong>
+        <p>
+          Too many A-races lower the score. A strong season usually has a few main goals and supporting B- or C-races around them.
+        </p>
+      </article>
+
+      <article>
+        <strong>Monthly density</strong>
+        <p>
+          If too many races sit in the same month, the score drops. The planner rewards a calendar that spreads load more evenly.
+        </p>
+      </article>
+
+      <article>
+        <strong>Average spacing</strong>
+        <p>
+          Very short gaps are risky. Extremely long gaps are only lightly marked, because they may still be useful training blocks.
+        </p>
+      </article>
+    </div>
+
+    <div class="season-score-info-scale">
+      <div><span>84-100</span><strong>Excellent</strong></div>
+      <div><span>68-83</span><strong>Good</strong></div>
+      <div><span>45-67</span><strong>Busy</strong></div>
+      <div><span>0-44</span><strong>Overloaded</strong></div>
+    </div>
+
+    <p class="season-score-info-note">
+      Use the score as a decision helper: review tight recovery gaps, reduce unnecessary A-races and keep your season focused on the races that matter most.
+    </p>
+
+  </div>
+
+</div>
+
+
+<div id="appMessageModal">
+
+  <div class="app-message-card">
+
+    <button id="closeAppMessage" aria-label="Close message">
+      &times;
+    </button>
+
+    <h2 id="appMessageTitle">
+      Notice
+    </h2>
+
+    <p id="appMessageText"></p>
+
+    <button id="appMessageOk">
+      OK
+    </button>
+
+  </div>
+
+</div>
+
+<div id="welcomeModal">
+
+  <div class="welcome-card">
+
+    <button
+      id="closeWelcomeModal"
+      type="button"
+      aria-label="Close welcome"
+    >
+      &times;
+    </button>
+
+    <span>CLOSED BETA</span>
+
+    <h2>
+      Willkommen bei Sport Event Map
+    </h2>
+
+    <p class="welcome-copy">
+      The platform is ready to use, but event data and planning workflows are still being refined with beta feedback.
+    </p>
+
+    <ol>
+      <li>Find endurance events with the map, search and filters.</li>
+      <li>Save races and organize your season with priorities.</li>
+      <li>Send feedback when data is missing, outdated or unclear.</li>
+    </ol>
+
+    <div class="welcome-actions">
+      <button
+        id="skipWelcomeBtn"
+        type="button"
+        class="secondary"
+      >
+        Skip
+      </button>
+
+      <button
+        id="startWelcomeBtn"
+        type="button"
+      >
+        Continue exploring
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- FEEDBACK MODAL -->
+<div id="feedbackModal">
+
+  <div class="feedback-card">
+
+    <button id="closeFeedbackModal" aria-label="Close feedback">
+      &times;
+    </button>
+
+    <h2>
+      Wie hilfreich war Sport Event Map heute?
+    </h2>
+
+    <p>
+      Help improve the closed beta. Please keep personal or sensitive information out of your message.
+    </p>
+
+    <p class="feedback-email-note">
+      Found a missing event or want to send more context?
+      Use this form or email
+      <a id="feedbackEmailLink" href="mailto:feedback@[your-domain].com">feedback@[your-domain].com</a>.
+    </p>
+
+    <div class="feedback-prompt-list">
+      <span>Helpful prompts for beta testing</span>
+      <ul>
+        <li>Did you find an event you would actually consider?</li>
+        <li>Was the Season Planner useful?</li>
+        <li>What would make you come back next week?</li>
+        <li>Which event was missing or incorrect?</li>
+      </ul>
+    </div>
+
+    <div class="feedback-form-grid">
+      <label>
+        Category
+        <select id="feedbackCategory">
+          <option value="bug">Bug</option>
+          <option value="usability">Usability</option>
+          <option value="incorrect_event_data">Incorrect event data</option>
+          <option value="missing_event">Missing event</option>
+          <option value="season_planner">Season Planner</option>
+          <option value="improvement">Improvement idea</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+
+      <label>
+        Product area
+        <select id="feedbackProductArea">
+          <option value="event_map">Event Map</option>
+          <option value="event_details">Event Details</option>
+          <option value="filters">Search & Filters</option>
+          <option value="favorites">Favorites</option>
+          <option value="season_planner">Season Planner</option>
+          <option value="profile_auth">Profile & Login</option>
+          <option value="event_submission">Event Submission</option>
+          <option value="admin">Admin</option>
+          <option value="other">Other</option>
+        </select>
+      </label>
+    </div>
+
+    <label>
+      Short description
+      <input
+        id="feedbackSummary"
+        type="text"
+        maxlength="180"
+        placeholder="What happened or what should improve?"
+      />
+    </label>
+
+    <input
+      type="hidden"
+      id="feedbackRating"
+      value=""
+    />
+
+    <div
+      class="feedback-rating-options"
+      aria-label="Feedback rating"
+    >
+      <button type="button" data-feedback-rating="5" aria-label="Very helpful">&#128512;</button>
+      <button type="button" data-feedback-rating="4" aria-label="Helpful">&#128578;</button>
+      <button type="button" data-feedback-rating="3" aria-label="Okay">&#128528;</button>
+      <button type="button" data-feedback-rating="2" aria-label="Not helpful">&#128577;</button>
+    </div>
+
+    <label>
+      Details (optional)
+      <textarea
+        id="feedbackMessage"
+        rows="5"
+        maxlength="2000"
+        placeholder="Steps, expected result, or additional context."
+      ></textarea>
+    </label>
+
+    <div class="feedback-form-grid">
+      <label>
+        Related event (optional)
+        <input
+          id="feedbackEventId"
+          type="text"
+          maxlength="160"
+          placeholder="Event name or event ID"
+        />
+      </label>
+
+      <label>
+        Screenshot note (optional)
+        <input
+          id="feedbackScreenshotHint"
+          type="text"
+          maxlength="240"
+          placeholder="Example: Screenshot available on request"
+        />
+      </label>
+    </div>
+
+    <button id="submitFeedbackBtn">
+      Send feedback
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ADMIN MODAL -->
+<div id="adminModal">
+
+  <div class="admin-card">
+
+    <button id="closeAdminModal" aria-label="Close admin dashboard">
+      &times;
+    </button>
+
+    <div class="admin-dashboard-header">
+      <div>
+        <span class="admin-eyebrow">Closed beta operations</span>
+        <h2>
+          Admin Dashboard
+        </h2>
+        <p>Review submissions, monitor data quality and respond to beta feedback.</p>
+      </div>
+      <div class="admin-header-actions">
+        <span id="adminLastUpdated">Not refreshed yet</span>
+        <button type="button" id="refreshAdminDashboardBtn">
+          Refresh dashboard
+        </button>
+      </div>
+    </div>
+
+    <div
+      id="adminSystemStatus"
+      class="admin-system-status"
+      role="status"
+      aria-live="polite"
+    >
+      Checking database setup...
+    </div>
+
+    <div class="admin-tabs">
+
+      <button
+        type="button"
+        class="admin-tab active"
+        data-admin-tab="review"
+      >
+        Submissions
+        <span id="adminPendingTabCount" class="admin-tab-count">0</span>
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="quality"
+      >
+        Data Quality
+        <span id="adminQualityTabCount" class="admin-tab-count">0</span>
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="feedback"
+      >
+        Feedback
+        <span id="adminFeedbackTabCount" class="admin-tab-count">0</span>
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="analytics"
+      >
+        Analytics
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="knowledge"
+      >
+        Knowledge
+        <span id="adminKnowledgeTabCount" class="admin-tab-count">0</span>
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="knowledgeAudit"
+      >
+        Knowledge Audit
+        <span id="adminKnowledgeAuditTabCount" class="admin-tab-count">0</span>
+      </button>
+
+      <button
+        type="button"
+        class="admin-tab"
+        data-admin-tab="imports"
+      >
+        Imports
+      </button>
+
+    </div>
+
+    <div
+      class="admin-tab-panel active"
+      id="adminReviewPanel"
+    >
+
+    <div id="adminStats">
+
+      <div class="admin-stat-card">
+
+        <span>
+          Pending submissions
+        </span>
+
+        <strong id="pendingCount">
+          0
+        </strong>
+
+      </div>
+
+      <div class="admin-stat-card">
+
+        <span>
+          Approved submissions
+        </span>
+
+        <strong
+          id="approvedCount"
+          class="admin-stat-positive"
+        >
+          0
+        </strong>
+
+      </div>
+
+      <div class="admin-stat-card">
+
+        <span>
+          Rejected submissions
+        </span>
+
+        <strong
+          id="rejectedCount"
+          class="admin-stat-negative"
+        >
+          0
+        </strong>
+
+      </div>
+
+      <div class="admin-stat-card">
+
+        <span>
+          Pending without coordinates
+        </span>
+
+        <strong id="missingCoordsCount">
+          0
+        </strong>
+
+      </div>
+
+      <div class="admin-stat-card">
+
+        <span>
+          Approved last 30 days
+        </span>
+
+        <strong
+          id="approvedLast30Count"
+          class="admin-stat-positive"
+        >
+          0
+        </strong>
+
+      </div>
+
+      <div class="admin-stat-card">
+
+        <span>
+          Rejected last 30 days
+        </span>
+
+        <strong
+          id="rejectedLast30Count"
+          class="admin-stat-negative"
+        >
+          0
+        </strong>
+
+      </div>
+
+    </div>
+
+    <div class="admin-table-section admin-pending-section">
+
+      <div class="admin-section-heading">
+        <div>
+          <h3>
+            Pending submissions
+          </h3>
+          <p id="pendingEventsSummary">Loading submissions...</p>
+        </div>
+        <button type="button" id="refreshPendingEventsBtn">
+          Refresh
+        </button>
+      </div>
+
+      <div class="admin-review-toolbar">
+        <label>
+          Search
+          <input
+            type="search"
+            id="pendingEventSearch"
+            placeholder="Event, city or country"
+          />
+        </label>
+        <label>
+          Readiness
+          <select id="pendingEventFilter">
+            <option value="all">All submissions</option>
+            <option value="ready">Ready to approve</option>
+            <option value="issues">Needs attention</option>
+            <option value="coordinates">Missing coordinates</option>
+            <option value="website">Invalid website</option>
+            <option value="date">Missing date</option>
+            <option value="registration">Registration status unclear</option>
+            <option value="source">Source not official</option>
+          </select>
+        </label>
+        <label>
+          Sort
+          <select id="pendingEventSort">
+            <option value="oldest">Oldest first</option>
+            <option value="newest">Newest first</option>
+            <option value="issues">Issues first</option>
+            <option value="name">Event name</option>
+          </select>
+        </label>
+        <label>
+          Batch
+          <select id="pendingBatchFilter">
+            <option value="all">All batches</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="admin-review-bulkbar">
+        <span id="pendingBulkSelectionCount">0 selected</span>
+        <button type="button" id="approveSelectedPendingBtn">
+          Approve selected ready
+        </button>
+        <button type="button" id="approveVisibleReadyBtn">
+          Approve all visible ready
+        </button>
+      </div>
+
+      <div id="pendingEventsList" aria-live="polite"></div>
+
+    </div>
+
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminQualityPanel"
+    >
+
+    <div class="admin-table-section admin-quality-section">
+
+      <div class="admin-section-heading">
+        <div>
+          <h3>
+            Data Quality Review
+          </h3>
+          <p>Read-only review of the curated CSV. Changes continue through the import workflow.</p>
+        </div>
+        <button type="button" id="refreshDataQualityBtn">
+          Recheck CSV
+        </button>
+      </div>
+
+      <div class="admin-quality-summary">
+        <div>
+          <span>Active approved events</span>
+          <strong id="activeApprovedEventsCount">0</strong>
+        </div>
+        <div>
+          <span>Progress to 1,000</span>
+          <strong id="eventGoalProgressCount">0%</strong>
+        </div>
+        <div>
+          <span>Needs review</span>
+          <strong id="qualityReviewCount">0</strong>
+        </div>
+        <div>
+          <span>Outdated date</span>
+          <strong id="missingStatsCount">0</strong>
+        </div>
+        <div>
+          <span>No official website</span>
+          <strong id="urlReviewCount">0</strong>
+        </div>
+        <div>
+          <span>Possible duplicates</span>
+          <strong id="possibleDuplicateCount">0</strong>
+        </div>
+        <div>
+          <span>Missing coordinates</span>
+          <strong id="missingQualityCoordsCount">0</strong>
+        </div>
+        <div>
+          <span>Average quality score</span>
+          <strong id="averageQualityScore">0</strong>
+        </div>
+      </div>
+
+      <div class="admin-quality-progress">
+        <span>
+          <strong id="eventGoalProgressLabel">0 of 1,000 launch-ready events</strong>
+          <em>Quality-first launch target</em>
+        </span>
+        <div class="admin-quality-progress-track">
+          <span id="eventGoalProgressBar"></span>
+        </div>
+      </div>
+
+      <div class="admin-quality-priority">
+        <div>
+          <h4>Priority queue</h4>
+          <p>Only real issues appear here: official website, date, coordinates, source, duplicates and stale checks.</p>
+        </div>
+        <select id="qualityReviewSort" aria-label="Quality review sort">
+          <option value="priority">Review priority</option>
+          <option value="score">Lowest quality score</option>
+          <option value="name">Event name</option>
+          <option value="date">Event date</option>
+        </select>
+      </div>
+
+      <div class="admin-quality-bulkbar">
+        <span id="qualityBulkSelectionCount">0 selected</span>
+        <select id="qualityBulkAction" aria-label="Bulk quality action">
+          <option value="">Choose bulk action</option>
+          <option value="date_expected">Mark as date expected</option>
+          <option value="needs_review">Mark as needs review</option>
+          <option value="archive">Archive selected</option>
+          <option value="confirm_valid">Confirm still valid</option>
+          <option value="approve">Approve selected</option>
+          <option value="last_checked">Update last checked</option>
+        </select>
+        <button type="button" id="applyQualityBulkActionBtn">
+          Apply
+        </button>
+      </div>
+      <div id="qualityPriorityReviewList"></div>
+
+      <div class="admin-quality-breakdown">
+        <section>
+          <h4>Events by sport</h4>
+          <div id="qualitySportBreakdown"></div>
+        </section>
+        <section>
+          <h4>Events by country</h4>
+          <div id="qualityCountryBreakdown"></div>
+        </section>
+      </div>
+
+      <div class="admin-quality-grid">
+        <div>
+          <h4>Registration status unknown</h4>
+          <div id="statusReviewList"></div>
+        </div>
+        <div>
+          <h4>Date outdated or expected</h4>
+          <div id="dateReviewList"></div>
+        </div>
+        <div>
+          <h4>Coordinate issues</h4>
+          <div id="coordinateReviewList"></div>
+        </div>
+        <div>
+          <h4>Website/source issues</h4>
+          <div id="officialWebsiteReviewList"></div>
+        </div>
+      </div>
+
+    </div>
+
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminKnowledgePanel"
+    >
+      <div class="admin-table-section admin-knowledge-workspace">
+        <div class="admin-section-heading">
+          <div>
+            <span class="admin-eyebrow">Event Knowledge Base</span>
+            <h3>
+              Detailseiten pflegen
+            </h3>
+            <p>Bearbeite strukturierte Detaildaten, Quellen und FAQ für die statisch generierten Event-Guides.</p>
+          </div>
+          <button type="button" id="refreshEventKnowledgeBtn">
+            Refresh
+          </button>
+        </div>
+
+        <div class="admin-knowledge-toolbar">
+          <label>
+            Event
+            <select id="knowledgeEventSelect">
+              <option value="">Event auswählen</option>
+            </select>
+          </label>
+          <label>
+            Slug
+            <input id="knowledgeEventSlug" type="text" placeholder="event-slug-2026" />
+          </label>
+          <label>
+            Status
+            <select id="knowledgeVerificationStatus">
+              <option value="draft">Draft</option>
+              <option value="partially_verified">Partially verified</option>
+              <option value="verified_official_source">Verified official source</option>
+              <option value="needs_review">Needs review</option>
+            </select>
+          </label>
+          <label class="admin-knowledge-public-toggle">
+            <input id="knowledgeIsPublic" type="checkbox" />
+            Public
+          </label>
+        </div>
+
+        <p id="eventKnowledgeStatus" class="admin-section-status" aria-live="polite">
+          Waehle ein Event, um Detaildaten zu bearbeiten.
+        </p>
+
+        <section class="admin-knowledge-research-panel">
+          <div class="admin-knowledge-section-header">
+            <div>
+              <h4>Research</h4>
+              <p>Starte einen Tool-Job für fehlende Detaildaten. Ergebnisse landen als Review-Vorschläge und werden nie automatisch public.</p>
+            </div>
+            <button type="button" id="startKnowledgeResearchBtn">
+              Start Research
+            </button>
+          </div>
+
+          <div class="admin-knowledge-research-grid">
+            <label>
+              Scope
+              <select id="knowledgeResearchScope">
+                <option value="all">All events</option>
+                <option value="high">High priority only</option>
+                <option value="current">Current selected event</option>
+                <option value="missing-entry-fee">Missing entry fee</option>
+                <option value="missing-cutoff">Missing cutoff</option>
+                <option value="missing-start-time">Missing start time</option>
+                <option value="missing-elevation">Missing elevation</option>
+                <option value="missing-sources">Missing sources</option>
+              </select>
+            </label>
+            <label>
+              Limit
+              <input id="knowledgeResearchLimit" type="number" min="1" max="100" value="10" />
+            </label>
+          </div>
+
+          <div class="admin-knowledge-research-command">
+            <span>Tool command</span>
+            <code id="knowledgeResearchCommand">npm run research:event-knowledge -- --scope high --limit 10</code>
+          </div>
+
+          <div class="admin-knowledge-research-progress">
+            <div>
+              <span>Status</span>
+              <strong id="knowledgeResearchJobStatus">queued</strong>
+            </div>
+            <div>
+              <span>Current event</span>
+              <strong id="knowledgeResearchCurrentEvent">-</strong>
+            </div>
+            <div>
+              <span>Processed</span>
+              <strong id="knowledgeResearchProcessed">0 / 0</strong>
+            </div>
+            <div>
+              <span>Found fields</span>
+              <strong id="knowledgeResearchFoundFields">0</strong>
+            </div>
+            <div>
+              <span>Errors</span>
+              <strong id="knowledgeResearchErrorCount">0</strong>
+            </div>
+          </div>
+
+          <p id="knowledgeResearchStatus" class="admin-section-status" aria-live="polite">
+            Research jobs run through the local tool script. Refresh after the job completes to review proposals.
+          </p>
+        </section>
+
+        <form id="eventKnowledgeForm" class="admin-knowledge-form">
+          <section>
+            <h4>Basis</h4>
+            <div class="admin-knowledge-grid">
+              <label>Event name<input name="event_name" data-knowledge-table="details" /></label>
+              <label>Series<input name="event_series" data-knowledge-table="details" /></label>
+              <label>Sport<input name="sport_type" data-knowledge-table="details" /></label>
+              <label>Date<input name="date" data-knowledge-table="details" /></label>
+              <label>City<input name="city" data-knowledge-table="details" /></label>
+              <label>Country<input name="country" data-knowledge-table="details" /></label>
+              <label>Region<input name="region" data-knowledge-table="details" /></label>
+              <label>Organizer<input name="organizer" data-knowledge-table="details" /></label>
+              <label>Official website<input name="official_website" type="url" data-knowledge-table="details" /></label>
+              <label>Registration URL<input name="registration_url" type="url" data-knowledge-table="details" /></label>
+              <label>Last checked<input name="last_checked" type="date" data-knowledge-table="details" /></label>
+              <label>Event status<input name="event_status" data-knowledge-table="details" /></label>
+            </div>
+          </section>
+
+          <section>
+            <h4>Registration</h4>
+            <div class="admin-knowledge-grid">
+              <label>Status<input name="registration_status" data-knowledge-table="registration" /></label>
+              <label>Opens<input name="registration_open_date" data-knowledge-table="registration" /></label>
+              <label>Closes<input name="registration_close_date" data-knowledge-table="registration" /></label>
+              <label>Fee min<input name="entry_fee_min" data-knowledge-table="registration" /></label>
+              <label>Fee max<input name="entry_fee_max" data-knowledge-table="registration" /></label>
+              <label>Currency<input name="currency" data-knowledge-table="registration" /></label>
+              <label>Qualification<textarea name="qualification_required" rows="2" data-knowledge-table="registration"></textarea></label>
+              <label>Refund policy<textarea name="refund_policy" rows="2" data-knowledge-table="registration"></textarea></label>
+            </div>
+          </section>
+
+          <section>
+            <h4>Course</h4>
+            <div class="admin-knowledge-grid">
+              <label>Distances<textarea name="distances" rows="2" data-knowledge-table="course" data-knowledge-array="true"></textarea></label>
+              <label>Main distance<input name="main_distance" data-knowledge-table="course" /></label>
+              <label>Course type<input name="course_type" data-knowledge-table="course" /></label>
+              <label>Surface<input name="surface" data-knowledge-table="course" /></label>
+              <label>Start<input name="start_location" data-knowledge-table="course" /></label>
+              <label>Finish<input name="finish_location" data-knowledge-table="course" /></label>
+              <label>Elevation gain<input name="elevation_gain" data-knowledge-table="course" /></label>
+              <label>Difficulty<input name="difficulty_rating" data-knowledge-table="course" /></label>
+              <label>PB potential<input name="personal_best_potential" data-knowledge-table="course" /></label>
+              <label>Course character<textarea name="course_character" rows="3" data-knowledge-table="course"></textarea></label>
+              <label>Beginner friendly<textarea name="beginner_friendly" rows="2" data-knowledge-table="course"></textarea></label>
+            </div>
+          </section>
+
+          <section>
+            <h4>Race Day</h4>
+            <div class="admin-knowledge-grid">
+              <label>Start time<input name="start_time" data-knowledge-table="race_day" /></label>
+              <label>Total cutoff<input name="total_cutoff" data-knowledge-table="race_day" /></label>
+              <label>Swim cutoff<input name="swim_cutoff" data-knowledge-table="race_day" /></label>
+              <label>Bike cutoff<input name="bike_cutoff" data-knowledge-table="race_day" /></label>
+              <label>Run cutoff<input name="run_cutoff" data-knowledge-table="race_day" /></label>
+              <label>Aid stations<textarea name="aid_stations" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label>Bib pickup<textarea name="bib_pickup_info" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label>Medical support<textarea name="medical_support" rows="2" data-knowledge-table="race_day"></textarea></label>
+            </div>
+          </section>
+
+          <section>
+            <h4>Travel, Weather & Statistics</h4>
+            <div class="admin-knowledge-grid">
+              <label>Airport<input name="nearest_airport" data-knowledge-table="travel" /></label>
+              <label>Train station<input name="nearest_train_station" data-knowledge-table="travel" /></label>
+              <label>Public transport<textarea name="public_transport_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label>Accommodation<textarea name="accommodation_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label>Typical weather<textarea name="typical_weather" rows="2" data-knowledge-table="weather"></textarea></label>
+              <label>Temperature<input name="average_temperature" data-knowledge-table="weather" /></label>
+              <label>Heat risk<input name="heat_risk" data-knowledge-table="weather" /></label>
+              <label>Planning tips<textarea name="planning_tips" rows="2" data-knowledge-table="weather"></textarea></label>
+              <label>Participants<input name="participant_count" data-knowledge-table="statistics" /></label>
+              <label>Historic significance<textarea name="historic_significance" rows="2" data-knowledge-table="statistics"></textarea></label>
+              <label>Championship status<input name="championship_status" data-knowledge-table="statistics" /></label>
+              <label>World major<select name="world_major" data-knowledge-table="statistics" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
+            </div>
+          </section>
+
+          <section>
+            <h4>Editorial</h4>
+            <div class="admin-knowledge-grid">
+              <label>Why it stands out<textarea name="why_this_event_stands_out" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label>Known / atmosphere<textarea name="atmosphere" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label>Good fit for<textarea name="good_fit_for" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label>Not ideal for<textarea name="not_ideal_for" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label>Planning context<textarea name="planning_context" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label>SEO summary<textarea name="seo_summary" rows="3" data-knowledge-table="editorial"></textarea></label>
+            </div>
+          </section>
+
+          <section>
+            <div class="admin-knowledge-section-header">
+              <h4>Sources</h4>
+              <button type="button" id="addKnowledgeSourceBtn">Add source</button>
+            </div>
+            <div id="knowledgeSourcesList" class="admin-knowledge-list"></div>
+          </section>
+
+          <section>
+            <div class="admin-knowledge-section-header">
+              <h4>FAQ</h4>
+              <button type="button" id="addKnowledgeFaqBtn">Add FAQ</button>
+            </div>
+            <div id="knowledgeFaqList" class="admin-knowledge-list"></div>
+          </section>
+
+          <div class="admin-knowledge-actions">
+            <button type="button" id="loadEventKnowledgeBtn">
+              Load selected
+            </button>
+            <button type="button" id="saveEventKnowledgeBtn">
+              Save Knowledge
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminKnowledgeAuditPanel"
+    >
+      <div class="admin-table-section admin-knowledge-audit-workspace">
+        <div class="admin-section-heading">
+          <div>
+            <span class="admin-eyebrow">Knowledge Enrichment</span>
+            <h3>
+              Audit & Review Queue
+            </h3>
+            <p>Prüfe fehlende Knowledge-Daten, öffne Research Tasks und übernimm nur geprüfte Kandidaten in Supabase.</p>
+          </div>
+          <button type="button" id="refreshKnowledgeAuditBtn">
+            Refresh
+          </button>
+        </div>
+
+        <div class="admin-knowledge-audit-summary">
+          <div>
+            <span>Events audited</span>
+            <strong id="knowledgeAuditTotalCount">0</strong>
+          </div>
+          <div>
+            <span>Average completion</span>
+            <strong id="knowledgeAuditAverageScore">0%</strong>
+          </div>
+          <div>
+            <span>High priority</span>
+            <strong id="knowledgeAuditHighCount">0</strong>
+          </div>
+          <div>
+            <span>Review tasks</span>
+            <strong id="knowledgeAuditReviewCount">0</strong>
+          </div>
+        </div>
+
+        <div class="admin-knowledge-audit-toolbar">
+          <label>
+            Priority
+            <select id="knowledgeAuditPriorityFilter">
+              <option value="high">High priority</option>
+              <option value="medium">Medium priority</option>
+              <option value="low">Low priority</option>
+              <option value="all">All priorities</option>
+            </select>
+          </label>
+          <label>
+            Search
+            <input id="knowledgeAuditSearch" type="search" placeholder="Event, city or missing field" />
+          </label>
+        </div>
+
+        <p id="knowledgeAuditStatus" class="admin-section-status" aria-live="polite">
+          Run npm run audit:event-knowledge and npm run enrich:event-knowledge to create the review queue.
+        </p>
+
+        <div id="knowledgeAuditList" class="admin-knowledge-audit-list"></div>
+      </div>
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminImportsPanel"
+    >
+
+      <div class="admin-import-panel admin-staging-panel">
+
+        <h3>
+          Event Staging Workflow
+        </h3>
+        <p>
+          New events should enter the pending review list first. Approve only events with official websites, current dates, coordinates, sport, distance and a clear source.
+        </p>
+
+        <div class="admin-staging-steps">
+          <span>1. Stage as pending</span>
+          <span>2. Check quality reasons</span>
+          <span>3. Resolve duplicates</span>
+          <span>4. Approve or reject</span>
+          <span>5. Update existing event when annual dates change</span>
+        </div>
+
+      </div>
+
+      <div class="admin-import-panel">
+
+        <h3>
+          World Triathlon Staging
+        </h3>
+        <p>
+          Preview first, then save as pending. Imported rows still require admin review before they become public.
+        </p>
+
+        <div class="admin-import-fields">
+
+          <label>
+            Start
+            <input
+              type="date"
+              id="wtStartDate"
+            />
+          </label>
+
+          <label>
+            End
+            <input
+              type="date"
+              id="wtEndDate"
+            />
+          </label>
+
+        </div>
+
+        <div class="admin-import-actions">
+
+          <button id="previewWorldTriathlonBtn">
+            Preview
+          </button>
+
+          <button id="saveWorldTriathlonBtn">
+            Save Pending
+          </button>
+
+        </div>
+
+        <div id="worldTriathlonImportStatus"></div>
+
+        <div id="worldTriathlonPreviewList"></div>
+
+      </div>
+
+      <div class="admin-import-panel admin-data-workflow-panel">
+
+        <h3>
+          Local CSV Staging Import
+        </h3>
+
+        <p>
+          Load a validated staging CSV, review the rows, then save them to Supabase as non-public staging events.
+        </p>
+
+        <div class="admin-local-import-controls">
+          <label>
+            Staging CSV
+            <input
+              type="file"
+              id="adminStagingCsvInput"
+              accept=".csv,text/csv"
+            />
+          </label>
+          <button type="button" id="previewStagingCsvBtn">
+            Preview CSV
+          </button>
+          <button type="button" id="saveStagingCsvBtn" disabled>
+            Save to review queue
+          </button>
+        </div>
+
+        <p id="adminStagingImportStatus" class="admin-import-status">
+          Choose a file like data/imports/staging/germany-road-running-batch-01.staging.csv.
+        </p>
+
+        <div id="adminStagingPreviewList"></div>
+
+        <h3>
+          CSV Data Workflow
+        </h3>
+
+        <p>
+          Use this area as the manual checklist before adding large event batches to the map.
+        </p>
+
+        <div class="admin-data-workflow-grid">
+
+          <a href="NO_CODE_DATA_IMPORT.md" target="_blank" rel="noopener noreferrer">
+            Import Guide
+          </a>
+
+          <a href="data/imports/review/events-local-running-expanded-report.html" target="_blank" rel="noopener noreferrer">
+            Latest Import Report
+          </a>
+
+          <a href="data/imports/review/events-local-running-expanded-url-review.csv" target="_blank" rel="noopener noreferrer">
+            URL Review CSV
+          </a>
+
+          <a href="data/imports/review/events.local-running-expanded.review.csv" target="_blank" rel="noopener noreferrer">
+            Rows Needing Review
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminAnalyticsPanel"
+    >
+
+      <div class="admin-table-section admin-analytics-workspace">
+        <div class="admin-analytics-header">
+          <div>
+            <span class="admin-eyebrow">Beta product signals</span>
+            <h3>
+              Analytics
+            </h3>
+            <p>Understand whether testers discover events, return to the product and use the Season Planner.</p>
+          </div>
+          <div class="admin-analytics-controls">
+            <label>
+              Period
+              <select id="adminAnalyticsRange">
+                <option value="7">Last 7 days</option>
+                <option value="30" selected>Last 30 days</option>
+                <option value="90">Last 90 days</option>
+                <option value="all">All time</option>
+              </select>
+            </label>
+            <button type="button" id="refreshAdminAnalyticsBtn">
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <div class="analytics-section-heading">
+          <div>
+            <h4>Overview</h4>
+            <p id="analyticsRangeLabel">Last 30 days</p>
+          </div>
+        </div>
+
+        <div class="analytics-dashboard-grid analytics-kpi-grid">
+          <div class="analytics-card analytics-card-primary">
+            <span>Total Accounts</span>
+            <strong id="analyticsTotalAccounts">0</strong>
+            <em>Registered profiles</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Active Users 7d</span>
+            <strong id="analyticsActiveUsers7d">0</strong>
+            <em>Unique users or visitors</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Active Users 30d</span>
+            <strong id="analyticsActiveUsers30d">0</strong>
+            <em>Unique users or visitors</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Returning 7d</span>
+            <strong id="analyticsReturningUsers7d">0</strong>
+            <em>2+ sessions or active days</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Returning 30d</span>
+            <strong id="analyticsReturningUsers30d">0</strong>
+            <em>2+ sessions or active days</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Total Sessions</span>
+            <strong id="analyticsTotalSessions">0</strong>
+            <em>Selected period</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Searches</span>
+            <strong id="analyticsSearchesKpi">0</strong>
+            <em>Searches performed</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Favorites Added</span>
+            <strong id="analyticsFavoritesAddedKpi">0</strong>
+            <em>Planning intent</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Planner Users</span>
+            <strong id="analyticsPlannerUsersKpi">0</strong>
+            <em>Opened or added races</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Planner Adds</span>
+            <strong id="analyticsPlannerEventsAddedKpi">0</strong>
+            <em>Races added</em>
+          </div>
+          <div class="analytics-card analytics-card-primary">
+            <span>Feedback</span>
+            <strong id="analyticsFeedbackSubmissionsKpi">0</strong>
+            <em>Submitted feedback</em>
+          </div>
+        </div>
+
+        <div class="analytics-insight-strip">
+          <div>
+            <strong>Retention</strong>
+            <span id="analyticsRetentionInsight">Waiting for returning-user data.</span>
+          </div>
+          <div>
+            <strong>Discovery</strong>
+            <span id="analyticsDiscoveryInsight">Waiting for search and event data.</span>
+          </div>
+          <div>
+            <strong>Planning</strong>
+            <span id="analyticsPlanningInsight">Waiting for planner data.</span>
+          </div>
+        </div>
+
+        <div class="analytics-section-grid">
+          <section class="analytics-detail-panel">
+            <div class="analytics-panel-heading">
+              <div>
+                <h4>Retention & Returning Users</h4>
+                <p>Do testers come back after the first visit?</p>
+              </div>
+            </div>
+            <div class="analytics-mini-grid">
+              <div><span>New vs returning</span><strong id="analyticsNewReturningSplit">-</strong></div>
+              <div><span>Avg sessions/user</span><strong id="analyticsAvgSessionsPerUser">0</strong></div>
+              <div><span>2+ visits</span><strong id="analyticsUsers2Visits">0</strong></div>
+              <div><span>3+ visits</span><strong id="analyticsUsers3Visits">0</strong></div>
+              <div><span>5+ visits</span><strong id="analyticsUsers5Visits">0</strong></div>
+            </div>
+            <div id="analyticsRetentionTable" class="analytics-table-list"></div>
+          </section>
+
+          <section class="analytics-detail-panel">
+            <div class="analytics-panel-heading">
+              <div>
+                <h4>Search</h4>
+                <p>What people search for and whether searches lead to event opens.</p>
+              </div>
+            </div>
+            <div class="analytics-mini-grid">
+              <div><span>Total searches</span><strong id="analyticsTotalSearches">0</strong></div>
+              <div><span>Searches/user</span><strong id="analyticsSearchesPerUser">0</strong></div>
+              <div><span>Zero results</span><strong id="analyticsZeroResultSearches">0</strong></div>
+              <div><span>Search &rarr; open</span><strong id="analyticsSearchClickRate">0%</strong></div>
+            </div>
+            <div class="analytics-two-column">
+              <div>
+                <h5>Top search terms</h5>
+                <div id="analyticsTopSearchTerms" class="analytics-table-list"></div>
+              </div>
+              <div>
+                <h5>Most used filters</h5>
+                <div id="analyticsMostUsedFilters" class="analytics-table-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="analytics-detail-panel">
+            <div class="analytics-panel-heading">
+              <div>
+                <h4>Event Discovery</h4>
+                <p>Which events attract attention and convert into planning intent.</p>
+              </div>
+            </div>
+            <div class="analytics-mini-grid">
+              <div><span>Detail opens</span><strong id="analyticsEventDetailOpens">0</strong></div>
+              <div><span>Favorite conversion</span><strong id="analyticsFavoriteConversionRate">0%</strong></div>
+            </div>
+            <div class="analytics-two-column">
+              <div>
+                <h5>Most viewed events</h5>
+                <div id="analyticsMostViewedEvents" class="analytics-table-list"></div>
+              </div>
+              <div>
+                <h5>Most favorited events</h5>
+                <div id="analyticsMostFavoritedEvents" class="analytics-table-list"></div>
+              </div>
+            </div>
+            <h5>Most clicked official websites</h5>
+            <div id="analyticsMostExternalClicks" class="analytics-table-list"></div>
+          </section>
+
+          <section class="analytics-detail-panel">
+            <div class="analytics-panel-heading">
+              <div>
+                <h4>Season Planner</h4>
+                <p>Whether testers move from discovery into real season planning.</p>
+              </div>
+            </div>
+            <div class="analytics-mini-grid">
+              <div><span>Planner opens</span><strong id="analyticsPlannerOpens">0</strong></div>
+              <div><span>Planner users</span><strong id="analyticsPlannerUsers">0</strong></div>
+              <div><span>Events added</span><strong id="analyticsPlannerEventsAdded">0</strong></div>
+              <div><span>Avg planned/user</span><strong id="analyticsAvgPlannedEvents">0</strong></div>
+              <div><span>Recommendations</span><strong id="analyticsRecommendationClicks">0</strong></div>
+              <div><span>Planner conversion</span><strong id="analyticsPlannerConversionRate">0%</strong></div>
+            </div>
+            <div class="analytics-two-column">
+              <div>
+                <h5>Priority mix</h5>
+                <div id="analyticsPriorityMix" class="analytics-table-list"></div>
+              </div>
+              <div>
+                <h5>Most planned events</h5>
+                <div id="analyticsMostPlannedEventsV2" class="analytics-table-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="analytics-detail-panel">
+            <div class="analytics-panel-heading">
+              <div>
+                <h4>Feedback</h4>
+                <p>Quality of beta feedback and open product issues.</p>
+              </div>
+            </div>
+            <div class="analytics-mini-grid">
+              <div><span>Total feedback</span><strong id="analyticsFeedbackTotal">0</strong></div>
+              <div><span>New feedback</span><strong id="analyticsFeedbackNew">0</strong></div>
+              <div><span>By rating</span><strong id="analyticsFeedbackByRating">-</strong></div>
+            </div>
+            <div class="analytics-two-column">
+              <div>
+                <h5>Feedback by category</h5>
+                <div id="analyticsFeedbackByCategory" class="analytics-table-list"></div>
+              </div>
+              <div>
+                <h5>Latest feedback</h5>
+                <div id="analyticsLatestFeedback" class="analytics-table-list"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <p id="adminAnalyticsStatus" class="admin-section-status" aria-live="polite"></p>
+        <div class="analytics-legacy-compat" hidden>
+          <div id="analyticsActivityBreakdown"></div>
+          <div id="analyticsTopEvents"></div>
+          <div id="analyticsTopPlannedEvents"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div
+      class="admin-tab-panel"
+      id="adminFeedbackPanel"
+    >
+      <div class="admin-table-section">
+        <div class="admin-feedback-workspace">
+          <div class="admin-feedback-heading">
+            <div>
+              <h4>Feedback review</h4>
+              <p>Filter beta feedback and update its internal review status.</p>
+            </div>
+            <button type="button" id="refreshAdminFeedbackBtn">
+              Refresh
+            </button>
+          </div>
+
+          <div class="admin-feedback-filters">
+            <label>
+              Category
+              <select id="feedbackCategoryFilter">
+                <option value="">All categories</option>
+                <option value="bug">Bug</option>
+                <option value="usability">Usability</option>
+                <option value="incorrect_event_data">Incorrect event data</option>
+                <option value="missing_event">Missing event</option>
+                <option value="season_planner">Season Planner</option>
+                <option value="improvement">Improvement idea</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+
+            <label>
+              Status
+              <select id="feedbackStatusFilter">
+                <option value="active" selected>Active reviews</option>
+                <option value="">All statuses</option>
+                <option value="new">New</option>
+                <option value="reviewed">Reviewed</option>
+                <option value="planned">Planned</option>
+                <option value="resolved">Resolved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </label>
+
+            <label>
+              Product area
+              <select id="feedbackAreaFilter">
+                <option value="">All areas</option>
+                <option value="event_map">Event Map</option>
+                <option value="event_details">Event Details</option>
+                <option value="filters">Search & Filters</option>
+                <option value="favorites">Favorites</option>
+                <option value="season_planner">Season Planner</option>
+                <option value="profile_auth">Profile & Login</option>
+                <option value="event_submission">Event Submission</option>
+                <option value="admin">Admin</option>
+                <option value="other">Other</option>
+              </select>
+            </label>
+
+            <label>
+              Date
+              <select id="feedbackDateFilter">
+                <option value="">All time</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="admin-feedback-summary">
+            <div>
+              <span>New</span>
+              <strong id="adminFeedbackNewCount">0</strong>
+            </div>
+            <div>
+              <span>Planned</span>
+              <strong id="adminFeedbackPlannedCount">0</strong>
+            </div>
+            <div>
+              <span>Resolved</span>
+              <strong id="adminFeedbackResolvedCount">0</strong>
+            </div>
+          </div>
+
+          <p id="adminFeedbackSummary" class="admin-section-status">Loading feedback...</p>
+          <div id="adminFeedbackManagementList" aria-live="polite"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<footer id="discoveryFooter" class="discovery-footer">
+  <nav id="legalLinks" aria-label="Rechtliche Hinweise und Kontakt">
+    <a href="imprint.html">Impressum</a>
+    <a href="privacy.html">Datenschutz</a>
+    <a href="legal.html">Nutzungsbedingungen</a>
+    <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
+    <a href="index.html#landing" id="landingFooterLink">Landingpage</a>
+    <button type="button" id="legalFeedbackLink">Feedback</button>
+  </nav>
+  <span class="discovery-footer-note">Public beta - event data may change.</span>
+</footer>
+
+
+<!-- SCRIPTS -->
+<script
+  defer
+  src="js/config.js?v=20260706-header-nav-v67"
+></script>
+<script defer src="js/i18n.js?v=20260720-discovery-controls-v68"></script>
+<script
+  defer
+  src="js/supabase-loader.js?v=20260706-header-nav-v67"
+  data-supabase-src="js/supabase.js?v=20260706-header-nav-v67"
+></script>
+
+<script defer src="js/events.js?v=20260716-season-stability-v18"></script>
+<script defer src="js/map.js?v=20260716-discovery-default-v68"></script>
+<script defer src="js/search.js?v=20260720-discovery-controls-v68"></script>
+<script defer src="js/app.js?v=20260720-discovery-controls-v70"></script>
+
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,38 @@
+# Secrets and machine-local runtime configuration
+.env
+.env.*
+!.env.example
+js/config.js
+data/imports/private/
+data/imports/private/geoapify-key.txt
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Dependencies and build output
+node_modules/
+.pnpm-store/
+dist/
+
+# Local test and browser artifacts
+.playwright-browsers/
+test-results/
+playwright-report/
+reports/responsive-screenshots/
+
+# Local data snapshots and review artifacts
+data/backups/
+data/imports/raw/
+data/imports/review/
+data/imports/staging/
+
+# Editor and operating-system files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# Historical standalone repository; the current application lives here.
+SportEventMap_publicVersion/

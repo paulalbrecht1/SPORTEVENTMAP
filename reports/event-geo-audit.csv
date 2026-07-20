@@ -1,0 +1,995 @@
+severity;event_name;event_id;city;country;address;latitude;longitude;issues;distance_to_city_km;distance_to_address_km;confidence_score;suggested_latitude;suggested_longitude;recommended_action
+clean;Bielefelder Triathlon;bielefelder-triathlon-bielefeld-28-06-2026;Bielefeld;Germany;Senner Waldbad, Am Waldbad 72, 33659 Bielefeld;51.9622218;8.526118;;6.3;0.0;0.95;;;No pin action required.
+clean;Sörmlands 100 Trail Run;sormlands-100-trail-run-bjornlunda-11-09-2026;Björnlunda;Sweden;Öster-Malma Castle, 611 91 Björnlunda, Nyköping Municipality, Sweden;58.95083;17.15806;;12.8;;0.95;;;No pin action required.
+clean;IRONMAN Hamburg European Championship;ironman-hamburg-european-championship-hamburg-07-06-2026;Hamburg;Germany;Jungfernstieg 53, 20354 Hamburg;53.554191;9.9911391;;0.8;0.0;0.95;;;No pin action required.
+clean;IRONMAN Frankfurt;ironman-frankfurt-frankfurt-28-06-2026;Frankfurt;Germany;Mainkai, 60311 Frankfurt;50.1093261;8.6837057;;0.2;0.0;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Duisburg;ironman-70-3-duisburg-duisburg-16-08-2026;Duisburg;Germany;Kruppstraße 30, 47055 Duisburg;51.3947457;6.7114351;;5.6;0.0;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Leipzig;ironman-70-3-leipzig-leipzig-23-08-2026;Leipzig;Germany;Leipzig, Germany;51.3406321;12.3747329;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Erkner;ironman-70-3-erkner-erkner-13-09-2026;Erkner;Germany;Erkner, Germany;52.4259804;13.7542811;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN Kaernten-Klagenfurt Austria;ironman-kaernten-klagenfurt-austria-klagenfurt-14-06-2026;Klagenfurt;Austria;Klagenfurt, Austria;46.623943;14.3075976;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 European Championship Elsinore;ironman-70-3-european-championship-elsinore-elsinore-21-06-2026;Elsinore;Denmark;Elsinore, Denmark;56.0348739;12.6130073;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Westfriesland;ironman-70-3-westfriesland-hoorn-21-06-2026;Hoorn;Netherlands;Hoorn, Netherlands;52.653272;5.0735802;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN Switzerland Thun;ironman-switzerland-thun-thun-05-07-2026;Thun;Switzerland;Thun, Switzerland;46.7582827;7.628086;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Jonkoping;ironman-70-3-jonkoping-jonkoping-05-07-2026;Jonkoping;Sweden;Jonkoping, Sweden;57.7825634;14.165719;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Luxembourg;ironman-70-3-luxembourg-moselle-12-07-2026;Moselle;Luxembourg;Moselle, Luxembourg;50.0997553;5.9153518;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN Vitoria-Gasteiz;ironman-vitoria-gasteiz-vitoria-gasteiz-12-07-2026;Vitoria-Gasteiz;Spain;Vitoria-Gasteiz, Spain;42.8465088;-2.6724025;;0.0;;0.95;;;No pin action required.
+clean;IRONMAN 70.3 Vitoria-Gasteiz;ironman-70-3-vitoria-gasteiz-vitoria-gasteiz-12-07-2026;Vitoria-Gasteiz;Spain;Vitoria-Gasteiz, Spain;42.8465088;-2.6724025;;0.0;;0.95;;;No pin action required.
+clean;Generali Köln Marathon;generali-koln-marathon-koln-04-10-2026;Köln;Germany;L111, 50679 Köln;50.936742995562746;6.978251138557531;;1.3;0.0;0.95;;;No pin action required.
+clean;Köln Triathlon;koln-triathlon-koln-06-09-2026;Köln;Germany;Rheinparkweg 1, 50679 Köln;50.9458861;6.9704153;;1.1;0.0;0.95;;;No pin action required.
+clean;Haspa Marathon Hamburg;haspa-marathon-hamburg-hamburg-25-04-2027;Hamburg;Germany;Karolinenstraße / Hamburg Messe, Hamburg;53.557504;9.975498;;1.9;1.9;0.95;;;No pin action required.
+clean;BMW Berlin Marathon;bmw-berlin-marathon-berlin-27-09-2026;Berlin;Germany;Straße des 17. Juni, between Brandenburg Gate and Kleiner Stern, Berlin;52.524932;13.407032;;1.2;4.9;0.95;;;No pin action required.
+clean;Mainova Frankfurt Marathon;mainova-frankfurt-marathon-frankfurt-am-main-25-10-2026;Frankfurt am Main;Germany;Festhalle Messe Frankfurt, Frankfurt am Main;50.113036;8.651832;;2.2;0.6;0.95;;;No pin action required.
+clean;Thüringen Ultra;thuringen-ultra-frottstadt-04-07-2026;Fröttstädt;Germany;Bahnhofstraße 1, 99880 Hörsel;50.90132;10.560932;;3.8;0.0;0.95;;;No pin action required.
+clean;Münster Marathon;munster-marathon-munster-13-09-2026;Münster;Germany;Schlosspl. 2, 48149 Münster;51.9638852;7.613212;;0.8;0.0;0.95;;;No pin action required.
+clean;GutsMuths Rennsteiglauf;gutsmuths-rennsteiglauf-schmiedefeld-22-05-2027;Schmiedefeld;Germany;Schmiedefeld, Germany;50.5333;11.2167;;0.0;;0.95;;;No pin action required.
+clean;Ostseeman;ostseeman-glucksburg-02-08-2026;Glücksburg;Germany;Sandwigstraße 1, 24960 Glücksburg;54.840851;9.5343775;;2.3;0.0;0.95;;;No pin action required.
+clean;Zugspitz Ultratrail;zugspitz-ultratrail-garmisch-partenkirchen-20-06-2026;Garmisch-Partenkirchen;Germany;Richard-Strauss-Platz 1, 82467 Garmisch-Partenkirchen;47.4948475;11.0915726;;0.4;0.0;0.95;;;No pin action required.
+clean;Challenge Roth;challenge-roth-roth-05-07-2026;Roth;Germany;Otto-Schrimpff-Straße 12, 91154 Roth;49.2430375;11.0948034;;1.8;0.0;0.95;;;No pin action required.
+clean;Dresden Marathon;dresden-marathon-dresden-25-10-2026;Dresden;Germany;Ostra-Ufer 2, 01067 Dresden;51.0588063;13.731368;;1.2;0.0;0.95;;;No pin action required.
+clean;Magdeburg Marathon;magdeburg-marathon-magdeburg-04-10-2026;Magdeburg;Germany;Magdeburg, Germany;52.1314783;11.6400789;;0.0;;0.95;;;No pin action required.
+clean;Fischland Darss-Zingst Ultramarathon;fischland-darss-zingst-ultramarathon-ribnitz-damgarten-13-06-2026;Ribnitz-Damgarten;Germany;Ribnitz-Damgarten, Germany;54.2433326;12.4319733;;0.0;;0.95;;;No pin action required.
+clean;Kassel Marathon;kassel-marathon-kassel-20-09-2026;Kassel;Germany;Kassel, Germany;51.3157833;9.4978479;;0.0;;0.95;;;No pin action required.
+warning;Finkenwerder Insellauf;finkenwerder-insellauf-hamburg-06-06-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Panorama-Baumwipfel-Lauf;panorama-baumwipfel-lauf-oberschwarzach-13-06-2026;Oberschwarzach;Germany;Oberschwarzach, Germany;49.8537347;10.4192342;;0.0;;0.95;;;No pin action required.
+clean;Ebbser Koasamarsch;ebbser-koasamarsch-ebbs-13-06-2026;Ebbs;Austria;Ebbs, Austria;47.630874;12.2154318;;0.0;;0.95;;;No pin action required.
+clean;Himmelgeister Brückenlauf;himmelgeister-bruckenlauf-dusseldorf-13-06-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.2254018;6.7763137;;0.0;;0.95;;;No pin action required.
+clean;GlückLauf;glucklauf-salzgitter-13-06-2026;Salzgitter;Germany;Salzgitter, Germany;52.1503721;10.3593147;;0.0;;0.95;;;No pin action required.
+clean;Mendener Citylauf mit Halbmarathon;mendener-citylauf-mit-halbmarathon-menden-14-06-2026;Menden;Germany;Menden, Germany;51.43779;7.7953822;;0.0;;0.95;;;No pin action required.
+clean;Gorch-Fock-Lauf;gorch-fock-lauf-wilhelmshaven-14-06-2026;Wilhelmshaven;Germany;Wilhelmshaven, Germany;53.5278793;8.106301;;0.0;;0.95;;;No pin action required.
+clean;Herzogstadtlauf Straubing;herzogstadtlauf-straubing-straubing-14-06-2026;Straubing;Germany;Straubing, Germany;48.8839157;12.5955773;;1.9;;0.95;;;No pin action required.
+clean;Himmelswegelauf;himmelswegelauf-nebra-13-06-2026;Nebra;Germany;Nebra, Germany;51.2873083;11.5787877;;0.0;;0.95;;;No pin action required.
+clean;Tschirgant Sky Run;tschirgant-sky-run-imst-13-06-2026;Imst;Austria;Imst, Austria;47.2381536;10.7406982;;0.0;;0.95;;;No pin action required.
+warning;saarBRÜCKENlauf;saarbruckenlauf-saarbrucken-14-06-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Heidenheimer Sparkassen-Stadtlauf;heidenheimer-sparkassen-stadtlauf-heidenheim-14-06-2026;Heidenheim;Germany;Heidenheim, Germany;48.6767637;10.152923;;57.4;;0.95;;;No pin action required.
+clean;Drebber Marathon;drebber-marathon-drebber-13-06-2026;Drebber;Germany;Drebber, Germany;52.652437;8.4199322;;0.0;;0.95;;;No pin action required.
+clean;Eschathlon - Der Eschborner Halbmarathon;eschathlon-der-eschborner-halbmarathon-eschborn-14-06-2026;Eschborn;Germany;Eschborn, Germany;50.1504737;8.5607767;;0.0;;0.95;;;No pin action required.
+clean;Hennefer Europalauf;hennefer-europalauf-hennef-20-06-2026;Hennef;Germany;Hennef, Germany;50.7754417;7.2847945;;0.0;;0.95;;;No pin action required.
+clean;Rennsteig Staffellauf;rennsteig-staffellauf-horschel-20-06-2026;Hörschel;Germany;Hörschel, Germany;51.0054262;10.230899;;0.0;;0.95;;;No pin action required.
+clean;Skatstadtmarathon;skatstadtmarathon-altenburg-13-06-2026;Altenburg;Germany;Altenburg, Germany;50.9852411;12.4340988;;0.0;;0.95;;;No pin action required.
+clean;Barmstedter Stadtlauf;barmstedter-stadtlauf-barmstedt-14-06-2026;Barmstedt;Germany;Barmstedt, Germany;53.7889203;9.7703927;;0.0;;0.95;;;No pin action required.
+warning;Sparkassen Metropolmarathon;sparkassen-metropolmarathon-furth-14-06-2026;Fürth;Germany;Fürth, Germany;49.4885711;10.9587203;coordinates_far_from_city;158.2;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Sababurger Tierparklauf;sababurger-tierparklauf-hofgeismar-sababurg-21-06-2026;Hofgeismar-Sababurg;Germany;Hofgeismar-Sababurg, Germany;51.4972178;9.4280731;;2.9;;0.95;;;No pin action required.
+clean;Melibokuslauf;melibokuslauf-alsbach-hahnlein-14-06-2026;Alsbach-Hähnlein;Germany;Alsbach-Hähnlein, Germany;49.7383506;8.5950049;;0.0;;0.95;;;No pin action required.
+clean;Draisinenlauf Altenglan;draisinenlauf-altenglan-altenglan-21-06-2026;Altenglan;Germany;Altenglan, Germany;49.5536508;7.4610041;;0.0;;0.95;;;No pin action required.
+clean;Fichtelgebirgsmarathon;fichtelgebirgsmarathon-bad-alexandersbad-04-07-2026;Bad Alexandersbad;Germany;Bad Alexandersbad, Germany;50.0110866;12.0241501;;0.0;;0.95;;;No pin action required.
+clean;Montafon Arlberg Marathon;montafon-arlberg-marathon-st-anton-am-arlberg-27-06-2026;St. Anton am Arlberg;Austria;St. Anton am Arlberg, Austria;47.1288996;10.2663669;;0.0;;0.95;;;No pin action required.
+clean;Flechtkulturlauf Obermain;flechtkulturlauf-obermain-lichtenfels-20-06-2026;Lichtenfels;Germany;Lichtenfels, Germany;50.1315263;11.0839299;;0.0;;0.95;;;No pin action required.
+clean;Remmers-Hasetal Marathon;remmers-hasetal-marathon-loningen-27-06-2026;Löningen;Germany;Löningen, Germany;52.7363493;7.7570655;;0.0;;0.95;;;No pin action required.
+clean;Gornergrat Zermatt Marathon;gornergrat-zermatt-marathon-st-niklaus-04-07-2026;St. Niklaus;Switzerland;St. Niklaus, Switzerland;46.177002;7.802516;;0.0;;0.95;;;No pin action required.
+clean;Roruper Abendlauf;roruper-abendlauf-dulmen-rorup-10-07-2026;Dülmen-Rorup;Germany;Dülmen-Rorup, Germany;51.8283677;7.2791406;;0.6;;0.95;;;No pin action required.
+clean;Eselsburger-Tal-Lauf;eselsburger-tal-lauf-herbrechtingen-05-07-2026;Herbrechtingen;Germany;Herbrechtingen, Germany;48.6226932;10.1761696;;0.0;;0.95;;;No pin action required.
+clean;ProPotsdam Schlösserlauf;propotsdam-schlosserlauf-potsdam-07-06-2026;Potsdam;Germany;Potsdam, Germany;52.4009309;13.0591397;;0.0;;0.95;;;No pin action required.
+clean;SportScheck RUN München;sportscheck-run-munchen-munchen-05-07-2026;München;Germany;München, Germany;48.1371079;11.5753822;;0.0;;0.95;;;No pin action required.
+info;Gletschermarathon Pitztal;gletschermarathon-pitztal-sankt-leonhard-im-pitztal-05-07-2026;Sankt Leonhard im Pitztal;Austria;Mandarfen, Sankt Leonhard im Pitztal, Tirol, Austria;46.9686284;10.8709246;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Ermstal-Marathon;ermstal-marathon-metzingen-12-07-2026;Metzingen;Germany;Metzingen, Germany;48.5397247;9.2831201;;0.0;;0.95;;;No pin action required.
+clean;Heizomat Altmühlseelauf;heizomat-altmuhlseelauf-gunzenhausen-18-07-2026;Gunzenhausen;Germany;Gunzenhausen, Germany;49.1161362;10.7406852;;0.0;;0.95;;;No pin action required.
+clean;Küstenkanallauf;kustenkanallauf-friesoythe-kampe-04-07-2026;Friesoythe/Kampe;Germany;Friesoythe/Kampe, Germany;53.0847318;7.854147;;1.3;;0.95;;;No pin action required.
+clean;Ottonenlauf;ottonenlauf-alexisbad-01-08-2026;Alexisbad;Germany;Alexisbad, Germany;51.6499442;11.1165337;;0.0;;0.95;;;No pin action required.
+clean;Altmühl-Jura Halbmarathon;altmuhl-jura-halbmarathon-greding-26-07-2026;Greding;Germany;Greding, Germany;49.0666571;11.3398301;;0.0;;0.95;;;No pin action required.
+clean;Rheingauer Halbmarathon;rheingauer-halbmarathon-oestrich-winkel-26-07-2026;Oestrich-Winkel;Germany;Oestrich-Winkel, Germany;50.0071863;8.0167585;;0.0;;0.95;;;No pin action required.
+clean;Marburger Nachtmarathon;marburger-nachtmarathon-marburg-03-07-2026;Marburg;Germany;Marburg, Germany;50.8090106;8.7704695;;0.0;;0.95;;;No pin action required.
+clean;Wilhelmsfelder Kerwelauf;wilhelmsfelder-kerwelauf-wilhelmsfeld-05-07-2026;Wilhelmsfeld;Germany;Wilhelmsfeld, Germany;49.4626013;8.7632568;;0.0;;0.95;;;No pin action required.
+clean;Marathon rund um Wellen;marathon-rund-um-wellen-wellen-02-08-2026;Wellen;Germany;Wellen, Germany;49.6692928;6.4334568;;0.0;;0.95;;;No pin action required.
+clean;Kapellenlauf Vorra;kapellenlauf-vorra-frensdorf-02-08-2026;Frensdorf;Germany;Frensdorf, Germany;49.8091858;10.8699018;;0.0;;0.95;;;No pin action required.
+warning;Eilenriederennen Hannover;eilenriederennen-hannover-hannover-30-08-2026;Hannover;Germany;Hannover, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;FlorSTADT Halbmarathon;florstadt-halbmarathon-florstadt-23-08-2026;Florstadt;Germany;Florstadt, Germany;50.3200881;8.9050064;;0.0;;0.95;;;No pin action required.
+clean;Borkumer Meilenlauf;borkumer-meilenlauf-borkum-05-09-2026;Borkum;Germany;Borkum, Germany;53.5862669;6.6917449;;1.6;;0.95;;;No pin action required.
+warning;Rosengartenlauf;rosengartenlauf-rosengarten-vahrendorf-23-08-2026;Rosengarten-Vahrendorf;Germany;Rosengarten-Vahrendorf, Germany;53.3983771;9.9048979;coordinates_far_from_city;163.4;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Jungfrau Marathon;jungfrau-marathon-interlaken-04-09-2026;Interlaken;Switzerland;Interlaken, Switzerland;46.6855231;7.8585139;;0.0;;0.95;;;No pin action required.
+clean;Steinhuder-Meer-Lauf;steinhuder-meer-lauf-neustadt-am-rubenberge-05-09-2026;Neustadt am Rübenberge;Germany;Neustadt am Rübenberge, Germany;52.5045772;9.4616921;;0.0;;0.95;;;No pin action required.
+clean;City Marathon Bremerhaven;city-marathon-bremerhaven-bremerhaven-06-09-2026;Bremerhaven;Germany;Bremerhaven, Germany;53.5505392;8.5851945;;0.0;;0.95;;;No pin action required.
+warning;BORSIG Halbmarathon;borsig-halbmarathon-berlin-06-09-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Koberstädter Waldmarathon;koberstadter-waldmarathon-egelsbach-30-08-2026;Egelsbach;Germany;Egelsbach, Germany;49.9668352;8.6659289;;0.0;;0.95;;;No pin action required.
+clean;Burgwald Märchen Marathon;burgwald-marchen-marathon-rauschenberg-30-08-2026;Rauschenberg;Germany;Rauschenberg, Germany;50.9089878;8.8864674;;0.0;;0.95;;;No pin action required.
+clean;Fehmarn Marathon;fehmarn-marathon-fehmarn-05-09-2026;Fehmarn;Germany;Fehmarn, Germany;54.4685201;11.1342465;;0.0;;0.95;;;No pin action required.
+clean;Flensburg liebt dich Marathon;flensburg-liebt-dich-marathon-flensburg-06-09-2026;Flensburg;Germany;Flensburg, Germany;54.7833021;9.4333264;;0.0;;0.95;;;No pin action required.
+clean;swb Bremen Marathon;swb-bremen-marathon-bremen-13-09-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+clean;Fränkische Schweiz Marathon;frankische-schweiz-marathon-ebermannstadt-06-09-2026;Ebermannstadt;Germany;Ebermannstadt, Germany;49.7802113;11.1875112;;0.0;;0.95;;;No pin action required.
+clean;Pfälzerwald Marathon;pfalzerwald-marathon-pirmasens-12-09-2026;Pirmasens;Germany;Pirmasens, Germany;49.1996961;7.6087847;;0.0;;0.95;;;No pin action required.
+clean;wep-Strom Lauf;wep-strom-lauf-huckelhoven-13-09-2026;Hückelhoven;Germany;Hückelhoven, Germany;51.0552368;6.2247322;;0.0;;0.95;;;No pin action required.
+clean;Friedberger Halbmarathon;friedberger-halbmarathon-friedberg-i-bayern-13-09-2026;Friedberg i.Bayern;Germany;Friedberg i.Bayern, Germany;48.3551962;10.9786498;;0.0;;0.95;;;No pin action required.
+clean;ebm-papst Marathon;ebm-papst-marathon-niedernhall-13-09-2026;Niedernhall;Germany;Niedernhall, Germany;49.294729;9.61617;;0.0;;0.95;;;No pin action required.
+clean;Schweriner Fünf-Seen-Lauf;schweriner-funf-seen-lauf-schwerin-04-07-2026;Schwerin;Germany;Schwerin, Germany;53.6288297;11.4148038;;0.0;;0.95;;;No pin action required.
+clean;Ahrathon Erlebnislauf;ahrathon-erlebnislauf-bad-neuenahr-ahrweiler-13-06-2026;Bad Neuenahr-Ahrweiler;Germany;Bad Neuenahr-Ahrweiler, Germany;50.5444551;7.1186671;;0.0;;0.95;;;No pin action required.
+clean;Schapener Volkslauf;schapener-volkslauf-braunschweig-06-09-2026;Braunschweig;Germany;Braunschweig, Germany;52.2646577;10.5236066;;0.0;;0.95;;;No pin action required.
+clean;Bodensee Marathon;bodensee-marathon-kressbronn-19-09-2026;Kressbronn;Germany;Kressbronn, Germany;49.0655511;10.1378705;;0.0;;0.95;;;No pin action required.
+clean;Wachau Marathon;wachau-marathon-krems-13-09-2026;Krems;Austria;Krems, Austria;48.4108382;15.6003717;;0.0;;0.95;;;No pin action required.
+clean;Trail Marathon Heidelberg;trail-marathon-heidelberg-heidelberg-20-09-2026;Heidelberg;Germany;Heidelberg, Germany;49.4093582;8.694724;;0.0;;0.95;;;No pin action required.
+clean;Brauereienlauf;brauereienlauf-litzendorf-19-09-2026;Litzendorf;Germany;Litzendorf, Germany;49.9123064;11.0096505;;0.0;;0.95;;;No pin action required.
+clean;Sparkassen - Küstenmarathon;sparkassen-kustenmarathon-otterndorf-20-09-2026;Otterndorf;Germany;Otterndorf, Germany;53.8073939;8.8956836;;0.0;;0.95;;;No pin action required.
+clean;Altstadtlauf Salzwedel;altstadtlauf-salzwedel-salzwedel-20-09-2026;Salzwedel;Germany;Salzwedel, Germany;52.8528456;11.1539699;;0.0;;0.95;;;No pin action required.
+clean;Schuster Tegernseelauf;schuster-tegernseelauf-gmund-am-tegernsee-20-09-2026;Gmund am Tegernsee;Germany;Gmund am Tegernsee, Germany;47.750822;11.738955;;0.0;;0.95;;;No pin action required.
+clean;Taubertal 100;taubertal-100-rothenburg-ob-der-tauber-03-10-2026;Rothenburg ob der Tauber;Germany;Rothenburg ob der Tauber, Germany;49.3658042;10.1629182;;0.0;;0.95;;;No pin action required.
+clean;Baden Marathon Karlsruhe;baden-marathon-karlsruhe-karlsruhe-20-09-2026;Karlsruhe;Germany;Karlsruhe, Germany;49.0068705;8.4034195;;0.0;;0.95;;;No pin action required.
+clean;Einstein Marathon;einstein-marathon-ulm-27-09-2026;Ulm;Germany;Ulm, Germany;48.3984968;9.9912458;;0.0;;0.95;;;No pin action required.
+clean;Halbmarathon Altötting;halbmarathon-altotting-altotting-20-09-2026;Altötting;Germany;Altötting, Germany;48.2268085;12.6757914;;0.0;;0.95;;;No pin action required.
+clean;Schwarzwald Marathon;schwarzwald-marathon-braunlingen-10-10-2026;Bräunlingen;Germany;Bräunlingen, Germany;47.9300645;8.448329;;0.0;;0.95;;;No pin action required.
+clean;Kaisermarathon;kaisermarathon-soll-10-10-2026;Söll;Austria;Söll, Austria;47.5037676;12.1914903;;0.0;;0.95;;;No pin action required.
+clean;Kärntner Marathon;karntner-marathon-feldkirchen-27-09-2026;Feldkirchen;Austria;Feldkirchen, Austria;46.7284183;14.0906473;;0.8;;0.95;;;No pin action required.
+clean;Fulda Marathon;fulda-marathon-fulda-06-09-2026;Fulda;Germany;Fulda, Germany;50.5514658;9.6762161;;0.0;;0.95;;;No pin action required.
+clean;Eindhoven Marathon;eindhoven-marathon-eindhoven-11-10-2026;Eindhoven;Netherlands;Eindhoven, Netherlands;51.4392648;5.478633;;0.0;;0.95;;;No pin action required.
+clean;Graz Marathon;graz-marathon-graz-11-10-2026;Graz;Austria;Graz, Austria;47.0708678;15.4382786;;0.0;;0.95;;;No pin action required.
+clean;RIBE Citylauf Schwabach;ribe-citylauf-schwabach-schwabach-11-10-2026;Schwabach;Germany;Schwabach, Germany;49.3290521;11.0207677;;0.0;;0.95;;;No pin action required.
+clean;Marathon München by Brooks;marathon-munchen-by-brooks-munchen-11-10-2026;München;Germany;München, Germany;48.1371079;11.5753822;;0.0;;0.95;;;No pin action required.
+clean;Hachenburg Löwen Marathon;hachenburg-lowen-marathon-hachenburg-17-10-2026;Hachenburg;Germany;Hachenburg, Germany;50.6627538;7.8253173;;0.0;;0.95;;;No pin action required.
+clean;Drei-Talsperren Marathon;drei-talsperren-marathon-eibenstock-19-09-2026;Eibenstock;Germany;Eibenstock, Germany;50.4725811;12.6117135;;0.0;;0.95;;;No pin action required.
+clean;Leipzig RUN;leipzig-run-leipzig-11-10-2026;Leipzig;Germany;Leipzig, Germany;51.3406321;12.3747329;;0.0;;0.95;;;No pin action required.
+clean;Filderstadt-Halbmarathon;filderstadt-halbmarathon-filderstadt-18-10-2026;Filderstadt;Germany;Filderstadt, Germany;48.6664;9.2199647;;0.0;;0.95;;;No pin action required.
+clean;Swiss City Marathon Lucerne;swiss-city-marathon-lucerne-luzern-25-10-2026;Luzern;Switzerland;Luzern, Switzerland;47.052144;8.3058123;;0.0;;0.95;;;No pin action required.
+clean;Westenergie Marathon;westenergie-marathon-essen-11-10-2026;Essen;Germany;Essen, Germany;51.4582235;7.0158171;;0.0;;0.95;;;No pin action required.
+clean;Braunschweiger Lauftage;braunschweiger-lauftage-braunschweig-25-10-2026;Braunschweig;Germany;Braunschweig, Germany;52.2646577;10.5236066;;0.0;;0.95;;;No pin action required.
+clean;Usedom Marathon;usedom-marathon-wolgast-05-09-2026;Wolgast;Germany;Wolgast, Germany;54.0536473;13.7757809;;0.0;;0.95;;;No pin action required.
+clean;Aschaffenburger Sparkassen Halbmarathon;aschaffenburger-sparkassen-halbmarathon-aschaffenburg-04-10-2026;Aschaffenburg;Germany;Aschaffenburg, Germany;49.9706701;9.1384857;;0.6;;0.95;;;No pin action required.
+clean;Chiemgau Trail Run;chiemgau-trail-run-marquartstein-24-10-2026;Marquartstein;Germany;Marquartstein, Germany;47.7608226;12.4604809;;0.0;;0.95;;;No pin action required.
+clean;Karneval Marathon Köln;karneval-marathon-koln-koln-11-11-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;SportScheck RUN Nürnberg;sportscheck-run-nurnberg-nurnberg-25-10-2026;Nürnberg;Germany;Nürnberg, Germany;49.453872;11.077298;;0.0;;0.95;;;No pin action required.
+clean;Lausanne Marathon;lausanne-marathon-lausanne-25-10-2026;Lausanne;Switzerland;Lausanne, Switzerland;46.5218269;6.6327025;;0.0;;0.95;;;No pin action required.
+clean;Schloss Marienburg Marathon;schloss-marienburg-marathon-nordstemmen-adensen-21-11-2026;Nordstemmen-Adensen;Germany;Nordstemmen-Adensen, Germany;52.1763239;9.729259;;4.3;;0.95;;;No pin action required.
+clean;Röntgenlauf;rontgenlauf-remscheid-25-10-2026;Remscheid;Germany;Remscheid, Germany;51.1798706;7.1943544;;0.0;;0.95;;;No pin action required.
+clean;Siebengebirgsmarathon;siebengebirgsmarathon-bad-honnef-06-12-2026;Bad Honnef;Germany;Bad Honnef, Germany;50.6448582;7.2272534;;0.0;;0.95;;;No pin action required.
+clean;Zürich Marathon;zurich-marathon-zurich-11-04-2027;Zürich;Switzerland;Zürich, Switzerland;47.3744489;8.5410422;;0.0;;0.95;;;No pin action required.
+clean;Falke Rothaarsteig Marathon;falke-rothaarsteig-marathon-fleckenberg-17-10-2026;Fleckenberg;Germany;Fleckenberg, Germany;51.1325162;8.2623868;;0.0;;0.95;;;No pin action required.
+clean;Oldenburg Marathon;oldenburg-marathon-edewecht-25-10-2026;Edewecht;Germany;Edewecht, Germany;53.1283992;7.9855044;;0.0;;0.95;;;No pin action required.
+clean;Mein Freiburg Marathon;mein-freiburg-marathon-freiburg-04-04-2027;Freiburg;Germany;Freiburg, Germany;47.9960901;7.8494005;;0.0;;0.95;;;No pin action required.
+clean;Winterstaffel Pulheim;winterstaffel-pulheim-pulheim-31-01-2027;Pulheim;Germany;Pulheim, Germany;50.9979888;6.8025409;;0.0;;0.95;;;No pin action required.
+clean;uniper Marathon Düsseldorf;uniper-marathon-dusseldorf-dusseldorf-18-04-2027;Düsseldorf;Germany;Düsseldorf, Germany;51.2254018;6.7763137;;0.0;;0.95;;;No pin action required.
+clean;ADAC Marathon Hannover;adac-marathon-hannover-hannover-11-04-2027;Hannover;Germany;Trammplatz / Neues Rathaus, Hannover;52.36793;9.73772;;0.7;0.0;0.95;;;No pin action required.
+clean;Frauenfelder Marathon;frauenfelder-marathon-frauenfeld-15-11-2026;Frauenfeld;Switzerland;Frauenfeld, Switzerland;47.5561915;8.8963347;;0.0;;0.95;;;No pin action required.
+clean;Tangermünder Elbdeichmarathon;tangermunder-elbdeichmarathon-tangermunde-18-04-2027;Tangermünde;Germany;Tangermünde, Germany;52.5431104;11.9722524;;0.0;;0.95;;;No pin action required.
+clean;Saaletal Marathon;saaletal-marathon-ramsthal-10-04-2027;Ramsthal;Germany;Ramsthal, Germany;50.1398945;10.0692744;;0.0;;0.95;;;No pin action required.
+clean;Ring Running Series;ring-running-series-hockenheim-21-11-2026;Hockenheim;Germany;Hockenheim, Germany;49.3188892;8.5475467;;0.0;;0.95;;;No pin action required.
+clean;Rursee Marathon;rursee-marathon-simmerath-08-11-2026;Simmerath;Germany;Simmerath, Germany;50.6072499;6.3005267;;0.0;;0.95;;;No pin action required.
+clean;Salvus-Teekottenlauf;salvus-teekottenlauf-emsdetten-23-04-2027;Emsdetten;Germany;Emsdetten, Germany;52.174687;7.5301756;;0.0;;0.95;;;No pin action required.
+clean;Leipzig Marathon;leipzig-marathon-leipzig-18-04-2027;Leipzig;Germany;Leipzig, Germany;51.3406321;12.3747329;;0.0;;0.95;;;No pin action required.
+clean;Vienna City Marathon;vienna-city-marathon-vienna-18-04-2027;Vienna;Austria;Reichsbrücke / Wagramer Straße, Vienna;48.2317425;16.4158593;;4.1;0.0;0.95;;;No pin action required.
+clean;Cuxhaven Marathon;cuxhaven-marathon-cuxhaven-02-05-2027;Cuxhaven;Germany;Cuxhaven, Germany;53.86878;8.698286;;0.0;;0.95;;;No pin action required.
+clean;Obermain Marathon;obermain-marathon-bad-staffelstein-11-04-2027;Bad Staffelstein;Germany;Bad Staffelstein, Germany;50.1028339;10.999159;;0.0;;0.95;;;No pin action required.
+clean;Spreewald Marathon;spreewald-marathon-burg-25-04-2027;Burg;Germany;Burg, Germany;49.9600346;6.3512069;;0.0;;0.95;;;No pin action required.
+clean;Marathon Deutsche Weinstraße;marathon-deutsche-weinstra-e-bockenheim-02-04-2028;Bockenheim;Germany;Bockenheim, Germany;50.1233115;8.6460563;;0.0;;0.95;;;No pin action required.
+clean;9. Super-Cross-Sprint Triathlon;9-super-cross-sprint-triathlon-merzig-07-06-2026;Merzig;Germany;Merzig, Germany;49.443;6.627;;0.8;;0.95;;;No pin action required.
+clean;PUMA Salzburg Marathon;puma-salzburg-marathon-salzburg-23-05-2027;Salzburg;Austria;Salzburg, Austria;47.7981346;13.0464806;;0.0;;0.95;;;No pin action required.
+clean;RYZON Bonn Triathlon;ryzon-bonn-triathlon-bonn-07-06-2026;Bonn;Germany;Bonn, Germany;50.74;7.113;;0.9;;0.95;;;No pin action required.
+clean;17. Burgwald-Triathlon;17-burgwald-triathlon-burgwald-07-06-2026;Burgwald;Germany;Burgwald, Germany;51.022;8.807;;1.4;;0.95;;;No pin action required.
+clean;16. GSYSTEMS-Koberbachtal-Triathlon - OD & JD;16-gsystems-koberbachtal-triathlon-od-jd-werdau-ot-langenhessen-06-06-2026;Werdau/ OT Langenhessen;Germany;Werdau/ OT Langenhessen, Germany;50.746;12.414;;4.0;;0.95;;;No pin action required.
+clean;Enni Triathlon Moers;enni-triathlon-moers-moers-07-06-2026;Moers;Germany;Moers, Germany;51.438;6.622;;1.5;;0.95;;;No pin action required.
+clean;24. Meerenergie Triathlon Bokeloh;24-meerenergie-triathlon-bokeloh-wunstorf-07-06-2026;Wunstorf;Germany;Wunstorf, Germany;52.42;9.376;;3.7;;0.95;;;No pin action required.
+clean;VR Bank Triathlon Heilbronn powered by Audi;vr-bank-triathlon-heilbronn-powered-by-audi-heilbronn-14-06-2026;Heilbronn;Germany;Heilbronn, Germany;49.144;9.217;;0.2;;0.95;;;No pin action required.
+clean;12. Feuchtwanger Triathlon;12-feuchtwanger-triathlon-feuchtwangen-14-06-2026;Feuchtwangen;Germany;Feuchtwangen, Germany;49.161;10.325;;0.9;;0.95;;;No pin action required.
+clean;39. Kallmünzer Sparkassen-Triathlon;39-kallmunzer-sparkassen-triathlon-kallmunz-13-06-2026;Kallmünz;Germany;Kallmünz, Germany;49.161;11.953;;1.8;;0.95;;;No pin action required.
+clean;3. Oste-Triathlon Bremervörde;3-oste-triathlon-bremervorde-bremervorde-14-06-2026;Bremervörde;Germany;Bremervörde, Germany;53.49;9.146;;0.9;;0.95;;;No pin action required.
+clean;9. Cottbuser Ostsee-Triathlon;9-cottbuser-ostsee-triathlon-teichland-14-06-2026;Teichland;Germany;Teichland, Germany;51.893;14.326;;10.7;;0.95;;;No pin action required.
+clean;Havelberg Triathlon 2026;havelberg-triathlon-2026-havelberg-06-06-2026;Havelberg;Germany;Havelberg, Germany;52.829;12.067;;0.7;;0.95;;;No pin action required.
+clean;Lifestyle Würzburg Triathlon;lifestyle-wurzburg-triathlon-erlabrunn-14-06-2026;Erlabrunn;Germany;Erlabrunn, Germany;49.859;9.842;;0.3;;0.95;;;No pin action required.
+clean;25. Sternberger Triathlon;25-sternberger-triathlon-sternberg-14-06-2026;Sternberg;Germany;Sternberg, Germany;53.662;11.949;;9.7;;0.95;;;No pin action required.
+clean;35. Reiling-Triathlon Harsewinkel;35-reiling-triathlon-harsewinkel-harsewinkel-07-06-2026;Harsewinkel;Germany;Harsewinkel, Germany;51.966;8.22;;0.6;;0.95;;;No pin action required.
+warning;33. Mußbach Triathlon;33-mu-bach-triathlon-neustadt-14-06-2026;Neustadt;Germany;Neustadt, Germany;49.388;8.13;coordinates_far_from_city;555.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;12. Ockstädter Cross Triathlon im Kirschenberg;12-ockstadter-cross-triathlon-im-kirschenberg-friedberg-ockstadt-20-06-2026;Friedberg-Ockstadt;Germany;Friedberg-Ockstadt, Germany;50.339;8.806;coordinates_far_from_city;273.0;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Audi Triathlon Ingolstadt powered by BÜCHL;audi-triathlon-ingolstadt-powered-by-buchl-ingolstadt-14-06-2026;Ingolstadt;Germany;Ingolstadt, Germany;48.753;11.394;;2.5;;0.95;;;No pin action required.
+clean;Nymphensee Triathlon;nymphensee-triathlon-brieselang-14-06-2026;Brieselang;Germany;Brieselang, Germany;52.584;13.018;;1.6;;0.95;;;No pin action required.
+clean;7 Türme Triathlon 2026;7-turme-triathlon-2026-lubeck-14-06-2026;Lübeck;Germany;Lübeck, Germany;53.866;10.685;;0.1;;0.95;;;No pin action required.
+clean;31. Stadttriathlon Erding 2026;31-stadttriathlon-erding-2026-erding-14-06-2026;Erding;Germany;Erding, Germany;48.319;11.909;;1.4;;0.95;;;No pin action required.
+clean;33. Steinbecker Triathlon;33-steinbecker-triathlon-recke-21-06-2026;Recke;Germany;Recke, Germany;52.339;7.736;;3.7;;0.95;;;No pin action required.
+clean;29. Vierlanden-Triathlon;29-vierlanden-triathlon-hamburg-21-06-2026;Hamburg;Germany;Hamburg, Germany;53.473;10.173;;14.2;;0.95;;;No pin action required.
+clean;41. Hückeswagener Triathlon;41-huckeswagener-triathlon-huckeswagen-21-06-2026;Hückeswagen;Germany;Hückeswagen, Germany;51.141;7.355;;1.4;;0.95;;;No pin action required.
+clean;32. Heinz Beierstorf Triathlon Stutensee;32-heinz-beierstorf-triathlon-stutensee-stutensee-21-06-2026;Stutensee;Germany;Stutensee, Germany;49.068;8.476;;2.5;;0.95;;;No pin action required.
+clean;9. Lauchringer Triathlon-Nacht;9-lauchringer-triathlon-nacht-lauchringen-26-06-2026;Lauchringen;Germany;Lauchringen, Germany;47.624;8.305;;0.8;;0.95;;;No pin action required.
+clean;34. Mühlchen-Triathlon Darmstadt-Arheilgen;34-muhlchen-triathlon-darmstadt-arheilgen-darmstadt-21-06-2026;Darmstadt;Germany;Darmstadt, Germany;49.901;8.668;;3.4;;0.95;;;No pin action required.
+clean;Wormser Nibelungenlauf;wormser-nibelungenlauf-worms-13-09-2026;Worms;Germany;Worms, Germany;49.6302618;8.3620898;;0.0;;0.95;;;No pin action required.
+clean;Einhorn-Triathlon Bremen;einhorn-triathlon-bremen-bremen-14-06-2026;Bremen;Germany;Bremen, Germany;53.118;8.817;;4.7;;0.95;;;No pin action required.
+clean;StadtTriathlon Forchheim;stadttriathlon-forchheim-forchheim-14-06-2026;Forchheim;Germany;Forchheim, Germany;49.71;11.064;;0.3;;0.95;;;No pin action required.
+clean;SanktPauli Ultra;sanktpauli-ultra-rotenburg-wumme-tostedt-15-05-2027;Rotenburg/Wümme - Tostedt;Germany;Rotenburg/Wümme - Tostedt, Germany;53.28265;9.7124175;;0.0;;0.95;;;No pin action required.
+clean;Nordhäuser Triathlon;nordhauser-triathlon-nordhausen-21-06-2026;Nordhausen;Germany;Nordhausen, Germany;51.472;10.811;;3.9;;0.95;;;No pin action required.
+clean;14. Neunkircher Jedermann- und Staffeltriathlon;14-neunkircher-jedermann-und-staffeltriathlon-neunkirchen-21-06-2026;Neunkirchen;Germany;Neunkirchen, Germany;49.344;7.184;;0.7;;0.95;;;No pin action required.
+clean;Rosenstadt-Triathlon;rosenstadt-triathlon-eutin-21-06-2026;Eutin;Germany;Eutin, Germany;54.137;10.619;;0.2;;0.95;;;No pin action required.
+warning;41. Edersee-Triathlon;41-edersee-triathlon-waldeck-27-06-2026;Waldeck;Germany;Waldeck, Germany;51.208;9.065;coordinates_far_from_city;192.7;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;17. ITH-Hennesee-Triathlon;17-ith-hennesee-triathlon-meschede-27-06-2026;Meschede;Germany;Meschede, Germany;51.303;8.263;;4.8;;0.95;;;No pin action required.
+clean;41. Lipperlandtriathlon;41-lipperlandtriathlon-lage-21-06-2026;Lage;Germany;Lage, Germany;51.963;8.756;;4.0;;0.95;;;No pin action required.
+clean;Viking Triathlon Schleswig;viking-triathlon-schleswig-schleswig-21-06-2026;Schleswig;Germany;Schleswig, Germany;54.513;9.558;;0.8;;0.95;;;No pin action required.
+clean;Allgäu-Panorama-Marathon;allgau-panorama-marathon-sonthofen-09-08-2026;Sonthofen;Germany;Sonthofen, Germany;47.5135363;10.281931;;1.6;;0.95;;;No pin action required.
+clean;Freudenstadt Grüntal 12h/24h Lauf (Herbst);freudenstadt-gruntal-12h-24h-lauf-herbst-freudenstadt-gruntal-03-10-2026;Freudenstadt-Grüntal;Germany;Freudenstadt-Grüntal, Germany;48.4796222;8.4683264;;0.0;;0.95;;;No pin action required.
+clean;12.Mittelmosel Triathlon powered by vit:bikes Zell;12-mittelmosel-triathlon-powered-by-vit-bikes-zell-bullay-21-06-2026;Bullay;Germany;Bullay, Germany;50.054;7.13;;0.2;;0.95;;;No pin action required.
+clean;4. Neustädter Triathlon Sprintdistanz;4-neustadter-triathlon-sprintdistanz-neustadt-a-d-donau-28-06-2026;Neustadt a.d. Donau;Germany;Neustadt a.d. Donau, Germany;48.809;11.764;;0.0;;0.95;;;No pin action required.
+warning;adidas Runners City Night Berlin;adidas-runners-city-night-berlin-berlin-01-08-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;35. Tölzer Triathlon;35-tolzer-triathlon-sachsenkam-21-06-2026;Sachsenkam;Germany;Sachsenkam, Germany;47.822;11.622;;1.5;;0.95;;;No pin action required.
+clean;AOK Firmenlauf Reutlingen;aok-firmenlauf-reutlingen-reutlingen-11-06-2026;Reutlingen;Germany;Reutlingen, Germany;48.4919508;9.2114144;;0.0;;0.95;;;No pin action required.
+clean;B2Run Gelsenkirchen;b2run-gelsenkirchen-gelsenkirchen-01-09-2026;Gelsenkirchen;Germany;Gelsenkirchen, Germany;51.5110321;7.0960124;;0.0;;0.95;;;No pin action required.
+clean;B2Run Koblenz;b2run-koblenz-koblenz-26-06-2026;Koblenz;Germany;Koblenz, Germany;50.3533278;7.5943951;;0.0;;0.95;;;No pin action required.
+clean;B2Run Kaiserslautern;b2run-kaiserslautern-kaiserslautern-11-06-2026;Kaiserslautern;Germany;Kaiserslautern, Germany;49.4432174;7.7689951;;0.0;;0.95;;;No pin action required.
+clean;AOK-Firmenlauf Rheine;aok-firmenlauf-rheine-rheine-26-06-2026;Rheine;Germany;Rheine, Germany;52.2797707;7.4373615;;0.0;;0.95;;;No pin action required.
+clean;Eversburger Gewässer Ultramarathon;eversburger-gewasser-ultramarathon-osnabruck-06-06-2026;Osnabrück;Germany;Osnabrück, Germany;52.2719595;8.047635;;0.0;;0.95;;;No pin action required.
+clean;Badeparadies Schwarzwald Firmenlauf Villingen-Schwenningen;badeparadies-schwarzwald-firmenlauf-villingen-schwenningen-villingen-schwenninge;Villingen-Schwenningen;Germany;Villingen-Schwenningen, Germany;48.063152;8.4929618;;0.0;;0.95;;;No pin action required.
+clean;TenneT POWERTRIATHLON Trebgast 2026;tennet-powertriathlon-trebgast-2026-trebgast-28-06-2026;Trebgast;Germany;Trebgast, Germany;50.062;11.55;;0.7;;0.95;;;No pin action required.
+clean;Sparda Münster City Triathlon 2026;sparda-munster-city-triathlon-2026-munster-21-06-2026;Münster;Germany;Münster, Germany;51.951;7.638;;1.6;;0.95;;;No pin action required.
+warning;Franklin Meilenlauf Mannheim;franklin-meilenlauf-mannheim-mannheim-11-10-2026;Mannheim;Germany;Mannheim, Germany;49.4892913;8.4673098;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;AOK Firmenlauf Bielefeld;aok-firmenlauf-bielefeld-bielefeld-26-08-2026;Bielefeld;Germany;Bielefeld, Germany;52.0191005;8.531007;;0.0;;0.95;;;No pin action required.
+clean;Fürst Carl Seenlandmarathon;furst-carl-seenlandmarathon-pleinfeld-20-09-2026;Pleinfeld;Germany;Pleinfeld, Germany;49.1053751;10.98564;;0.0;;0.95;;;No pin action required.
+warning;Haspa Halbmarathon Hamburg;haspa-halbmarathon-hamburg-hamburg-25-04-2027;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Dürener Firmenlauf;durener-firmenlauf-duren-12-06-2026;Düren;Germany;Düren, Germany;50.8031684;6.4820806;;0.0;;0.95;;;No pin action required.
+clean;Kap-Arkona-Lauf;kap-arkona-lauf-putgarten-03-10-2026;Putgarten;Germany;Putgarten, Germany;54.6728579;13.4159183;;0.0;;0.95;;;No pin action required.
+clean;Haster Volkslauf Osnabrück;haster-volkslauf-osnabruck-osnabruck-07-06-2026;Osnabrück;Germany;Osnabrück, Germany;52.2719595;8.047635;;0.0;;0.95;;;No pin action required.
+clean;Gütersloh läuft;gutersloh-lauft-gutersloh-08-07-2026;Gütersloh;Germany;Gütersloh, Germany;51.9063997;8.3782078;;0.0;;0.95;;;No pin action required.
+clean;König Ludwig Lauf Sommer;konig-ludwig-lauf-sommer-oberammergau-26-09-2026;Oberammergau;Germany;Oberammergau, Germany;47.597344;11.0640664;;0.0;;0.95;;;No pin action required.
+clean;LaminatDEPOT-Lauf Velbert;laminatdepot-lauf-velbert-velbert-05-07-2026;Velbert;Germany;Velbert, Germany;51.3406713;7.0439912;;0.0;;0.95;;;No pin action required.
+clean;Firmenpuls Neuss;firmenpuls-neuss-neuss-08-09-2026;Neuss;Germany;Neuss, Germany;51.1981778;6.6916476;;0.0;;0.95;;;No pin action required.
+clean;Osnabrücker Ringweg Ultramarathon;osnabrucker-ringweg-ultramarathon-osnabruck-13-06-2026;Osnabrück;Germany;Osnabrück, Germany;52.2719595;8.047635;;0.0;;0.95;;;No pin action required.
+warning;REWE Women's Run Hamburg;rewe-women-s-run-hamburg-hamburg-14-06-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Bietigheimer Silvesterlauf;bietigheimer-silvesterlauf-bietigheim-bissingen-31-12-2026;Bietigheim-Bissingen;Germany;Bietigheim-Bissingen, Germany;48.9493243;9.1364229;;0.0;;0.95;;;No pin action required.
+clean;Mülheimer Firmenlauf;mulheimer-firmenlauf-mulheim-an-der-ruhr-17-09-2026;Mülheim an der Ruhr;Germany;Mülheim an der Ruhr, Germany;51.4272925;6.8829192;;0.0;;0.95;;;No pin action required.
+clean;RUN & FUN Krefelder Firmenlauf;run-fun-krefelder-firmenlauf-krefeld-02-09-2026;Krefeld;Germany;Krefeld, Germany;51.3331205;6.5623343;;0.0;;0.95;;;No pin action required.
+clean;Kölner Halbmarathon;kolner-halbmarathon-koln-30-08-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;Siegerländer AOK-Firmenlauf Siegen;siegerlander-aok-firmenlauf-siegen-siegen-15-07-2026;Siegen;Germany;Siegen, Germany;50.8751175;8.0256131;;0.0;;0.95;;;No pin action required.
+clean;Schwebebahnlauf Wuppertal;schwebebahnlauf-wuppertal-wuppertal-14-06-2026;Wuppertal;Germany;Wuppertal, Germany;51.264018;7.1780374;;0.0;;0.95;;;No pin action required.
+clean;Sparkasse 3-Länder-Marathon;sparkasse-3-lander-marathon-lindau-11-10-2026;Lindau;Germany;Lindau, Germany;54.3846451;9.9034272;;0.0;;0.95;;;No pin action required.
+clean;Lüneburger Firmenlauf;luneburger-firmenlauf-luneburg-12-06-2026;Lüneburg;Germany;Lüneburg, Germany;53.248706;10.407855;;0.0;;0.95;;;No pin action required.
+warning;Sandhofer Straßenlauf;sandhofer-stra-enlauf-mannheim-19-06-2026;Mannheim;Germany;Mannheim, Germany;49.4892913;8.4673098;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Solinger Klingenlauf;solinger-klingenlauf-solingen-04-06-2026;Solingen;Germany;Solingen, Germany;51.1721629;7.0845893;;0.0;;0.95;;;No pin action required.
+clean;Mainauenlauf Bayreuth;mainauenlauf-bayreuth-bayreuth-14-06-2026;Bayreuth;Germany;Bayreuth, Germany;49.9446345;11.5743543;;0.0;;0.95;;;No pin action required.
+clean;Stadtlauf Hanau;stadtlauf-hanau-hanau-18-09-2026;Hanau;Germany;Hanau, Germany;50.132881;8.9169797;;0.0;;0.95;;;No pin action required.
+clean;Usedom Beach Marathon;usedom-beach-marathon-heringsdorf-06-06-2026;Heringsdorf;Germany;Heringsdorf, Germany;53.9543267;14.1673508;;0.0;;0.95;;;No pin action required.
+clean;Sparkassen Firmenlauf Oberhausen;sparkassen-firmenlauf-oberhausen-oberhausen-18-06-2026;Oberhausen;Germany;Oberhausen, Germany;51.4696137;6.8514435;;0.0;;0.95;;;No pin action required.
+clean;VR Bank Firmenlauf Bamberg;vr-bank-firmenlauf-bamberg-bamberg-18-09-2026;Bamberg;Germany;Bamberg, Germany;49.8916044;10.8868478;;0.0;;0.95;;;No pin action required.
+clean;WVV Marathon Würzburg;wvv-marathon-wurzburg-wurzburg-23-05-2027;Würzburg;Germany;Würzburg, Germany;49.7933723;9.9309779;;0.0;;0.95;;;No pin action required.
+info;1. Volkslauf Seelze;1-volkslauf-seelze-seelze-15-11-2026;Seelze;Germany;Seelze, Lower Saxony, Germany, Germany;52.3964639;9.594287;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;1. Hannover Backyard Ultra;1-hannover-backyard-ultra-hannover-08-08-2026;Hannover;Germany;Georgengarten, Hannover, Lower Saxony, Germany, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+warning;1. Laufchallenge Mellendorfer TV;1-laufchallenge-mellendorfer-tv-hanover-23-08-2026;Hanover;Germany;Wedemark, Hanover, Lower Saxony, Germany, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;10. Charity-Lauf Koldingen;10-charity-lauf-koldingen-region-hannover-02-08-2026;Region Hannover;Germany;Koldingen, Pattensen, Region Hannover, Lower Saxony, Germany, Germany;52.2714193;9.7968916;;14.6;;0.95;;;No pin action required.
+clean;07. Stadtholz Marathon;07-stadtholz-marathon-rheda-wiedenbruck-20-07-2026;Rheda-Wiedenbrück;Germany;Heideteich, Rheda-Wiedenbrück, North Rhine-Westphalia, Germany, Germany;51.8428202;8.2985615;;0.0;;0.95;;;No pin action required.
+clean;11. Lichterlauf Tangermünde;11-lichterlauf-tangermunde-saxony-anhalt-21-08-2026;Saxony-Anhalt;Germany;Kaiserstadt Tangermünde, Elbufer, Bleichenberg, Saxony-Anhalt, Germany, Germany;52;11.7333;;8.8;;0.95;;;No pin action required.
+warning;1. Westerwälder Backyard Ultra;1-westerwalder-backyard-ultra-westerwald-05-06-2026;Westerwald;Germany;Höchstenbach, Westerwald, Rheinland-Pfalz, Germany, Germany;50.6319191;7.7428015;coordinates_far_from_city;207.6;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+info;13. Heilwald Marathon;13-heilwald-marathon-bad-lippspringe-24-07-2026;Bad Lippspringe;Germany;Bad Lippspringe, Nordrhein-Westfalen, Germany, Germany;51.7833;8.81667;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;15. Brunsberglauf;15-brunsberglauf-buchholz-in-der-nordheide-06-09-2026;Buchholz in der Nordheide;Germany;Buchholz in der Nordheide, Lower Saxony, Germany, Germany;53.3187601;9.8770469;;1.8;;0.95;;;No pin action required.
+warning;15. Fullestrand-Ultramarathon;15-fullestrand-ultramarathon-hesse-13-06-2026;Hesse;Germany;Kasseler Auedamm 17, Kassel, Hesse, Germany, Germany;51.3027675;9.5000115;coordinates_far_from_city;84.0;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+info;17. VSB Dresdner Nachtlauf;17-vsb-dresdner-nachtlauf-dresden-14-08-2026;Dresden;Germany;Heinz-Steyer-Stadion, Dresden, Saxony, Germany, Germany;51.059798;13.7268658;city_level_pin_with_precise_address;1.4;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;16. Köhlbrandbrückenlauf;16-kohlbrandbruckenlauf-kohlbrandbrucke-03-10-2026;Köhlbrandbrücke;Germany;Köhlbrandbrücke, Hamburg, Germany, Germany;53.517283;9.970124;;3.1;;0.95;;;No pin action required.
+info;20. Müggelsee-Halbmarathon;20-muggelsee-halbmarathon-muggelsee-gebiet-18-10-2026;Müggelsee-Gebiet;Germany;Müggelsee-Gebiet, Berlin, Germany, Germany;52.429805;13.67664;city_level_pin_with_precise_address;2.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;14. Garbsener Citylauf;14-garbsener-citylauf-garbsen-12-06-2026;Garbsen;Germany;Rathausplatz, Garbsen, Lower Saxony, Germany, Germany;52.426678;9.592613;city_level_pin_with_precise_address;0.5;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;14. Stadtlauf des TSV Neustadt;14-stadtlauf-des-tsv-neustadt-neustadt-am-rubenberge-07-06-2026;Neustadt am Rübenberge;Germany;Neustadt am Rübenberge, Lower Saxony, Germany, Germany;52.5023396;9.4282662;;2.3;;0.95;;;No pin action required.
+clean;2. Jenaer Backyard Ultra;2-jenaer-backyard-ultra-jena-06-06-2026;Jena;Germany;Jena-Cospeda, Jena, Thüringen, Germany, Germany;50.9281717;11.5879359;;0.0;;0.95;;;No pin action required.
+clean;24. Duderstädter Sparkassenlauf;24-duderstadter-sparkassenlauf-duderstadt-28-08-2026;Duderstadt;Germany;Duderstadt, Niedersachsen, Germany, Germany;51.514633;10.2676414;;0.5;;0.95;;;No pin action required.
+clean;23. Lehrter CityLauf;23-lehrter-citylauf-lehrte-04-09-2026;Lehrte;Germany;Lehrte, Lower Saxony, Germany, Germany;52.3689852;9.9885921;;1.1;;0.95;;;No pin action required.
+clean;17. Klingenthal Salzkotten Marathon;17-klingenthal-salzkotten-marathon-paderborn-07-06-2026;Paderborn;Germany;Salzkotten, Paderborn, North Rhine-Westphalia, Germany, Germany;51.6717596;8.6068636;;11.3;;0.95;;;No pin action required.
+clean;25. Volkslauf um den Altwarmbüchener See;25-volkslauf-um-den-altwarmbuchener-see-isernhagen-10-10-2026;Isernhagen;Germany;Altwarmbüchen, Isernhagen, Lower Saxony, Germany, Germany;52.4347962;9.8483711;;2.1;;0.95;;;No pin action required.
+clean;25. Benther-Berg-Lauf;25-benther-berg-lauf-ronnenberg-benthe-03-10-2026;Ronnenberg-Benthe;Germany;VSV Benthe Sportplatz, Am Hammfeld, Ronnenberg-Benthe, Lower Saxony, Germany, Germany;52.342381;9.631612;;3.2;;0.95;;;No pin action required.
+warning;30. Lauf um den Arendsee;30-lauf-um-den-arendsee-saxony-anhalt-30-08-2026;Saxony-Anhalt;Germany;Strandbad Arendsee, Arendsee, Saxony-Anhalt, Germany, Germany;52.8906009;11.4768454;coordinates_far_from_city;107.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;23. Sudenburg-Lauf - Der Lauf mit dem Lächeln;23-sudenburg-lauf-der-lauf-mit-dem-lacheln-saxony-anhalt-13-06-2026;Saxony-Anhalt;Germany;Heinrich-Germer-Stadion, Magdeburg, Saxony-Anhalt, Germany, Germany;52.106248;11.601218;;20.6;;0.95;;;No pin action required.
+clean;28. Hiddestorfer Rübenlauf;28-hiddestorfer-rubenlauf-hiddestorf-20-09-2026;Hiddestorf;Germany;Hiddestorf, Lower Saxony, Germany, Germany;52.2850507;9.7030835;;0.5;;0.95;;;No pin action required.
+warning;38. Volkslauf des TSV Breuna;38-volkslauf-des-tsv-breuna-hesse-06-09-2026;Hesse;Germany;Lauf- und Wanderpark Breuna, Breuna, Waldeck-Frankenberg, Hesse, Germany, Germany;51.0448;7.405929;coordinates_far_from_city;123.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;35. Speller Sparkassen-Sommernachtslauf;35-speller-sparkassen-sommernachtslauf-spelle-14-08-2026;Spelle;Germany;Wählehof, Spelle, Lower Saxony, Germany, Germany;52.3647228;7.4737526;;0.0;;0.95;;;No pin action required.
+clean;38. Heiligenhafen Mitternachtslauf;38-heiligenhafen-mitternachtslauf-ostholstein-24-07-2026;Ostholstein;Germany;Heiligenhafen, Ostholstein, Schleswig-Holstein, Germany, Germany;54.3717445;10.9809235;;23.4;;0.95;;;No pin action required.
+clean;43. Flora-Westfalica Marathon;43-flora-westfalica-marathon-rheda-wiedenbruck-30-07-2026;Rheda-Wiedenbrück;Germany;Rheda-Wiedenbrück, North Rhine-Westphalia, Germany, Germany;51.8360891;8.2988715;;0.7;;0.95;;;No pin action required.
+clean;36. Göttinger Altstadtlauf;36-gottinger-altstadtlauf-gottingen-01-07-2026;Göttingen;Germany;Innenstadt, Göttingen, Lower Saxony, Germany, Germany;51.5318433;9.9353974;;0.1;;0.95;;;No pin action required.
+clean;40. Braunschweiger Nachtlauf;40-braunschweiger-nachtlauf-braunschweig-19-06-2026;Braunschweig;Germany;Bohlweg, Braunschweig, Lower Saxony, Germany, Germany;52.262082;10.526073;;0.3;0.3;0.95;;;No pin action required.
+info;37. Heideblütenlauf;37-heideblutenlauf-schneverdingen-29-08-2026;Schneverdingen;Germany;Schulstraße, Schneverdingen, Lower Saxony, Germany, Germany;53.1187799;9.7873454;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;49. Warburger Oktoberwochen Volkslauf;49-warburger-oktoberwochen-volkslauf-warburg-03-10-2026;Warburg;Germany;Sportzentrum Diemelaue, Warburg, North Rhine-Westphalia, Germany, Germany;51.4886533;9.1488385;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Abendlauf TSV Blau-Weiß Ippinghausen;abendlauf-tsv-blau-wei-ippinghausen-hesse-20-06-2026;Hesse;Germany;Weidelsburgstadion, Wolfhagen-Ippinghausen, Hesse, Germany, Germany;51.2816935;9.1410782;;75.3;;0.95;;;No pin action required.
+warning;43. Internationalen Airport Race;43-internationalen-airport-race-hamburg-airport-13-09-2026;Hamburg Airport;Germany;Hamburg Airport, Hamburg, Germany, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;9.2;;0.65;;;No pin action required.
+clean;6. Hofer Backyard Ultra;6-hofer-backyard-ultra-upper-franconia-27-06-2026;Upper Franconia;Germany;Hof, Upper Franconia, Bavaria, Germany, Germany;50.3187507;11.9162992;;39.4;;0.95;;;No pin action required.
+clean;6. Tuchmacher Stadtlauf;6-tuchmacher-stadtlauf-bramsche-06-09-2026;Bramsche;Germany;Bramsche, Lower Saxony, Germany, Germany;52.4075184;7.9791742;;0.0;;0.95;;;No pin action required.
+clean;Abt-Degen-Lauf;abt-degen-lauf-zeil-am-main-10-10-2026;Zeil am Main;Germany;Zeil am Main, Bavaria, Germany, Germany;50.0137529;10.5948036;;0.0;;0.95;;;No pin action required.
+info;Aalener Stadtlauf;aalener-stadtlauf-aalen-19-07-2026;Aalen;Germany;Sparkassenplatz, Aalen, Baden-Württemberg, Germany, Germany;48.838115;10.095077;city_level_pin_with_precise_address;0.2;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;ADAC-Tine-Flugplatzlauf;adac-tine-flugplatzlauf-husum-07-06-2026;Husum;Germany;Husum, Schleswig-Holstein, Germany, Germany;54.4918698;9.0322878;;1.6;;0.95;;;No pin action required.
+warning;32. Zeitzer Stadtlauf;32-zeitzer-stadtlauf-saxony-anhalt-29-08-2026;Saxony-Anhalt;Germany;Schlosspark Zeitz, Zeitz, Saxony-Anhalt, Germany, Germany;51.0491637;12.1349991;coordinates_far_from_city;102.7;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Aerzener twinfit-Volkslauf;aerzener-twinfit-volkslauf-aerzen-20-09-2026;Aerzen;Germany;Aerzen, Lower Saxony, Germany, Germany;52.035157;9.25543;;1.7;;0.95;;;No pin action required.
+clean;Almetal-Marathon;almetal-marathon-paderborn-18-10-2026;Paderborn;Germany;Büren-Ringelstein, Paderborn, North Rhine-Westphalia, Germany, Germany;51.7177044;8.752653;;0.0;;0.95;;;No pin action required.
+clean;After Work Run Bad Homburg;after-work-run-bad-homburg-hesse-02-09-2026;Hesse;Germany;Bad Homburg v. d. Höhe, Hochtaunuskreis, Hesse, Germany, Germany;50.2459526;8.6148995;;49.8;;0.95;;;No pin action required.
+clean;Altra Sunset Wattenmeer;altra-sunset-wattenmeer-hamburg-30-08-2026;Hamburg;Germany;St. Pauli Hafenstraße, Hamburg, Germany;53.5462223;9.967162;;2.3;;0.95;;;No pin action required.
+clean;AOK Firmenlauf Balingen;aok-firmenlauf-balingen-balingen-24-09-2026;Balingen;Germany;Marktplatz, Balingen, Baden-Württemberg, Germany, Germany;48.3313;8.886042;;6.8;;0.95;;;No pin action required.
+clean;Allersberger Kirchweihlauf;allersberger-kirchweihlauf-mittelfranken-25-07-2026;Mittelfranken;Germany;Marktplatz Allersberg, Allersberg, Mittelfranken, Bavaria, Germany, Germany;49.2513012;11.2356812;;40.4;;0.95;;;No pin action required.
+info;Alb-Run Heroldstatt;alb-run-heroldstatt-heroldstatt-11-07-2026;Heroldstatt;Germany;Sportzentrum Heroldstatt, Bannholz 10, Heroldstatt, Baden-Württemberg, Germany, Germany;48.4524395;9.6788239;city_level_pin_with_precise_address;1.8;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;AOK Firmenlauf Feuerbach;aok-firmenlauf-feuerbach-stuttgart-17-09-2026;Stuttgart;Germany;Sportpark Feuerbach, Stuttgart, Baden-Württemberg, Germany, Germany;48.7784485;9.1800132;city_level_pin_with_precise_address,shared_coordinates_multiple_places;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Alpener Stadtlauf;alpener-stadtlauf-alpen-03-06-2026;Alpen;Germany;Sportzentrum Alpen, Alpen, North Rhine-Westphalia, Germany, Germany;51.5767474;6.5128805;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;4. Rammelsberger Steigerlauf;4-rammelsberger-steigerlauf-goslar-22-08-2026;Goslar;Germany;Rammelsberg, Goslar, Lower Saxony, Germany, Germany;51.9059936;10.4266284;;0.0;;0.95;;;No pin action required.
+info;AOK Firmenlauf Göppingen;aok-firmenlauf-goppingen-goppingen-08-07-2026;Göppingen;Germany;Dr. Heinrich-Zeller-Stadion, Göppingen, Baden-Württemberg, Germany, Germany;48.7031377;9.6541116;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;AOK Firmenlauf Sulz am Neckar;aok-firmenlauf-sulz-am-neckar-sulz-am-neckar-29-07-2026;Sulz am Neckar;Germany;Albeck-Stadion, Sulz am Neckar, Baden-Württemberg, Germany, Germany;48.3617509;8.6314329;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;AOK Firmenlauf Ludwigsburg;aok-firmenlauf-ludwigsburg-ludwigsburg-30-09-2026;Ludwigsburg;Germany;Residenzschloss Ludwigsburg, Ludwigsburg, Baden-Württemberg, Germany, Germany;48.8953937;9.1895147;city_level_pin_with_precise_address,shared_coordinates_multiple_places;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Ansmann Cup 2026;ansmann-cup-2026-assamstadt-27-06-2026;Assamstadt;Germany;Waldstadion Assamstadt, Assamstadt, Baden-Württemberg, Germany, Germany;49.4271724;9.6872392;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;AOK Firmenlauf Mosbach;aok-firmenlauf-mosbach-mosbach-15-09-2026;Mosbach;Germany;Messplatz, Im Äulein, 74821 Mosbach, Germany;49.3442705;9.1045539;;3.1;;0.95;;;No pin action required.
+clean;Alzauenlauf TSV Trostberg;alzauenlauf-tsv-trostberg-trostberg-14-11-2026;Trostberg;Germany;Trostberg, Bavaria, Germany, Germany;48.0277272;12.5530162;;1.0;;0.95;;;No pin action required.
+info;AOK Firmenlauf Schwäbisch Hall;aok-firmenlauf-schwabisch-hall-schwabisch-hall-22-07-2026;Schwäbisch Hall;Germany;Optima Sportpark, Schwäbisch Hall, Baden-Württemberg, Germany, Germany;49.1124305;9.7371246;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;AOK Firmenlauf Stuttgart;aok-firmenlauf-stuttgart-stuttgart-01-07-2026;Stuttgart;Germany;GAZI-Stadion, Stuttgart-Degerloch, Stuttgart, Baden-Württemberg, Germany, Germany;48.7784485;9.1800132;city_level_pin_with_precise_address,shared_coordinates_multiple_places;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;AOK Firmenlauf Waiblingen;aok-firmenlauf-waiblingen-waiblingen-16-09-2026;Waiblingen;Germany;Waiblingen, Baden-Württemberg, Germany, Germany;48.848514;9.3226283;city_level_pin_with_precise_address;1.8;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Aschauer Vorsilvesterlauf;aschauer-vorsilvesterlauf-aschau-im-chiemgau-28-12-2026;Aschau im Chiemgau;Germany;Aschau im Chiemgau, Bavaria, Germany, Germany;47.7764994;12.3234179;;4.0;;0.95;;;No pin action required.
+warning;B2Run Hamburg;b2run-hamburg-volksparkstadion-25-08-2026;Volksparkstadion;Germany;Volksparkstadion, Hamburg, Hamburg, Germany, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;7.9;;0.65;;;No pin action required.
+info;Auenwaldlauf;auenwaldlauf-auenwald-04-07-2026;Auenwald;Germany;Auenwald-Hohnweiler, Auenwald, Baden-Württemberg, Germany, Germany;48.940383;9.5115851;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Aspacher Volkslauf;aspacher-volkslauf-gro-aspach-19-09-2026;Großaspach;Germany;Mühlfeldhalle, Großaspach, Baden-Württemberg, Germany, Germany;48.9653254;9.3997185;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;AOK Firmenlauf in Haslach im Kinzigtal;aok-firmenlauf-in-haslach-im-kinzigtal-ortenaukreis-22-09-2026;Ortenaukreis;Germany;Haslach im Kinzigtal, Ortenaukreis, Baden-Württemberg, Germany, Germany;48.2769011;8.0871643;;18.8;;0.95;;;No pin action required.
+warning;Bad Buchauer Stadtlauf mit Federseehalbmarathon;bad-buchauer-stadtlauf-mit-federseehalbmarathon-biberach-11-07-2026;Biberach;Germany;Bad Buchau, Biberach, Baden-Württemberg, Germany, Germany;48.0655836;9.6097541;coordinates_far_from_city;121.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Bad Essener Abendlauf;bad-essener-abendlauf-bad-essen-03-07-2026;Bad Essen;Germany;Kirchplatz, 49152 Bad Essen, Germany;52.3204491;8.3388811;;0.4;0.1;0.95;;;No pin action required.
+warning;B2Run Berlin;b2run-berlin-olympiastadion-berlin-16-09-2026;Olympiastadion Berlin;Germany;Olympiastadion Berlin, Berlin, Germany, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;10.3;;0.65;;;No pin action required.
+warning;Babenberger Volkslauf;babenberger-volkslauf-bamberg-20-06-2026;Bamberg;Germany;Kirchweihsamstag, St. Urban, Bamberg, Bavaria, Germany, Germany;48.979251;9.777512;coordinates_far_from_city;129.3;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Bahnstadtlauf 2026;bahnstadtlauf-2026-heidelberg-11-07-2026;Heidelberg;Germany;Bahnstadt, Heidelberg, Baden-Württemberg, Germany, Germany;49.40278;8.6661594;;2.2;;0.95;;;No pin action required.
+info;Bausch+Ströbel Stadtlauf Ilshofen;bausch-strobel-stadtlauf-ilshofen-ilshofen-26-09-2026;Ilshofen;Germany;Roland-Wurmthaler-Halle, Ilshofen, Baden-Württemberg, Germany, Germany;49.170072;9.9186069;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;BarockLauf Ludwigsburg;barocklauf-ludwigsburg-ludwigsburg-10-07-2026;Ludwigsburg;Germany;Ludwigsburg, Baden-Württemberg, Germany, Germany;48.8953937;9.1895147;shared_coordinates_multiple_places;0.0;0.0;0.65;;;No pin action required.
+info;BÄRENFELS SOMMERTRAIL 63-KM mit MARATHON, HALBMARATHON und 11-KM;barenfels-sommertrail-63-km-mit-marathon-halbmarathon-und-11-km-neubrucke-12-07-;Neubrücke;Germany;Neubrücke, Saarland, Germany, Germany;49.6059296;7.1715988;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Bahndammlauf;bahndammlauf-53567-buchholz-06-09-2026;53567 Buchholz;Germany;Buchholz, 53567 Buchholz, Germany, Germany;50.67175626570943;7.422621352579696;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Benin Benefiz-Lauf;benin-benefiz-lauf-hirzweiler-26-09-2026;Hirzweiler;Germany;Hirzweiler, Saarland, Germany, Germany;49.4026691;7.0809661;;0.0;;0.95;;;No pin action required.
+clean;Benefizlauf - Laufend Gutes tun;benefizlauf-laufend-gutes-tun-wangen-im-allgau-19-06-2026;Wangen im Allgäu;Germany;Niederwangen, Wangen im Allgäu, Baden-Württemberg, Germany, Germany;47.6721727;9.7991925;;2.0;0.0;0.95;;;No pin action required.
+clean;Besenbinder Lauf - Rund um Hainrode;besenbinder-lauf-rund-um-hainrode-saxony-anhalt-27-06-2026;Saxony-Anhalt;Germany;Hainrode, Südharz, Saxony-Anhalt, Germany, Germany;51.501995;11.167476;;59.1;;0.95;;;No pin action required.
+clean;Bergisch Gladbacher Stadtlauf;bergisch-gladbacher-stadtlauf-bergisch-gladbach-11-09-2026;Bergisch Gladbach;Germany;Bergisch Gladbach, North Rhine-Westphalia, Germany, Germany;50.9587243;7.1876601;;5.7;;0.95;;;No pin action required.
+clean;Bergdorfmeile;bergdorfmeile-karlsruhe-26-06-2026;Karlsruhe;Germany;Hohenwettersbach, Karlsruhe, Baden-Württemberg, Germany, Germany;48.966316;8.4807718;;7.2;;0.95;;;No pin action required.
+clean;Bessunger Merck-Lauf;bessunger-merck-lauf-darmstadt-19-09-2026;Darmstadt;Germany;Bessunger, Darmstadt, Hessen, Germany, Germany;49.847729;8.648787;;2.8;;0.95;;;No pin action required.
+clean;Berliner Wasserbetriebe 5x5 km TEAM-Staffel;berliner-wasserbetriebe-5x5-km-team-staffel-tiergarten-04-06-2026;Tiergarten;Germany;Tiergarten, Berlin, Germany, Germany;52.5097776;13.3572597;;0.0;;0.95;;;No pin action required.
+clean;Bergkloster-Lauf;bergkloster-lauf-hochsauerlandkreis-27-09-2026;Hochsauerlandkreis;Germany;Bestwig, Hochsauerlandkreis, North Rhine-Westphalia, Germany, Germany;51.3609508;8.4005554;;10.2;;0.95;;;No pin action required.
+info;Bedburger Citylauf 2026;bedburger-citylauf-2026-bedburg-13-09-2026;Bedburg;Germany;Marktplatz, Bedburg, North Rhine-Westphalia, Germany, Germany;50.9972161;6.5767648;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Black Forest ULTRA Trail Run;black-forest-ultra-trail-run-kirchzarten-19-09-2026;Kirchzarten;Germany;Kirchzarten, Baden-Württemberg, Germany, Germany;47.9651461;7.9573306;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Bielebohlauf;bielebohlauf-oppach-23-08-2026;Oppach;Germany;Oppach, Saxony, Germany, Germany;51.0584736;14.5049458;;0.0;;0.95;;;No pin action required.
+clean;Birkhahnlauf;birkhahnlauf-neustadt-am-rubenberge-25-10-2026;Neustadt am Rübenberge;Germany;Schneeren, Neustadt am Rübenberge, Lower Saxony, Germany, Germany;52.5334673;9.3319121;;9.4;;0.95;;;No pin action required.
+clean;Böckstiegellauf;bockstiegellauf-bielefeld-26-09-2026;Bielefeld;Germany;Wanderparkplatz Peter auf'm Berge, Bergstraße, 33619 Bielefeld, Germany;52.0209957;8.4659634;;4.5;0.0;0.95;;;No pin action required.
+info;Birklauf;birklauf-gelting-29-08-2026;Gelting;Germany;Birkhalle Gelting, Gelting, Schleswig-Holstein, Germany, Germany;54.7468969;9.8969663;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Blankeneser Heldenlauf;blankeneser-heldenlauf-blankeneser-treppenviertel-30-08-2026;Blankeneser Treppenviertel;Germany;Blankeneser Treppenviertel, Hamburg, Germany, Germany;53.5573224;9.8080187;;0.3;;0.95;;;No pin action required.
+info;Bredstedt-Cross;bredstedt-cross-bredstedt-31-10-2026;Bredstedt;Germany;Sportpark Bredstedt, Bredstedt, Schleswig-Holstein, Germany, Germany;54.6236326;8.9640834;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Buchholzer Stadtlauf;buchholzer-stadtlauf-buchholz-in-der-nordheide-21-06-2026;Buchholz in der Nordheide;Germany;Buchholz in der Nordheide, Lower Saxony, Germany, Germany;53.3187601;9.8770469;;1.8;;0.95;;;No pin action required.
+clean;Brauerschwender Basaltlauf;brauerschwender-basaltlauf-hesse-27-06-2026;Hesse;Germany;Brauerschwend, Schwalmtal, Hesse, Germany, Germany;50.6953705;9.3235406;;23.0;;0.95;;;No pin action required.
+clean;Braunschweiger Speed5;braunschweiger-speed5-braunschweig-08-11-2026;Braunschweig;Germany;Braunschweig, Lower Saxony, Germany, Germany;52.2156124;10.5227434;;5.5;;0.95;;;No pin action required.
+clean;Blutenburglauf;blutenburglauf-munchen-26-07-2026;München;Germany;München-Untermenzing, München, Bayern, Germany, Germany;48.17767;11.47279;;8.8;;0.95;;;No pin action required.
+info;BWM Sommerlochlauf;bwm-sommerlochlauf-steinheim-an-der-murr-04-08-2026;Steinheim an der Murr;Germany;Steinheim an der Murr, Baden-Württemberg, Germany, Germany;48.9802924;9.2890186;city_level_pin_with_precise_address;1.8;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Canyon Run Mühlheim;canyon-run-muhlheim-hesse-06-09-2026;Hesse;Germany;Mühlheim am Main, Hesse, Germany, Germany;50.1080582;8.8467138;;57.1;;0.95;;;No pin action required.
+clean;Burg-Lauf Eppstein;burg-lauf-eppstein-hesse-26-06-2026;Hesse;Germany;Eppstein, Hochtaunuskreis, Hesse, Germany, Germany;50.155;8.3803;;68.2;;0.95;;;No pin action required.
+clean;Charity Mega Run;charity-mega-run-bingen-am-rhein-15-08-2026;Bingen am Rhein;Germany;Bingen am Rhein, Rheinland-Pfalz, Germany, Germany;49.9675456;7.8944;;0.0;;0.95;;;No pin action required.
+clean;Burscheider Stadtlauf;burscheider-stadtlauf-rheinisch-bergischer-kreis-11-10-2026;Rheinisch-Bergischer Kreis;Germany;Burscheid, Rheinisch-Bergischer Kreis, North Rhine-Westphalia, Germany, Germany;51.0824722;7.1212314;;8.4;;0.95;;;No pin action required.
+clean;Darmstädter Stadtlauf;darmstadter-stadtlauf-darmstadt-24-06-2026;Darmstadt;Germany;Darmstadt, Hessen, Germany, Germany;49.8735755;8.672461;;1.5;;0.95;;;No pin action required.
+clean;Citylauf Grevenbroich;citylauf-grevenbroich-grevenbroich-12-06-2026;Grevenbroich;Germany;Grevenbroich, North Rhine-Westphalia, Germany, Germany;51.0905783;6.5835365;;0.0;;0.95;;;No pin action required.
+clean;Crosslauf Fichtenau;crosslauf-fichtenau-fichtenau-11-07-2026;Fichtenau;Germany;Storchenweiher, 74579 Lautenbach, Fichtenau, Germany;49.07153;10.232296;;1.1;0.1;0.95;;;No pin action required.
+clean;Bremer Firmenlauf zur Spätschicht;bremer-firmenlauf-zur-spatschicht-weserwehr-25-06-2026;Weserwehr;Germany;Weserwehr, Bremen, Germany, Germany;53.058394;8.863995;;0.2;;0.95;;;No pin action required.
+warning;Die 10 Kilometer von Dürwiß;die-10-kilometer-von-durwi-eschweiler-01-08-2026;Eschweiler;Germany;Eschweiler, North Rhine-Westphalia, Germany, Germany;49.1359574;7.3651094;coordinates_far_from_city;202.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;Burgentrail Unterfränkische Traillaufmeisterschaften;burgentrail-unterfrankische-traillaufmeisterschaften-lower-franconia-03-10-2026;Lower Franconia;Germany;Ostheim, Lower Franconia, Bavaria, Germany, Germany;50.1238327;10.5336427;coordinates_far_from_city;225.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;Christmas Run To Tree;christmas-run-to-tree-forst-klovensteen-29-11-2026;Forst Klövensteen;Germany;Forst Klövensteen, Hamburg, Germany, Germany;53.5501721;10.0013165;coordinates_far_from_city,shared_coordinates_multiple_places;498.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Der Alstertallauf;der-alstertallauf-alsterwanderweg-23-08-2026;Alsterwanderweg;Germany;Alsterwanderweg, Hamburg, Germany, Germany;53.549738;9.986459;;12.9;;0.95;;;No pin action required.
+info;Ditzinger Keltenlauf;ditzinger-keltenlauf-ditzingen-18-10-2026;Ditzingen;Germany;Hirschlanden, Ditzingen, Baden-Württemberg, Germany, Germany;48.823918;9.07533;city_level_pin_with_precise_address;0.7;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Die 49. Nacht von Borgholzhausen;die-49-nacht-von-borgholzhausen-borgholzhausen-20-06-2026;Borgholzhausen;Germany;Borgholzhausen, North Rhine-Westphalia, Germany, Germany;52.1007247;8.3023897;;0.0;;0.95;;;No pin action required.
+warning;dm Firmenlauf Saarbrücken;dm-firmenlauf-saarbrucken-saarbrucken-02-06-2026;Saarbrücken;Germany;Saarbrücken, Saarland, Germany, Germany;49.234362;6.996379;city_level_pin_with_precise_address,shared_coordinates_multiple_places;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;DeisterCrossing Springe;deistercrossing-springe-hesse-13-09-2026;Hesse;Germany;Hilders, Fulda, Hesse, Germany, Germany;50.5554204;9.9754786;;67.1;;0.95;;;No pin action required.
+info;DresdenHALF;dresdenhalf-dresden-06-09-2026;Dresden;Germany;Dresden city center, Dresden, Saxony, Germany, Germany;51.048184;13.742725;city_level_pin_with_precise_address;0.3;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;Dieburger Stadtlauf;dieburger-stadtlauf-hesse-20-06-2026;Hesse;Germany;Dieburg, Darmstadt-Dieburg, Hesse, Germany, Germany;49.8981797;8.8396216;coordinates_far_from_city;80.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Ehriker Stadtmauerlauf mit 2. Ehriker Burg Ramstein Lauf;ehriker-stadtmauerlauf-mit-2-ehriker-burg-ramstein-lauf-rhineland-palatinate-30-;Rhineland-Palatinate;Germany;Ehrang, Trier, Rhineland-Palatinate, Germany, Germany;49.8185111;6.6848689;;47.3;;0.95;;;No pin action required.
+clean;edge beyond x Duracher Lauf;edge-beyond-x-duracher-lauf-oberallgau-21-06-2026;Oberallgäu;Germany;Durach, Oberallgäu, Bavaria, Germany, Germany;47.6969085;10.3441368;;17.0;;0.95;;;No pin action required.
+clean;Durlacher Turmberglauf;durlacher-turmberglauf-karlsruhe-26-09-2026;Karlsruhe;Germany;Karlsruhe, Baden-Württemberg, Germany, Germany;49.025927;8.3496984;;4.5;;0.95;;;No pin action required.
+info;Dünenlauf;dunenlauf-sandhausen-13-06-2026;Sandhausen;Germany;Walter-Reinhard-Stadion, Sandhausen, Baden-Württemberg, Germany, Germany;49.3424055;8.6595053;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Bönnigheimer Stromberglauf;bonnigheimer-stromberglauf-bonnigheim-21-11-2026;Bönnigheim;Germany;Bönnigheim, Baden-Württemberg, Germany, Germany;49.0417185;9.0933985;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;EDITH LÜCKE-Frauenlauf TRIER;edith-lucke-frauenlauf-trier-rhineland-palatinate-20-09-2026;Rhineland-Palatinate;Germany;Trier, Rhineland-Palatinate, Germany, Germany;49.7596208;6.6441878;;52.4;;0.95;;;No pin action required.
+warning;Edersee-Lauf;edersee-lauf-hesse-29-08-2026;Hesse;Germany;Vöhl-Herzhausen, Waldeck-Frankenberg, Hesse, Germany, Germany;49.679564;11.961774;coordinates_far_from_city;233.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Drachenlauf;drachenlauf-konigswinter-25-10-2026;Königswinter;Germany;Siebengebirge, Königswinter, North Rhine-Westphalia, Germany, Germany;50.6739719;7.1930989;;0.0;;0.95;;;No pin action required.
+info;ENSINGER Laufcup;ensinger-laufcup-vaihingen-an-der-enz-17-10-2026;Vaihingen an der Enz;Germany;Vaihingen an der Enz, Baden-Württemberg, Germany, Germany;48.9321398;8.9568316;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;Eschweiler Citylauf 2026;eschweiler-citylauf-2026-eschweiler-23-08-2026;Eschweiler;Germany;Eschweiler, North Rhine-Westphalia, Germany, Germany;49.1359574;7.3651094;coordinates_far_from_city;202.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;Eltviller Familienlauf 2026;eltviller-familienlauf-2026-hesse-20-09-2026;Hesse;Germany;Eltville, Rheingau-Taunus-Kreis, Hesse, Germany, Germany;50.0274688;8.1189627;coordinates_far_from_city;91.3;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Esenser Volksbanklauf - 31. Stadtlauf;esenser-volksbanklauf-31-stadtlauf-friesland-31-07-2026;Friesland;Germany;Esens, Friesland, Lower Saxony, Germany, Germany;53.6468107;7.6118499;;33.6;;0.95;;;No pin action required.
+clean;Flörsheimer Lebenslauf;florsheimer-lebenslauf-hochtaunuskreis-29-08-2026;Hochtaunuskreis;Germany;Flörsheim am Main, Hochtaunuskreis, Hessen, Germany, Germany;50.0296;8.4265;;29.0;;0.95;;;No pin action required.
+info;Firmenlauf Renningen;firmenlauf-renningen-renningen-24-06-2026;Renningen;Germany;Renningen, Baden-Württemberg, Germany, Germany;48.7648163;8.9347008;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;BraunenBerg-Lauf;braunenberg-lauf-ostalbkreis-19-09-2026;Ostalbkreis;Germany;Aalen, Ostalbkreis, Baden-Württemberg, Germany, Germany;48.8375607;10.0929593;;5.6;;0.95;;;No pin action required.
+clean;Freisinger Sparkassenlauf;freisinger-sparkassenlauf-freising-08-07-2026;Freising;Germany;Freising, Bavaria, Germany, Germany;48.4008273;11.7439565;;0.0;;0.95;;;No pin action required.
+info;Friedrichshaller Runde;friedrichshaller-runde-bad-friedrichshall-26-09-2026;Bad Friedrichshall;Germany;Bad Friedrichshall, Baden-Württemberg, Germany, Germany;49.2280136;9.2101479;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Freiberger Bürgerfestlauf;freiberger-burgerfestlauf-freiberg-17-07-2026;Freiberg;Germany;Freiberg, Saxony, Germany, Germany;50.9236767;13.3670114;;1.8;;0.95;;;No pin action required.
+info;Friedrichstaler Waldlauf;friedrichstaler-waldlauf-stutensee-25-10-2026;Stutensee;Germany;Friedrichstal, Stutensee, Baden-Württemberg, Germany, Germany;49.1051892;8.477052;city_level_pin_with_precise_address;1.9;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;FriesenCross;friesencross-friesland-25-07-2026;Friesland;Germany;Schillig, Friesland, Lower Saxony, Germany, Germany;53.7033668;8.0235529;;26.2;;0.95;;;No pin action required.
+clean;FSV-Lauf;fsv-lauf-erlangen-25-10-2026;Erlangen;Germany;Brucker Lache, Erlangen, Bavaria, Germany, Germany;49.5977469;11.0037372;;0.0;;0.95;;;No pin action required.
+info;Gänseliesellauf;ganseliesellauf-monheim-am-rhein-12-06-2026;Monheim am Rhein;Germany;Krischerstraße, Monheim am Rhein, North Rhine-Westphalia, Germany, Germany;51.0909476;6.8812387;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Future Run - Ausbildung in Bewegung;future-run-ausbildung-in-bewegung-buxtehude-hedendorf-18-09-2026;Buxtehude-Hedendorf;Germany;VSV Sportanlage, Feldstraße 50, 21614 Buxtehude, Germany;53.4718374;9.6154238;;9.9;0.0;0.95;;;No pin action required.
+clean;Fuchsburg Lauf;fuchsburg-lauf-landkreis-pfaffenhofen-an-der-ilm-27-06-2026;Landkreis Pfaffenhofen an der Ilm;Germany;Vohburg, Landkreis Pfaffenhofen an der Ilm, Bavaria, Germany, Germany;48.7706825;11.6167823;;19.1;;0.95;;;No pin action required.
+warning;Gäulauf;gaulauf-rhineland-palatinate-03-06-2026;Rhineland-Palatinate;Germany;Gommersheim, Südliche Weinstraße, Rhineland-Palatinate, Germany, Germany;49.2892155;8.2672665;coordinates_far_from_city;101.0;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+info;Gosheimer Lemberglauf;gosheimer-lemberglauf-gosheim-18-10-2026;Gosheim;Germany;Gosheim, Baden-Württemberg, Germany, Germany;48.1363107;8.7527322;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Fürstenwaldlauf;furstenwaldlauf-ochsenhausen-19-06-2026;Ochsenhausen;Germany;Ochsenhausen, Baden-Württemberg, Germany, Germany;48.0711222;9.9512104;;0.0;0.0;0.95;;;No pin action required.
+clean;Freystädter Volksfestlauf;freystadter-volksfestlauf-freystadt-07-06-2026;Freystadt;Germany;Freystadt, Bavaria, Germany, Germany;49.2014246;11.3505527;;1.6;;0.95;;;No pin action required.
+info;Gettorfer Staffelmarathon;gettorfer-staffelmarathon-gettorf-23-08-2026;Gettorf;Germany;Sportpark Gettorf, Gettorf, Schleswig-Holstein, Germany, Germany;54.4052957;9.9785888;city_level_pin_with_precise_address;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Gerolsteiner Stadtlauf;gerolsteiner-stadtlauf-rhineland-palatinate-20-06-2026;Rhineland-Palatinate;Germany;Gerolstein-Roth, Gerolstein, Rhineland-Palatinate, Germany, Germany;50.22594;6.676755;;54.5;;0.95;;;No pin action required.
+clean;Gocher Steintorlauf;gocher-steintorlauf-kleve-04-07-2026;Kleve;Germany;Goch, Kleve, North Rhine-Westphalia, Germany, Germany;51.6755765;6.1593045;;12.8;;0.95;;;No pin action required.
+clean;Fischerhuder Sommerlauf;fischerhuder-sommerlauf-osterholz-scharmbeck-27-06-2026;Osterholz-Scharmbeck;Germany;Fischerhude, Osterholz-Scharmbeck, Lower Saxony, Germany, Germany;53.2281763;8.7948239;;0.0;;0.95;;;No pin action required.
+warning;Grafschaftslauf;grafschaftslauf-rietberg-30-08-2026;Rietberg;Germany;Gut Rietberg, Rietberg, North Rhine-Westphalia, Germany, Germany;51.97549;11.177138;coordinates_far_from_city;189.5;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Erftflitzer Lauf;erftflitzer-lauf-neuss-19-06-2026;Neuss;Germany;Neuss-Holzheim, Neuss, North Rhine-Westphalia, Germany, Germany;51.1981778;6.6916476;;0.0;;0.95;;;No pin action required.
+warning;Gölitztallauf;golitztallauf-landkreis-zwickau-06-09-2026;Landkreis Zwickau;Germany;Marktgölitz, Landkreis Zwickau, Saxony, Germany, Germany;50.5559611;11.3363424;coordinates_far_from_city;86.6;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Hahnenkammlauf;hahnenkammlauf-edelsfeld-06-06-2026;Edelsfeld;Germany;Hahnenkamm, Edelsfeld, Bayern, Germany, Germany;49.5778828;11.6941734;;0.0;;0.95;;;No pin action required.
+clean;Halderner Volkslauf;halderner-volkslauf-rees-28-06-2026;Rees;Germany;Rees-Haldern, Rees, North Rhine-Westphalia, Germany, Germany;51.7581242;6.3956605;;0.0;;0.95;;;No pin action required.
+clean;Gladbecker Sparkassenlauf;gladbecker-sparkassenlauf-gladbeck-23-08-2026;Gladbeck;Germany;Gladbeck, North Rhine-Westphalia, Germany, Germany;51.5718661;6.9987803;;0.8;;0.95;;;No pin action required.
+warning;H/21 Halbmarathon;h-21-halbmarathon-hannover-11-10-2026;Hannover;Germany;Hannover, Lower Saxony, Germany, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+warning;Hardtwaldlauf 2026;hardtwaldlauf-2026-karlsruhe-28-06-2026;Karlsruhe;Germany;Hardtwaldlauf, Karlsruhe, Baden-Württemberg, Germany, Germany;48.302571;9.234713;coordinates_far_from_city;99.3;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Harzgeröder Klippenlauf;harzgeroder-klippenlauf-saxony-anhalt-07-06-2026;Saxony-Anhalt;Germany;Harzgerode, Harz, Saxony-Anhalt, Germany, Germany;51.6381169;11.1465703;;48.9;;0.95;;;No pin action required.
+clean;Harsefelder Lauf- und Musikfestival;harsefelder-lauf-und-musikfestival-stade-13-06-2026;Stade;Germany;Harsefeld, Stade, Lower Saxony, Germany, Germany;53.453232;9.502652;;16.4;;0.95;;;No pin action required.
+clean;Heideköniginnenpokal;heidekoniginnenpokal-amelinghausen-22-08-2026;Amelinghausen;Germany;Amelinghausen, Lower Saxony, Germany, Germany;53.1276759;10.2160653;;0.0;;0.95;;;No pin action required.
+clean;Hahner Kitzenhauslauf;hahner-kitzenhauslauf-aachen-14-06-2026;Aachen;Germany;Hahn, Aachen, North Rhine-Westphalia, Germany, Germany;50.7107143;6.1978317;;10.8;;0.95;;;No pin action required.
+clean;Heider Abend-Stadtlauf;heider-abend-stadtlauf-dithmarschen-05-06-2026;Dithmarschen;Germany;Heide, Dithmarschen, Schleswig-Holstein, Germany, Germany;54.1948848;9.0928251;;6.9;;0.95;;;No pin action required.
+clean;Herner St. Martini City-Lauf;herner-st-martini-city-lauf-herne-27-09-2026;Herne;Germany;Herne, North Rhine-Westphalia, Germany, Germany;51.5380394;7.219985;;0.0;;0.95;;;No pin action required.
+info;Herbstlauf Ready4Run Niederwangen;herbstlauf-ready4run-niederwangen-wangen-im-allgau-04-10-2026;Wangen im Allgäu;Germany;Wangen im Allgäu, Baden-Württemberg, Germany, Germany;47.6856552;9.8342247;city_level_pin_with_precise_address;1.8;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Heumadener Volkslauf 2026;heumadener-volkslauf-2026-stuttgart-heumaden-19-07-2026;Stuttgart-Heumaden;Germany;Sportgelände Untere Hasenwedel, Stuttgart-Heumaden, Baden-Württemberg, Germany, Germany;48.302571;9.234713;;49.4;;0.95;;;No pin action required.
+clean;Hausener Volks-Waldlauf (TGS-Hausen);hausener-volks-waldlauf-tgs-hausen-hesse-26-07-2026;Hesse;Germany;Sportplatz TGS Hausen, Obertshausen, Hesse, Germany, Germany;50.0731304;8.8732839;;60.5;;0.95;;;No pin action required.
+clean;Hockenheimringlauf;hockenheimringlauf-hockenheim-01-11-2026;Hockenheim;Germany;Hockenheimring, Hockenheim, Baden-Württemberg, Germany, Germany;49.3297989;8.5763;;2.4;;0.95;;;No pin action required.
+clean;Globus-Theißen-Lauf;globus-thei-en-lauf-thei-en-21-06-2026;Theißen;Germany;Theißen, Sachsen-Anhalt, Germany, Germany;51.088296;12.104777;;0.0;;0.95;;;No pin action required.
+warning;Herbstlauf der DJK Feudenheim;herbstlauf-der-djk-feudenheim-mannheim-17-10-2026;Mannheim;Germany;Mannheim-Feudenheim, Mannheim, Baden-Württemberg, Germany, Germany;49.4892913;8.4673098;city_level_pin_with_precise_address,shared_coordinates_multiple_places;0.0;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+clean;Heuchelheimer Mitternachtslauf;heuchelheimer-mitternachtslauf-hesse-20-06-2026;Hesse;Germany;Heuchelheim, Wetteraukreis, Hesse, Germany, Germany;50.5825469;8.6286262;;28.4;;0.95;;;No pin action required.
+info;Herbstlauf;herbstlauf-otigheim-26-09-2026;Ötigheim;Germany;Ötigheim, Baden-Württemberg, Germany, Germany;48.8874936;8.2405486;city_level_pin_with_precise_address;0.3;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+warning;Hofheimer Volkslauf;hofheimer-volkslauf-hesse-26-09-2026;Hesse;Germany;Sportpark Hofheim, Lampertheim-Hofheim, Hesse, Germany, Germany;50.983985;10.308904;coordinates_far_from_city;99.2;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Hohenlockstedter Pellkartoffellauf;hohenlockstedter-pellkartoffellauf-hohenlockstedt-26-09-2026;Hohenlockstedt;Germany;Pohl-Boskamp Gelände, Hohenlockstedt, Schleswig-Holstein, Germany, Germany;53.9667;9.61667;;0.0;;0.95;;;No pin action required.
+warning;Hohenneuffen-Berglauf mit BW Trail;hohenneuffen-berglauf-mit-bw-trail-beuren-14-06-2026;Beuren;Germany;Linsenhofen, Beuren, Baden-Württemberg, Germany, Germany;48.57857;9.37108;coordinates_far_from_city;236.6;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Valencia Marathon Trinidad Alfonso Zurich;valencia-marathon-trinidad-alfonso-zurich-valencia-06-12-2026;Valencia;Spain;Ciutat de les Arts i les Ciències, Valencia;39.4561;-0.3546;;2.4;;0.95;;;No pin action required.
+clean;TCS Amsterdam Marathon;tcs-amsterdam-marathon-amsterdam-18-10-2026;Amsterdam;Netherlands;Olympic Stadium, Amsterdam;52.3433;4.8542;;4.2;;0.95;;;No pin action required.
+clean;DNB Oslo Marathon;dnb-oslo-marathon-oslo-12-09-2026;Oslo;Norway;City Hall Square Oslo, 0160 Oslo;59.9111;10.7333;;0.4;7.0;0.95;;;No pin action required.
+clean;Estra Firenze Marathon;estra-firenze-marathon-florence-29-11-2026;Florence;Italy;Piazza del Duomo, Florence;43.7731;11.2559;;0.4;;0.95;;;No pin action required.
+clean;Wizz Air Milano Marathon;wizz-air-milano-marathon-milan-04-04-2027;Milan;Italy;Piazza del Duomo, Milan;45.4642;9.19;;0.0;;0.95;;;No pin action required.
+clean;adidas Stockholm Marathon;adidas-stockholm-marathon-stockholm-29-05-2027;Stockholm;Sweden;Stockholms Stadion, Lidingovagen, Stockholm;59.3452112;18.078824;;2.3;0.0;0.95;;;No pin action required.
+clean;EDP Porto Marathon;edp-porto-marathon-porto-08-11-2026;Porto;Portugal;Queimodromo, Parque da Cidade do Porto;41.1687;-8.6892;;6.9;;0.95;;;No pin action required.
+clean;EDP Lisbon Marathon;edp-lisbon-marathon-lisbon-10-10-2026;Lisbon;Portugal;Cascais start area to Lisbon finish area;38.7008746;-9.417913;;24.4;0.0;0.95;;;No pin action required.
+clean;Valencia Half Marathon Trinidad Alfonso Zurich;valencia-half-marathon-trinidad-alfonso-zurich-valencia-25-10-2026;Valencia;Spain;Ciutat de les Arts i les Ciències, Valencia;39.4561;-0.3546;;2.4;;0.95;;;No pin action required.
+clean;Generali Berlin Half Marathon;generali-berlin-half-marathon-berlin-04-04-2027;Berlin;Germany;Brandenburg Gate, Berlin;52.5163;13.3777;;1.2;;0.95;;;No pin action required.
+clean;HOKA UTMB Mont-Blanc;hoka-utmb-mont-blanc-chamonix-mont-blanc-24-08-2026;Chamonix-Mont-Blanc;France;Chamonix-Mont-Blanc town centre;45.9237;6.8694;;0.1;;0.95;;;No pin action required.
+clean;IRONMAN Copenhagen;ironman-copenhagen-copenhagen-16-08-2026;Copenhagen;Denmark;Amager Strandpark, Copenhagen;55.6565747;12.6452567;;5.8;0.3;0.95;;;No pin action required.
+clean;Challenge Almere-Amsterdam;challenge-almere-amsterdam-almere-12-09-2026;Almere;Netherlands;Esplanade, Almere;52.3714;5.2221;;0.3;;0.95;;;No pin action required.
+warning;Challenge Peguera Mallorca;challenge-peguera-mallorca-peguera-17-10-2026;Peguera;Spain;Peguera, Calvià, Mallorca;39.538;2.448;coordinates_far_from_city;297.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Challenge Kaiserwinkl-Walchsee;challenge-kaiserwinkl-walchsee-walchsee-28-06-2026;Walchsee;Austria;Dorfplatz, 6344 Walchsee;47.6516623;12.3182248;;0.1;0.0;0.95;;;No pin action required.
+clean;10. SaarschleifenLand-Lauf;10-saarschleifenland-lauf-merzig-06-09-2026;Merzig;Germany;Merzig, Germany;49.4427023;6.6374902;;0.0;;0.95;;;No pin action required.
+clean;10 Teiche Marathon;10-teiche-marathon-hahnenklee-12-09-2026;Hahnenklee;Germany;Hahnenklee, Germany;51.8602508;10.3384485;;0.0;;0.95;;;No pin action required.
+clean;12. Cross against Cancer;12-cross-against-cancer-homburg-13-09-2026;Homburg;Germany;Homburg, Germany;49.32146;7.3409031;;0.0;;0.95;;;No pin action required.
+clean;21. Wutzseelauf;21-wutzseelauf-lindow-11-10-2026;Lindow;Germany;Lindow, Germany;52.012058;12.9222766;;0.0;;0.95;;;No pin action required.
+clean;25. Marner Kohltagelauf;25-marner-kohltagelauf-marne-27-09-2026;Marne;Germany;Marne, Germany;53.9521162;9.0107437;;0.0;;0.95;;;No pin action required.
+clean;28. Mühlhäuser Altstadtlauf;28-muhlhauser-altstadtlauf-muhlhausen-29-08-2026;Mühlhausen;Germany;Mühlhausen, Germany;49.2481325;8.7270936;;0.0;;0.95;;;No pin action required.
+clean;31. Geiseltalseelauf;31-geiseltalseelauf-braunsbedra-03-10-2026;Braunsbedra;Germany;Braunsbedra, Germany;51.2840933;11.8855493;;0.0;;0.95;;;No pin action required.
+warning;32. Advent-Lauf Saarbrücken;32-advent-lauf-saarbrucken-saarbrucken-29-11-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;32. Bismarckturmlauf;32-bismarckturmlauf-neustadt-an-der-orla-03-10-2026;Neustadt an der Orla;Germany;Neustadt an der Orla, Germany;50.7093161;11.7747773;;0.0;;0.95;;;No pin action required.
+clean;33. Dabendorfer Herbstlauf;33-dabendorfer-herbstlauf-dabendorf-12-09-2026;Dabendorf;Germany;Dabendorf, Germany;52.2396196;13.4326804;;0.0;;0.95;;;No pin action required.
+clean;34. Büsumer Volkslauf;34-busumer-volkslauf-busum-03-07-2026;Büsum;Germany;Büsum, Germany;54.1298489;8.8586989;;0.0;;0.95;;;No pin action required.
+clean;36. Ratzeburger Adventslauf;36-ratzeburger-adventslauf-ratzeburg-29-11-2026;Ratzeburg;Germany;Ratzeburg, Germany;53.7011061;10.774288;;0.0;;0.95;;;No pin action required.
+clean;41. levoBank Stadtlauf Lebach;41-levobank-stadtlauf-lebach-lebach-26-06-2026;Lebach;Germany;Lebach, Germany;49.4132377;6.9091348;;0.0;;0.95;;;No pin action required.
+clean;41. Pönitzer Volkslauf;41-ponitzer-volkslauf-ponitz-12-07-2026;Pönitz;Germany;Pönitz, Germany;50.8568858;12.4229372;;0.0;;0.95;;;No pin action required.
+clean;42. Schwarzatallauf;42-schwarzatallauf-bad-blankenburg-27-06-2026;Bad Blankenburg;Germany;Bad Blankenburg, Germany;50.6829946;11.2726327;;0.0;;0.95;;;No pin action required.
+clean;48. Wernigeröder Silvesterlauf;48-wernigeroder-silvesterlauf-wernigerode-31-12-2026;Wernigerode;Germany;Wernigerode, Germany;51.8344172;10.7862526;;0.0;;0.95;;;No pin action required.
+clean;51. Hubertuslauf;51-hubertuslauf-neuruppin-18-10-2026;Neuruppin;Germany;Neuruppin, Germany;52.9243859;12.8092919;;0.0;;0.95;;;No pin action required.
+warning;52. Internationaler Silvesterlauf Saarbrücken;52-internationaler-silvesterlauf-saarbrucken-saarbrucken-27-12-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;7-Gebirgsmarathon;7-gebirgsmarathon-bad-honnef-13-12-2026;Bad Honnef;Germany;Bad Honnef, Germany;50.6448582;7.2272534;;0.0;;0.95;;;No pin action required.
+clean;9. Bernburger Halbmarathon;9-bernburger-halbmarathon-bernburg-19-09-2026;Bernburg;Germany;Bernburg, Germany;51.7939656;11.7373854;;0.0;;0.95;;;No pin action required.
+clean;Adventslauf Lage;adventslauf-lage-lage-06-12-2026;Lage;Germany;Lage, Germany;51.9914084;8.7919583;;0.0;;0.95;;;No pin action required.
+warning;BARMER CURREX Alsterlauf Hamburg;barmer-currex-alsterlauf-hamburg-hamburg-06-09-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+warning;Alstertallauf Hamburg;alstertallauf-hamburg-hamburg-25-10-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;AOK-Firmenlauf Witten;aok-firmenlauf-witten-witten-02-07-2026;Witten;Germany;Witten, Germany;51.4370171;7.335124;;0.0;;0.95;;;No pin action required.
+clean;Barther Flughafenlauf;barther-flughafenlauf-barth-19-07-2026;Barth;Germany;Barth, Germany;54.3690547;12.7258585;;0.0;;0.95;;;No pin action required.
+clean;Beetzseelauf;beetzseelauf-brandenburg-an-der-havel-03-10-2026;Brandenburg an der Havel;Germany;Brandenburg an der Havel, Germany;52.4108261;12.5497933;;0.0;;0.95;;;No pin action required.
+clean;Bertlicher Strassenläufe;bertlicher-strassenlaufe-herten-27-09-2026;Herten;Germany;Herten, Germany;51.5942009;7.1368071;;0.0;;0.95;;;No pin action required.
+clean;Bienwald Marathon;bienwald-marathon-kandel-14-03-2027;Kandel;Germany;Kandel, Germany;49.0809754;8.1970699;;0.0;;0.95;;;No pin action required.
+clean;Bottwartal Marathon;bottwartal-marathon-steinheim-18-10-2026;Steinheim;Germany;Steinheim, Germany;51.8660478;9.0942767;;0.0;;0.95;;;No pin action required.
+clean;Bremer Brückenlauf;bremer-bruckenlauf-bremen-04-07-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+clean;Bremer Kuhcross QX;bremer-kuhcross-qx-bremen-15-11-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+clean;Brocken Marathon;brocken-marathon-wernigerode-10-10-2026;Wernigerode;Germany;Wernigerode, Germany;51.8344172;10.7862526;;0.0;;0.95;;;No pin action required.
+clean;Bützower Citylauf;butzower-citylauf-butzow-30-08-2026;Bützow;Germany;Bützow, Germany;53.8500047;11.9832952;;0.0;;0.95;;;No pin action required.
+clean;24-Stunden-Burginsellauf Delmenhorst;24-stunden-burginsellauf-delmenhorst-delmenhorst-27-06-2026;Delmenhorst;Germany;Delmenhorst, Germany;53.048095;8.6286066;;0.0;;0.95;;;No pin action required.
+clean;Caputher Seelauf;caputher-seelauf-caputh-10-01-2027;Caputh;Germany;Caputh, Germany;52.3464533;12.9890287;;0.0;;0.95;;;No pin action required.
+clean;City Marathon Wiesbaden;city-marathon-wiesbaden-wiesbaden-20-06-2026;Wiesbaden;Germany;Wiesbaden, Germany;50.0820384;8.2416556;;0.0;;0.95;;;No pin action required.
+clean;Crailsheimer Halbmarathon;crailsheimer-halbmarathon-crailsheim-27-06-2026;Crailsheim;Germany;Crailsheim, Germany;49.1365626;10.0720195;;0.0;;0.95;;;No pin action required.
+clean;DAK Firmenlauf Cottbus;dak-firmenlauf-cottbus-cottbus-10-09-2026;Cottbus;Germany;Cottbus, Germany;51.7567447;14.3357307;;0.0;;0.95;;;No pin action required.
+clean;Dessauer Rathaus-Center City RUN;dessauer-rathaus-center-city-run-dessau-13-09-2026;Dessau;Germany;Dessau, Germany;51.8309956;12.2430723;;0.0;;0.95;;;No pin action required.
+clean;Dorstener 24-Stunden-Lauf;dorstener-24-stunden-lauf-dorsten-10-07-2026;Dorsten;Germany;Dorsten, Germany;51.6604071;6.9647431;;0.0;;0.95;;;No pin action required.
+clean;Düsseldorfer Silvesterlauf;dusseldorfer-silvesterlauf-dusseldorf-31-12-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.2254018;6.7763137;;0.0;;0.95;;;No pin action required.
+clean;Einstein-Marathon Ulm;einstein-marathon-ulm-ulm-22-09-2026;Ulm;Germany;Ulm, Germany;48.3984968;9.9912458;;0.0;;0.95;;;No pin action required.
+clean;Erfurter Nachtlauf;erfurter-nachtlauf-erfurt-29-08-2026;Erfurt;Germany;Erfurt, Germany;50.9777974;11.0287364;;0.0;;0.95;;;No pin action required.
+warning;fem.RUN Hannover;fem-run-hannover-hannover-25-09-2026;Hannover;Germany;Hannover, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Firmenlauf Chemnitz;firmenlauf-chemnitz-chemnitz-02-09-2026;Chemnitz;Germany;Chemnitz, Germany;50.8323531;12.918914;;0.0;;0.95;;;No pin action required.
+clean;Fleesenseelauf;fleesenseelauf-gohren-lebbin-26-09-2026;Göhren-Lebbin;Germany;Göhren-Lebbin, Germany;53.4781976;12.510908;;0.0;;0.95;;;No pin action required.
+clean;Frauenlauf Köln;frauenlauf-koln-koln-13-09-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;Halloween-Run Bremen;halloween-run-bremen-bremen-31-10-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+warning;hella hamburg halbmarathon;hella-hamburg-halbmarathon-hamburg-28-06-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;hella Marathon Rostock;hella-marathon-rostock-rostock-01-08-2026;Rostock;Germany;Rostock, Germany;54.0886707;12.1400211;;0.0;;0.95;;;No pin action required.
+clean;Hiltruper Halbmarathon;hiltruper-halbmarathon-munster-23-08-2026;Münster;Germany;Münster, Germany;51.9625101;7.6251879;;0.0;;0.95;;;No pin action required.
+clean;Hörnlelauf Konstanz;hornlelauf-konstanz-konstanz-11-10-2026;Konstanz;Germany;Konstanz, Germany;47.659216;9.1750718;;0.0;;0.95;;;No pin action required.
+clean;Hofmühl-Volksfest Halbmarathon;hofmuhl-volksfest-halbmarathon-eichstatt-30-08-2026;Eichstätt;Germany;Eichstätt, Germany;48.8863328;11.1989396;;0.0;;0.95;;;No pin action required.
+clean;Holzlandlauf;holzlandlauf-hermsdorf-12-09-2026;Hermsdorf;Germany;Hermsdorf, Germany;50.8984548;11.8550627;;0.0;;0.95;;;No pin action required.
+clean;Insellauf der AOK;insellauf-der-aok-insel-poel-21-06-2026;Insel Poel;Germany;Insel Poel, Germany;54.0081319;11.4433345;;0.0;;0.95;;;No pin action required.
+clean;Internationaler Schwarzwald-Marathon;internationaler-schwarzwald-marathon-braunlingen-11-10-2026;Bräunlingen;Germany;Bräunlingen, Germany;47.9300645;8.448329;;0.0;;0.95;;;No pin action required.
+clean;Internationaler Trierer Stadtlauf;internationaler-trierer-stadtlauf-trier-28-06-2026;Trier;Germany;Trier, Germany;49.7596208;6.6441878;;0.0;;0.95;;;No pin action required.
+clean;Kiel Lauf;kiel-lauf-kiel-13-09-2026;Kiel;Germany;Kiel, Germany;54.3227085;10.135555;;0.0;;0.95;;;No pin action required.
+clean;Kieler Förde Marathon;kieler-forde-marathon-kiel-20-09-2026;Kiel;Germany;Kiel, Germany;54.3227085;10.135555;;0.0;;0.95;;;No pin action required.
+clean;Kieler Förde Marathon;kieler-forde-marathon-kiel-19-09-2027;Kiel;Germany;Kiel, Germany;54.3227085;10.135555;;0.0;;0.95;;;No pin action required.
+clean;Königsschlösser Marathon;konigsschlosser-marathon-fussen-25-07-2026;Füssen;Germany;Füssen, Germany;47.5675998;10.6993217;;0.0;;0.95;;;No pin action required.
+clean;Kühlungsborner CrossLauf;kuhlungsborner-crosslauf-kuhlungsborn-19-09-2026;Kühlungsborn;Germany;Kühlungsborn, Germany;54.1483764;11.7441876;;0.0;;0.95;;;No pin action required.
+clean;(L)auf zur Venus;l-auf-zur-venus-bremen-13-09-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+clean;Lahnparklauf;lahnparklauf-wetzlar-30-08-2026;Wetzlar;Germany;Wetzlar, Germany;50.570561;8.531245;;0.0;;0.95;;;No pin action required.
+clean;Lipperland Marathon;lipperland-marathon-dorentrup-21-11-2026;Dörentrup;Germany;Dörentrup, Germany;52.0408142;9.0033681;;0.0;;0.95;;;No pin action required.
+clean;Ludwigshafener Stadtlauf;ludwigshafener-stadtlauf-ludwigshafen-am-rhein-27-06-2026;Ludwigshafen am Rhein;Germany;Ludwigshafen am Rhein, Germany;49.4704113;8.4381568;;0.0;;0.95;;;No pin action required.
+clean;Stadtwerke Lübeck Marathon;stadtwerke-lubeck-marathon-lubeck-18-10-2026;Lübeck;Germany;Lübeck, Germany;53.866444;10.684738;;0.0;;0.95;;;No pin action required.
+clean;Marburger Nacht-Marathon;marburger-nacht-marathon-marburg-03-07-2026;Marburg;Germany;Marburg, Germany;50.8090106;8.7704695;;0.0;;0.95;;;No pin action required.
+warning;100 Meilen Berlin — Mauerweglauf;100-meilen-berlin-mauerweglauf-berlin-15-08-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Miltenberger Landkreis-Lauftag;miltenberger-landkreis-lauftag-elsenfeld-13-09-2026;Elsenfeld;Germany;Elsenfeld, Germany;49.8473123;9.1618537;;0.0;;0.95;;;No pin action required.
+clean;Mitteldeutscher Marathon;mitteldeutscher-marathon-halle-04-10-2026;Halle;Germany;Halle, Germany;52.4523605;6.9192787;;0.0;;0.95;;;No pin action required.
+warning;Mittsommernachtslauf Hannover;mittsommernachtslauf-hannover-hannover-26-06-2026;Hannover;Germany;Hannover, Germany;52.3744779;9.7385532;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Müritz-Lauf;muritz-lauf-waren-muritz-27-06-2026;Waren (Müritz);Germany;Waren (Müritz), Germany;53.5156249;12.6850606;;0.0;;0.95;;;No pin action required.
+clean;Nordholzer Windmühlenlauf;nordholzer-windmuhlenlauf-wurster-nordseekuste-20-06-2026;Wurster Nordseeküste;Germany;Wurster Nordseeküste, Germany;53.7044885;8.568845;;0.0;;0.95;;;No pin action required.
+clean;Offenbacher Mainuferlauf;offenbacher-mainuferlauf-offenbach-am-main-11-10-2026;Offenbach am Main;Germany;Offenbach am Main, Germany;50.1055002;8.7610698;;0.0;;0.95;;;No pin action required.
+clean;OSC Vorsilvesterlauf;osc-vorsilvesterlauf-bremerhaven-27-12-2026;Bremerhaven;Germany;Bremerhaven, Germany;53.5505392;8.5851945;;0.0;;0.95;;;No pin action required.
+clean;OT Bremen Run;ot-bremen-run-bremen-13-09-2026;Bremen;Germany;Bremen, Germany;53.0758196;8.8071646;;0.0;;0.95;;;No pin action required.
+warning;PSD Bank Halbmarathon Hamburg;psd-bank-halbmarathon-hamburg-hamburg-20-09-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Reichenau Halbmarathon;reichenau-halbmarathon-reichenau-20-09-2026;Reichenau;Germany;Reichenau, Germany;47.6966514;9.0616115;;0.0;;0.95;;;No pin action required.
+clean;Rostock 10;rostock-10-rostock-03-10-2026;Rostock;Germany;Rostock, Germany;54.0886707;12.1400211;;0.0;;0.95;;;No pin action required.
+clean;Sachsenlauf-Coswig;sachsenlauf-coswig-coswig-21-06-2026;Coswig;Germany;Coswig, Germany;51.1267305;13.5783983;;0.0;;0.95;;;No pin action required.
+clean;Schlossinsellauf Lübben;schlossinsellauf-lubben-lubben-21-06-2026;Lübben;Germany;Lübben, Germany;51.9418987;13.8963805;;0.0;;0.95;;;No pin action required.
+clean;Sparkassen Silvesterlauf Werl-Soest;sparkassen-silvesterlauf-werl-soest-werl-31-12-2026;Werl;Germany;Werl, Germany;51.5533457;7.9155558;;0.0;;0.95;;;No pin action required.
+clean;Sparkassen Phoenix-Halbmarathon Dortmund;sparkassen-phoenix-halbmarathon-dortmund-dortmund-03-10-2026;Dortmund;Germany;Dortmund, Germany;51.5142273;7.4652789;;0.0;;0.95;;;No pin action required.
+clean;Sparkassen Rügenbrücken-Marathon;sparkassen-rugenbrucken-marathon-stralsund-10-10-2026;Stralsund;Germany;Stralsund, Germany;54.3096314;13.0820846;;0.0;;0.95;;;No pin action required.
+warning;Sparkassen-SAARathon;sparkassen-saarathon-saarbrucken-11-10-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Stadtwerke-Europalauf;stadtwerke-europalauf-neustadt-in-holstein-09-08-2026;Neustadt in Holstein;Germany;Neustadt in Holstein, Germany;54.1029898;10.8186738;;0.0;;0.95;;;No pin action required.
+clean;Stolberger Schloss-Lauf;stolberger-schloss-lauf-stolberg-29-08-2026;Stolberg;Germany;Stolberg, Germany;50.7702908;6.2295504;;0.0;;0.95;;;No pin action required.
+warning;Stuttgart-Lauf;stuttgart-lauf-stuttgart-21-06-2026;Stuttgart;Germany;Stuttgart, Germany;48.7784485;9.1800132;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;SWP CityLauf Pforzheim;swp-citylauf-pforzheim-pforzheim-26-06-2026;Pforzheim;Germany;Pforzheim, Germany;48.890934;8.7025509;;0.0;;0.95;;;No pin action required.
+clean;Teltowkanalhalbmarathon;teltowkanalhalbmarathon-teltow-06-12-2026;Teltow;Germany;Teltow, Germany;52.3805562;13.2685278;;0.0;;0.95;;;No pin action required.
+clean;Temnitzer Heide-Lauf;temnitzer-heide-lauf-temnitzquell-05-09-2026;Temnitzquell;Germany;Temnitzquell, Germany;53.0078136;12.6089047;;0.0;;0.95;;;No pin action required.
+clean;Tharandter-Wald-Lauf;tharandter-wald-lauf-hartha-30-08-2026;Hartha;Germany;Hartha, Germany;51.0984539;12.9715576;;0.0;;0.95;;;No pin action required.
+clean;Tiergartenlauf Velen;tiergartenlauf-velen-velen-20-06-2026;Velen;Germany;Velen, Germany;51.8957136;6.9839073;;0.0;;0.95;;;No pin action required.
+warning;LA-Hamburg TogetHHer Silvesterlauf;la-hamburg-togethher-silvesterlauf-hamburg-31-12-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Tübinger Erbe-Lauf;tubinger-erbe-lauf-tubingen-20-09-2026;Tübingen;Germany;Tübingen, Germany;48.5203263;9.053596;;0.0;;0.95;;;No pin action required.
+warning;UNO Urban Cross Lauf;uno-urban-cross-lauf-saarbrucken-04-10-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;SV-1860-Minden Volkslauf;sv-1860-minden-volkslauf-minden-29-08-2026;Minden;Germany;Minden, Germany;52.2881045;8.9168852;;0.0;;0.95;;;No pin action required.
+clean;Wallenstein Halbmarathon;wallenstein-halbmarathon-altdorf-26-07-2026;Altdorf;Germany;Altdorf, Germany;49.2863021;8.2164153;;0.0;;0.95;;;No pin action required.
+clean;Wardenburger Sommerlauf;wardenburger-sommerlauf-wardenburg-06-09-2026;Wardenburg;Germany;Wardenburg, Germany;53.0645396;8.1925341;;0.0;;0.95;;;No pin action required.
+clean;Warener Sommerlauf;warener-sommerlauf-waren-muritz-20-06-2026;Waren (Müritz);Germany;Waren (Müritz), Germany;53.5156249;12.6850606;;0.0;;0.95;;;No pin action required.
+clean;Weimarer Stadtlauf;weimarer-stadtlauf-weimar-10-10-2026;Weimar;Germany;Weimar, Germany;50.9793301;11.3297921;;0.0;;0.95;;;No pin action required.
+clean;Wintermarathon Leipzig;wintermarathon-leipzig-leipzig-16-01-2027;Leipzig;Germany;Leipzig, Germany;51.3406321;12.3747329;;0.0;;0.95;;;No pin action required.
+clean;Volksbank Stadtlauf Selm 2026;volksbank-stadtlauf-selm-2026-selm-18-06-2026;Selm;Germany;Selm, Germany;51.7005549;7.468614;;0.0;;0.95;;;No pin action required.
+warning;LKZ Firmenlauf;lkz-firmenlauf-ludwigsburg-17-06-2026;Ludwigsburg;Germany;Ludwigsburg, Germany;48.8953937;9.1895147;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Sommernachtslauf am Hufeisen;sommernachtslauf-am-hufeisen-hesse-17-06-2026;Hesse;Germany;Hesse, Germany;50.1694463;9.1971928;;50.2;;0.95;;;No pin action required.
+clean;Brunsbüttler Citylauf;brunsbuttler-citylauf-brunsbuttel-19-06-2026;Brunsbüttel;Germany;Brunsbüttel, Germany;53.901544;9.12846;;0.9;;0.95;;;No pin action required.
+clean;Jemgumer Dörploop;jemgumer-dorploop-jemgum-19-06-2026;Jemgum;Germany;Jemgum, Germany;53.2631054;7.3689976;;1.0;;0.95;;;No pin action required.
+clean;27. Midsummer-Triathlon;27-midsummer-triathlon-gro-ensee-18-06-2026;Großensee;Germany;Großensee, Germany;53.615;10.349;;0.5;;0.95;;;No pin action required.
+clean;4. Grünheider Schultriathlon;4-grunheider-schultriathlon-grunheide-mark-19-06-2026;Grünheide (Mark);Germany;Grünheide (Mark), Germany;52.422;13.751;;4.9;;0.95;;;No pin action required.
+clean;Memmert Rothsee Triathlon;memmert-rothsee-triathlon-hilpoltstein-20-06-2026;Hilpoltstein;Germany;Hilpoltstein, Germany;49.209;11.187;;5.3;;0.95;;;No pin action required.
+clean;29. Arendsee Triathlon;29-arendsee-triathlon-arendsee-altmark-20-06-2026;Arendsee (Altmark);Germany;Arendsee (Altmark), Germany;52.881;11.486;;0.4;;0.95;;;No pin action required.
+clean;35. Unterallgäuer Triathlon;35-unterallgauer-triathlon-ottobeuren-27-06-2026;Ottobeuren;Germany;Ottobeuren, Germany;47.948;10.295;;0.8;;0.95;;;No pin action required.
+warning;18. Mitteldeutscher Firmenteam Triathlon;18-mitteldeutscher-firmenteam-triathlon-ro-bach-27-06-2026;Roßbach;Germany;Roßbach, Germany;51.26;11.91;coordinates_far_from_city;305.2;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Swim + Run Vol. 13 / Triathlon Waldfeucht;swim-run-vol-13-triathlon-waldfeucht-heinsberg-kirchhoven-27-06-2026;Heinsberg - Kirchhoven;Germany;Heinsberg - Kirchhoven, Germany;51.04;6.06;;3.9;;0.95;;;No pin action required.
+clean;Triathlon Dierhagen;triathlon-dierhagen-dierhagen-27-06-2026;Dierhagen;Germany;Dierhagen, Germany;54.291;12.359;;0.5;;0.95;;;No pin action required.
+clean;28. EWR-Triathlon Lampertheim;28-ewr-triathlon-lampertheim-lampertheim-28-06-2026;Lampertheim;Germany;Lampertheim, Germany;49.592;8.433;;3.9;;0.95;;;No pin action required.
+clean;Herbrand Niederrhein Triathlon N3T;herbrand-niederrhein-triathlon-n3t-kalkar-28-06-2026;Kalkar;Germany;Kalkar, Germany;51.758;6.292;;2.1;;0.95;;;No pin action required.
+warning;Erbacher Triathlon;erbacher-triathlon-erbach-28-06-2026;Erbach;Germany;Erbach, Germany;48.323;9.897;coordinates_far_from_city;159.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;9. Drachentriathlon;9-drachentriathlon-furth-im-wald-28-06-2026;Furth im Wald;Germany;Furth im Wald, Germany;49.316;12.867;;1.8;;0.95;;;No pin action required.
+clean;3. triathlon.de CUP Landshut;3-triathlon-de-cup-landshut-landshut-28-06-2026;Landshut;Germany;Landshut, Germany;48.574;12.227;;7.0;;0.95;;;No pin action required.
+clean;Wemdinger Waldsee Triathlon;wemdinger-waldsee-triathlon-wemding-28-06-2026;Wemding;Germany;Wemding, Germany;48.878;10.731;;1.6;;0.95;;;No pin action required.
+clean;20. ENTEGA Heinerman Triathlon;20-entega-heinerman-triathlon-darmstadt-28-06-2026;Darmstadt;Germany;Darmstadt, Germany;49.871;8.673;;1.6;;0.95;;;No pin action required.
+clean;31. Fümmelsee-Triathlon;31-fummelsee-triathlon-wolfenbuttel-28-06-2026;Wolfenbüttel;Germany;Wolfenbüttel, Germany;52.168;10.504;;2.2;;0.95;;;No pin action required.
+clean;8. Nordhorner Triathlon;8-nordhorner-triathlon-nordhorn-28-06-2026;Nordhorn;Germany;Nordhorn, Germany;52.431;7.089;;1.4;;0.95;;;No pin action required.
+clean;Kulturstadttriathlon Weimar 2026;kulturstadttriathlon-weimar-2026-weimar-28-06-2026;Weimar;Germany;Weimar, Germany;50.981;11.328;;0.2;;0.95;;;No pin action required.
+warning;2. Zarrentin Triathlon;2-zarrentin-triathlon-zarrentin-28-06-2026;Zarrentin;Germany;Zarrentin, Germany;53.546;10.925;coordinates_far_from_city;141.5;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Hersbrucker Volkstriathlon 2026;hersbrucker-volkstriathlon-2026-hersbruck-28-06-2026;Hersbruck;Germany;Hersbruck, Germany;49.508;11.432;;0.3;;0.95;;;No pin action required.
+clean;28. Dreikirchener systemceram Triathlon;28-dreikirchener-systemceram-triathlon-dreikirchen-28-06-2026;Dreikirchen;Germany;Dreikirchen, Germany;50.451;7.965;;0.7;;0.95;;;No pin action required.
+clean;Wedemark-Spass-Triathlon;wedemark-spass-triathlon-wedemark-28-06-2026;Wedemark;Germany;Wedemark, Germany;52.57;9.604;;6.8;;0.95;;;No pin action required.
+clean;21. Sparkassen Triathlon Braunschweig;21-sparkassen-triathlon-braunschweig-braunschweig-28-06-2026;Braunschweig;Germany;Braunschweig, Germany;52.259;10.479;;3.1;;0.95;;;No pin action required.
+clean;19. DTU Triathlon Schultour 2026;19-dtu-triathlon-schultour-2026-neubrandenburg-01-07-2026;Neubrandenburg;Germany;Neubrandenburg, Germany;53.557;13.247;;0.9;;0.95;;;No pin action required.
+clean;WerbellinseeTriathlon;werbellinseetriathlon-joachimsthal-04-07-2026;Joachimsthal;Germany;Joachimsthal, Germany;52.918;13.725;;6.7;;0.95;;;No pin action required.
+clean;Sparkassen Triathlon Tag Schopfheim;sparkassen-triathlon-tag-schopfheim-schopfheim-04-07-2026;Schopfheim;Germany;Schopfheim, Germany;47.654;7.834;;1.0;;0.95;;;No pin action required.
+clean;35. Altmühltriathlon Leutershausen;35-altmuhltriathlon-leutershausen-leutershausen-04-07-2026;Leutershausen;Germany;Leutershausen, Germany;49.301;10.403;;0.4;;0.95;;;No pin action required.
+clean;Berliner Volkstriathlon;berliner-volkstriathlon-berlin-05-07-2026;Berlin;Germany;Berlin, Germany;52.442;13.242;;13.3;;0.95;;;No pin action required.
+clean;13. Wanzleber Sparkassen Triathlon;13-wanzleber-sparkassen-triathlon-wanzleben-borde-05-07-2026;Wanzleben-Börde;Germany;Wanzleben-Börde, Germany;52.058;11.444;;2.6;;0.95;;;No pin action required.
+clean;LEXWARE Freiburg-Triathlon 2026;lexware-freiburg-triathlon-2026-freiburg-im-breisgau-05-07-2026;Freiburg im Breisgau;Germany;Freiburg im Breisgau, Germany;48.011;7.814;;3.1;;0.95;;;No pin action required.
+clean;32.Poggensee Triathlon;32-poggensee-triathlon-bad-oldesloe-05-07-2026;Bad Oldesloe;Germany;Bad Oldesloe, Germany;53.827;10.378;;2.0;;0.95;;;No pin action required.
+clean;Saerbecker Triathlon;saerbecker-triathlon-saerbeck-05-07-2026;Saerbeck;Germany;Saerbeck, Germany;52.17;7.631;;0.6;;0.95;;;No pin action required.
+clean;SCOTT Tegernsee Triathlon 2026;scott-tegernsee-triathlon-2026-gmund-a-tegernsee-05-07-2026;Gmund a. Tegernsee;Germany;Gmund a. Tegernsee, Germany;47.742;11.737;;1.0;;0.95;;;No pin action required.
+clean;Volksbank Schultriathlon Ahlen 2026;volksbank-schultriathlon-ahlen-2026-ahlen-09-07-2026;Ahlen;Germany;Ahlen, Germany;51.764;7.869;;1.5;;0.95;;;No pin action required.
+clean;10. Schulmeisterschaft im Triathlon;10-schulmeisterschaft-im-triathlon-deggendorf-10-07-2026;Deggendorf;Germany;Deggendorf, Germany;48.82;12.911;;4.0;;0.95;;;No pin action required.
+clean;SUZUKI World Triathlon Hamburg 2026;suzuki-world-triathlon-hamburg-2026-hamburg-11-07-2026;Hamburg;Germany;Hamburg, Germany;53.551;9.994;;0.5;;0.95;;;No pin action required.
+clean;11. Wuggi-Triathlon;11-wuggi-triathlon-prackenbach-11-07-2026;Prackenbach;Germany;Prackenbach, Germany;49.13;12.848;;4.3;;0.95;;;No pin action required.
+clean;Schluchsee Triathlon;schluchsee-triathlon-schluchsee-11-07-2026;Schluchsee;Germany;Schluchsee, Germany;47.837;8.126;;4.3;;0.95;;;No pin action required.
+clean;43. GEALAN Triathlon der IfL Hof;43-gealan-triathlon-der-ifl-hof-hof-11-07-2026;Hof;Germany;Hof, Germany;50.283;11.894;;4.3;;0.95;;;No pin action required.
+clean;26.Ammerseetriathlon;26-ammerseetriathlon-die-en-am-ammersee-11-07-2026;Dießen am Ammersee;Germany;Dießen am Ammersee, Germany;47.979;11.098;;3.5;;0.95;;;No pin action required.
+clean;14. Stadtwerke Düsseldorf Familientriathlon;14-stadtwerke-dusseldorf-familientriathlon-dusseldorf-11-07-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.25;6.732;;4.1;;0.95;;;No pin action required.
+warning;Piratentriathlon Amberg;piratentriathlon-amberg-amberg-11-07-2026;Amberg;Germany;Amberg, Germany;49.442;11.858;coordinates_far_from_city;176.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Raiffeisentriathlon;raiffeisentriathlon-hamm-sieg-12-07-2026;Hamm (Sieg);Germany;Hamm (Sieg), Germany;50.766;7.674;;0.1;;0.95;;;No pin action required.
+clean;5. Stadtwerke-Bochum-Triathlon;5-stadtwerke-bochum-triathlon-bochum-12-07-2026;Bochum;Germany;Bochum, Germany;51.46;7.21;;2.5;;0.95;;;No pin action required.
+clean;41. Neue Rostocker WG Triathlon;41-neue-rostocker-wg-triathlon-rostock-12-07-2026;Rostock;Germany;Rostock, Germany;54.138;12.086;;6.5;;0.95;;;No pin action required.
+clean;Hager Papprint Biosphärentriathlon;hager-papprint-biospharentriathlon-gersheim-12-07-2026;Gersheim;Germany;Gersheim, Germany;49.154;7.235;;2.5;;0.95;;;No pin action required.
+clean;Schlaubetal- Triathlon;schlaubetal-triathlon-mullrose-12-07-2026;Müllrose;Germany;Müllrose, Germany;52.23;14.429;;2.0;;0.95;;;No pin action required.
+clean;16. Hensel Recycling Churfranken Triathlon;16-hensel-recycling-churfranken-triathlon-niedernberg-12-07-2026;Niedernberg;Germany;Niedernberg, Germany;49.906;9.135;;1.1;;0.95;;;No pin action required.
+clean;IOK-Triathlon Verl;iok-triathlon-verl-verl-12-07-2026;Verl;Germany;Verl, Germany;51.89;8.483;;2.0;;0.95;;;No pin action required.
+clean;38. Altmark-Triathlon;38-altmark-triathlon-hassel-ot-wischer-12-07-2026;Hassel OT Wischer;Germany;Hassel OT Wischer, Germany;52.74;12.027;;13.1;;0.95;;;No pin action required.
+clean;Offendorf-Triathlon;offendorf-triathlon-ratekau-12-07-2026;Ratekau;Germany;Ratekau, Germany;53.947;10.772;;2.8;;0.95;;;No pin action required.
+clean;Holzland Triathlon Haßmersheim;holzland-triathlon-ha-mersheim-ha-mersheim-12-07-2026;Haßmersheim;Germany;Haßmersheim, Germany;49.302;9.144;;0.2;;0.95;;;No pin action required.
+clean;Cross Triathlon TSV Karlstadt;cross-triathlon-tsv-karlstadt-karlstadt-12-07-2026;Karlstadt;Germany;Karlstadt, Germany;49.956;9.764;;2.1;;0.95;;;No pin action required.
+clean;Apian-Schultriathlon;apian-schultriathlon-85051-ingolstadt-14-07-2026;85051 Ingolstadt;Germany;85051 Ingolstadt, Germany;48.716;11.374;;1.7;;0.95;;;No pin action required.
+clean;Höglwörther-See-Triathlon;hoglworther-see-triathlon-anger-18-07-2026;Anger;Germany;Anger, Germany;47.804;12.857;;0.2;;0.95;;;No pin action required.
+clean;Möhnesee Triathlon 2026;mohnesee-triathlon-2026-mohnesee-18-07-2026;Möhnesee;Germany;Möhnesee, Germany;51.494;8.126;;2.0;;0.95;;;No pin action required.
+clean;39. Velburger Kirchweihtriathlon;39-velburger-kirchweihtriathlon-velburg-18-07-2026;Velburg;Germany;Velburg, Germany;49.228;11.671;;0.6;;0.95;;;No pin action required.
+clean;41. Welzheimer Triathlon;41-welzheimer-triathlon-welzheim-18-07-2026;Welzheim;Germany;Welzheim, Germany;48.875;9.636;;0.1;;0.95;;;No pin action required.
+clean;Mey Generalbau Triathlon Tübingen;mey-generalbau-triathlon-tubingen-tubingen-19-07-2026;Tübingen;Germany;Tübingen, Germany;48.517;9.058;;0.5;;0.95;;;No pin action required.
+warning;35. Kratschmayer Triathlon;35-kratschmayer-triathlon-waldenburg-19-07-2026;Waldenburg;Germany;Waldenburg, Germany;49.185;9.624;coordinates_far_from_city;283.7;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;23. Sparkassen-Triathlon Dortmund 2026;23-sparkassen-triathlon-dortmund-2026-dortmund-19-07-2026;Dortmund;Germany;Dortmund, Germany;51.528;7.447;;2.0;;0.95;;;No pin action required.
+clean;19. Rheinstetten Triathlon;19-rheinstetten-triathlon-rheinstetten-19-07-2026;Rheinstetten;Germany;Rheinstetten, Germany;48.98;8.32;;1.5;;0.95;;;No pin action required.
+clean;Landkreis-Schultriathlon Roth 2026;landkreis-schultriathlon-roth-2026-roth-21-07-2026;Roth;Germany;Roth, Germany;49.247;11.095;;2.0;;0.95;;;No pin action required.
+warning;Fürther Schultriathlon;further-schultriathlon-furth-22-07-2026;Fürth;Germany;Fürth, Germany;49.478;10.987;coordinates_far_from_city;160.4;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;25. Schultriathlon Sonnenlugerschule Mengen;25-schultriathlon-sonnenlugerschule-mengen-mengen-22-07-2026;Mengen;Germany;Mengen, Germany;48.045;9.323;;0.9;;0.95;;;No pin action required.
+clean;Die Finals 2026 - Sprint Triathlon Steinhuder Meer;die-finals-2026-sprint-triathlon-steinhuder-meer-wunstorf-23-07-2026;Wunstorf;Germany;Wunstorf, Germany;52.455;9.352;;6.2;;0.95;;;No pin action required.
+clean;33. Hofheimer Triathlon;33-hofheimer-triathlon-hofheim-i-ufr-25-07-2026;Hofheim i. UFr.;Germany;Hofheim i. UFr., Germany;50.16;10.53;;2.5;;0.95;;;No pin action required.
+clean;40. Müritz-Triathlon;40-muritz-triathlon-waren-muritz-25-07-2026;Waren (Müritz);Germany;Waren (Müritz), Germany;53.523;12.689;;0.9;;0.95;;;No pin action required.
+clean;2. Malteser Triathlon;2-malteser-triathlon-heitersheim-25-07-2026;Heitersheim;Germany;Heitersheim, Germany;47.871;7.669;;0.8;;0.95;;;No pin action required.
+clean;14. Schongau Triathlon;14-schongau-triathlon-schongau-26-07-2026;Schongau;Germany;Schongau, Germany;47.802;10.901;;1.1;;0.95;;;No pin action required.
+clean;35. M-net Erlanger Triathlon;35-m-net-erlanger-triathlon-erlangen-26-07-2026;Erlangen;Germany;Erlangen, Germany;49.602;10.981;;1.7;;0.95;;;No pin action required.
+clean;Sparkasse Passau TRIATHLON NIEDERBAYERN 2026;sparkasse-passau-triathlon-niederbayern-2026-pocking-26-07-2026;Pocking;Germany;Pocking, Germany;48.393;13.308;;1.0;;0.95;;;No pin action required.
+clean;40. Wörthsee-Triathlon;40-worthsee-triathlon-worthsee-26-07-2026;Wörthsee;Germany;Wörthsee, Germany;48.069;11.201;;0.4;;0.95;;;No pin action required.
+clean;Kindelsberg Triathlon;kindelsberg-triathlon-hilchenbach-26-07-2026;Hilchenbach;Germany;Hilchenbach, Germany;50.994;8.042;;4.6;;0.95;;;No pin action required.
+clean;43. Leipziger Triathlon;43-leipziger-triathlon-leipzig-26-07-2026;Leipzig;Germany;Leipzig, Germany;51.304;12.255;;9.3;;0.95;;;No pin action required.
+clean;Heidelberg Triathlon;heidelberg-triathlon-heidelberg-26-07-2026;Heidelberg;Germany;Heidelberg, Germany;49.413;8.685;;0.8;;0.95;;;No pin action required.
+clean;31. swb-Silbersee-Triathlon / Bremen-Stuhr;31-swb-silbersee-triathlon-bremen-stuhr-stuhr-26-07-2026;Stuhr;Germany;Stuhr, Germany;53.009;8.743;;2.1;;0.95;;;No pin action required.
+clean;17. eology Mainfrankentriathlon;17-eology-mainfrankentriathlon-kitzingen-01-08-2026;Kitzingen;Germany;Kitzingen, Germany;49.741;10.163;;1.0;;0.95;;;No pin action required.
+clean;41. Ravensburger Triathlon;41-ravensburger-triathlon-ravensburg-01-08-2026;Ravensburg;Germany;Ravensburg, Germany;47.787;9.602;;1.0;;0.95;;;No pin action required.
+clean;38. Sassenberger Triathlon 2026;38-sassenberger-triathlon-2026-sassenberg-02-08-2026;Sassenberg;Germany;Sassenberg, Germany;52.004;8.052;;1.9;;0.95;;;No pin action required.
+clean;7. Scharmützelsee-Triathlon;7-scharmutzelsee-triathlon-bad-saarow-02-08-2026;Bad Saarow;Germany;Bad Saarow, Germany;52.292;14.056;;0.1;;0.95;;;No pin action required.
+clean;Frankfurt City Triathlon;frankfurt-city-triathlon-frankfurt-am-main-02-08-2026;Frankfurt am Main;Germany;Frankfurt am Main, Germany;50.113;8.679;;0.3;;0.95;;;No pin action required.
+clean;2. Nagler See Jedermanntriathlon;2-nagler-see-jedermanntriathlon-nagel-02-08-2026;Nagel;Germany;Nagel, Germany;49.988;11.958;;1.3;;0.95;;;No pin action required.
+clean;38. Kamener Sparkassentriathlon;38-kamener-sparkassentriathlon-kamen-02-08-2026;Kamen;Germany;Kamen, Germany;51.575;7.618;;3.5;;0.95;;;No pin action required.
+clean;Oettinger Triathlon;oettinger-triathlon-oettingen-i-bayern-02-08-2026;Oettingen i. Bayern;Germany;Oettingen i. Bayern, Germany;48.928;10.573;;3.6;;0.95;;;No pin action required.
+clean;35. Regensburger Triathlon;35-regensburger-triathlon-regensburg-02-08-2026;Regensburg;Germany;Regensburg, Germany;49.027;12.098;;0.8;;0.95;;;No pin action required.
+clean;BraWo Triathlon Salgitter;brawo-triathlon-salgitter-salzgitter-02-08-2026;Salzgitter;Germany;Salzgitter, Germany;52.164;10.311;;3.6;;0.95;;;No pin action required.
+clean;Stadtwerke Borken Triathlon;stadtwerke-borken-triathlon-borken-08-08-2026;Borken;Germany;Borken, Germany;51.841;6.78;;5.4;;0.95;;;No pin action required.
+clean;37. Bergsee Triathlon;37-bergsee-triathlon-schleusingen-08-08-2026;Schleusingen;Germany;Schleusingen, Germany;50.528;10.687;;5.9;;0.95;;;No pin action required.
+clean;19. Licher Triathlon;19-licher-triathlon-lich-08-08-2026;Lich;Germany;Lich, Germany;50.529;8.816;;3.2;;0.95;;;No pin action required.
+clean;DATAGROUP Triathlon Nürnberg;datagroup-triathlon-nurnberg-nurnberg-09-08-2026;Nürnberg;Germany;Nürnberg, Germany;49.451;11.105;;2.0;;0.95;;;No pin action required.
+clean;Kraichgau Energie Summertime Triathlon;kraichgau-energie-summertime-triathlon-karlsdorf-neuthard-09-08-2026;Karlsdorf-Neuthard;Germany;Karlsdorf-Neuthard, Germany;49.131;8.534;;0.5;;0.95;;;No pin action required.
+clean;26. Pöhler-Triathlon;26-pohler-triathlon-pohl-09-08-2026;Pöhl;Germany;Pöhl, Germany;50.559;12.181;;2.1;;0.95;;;No pin action required.
+clean;14. GEWOBA City Triathlon Bremen;14-gewoba-city-triathlon-bremen-bremen-09-08-2026;Bremen;Germany;Bremen, Germany;53.095;8.773;;3.1;;0.95;;;No pin action required.
+clean;Rheiner Channel Triathlon;rheiner-channel-triathlon-rheine-09-08-2026;Rheine;Germany;Rheine, Germany;52.302;7.483;;4.0;;0.95;;;No pin action required.
+clean;35. Maibacher Triathlon;35-maibacher-triathlon-butzbach-09-08-2026;Butzbach;Germany;Butzbach, Germany;50.379;8.571;;6.4;;0.95;;;No pin action required.
+clean;Nordschwarzwald Triathlon;nordschwarzwald-triathlon-nagold-15-08-2026;Nagold;Germany;Nagold, Germany;48.552;8.723;;0.1;;0.95;;;No pin action required.
+clean;O-SEE Challenge/DM Cross Triathlon/XTERRA;o-see-challenge-dm-cross-triathlon-xterra-olbersdorf-15-08-2026;Olbersdorf;Germany;Olbersdorf, Germany;50.894;14.773;;2.7;;0.95;;;No pin action required.
+clean;12. Altwarmbüchener Triathlon am 15./16.8.2026;12-altwarmbuchener-triathlon-am-15-16-8-2026-hannover-15-08-2026;Hannover;Germany;Hannover, Germany;52.416;9.806;;6.5;;0.95;;;No pin action required.
+clean;Bornsdorf-Triathlon 2026;bornsdorf-triathlon-2026-heideblick-bornsdorf-15-08-2026;Heideblick-Bornsdorf;Germany;Heideblick-Bornsdorf, Germany;51.791;13.739;;4.0;;0.95;;;No pin action required.
+clean;37. KN Förde Triathlon 2026;37-kn-forde-triathlon-2026-kiel-16-08-2026;Kiel;Germany;Kiel, Germany;54.332;10.151;;1.4;;0.95;;;No pin action required.
+clean;23. Rodgau Triathlon;23-rodgau-triathlon-rodgau-16-08-2026;Rodgau;Germany;Rodgau, Germany;50.007;8.889;;1.2;;0.95;;;No pin action required.
+clean;Triathlon Festival Rheinhessen;triathlon-festival-rheinhessen-worrstadt-16-08-2026;Wörrstadt;Germany;Wörrstadt, Germany;49.832;8.106;;1.1;;0.95;;;No pin action required.
+clean;3. Edermünder Triathlon;3-edermunder-triathlon-edermunde-16-08-2026;Edermünde;Germany;Edermünde, Germany;51.216;9.414;;0.8;;0.95;;;No pin action required.
+clean;31. Ilmenauer Teamtriathlon 2026;31-ilmenauer-teamtriathlon-2026-ilmenau-19-08-2026;Ilmenau;Germany;Ilmenau, Germany;50.741;10.944;;6.4;;0.95;;;No pin action required.
+clean;42. Viernheimer V-Card-Triathlon;42-viernheimer-v-card-triathlon-viernheim-22-08-2026;Viernheim;Germany;Viernheim, Germany;49.547;8.584;;0.9;;0.95;;;No pin action required.
+clean;36. Elm-Lappwald Triathlon;36-elm-lappwald-triathlon-helmstedt-22-08-2026;Helmstedt;Germany;Helmstedt, Germany;52.171;10.976;;6.7;;0.95;;;No pin action required.
+clean;Marathoncross um den Messerpokal;marathoncross-um-den-messerpokal-bad-liebenstein-20-06-2026;Bad Liebenstein;Germany;Bad Liebenstein, Germany;50.8183801;10.3491578;;1.0;;0.95;;;No pin action required.
+clean;Losheimer Trailfest;losheimer-trailfest-losheim-am-see-27-06-2026;Losheim am See;Germany;Losheim am See, Germany;49.5082531;6.7447054;;0.0;;0.95;;;No pin action required.
+clean;B. BRAUN Marathon;b-braun-marathon-tuttlingen-28-06-2026;Tuttlingen;Germany;Tuttlingen, Germany;47.9844315;8.8186606;;0.0;;0.95;;;No pin action required.
+clean;Maintal Ultratrail;maintal-ultratrail-veitshochheim-18-07-2026;Veitshöchheim;Germany;Veitshöchheim, Germany;49.8324007;9.8723628;;1.5;;0.95;;;No pin action required.
+clean;Sachsenwaldlauf;sachsenwaldlauf-schwarzenbek-06-09-2026;Schwarzenbek;Germany;Schwarzenbek, Germany;53.503122;10.4785643;;0.0;;0.95;;;No pin action required.
+clean;Südthüringentrail;sudthuringentrail-suhl-12-09-2026;Suhl;Germany;Suhl, Germany;50.6086518;10.6926437;;0.0;;0.95;;;No pin action required.
+clean;LIWA-LaufEvent;liwa-laufevent-lichtenwald-hegenlohe-18-04-2027;Lichtenwald-Hegenlohe;Germany;Lichtenwald-Hegenlohe, Germany;48.7338334;9.4766259;;2.1;;0.95;;;No pin action required.
+clean;Meldorfer Brückenlauf;meldorfer-bruckenlauf-meldorf-01-05-2027;Meldorf;Germany;Meldorf, Germany;54.08988;9.070633;;0.0;;0.95;;;No pin action required.
+clean;Vatertagslauf in Rhaunen;vatertagslauf-in-rhaunen-rhaunen-06-05-2027;Rhaunen;Germany;Rhaunen, Germany;49.8642489;7.3442701;;0.0;;0.95;;;No pin action required.
+clean;Gutenberg Halbmarathon Mainz;gutenberg-halbmarathon-mainz-mainz-09-05-2027;Mainz;Germany;Mainz, Germany;49.9995205;8.2736253;;0.0;;0.95;;;No pin action required.
+clean;Gerolsteiner Helgoland Marathon;gerolsteiner-helgoland-marathon-helgoland-22-05-2027;Helgoland;Germany;Helgoland, Germany;54.1820608;7.8876314;;0.5;;0.95;;;No pin action required.
+clean;Sevilla Marathon;sevilla-marathon-sevilla-21-02-2027;Sevilla;Spain;Sevilla, Spain;37.383606;-5.97997;;1.5;;0.95;;;No pin action required.
+clean;Malta Marathon;malta-marathon-mdina-28-02-2027;Mdina;Malta;Mdina, Malta;35.8858923;14.4025288;;0.0;;0.95;;;No pin action required.
+clean;Barcelona Marathon;barcelona-marathon-barcelona-14-03-2027;Barcelona;Spain;Barcelona, Spain;41.403614;2.153082;;3.1;;0.95;;;No pin action required.
+clean;Rome Marathon;rome-marathon-rom-14-03-2027;Rom;Italy;Rom, Italy;41.8933203;12.4829321;;0.0;;0.95;;;No pin action required.
+clean;Linz Donau Marathon;linz-donau-marathon-linz-11-04-2027;Linz;Austria;Linz, Austria;48.251885;14.3820384;;9.3;;0.95;;;No pin action required.
+clean;Madrid Marathon;madrid-marathon-madrid-25-04-2027;Madrid;Spain;Madrid, Spain;40.4174111;-3.7227046;;1.6;;0.95;;;No pin action required.
+clean;London Marathon;london-marathon-london-25-04-2027;London;UK;London, UK;51.5074456;-0.1277653;;0.0;;0.95;;;No pin action required.
+clean;Innsbruck Alpine Trailrun;innsbruck-alpine-trailrun-innsbruck-05-05-2027;Innsbruck;Austria;Innsbruck, Austria;47.2695153;11.3971372;;0.6;;0.95;;;No pin action required.
+clean;Generali Genf Marathon;generali-genf-marathon-genf-08-05-2027;Genf;Switzerland;Genf, Switzerland;46.2017559;6.1466014;;0.0;;0.95;;;No pin action required.
+clean;Kopenhagen Marathon;kopenhagen-marathon-kopenhagen-09-05-2027;Kopenhagen;Denmark;Kopenhagen, Denmark;55.6867243;12.5700724;;0.0;;0.95;;;No pin action required.
+clean;Swiss Irontrail;swiss-irontrail-savognin-27-06-2026;Savognin;Switzerland;Savognin, Switzerland;46.5969026;9.5980124;;0.0;;0.95;;;No pin action required.
+clean;Bernina Gletschermarathon;bernina-gletschermarathon-pontresina-03-07-2026;Pontresina;Switzerland;Pontresina, Switzerland;46.489993;9.9042965;;0.0;;0.95;;;No pin action required.
+clean;Silvrettatrailrun 3000;silvrettatrailrun-3000-ischgl-10-07-2026;Ischgl;Austria;Ischgl, Austria;47.0120228;10.2913166;;0.0;;0.95;;;No pin action required.
+clean;Gletscher Trailrun;gletscher-trailrun-obergurgl-16-07-2026;Obergurgl;Austria;Obergurgl, Austria;46.8711626;11.0282497;;0.0;;0.95;;;No pin action required.
+clean;Grossglockner ULTRA-TRAIL;grossglockner-ultra-trail-kaprun-23-07-2026;Kaprun;Austria;Kaprun, Austria;47.2713898;12.7573679;;0.0;;0.95;;;No pin action required.
+clean;Davos X-Trails;davos-x-trails-davos-24-07-2026;Davos;Switzerland;Davos, Switzerland;46.796198;9.8236892;;0.0;;0.95;;;No pin action required.
+clean;Gondo Marathon;gondo-marathon-gondo-08-08-2026;Gondo;Switzerland;Gondo, Switzerland;46.1958512;8.1399499;;0.0;;0.95;;;No pin action required.
+clean;Helsinki Marathon;helsinki-marathon-helsinki-22-08-2026;Helsinki;Finland;Helsinki, Finland;60.1666204;24.9435408;;0.0;;0.95;;;No pin action required.
+clean;Reykjavik Marathon;reykjavik-marathon-reykjavik-22-08-2026;Reykjavik;Iceland;Reykjavik, Iceland;64.145981;-21.9422367;;0.0;;0.95;;;No pin action required.
+clean;Kleine Zeitung Wörthersee Halbmarathon;kleine-zeitung-worthersee-halbmarathon-klagenfurt-30-08-2026;Klagenfurt;Austria;Klagenfurt, Austria;46.623943;14.3075976;;0.0;;0.95;;;No pin action required.
+clean;Torlauf Dachstein;torlauf-dachstein-ramsau-am-dachstein-05-09-2026;Ramsau am Dachstein;Austria;Ramsau am Dachstein, Austria;47.4217532;13.6531171;;0.0;;0.95;;;No pin action required.
+clean;Bukarest Marathon;bukarest-marathon-bukarest-11-10-2026;Bukarest;Romania;Bukarest, Romania;44.4361414;26.102684;;0.0;;0.95;;;No pin action required.
+clean;Ascona-Locarno Run;ascona-locarno-run-ascona-11-10-2026;Ascona;Switzerland;Ascona, Switzerland;46.1554222;8.7707865;;0.0;;0.95;;;No pin action required.
+clean;Budapest Marathon;budapest-marathon-budapest-11-10-2026;Budapest;Hungary;Budapest, Hungary;47.4978789;19.0402383;;0.0;;0.95;;;No pin action required.
+clean;Salzkammergut Marathon;salzkammergut-marathon-st-wolfgang-17-10-2026;St. Wolfgang;Austria;St. Wolfgang, Austria;47.7378747;13.448274;;0.0;;0.95;;;No pin action required.
+clean;Palma Marathon;palma-marathon-palma-de-mallorca-18-10-2026;Palma de Mallorca;Spain;Palma de Mallorca, Spain;39.5695818;2.6500745;;0.0;;0.95;;;No pin action required.
+clean;Antwerpen Marathon;antwerpen-marathon-antwerpen-18-10-2026;Antwerpen;Belgium;Antwerpen, Belgium;51.2211097;4.3997081;;0.0;;0.95;;;No pin action required.
+clean;Dublin Marathon;dublin-marathon-dublin-25-10-2026;Dublin;Ireland;Dublin, Ireland;53.3493795;-6.2605593;;0.0;;0.95;;;No pin action required.
+clean;Athen Marathon;athen-marathon-athen-08-11-2026;Athen;Greece;Athen, Greece;37.9755648;23.7348324;;0.0;;0.95;;;No pin action required.
+clean;Verona Run Marathon;verona-run-marathon-verona-15-11-2026;Verona;Italy;Verona, Italy;45.4384958;10.9924122;;0.0;;0.95;;;No pin action required.
+clean;Welschlauf Südsteiermark;welschlauf-sudsteiermark-ehrenhausen-wies-01-05-2027;Ehrenhausen-Wies;Austria;Ehrenhausen-Wies, Austria;46.722456;15.58452;;0.3;;0.95;;;No pin action required.
+clean;Zugspitz Ultratrail Garmisch-Partenkirchen;zugspitz-ultratrail-garmisch-partenkirchen-garmisch-partenkirchen-18-06-2026;Garmisch-Partenkirchen;Germany;Garmisch-Partenkirchen, Germany;47.482204;11.116756;;1.9;;0.95;;;No pin action required.
+clean;Vienna Summer Night Race;vienna-summer-night-race-wien-18-06-2026;Wien;Austria;Wien, Austria;48.216704;16.393019;;1.8;;0.95;;;No pin action required.
+clean;CampUS Run Stuttgart;campus-run-stuttgart-stuttgart-18-06-2026;Stuttgart;Germany;Stuttgart, Germany;48.7413921;9.0951792;;7.5;;0.95;;;No pin action required.
+clean;Legdener Mittsommernachtslauf;legdener-mittsommernachtslauf-legden-19-06-2026;Legden;Germany;Legden, Germany;52.037936;7.1037835;;0.8;;0.95;;;No pin action required.
+clean;MidSummerRun Hamburg;midsummerrun-hamburg-hamburg-19-06-2026;Hamburg;Germany;Hamburg, Germany;53.643053;10.073764;;11.4;;0.95;;;No pin action required.
+clean;Sonnenwendlauf Markkleeberg Winter-Edition;sonnenwendlauf-markkleeberg-winter-edition-markkleeberg-19-06-2026;Markkleeberg;Germany;Markkleeberg, Germany;51.2785751;12.3718819;;0.0;;0.95;;;No pin action required.
+clean;Altstadtlauf Heppenheim;altstadtlauf-heppenheim-heppenheim-19-06-2026;Heppenheim;Germany;Heppenheim, Germany;49.6423321;8.642148;;2.0;;0.95;;;No pin action required.
+clean;Wallauer Mittsommerlauf;wallauer-mittsommerlauf-hofheim-wallau-19-06-2026;Hofheim-Wallau;Germany;Hofheim-Wallau, Germany;50.0640791;8.3648901;;6.1;;0.95;;;No pin action required.
+clean;Seelbach-Schwarzwald-Sonnwendlauf;seelbach-schwarzwald-sonnwendlauf-seelbach-19-06-2026;Seelbach;Germany;Seelbach, Germany;48.31018;7.938145;;0.5;;0.95;;;No pin action required.
+clean;Burgberglauf Gehrden;burgberglauf-gehrden-gehrden-20-06-2026;Gehrden;Germany;Gehrden, Germany;52.313508;9.6008438;;0.0;;0.95;;;No pin action required.
+clean;Horremer Abendlauf Kerpen;horremer-abendlauf-kerpen-kerpen-20-06-2026;Kerpen;Germany;Kerpen, Germany;50.911261;6.7107268;;4.8;;0.95;;;No pin action required.
+clean;Traunsee-Halbmarathon Ebensee - Gmunden;traunsee-halbmarathon-ebensee-gmunden-ebensee-am-traunsee-20-06-2026;Ebensee am Traunsee;Austria;Ebensee am Traunsee, Austria;47.8122366;13.7741666;;0.0;;0.95;;;No pin action required.
+clean;Muddy Angel Run Dresden;muddy-angel-run-dresden-dresden-20-06-2026;Dresden;Germany;Dresden, Germany;51.022816;13.79697;;5.1;;0.95;;;No pin action required.
+clean;Rats-Run Sulzbach-Rosenberg;rats-run-sulzbach-rosenberg-sulzbach-rosenberg-21-06-2026;Sulzbach-Rosenberg;Germany;Sulzbach-Rosenberg, Germany;49.4988014;11.7290848;;1.3;;0.95;;;No pin action required.
+clean;Mittsommerlauf Düsseldorf;mittsommerlauf-dusseldorf-dusseldorf-21-06-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.1939081;6.8848126;;8.3;;0.95;;;No pin action required.
+clean;Vechtdal Trail Ommen;vechtdal-trail-ommen-ommen-20-06-2026;Ommen;Netherlands;Ommen, Netherlands;52.510347;6.4524247;;0.0;;0.95;;;No pin action required.
+clean;Allgäu Mittsommer Marsch Sonthofen;allgau-mittsommer-marsch-sonthofen-sonthofen-21-06-2026;Sonthofen;Germany;Sonthofen, Germany;47.5106828;10.2749642;;1.9;;0.95;;;No pin action required.
+clean;Indeland-Triathlon Eschweiler;indeland-triathlon-eschweiler-eschweiler-21-06-2026;Eschweiler;Germany;Eschweiler, Germany;50.8521731;6.2642036;;3.9;;0.95;;;No pin action required.
+clean;Überlingen Run;uberlingen-run-uberlingen-21-06-2026;Überlingen;Germany;Überlingen, Germany;47.7689472;9.1450754;;1.2;;0.95;;;No pin action required.
+info;Ratschings Mountain Trails;ratschings-mountain-trails-ratschings-21-06-2026;Ratschings;Germany;Ratschings, Germany;51.267923;6.532901;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Campus Run Berlin;campus-run-berlin-berlin-25-06-2026;Berlin;Germany;Berlin, Germany;52.453169;13.291379;;10.0;;0.95;;;No pin action required.
+info;Kaiserkrone Trail Scheffau;kaiserkrone-trail-scheffau-scheffau-am-wilden-kaiser-26-06-2026;Scheffau am Wilden Kaiser;Germany;Scheffau am Wilden Kaiser, Germany;50.121784;8.680719;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Midnight Run Reykjavík 104 Reykjavík 21,1 km, 10 km, 5 km;midnight-run-reykjavik-104-reykjavik-21-1-km-10-km-5-km-is-104-reykjavik-25-06-2;IS 104 Reykjavík;Germany;IS 104 Reykjavík, Germany;51.1937835;6.4334846;;48.9;;0.95;;;No pin action required.
+clean;Altstadtfestlauf Lauf an der Pegnitz;altstadtfestlauf-lauf-an-der-pegnitz-lauf-an-der-pegnitz-26-06-2026;Lauf an der Pegnitz;Germany;Lauf an der Pegnitz, Germany;49.5114086;11.2789722;;1.0;;0.95;;;No pin action required.
+clean;Steinhuder Meer-Triathlon;steinhuder-meer-triathlon-steinhude-25-06-2026;Steinhude;Germany;Steinhude, Germany;52.45276;9.3497397;;0.8;;0.95;;;No pin action required.
+info;Xletix Challenge Tirol;xletix-challenge-tirol-kuhtai-27-06-2026;Kühtai;Germany;Kühtai, Germany;53.2497728;10.4197721;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Sauwald Trail Schardenberg;sauwald-trail-schardenberg-schardenberg-27-06-2026;Schardenberg;Austria;Schardenberg, Upper Austria, Austria;48.5195888;13.4972841;;0.0;;0.95;;;No pin action required.
+clean;X-Trail-Breitnau;x-trail-breitnau-breitnau-27-06-2026;Breitnau;Germany;Breitnau, Germany;47.9392607;8.0789154;;0.2;;0.95;;;No pin action required.
+warning;SachsenTrail Breitenbrunn;sachsentrail-breitenbrunn-breitenbrunn-27-06-2026;Breitenbrunn;Germany;Breitenbrunn, Germany;50.456404;12.743606;coordinates_far_from_city;308.9;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+info;Lungauer Tauern Krone Challenge Tamsweg;lungauer-tauern-krone-challenge-tamsweg-tamsweg-27-06-2026;Tamsweg;Germany;Tamsweg, Germany;49.554866;9.494958;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Montafon-Arlberg-Marathon;montafon-arlberg-marathon-st-anton-27-06-2026;St. Anton;Germany;St. Anton, Germany;51.2341228;6.2472597;;0.6;;0.95;;;No pin action required.
+clean;Bever-Lauf Ostbevern;bever-lauf-ostbevern-ostbevern-27-06-2026;Ostbevern;Germany;Ostbevern, Germany;52.0320649;7.8439684;;0.5;;0.95;;;No pin action required.
+clean;Gettingtough Oberhof;gettingtough-oberhof-oberhof-27-06-2026;Oberhof;Germany;Oberhof, Germany;50.7073269;10.7244444;;0.1;;0.95;;;No pin action required.
+info;Aletsch Halbmarathon Bettmeralp;aletsch-halbmarathon-bettmeralp-bettmeralp-28-06-2026;Bettmeralp;Germany;Bettmeralp, Germany;48.751635;9.145575;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Sunrise Run Düsseldorf;sunrise-run-dusseldorf-dusseldorf-28-06-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.1825569;6.9111903;;10.5;;0.95;;;No pin action required.
+warning;Schwalbacher Volkslauf Lauf gegen Armut;schwalbacher-volkslauf-lauf-gegen-armut-schwalbach-28-06-2026;Schwalbach;Germany;Schwalbach, Germany;50.1497186;8.5315695;coordinates_far_from_city;154.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Steinwiesenlauf Hamburg;steinwiesenlauf-hamburg-ellerbek-05-07-2026;Ellerbek;Germany;Ellerbek, Germany;53.647635;9.888435;;0.3;;0.95;;;No pin action required.
+warning;Eßlinger Zeitung-Lauf;e-linger-zeitung-lauf-esslingen-05-07-2026;Esslingen;Germany;Esslingen, Germany;48.7416225;9.3042312;coordinates_far_from_city;239.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Stadionlauf Köln;stadionlauf-koln-koln-05-07-2026;Köln;Germany;Köln, Germany;50.9335055;6.8751167;;6.0;;0.95;;;No pin action required.
+clean;Kraftsolmser Dorflauf Waldsolms;kraftsolmser-dorflauf-waldsolms-waldsolms-05-07-2026;Waldsolms;Germany;Waldsolms, Germany;50.4556612;8.4567897;;3.0;;0.95;;;No pin action required.
+clean;Seiser-Alm-Halbmarathon;seiser-alm-halbmarathon-kastelruth-05-07-2026;Kastelruth;Italy;Kastelruth, South Tyrol, Italy;46.5678425;11.5596852;;4.4;;0.95;;;No pin action required.
+clean;City Run Münster;city-run-munster-munster-05-07-2026;Münster;Germany;Münster, Germany;51.96133242426577;7.626396022676501;;0.2;;0.95;;;No pin action required.
+clean;Ultra-Trail Val d'Aran Pyrenees;ultra-trail-val-d-aran-pyrenees-vielha-e-mijaran-05-07-2026;Vielha e Mijaran;Spain;Vielha e Mijaran, Catalonia, Spain;42.7017572;0.7954744;;0.0;;0.95;;;No pin action required.
+clean;Staffelsee-Panoramalauf Murnau;staffelsee-panoramalauf-murnau-murnau-05-07-2026;Murnau;Germany;Murnau, Germany;47.684213;11.185316;;74.9;;0.95;;;No pin action required.
+clean;Kirchweihlauf Neuendettelsau;kirchweihlauf-neuendettelsau-neuendettelsau-05-07-2026;Neuendettelsau;Germany;Neuendettelsau, Germany;49.2865466;10.787586;;0.2;;0.95;;;No pin action required.
+clean;Sonthofer Citylauf;sonthofer-citylauf-sonthofen-10-07-2026;Sonthofen;Germany;Sonthofen, Germany;47.512886;10.2791548;;1.7;;0.95;;;No pin action required.
+info;Gran Trail Courmayeur;gran-trail-courmayeur-courmayeur-10-07-2026;Courmayeur;Germany;Courmayeur, Germany;52.5190043;13.409291;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Altstadtlauf Köln;altstadtlauf-koln-koln-10-07-2026;Köln;Germany;Köln, Germany;50.9319828;6.9644356;;0.8;;0.95;;;No pin action required.
+clean;Burbacher Windecklauf;burbacher-windecklauf-marxzell-burbach-10-07-2026;Marxzell-Burbach;Germany;Marxzell-Burbach, Germany;48.8758167;8.436951;;0.6;;0.95;;;No pin action required.
+info;Trail Verbier St-Bernard;trail-verbier-st-bernard-verbier-10-07-2026;Verbier;Germany;Verbier, Germany;50.5995659;8.8793986;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Rosengarten Schlern Skymarathon Tiers;rosengarten-schlern-skymarathon-tiers-tiers-11-07-2026;Tiers;Italy;Tiers, South Tyrol, Italy;46.4673482;11.52748;;2.8;;0.95;;;No pin action required.
+clean;Steinenberger Waldlauf;steinenberger-waldlauf-steinenberg-12-07-2026;Steinenberg;Germany;Steinenberg, Germany;48.8597111;9.5499317;;0.0;;0.95;;;No pin action required.
+clean;Stadtlauf Fürstenfeldbruck;stadtlauf-furstenfeldbruck-furstenfeldbruck-12-07-2026;Fürstenfeldbruck;Germany;Fürstenfeldbruck, Germany;48.1777704;11.2523221;;0.3;;0.95;;;No pin action required.
+clean;City Trail Essen;city-trail-essen-essen-12-07-2026;Essen;Germany;Essen, Germany;51.4570387;7.0092077;;0.5;;0.95;;;No pin action required.
+clean;Stadtlauf Düren;stadtlauf-duren-duren-12-07-2026;Düren;Germany;Düren, Germany;50.801834;6.48195;;0.1;;0.95;;;No pin action required.
+clean;Eiger Ultra Trail Grindelwald;eiger-ultra-trail-grindelwald-grindelwald-15-07-2026;Grindelwald;Switzerland;Grindelwald, Switzerland;46.6242733;8.0367462;;0.0;;0.95;;;No pin action required.
+clean;Altstadtlauf Reutlingen;altstadtlauf-reutlingen-reutlingen-17-07-2026;Reutlingen;Germany;Reutlingen, Germany;48.4917556;9.2118276;;0.0;;0.95;;;No pin action required.
+info;Engadin Ultra Trail;engadin-ultra-trail-samedan-17-07-2026;Samedan;Germany;Samedan, Germany;48.083493;9.865326;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Volkslauf Rund um Geislar;volkslauf-rund-um-geislar-bonn-17-07-2026;Bonn;Germany;Bonn, Germany;50.7565793;7.125186;;2.9;;0.95;;;No pin action required.
+clean;Lousberglauf Aachen;lousberglauf-aachen-aachen-01-07-2026;Aachen;Germany;Aachen, Germany;50.788602;6.0697404;;1.7;;0.95;;;No pin action required.
+warning;Forster Rosen-Pokal-Lauf;forster-rosen-pokal-lauf-forst-03-07-2026;Forst;Germany;Forst, Germany;51.68256;14.637928;coordinates_far_from_city;512.5;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Brunnenfestlauf Reute;brunnenfestlauf-reute-bad-waldsee-03-07-2026;Bad Waldsee;Germany;Bad Waldsee, Germany;47.9209556;9.7542772;;0.0;;0.95;;;No pin action required.
+warning;Stubai Ultratrail Neustift;stubai-ultratrail-neustift-neustift-03-07-2026;Neustift;Germany;Neustift, Germany;48.5791354;13.1948733;coordinates_far_from_city;107.5;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;Wielemer Viertele Salem-Mittelstenweiler;wielemer-viertele-salem-mittelstenweiler-salem-mittelstenweiler-03-07-2026;Salem-Mittelstenweiler;Germany;Salem-Mittelstenweiler, Germany;47.7502685;9.3359655;coordinates_far_from_city;665.1;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+warning;Drevenacker Abendlauf;drevenacker-abendlauf-hunxe-drevenack-03-07-2026;Hünxe-Drevenack;Germany;Hünxe-Drevenack, Germany;51.735159;11.587628;coordinates_far_from_city;333.8;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Mittsommerlauf Heitersheim;mittsommerlauf-heitersheim-heitersheim-04-07-2026;Heitersheim;Germany;Heitersheim, Germany;47.872152;7.6599129;;0.2;;0.95;;;No pin action required.
+clean;BobbahnRun Winterberg;bobbahnrun-winterberg-winterberg-04-07-2026;Winterberg;Germany;Winterberg, Germany;51.1820201;8.5090996;;2.1;;0.95;;;No pin action required.
+clean;S´Kay Run Erlenbach;s-kay-run-erlenbach-erlenbach-04-07-2026;Erlenbach;Germany;Erlenbach, Germany;49.1714845;9.2598297;;0.7;;0.95;;;No pin action required.
+info;Montafon Totale Trail Silvretta;montafon-totale-trail-silvretta-schruns-04-07-2026;Schruns;Germany;Schruns, Germany;51.459378;7.0386;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+info;Traunsee Bergmarathon Gmunden;traunsee-bergmarathon-gmunden-gmunden-04-07-2026;Gmunden;Germany;Gmunden, Germany;48.237136;9.934623;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Schneekopflauf Schmiedefeld;schneekopflauf-schmiedefeld-schmiedefeld-am-rennsteig-04-07-2026;Schmiedefeld am Rennsteig;Germany;Schmiedefeld am Rennsteig, Germany;50.6024553;10.8167171;;0.7;;0.95;;;No pin action required.
+warning;Panoramalauf Rothenberg;panoramalauf-rothenberg-oberzent-rothenberg-05-07-2026;Oberzent-Rothenberg;Germany;Oberzent-Rothenberg, Germany;48.1364668;11.5574673;coordinates_far_from_city;464.4;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Lauf Rund um die Veste Coburg;lauf-rund-um-die-veste-coburg-coburg-05-07-2026;Coburg;Germany;Coburg, Germany;50.2582226;10.964561;;0.0;;0.95;;;No pin action required.
+info;Stilfserjoch Stelvio Trail Run;stilfserjoch-stelvio-trail-run-prad-am-stilfserjoch-18-07-2026;Prad am Stilfserjoch;Germany;Prad am Stilfserjoch, Germany;47.6833531;11.7685827;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;Hanse-Citylauf Wesel;hanse-citylauf-wesel-wesel-18-07-2026;Wesel;Germany;Wesel, Germany;51.6573154;6.6118096;;0.4;;0.95;;;No pin action required.
+clean;North Pole Marathon Spitzbergen - Spitzbergen 42,195 km;north-pole-marathon-spitzbergen-spitzbergen-42-195-km-longyearbyen-19-07-2026;Longyearbyen;Norway;Longyearbyen, Svalbard, Norway;78.2231558;15.6463656;;0.0;;0.95;;;No pin action required.
+warning;Muppberg-Trailrun Neustadt;muppberg-trailrun-neustadt-neustadt-19-07-2026;Neustadt;Germany;Neustadt, Germany;50.3251848;11.1273948;coordinates_far_from_city;420.6;;0.50;;;"Review the city or pin; the current point is far from the cached city reference."
+clean;Wild & Run Oberkollbach;wild-run-oberkollbach-oberreichenbach-22-07-2026;Oberreichenbach;Germany;Oberreichenbach, Germany;48.7341559;8.6635903;;0.0;;0.95;;;No pin action required.
+clean;Urban Trail Run München;urban-trail-run-munchen-munchen-24-07-2026;München;Germany;München, Germany;48.173975;11.550024;;4.5;;0.95;;;No pin action required.
+clean;Rock the Race Cross-Hindernislauf Würzburg;rock-the-race-cross-hindernislauf-wurzburg-wurzburg-26-07-2026;Würzburg;Germany;Würzburg, Germany;49.795587;9.926229;;0.4;;0.95;;;No pin action required.
+info;Pitz Alpine Glacier Trail;pitz-alpine-glacier-trail-mandarfen-31-07-2026;Mandarfen;Austria;Mandarfen, Sankt Leonhard im Pitztal, Tirol, Austria;46.9686284;10.8709246;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+clean;SüdwestPark FunRun - Nürnberg;sudwestpark-funrun-nurnberg-nurnberg-18-06-2026;Nürnberg;Germany;Nürnberg, Germany;49.453872;11.077298;;0.0;;0.95;;;No pin action required.
+clean;Högl-Berglauf - Ainring;hogl-berglauf-ainring-ainring-19-06-2026;Ainring;Germany;Ainring, Germany;47.8156196;12.9429053;;0.0;;0.95;;;No pin action required.
+clean;Laatzen Leinelauf;laatzen-leinelauf-laatzen-19-06-2026;Laatzen;Germany;Laatzen, Germany;52.3078258;9.8146181;;0.0;;0.95;;;No pin action required.
+clean;Brunsbütteler Citylauf;brunsbutteler-citylauf-brunsbuttel-19-06-2026;Brunsbüttel;Germany;Brunsbüttel, Germany;53.8972549;9.1395423;;0.0;;0.95;;;No pin action required.
+clean;Bargstedter Mittsommernachtslauf;bargstedter-mittsommernachtslauf-bargstedt-19-06-2026;Bargstedt;Germany;Bargstedt, Germany;54.1622399;9.7695501;;0.0;;0.95;;;No pin action required.
+clean;Sielmanns Heidelauf - Dallgow-Döberitz;sielmanns-heidelauf-dallgow-doberitz-dallgow-doberitz-20-06-2026;Dallgow-Döberitz;Germany;Dallgow-Döberitz, Germany;52.5406496;13.0602956;;0.0;;0.95;;;No pin action required.
+warning;BLN 10k - Berlin;bln-10k-berlin-berlin-20-06-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Wald- und Wiesenlauf Hassel;wald-und-wiesenlauf-hassel-hassel-20-06-2026;Hassel;Germany;Hassel, Germany;52.6391075;11.9272675;;0.0;;0.95;;;No pin action required.
+clean;Empor Lauf - Dahme/Mark;empor-lauf-dahme-mark-dahme-mark-20-06-2026;Dahme/Mark;Germany;Dahme/Mark, Germany;51.8699392;13.4284903;;0.0;;0.95;;;No pin action required.
+clean;Fiderepasslauf - Oberstdorf;fiderepasslauf-oberstdorf-oberstdorf-20-06-2026;Oberstdorf;Germany;Oberstdorf, Germany;47.3708539;10.3119292;;0.0;;0.95;;;No pin action required.
+clean;Samstagslauf Großenmeer - Ovelgönne;samstagslauf-gro-enmeer-ovelgonne-ovelgonne-20-06-2026;Ovelgönne;Germany;Ovelgönne, Germany;53.3427799;8.4209977;;0.0;;0.95;;;No pin action required.
+clean;Podbielski Lauf - Karstädt;podbielski-lauf-karstadt-karstadt-20-06-2026;Karstädt;Germany;Karstädt, Germany;53.2883824;11.4893222;;0.0;;0.95;;;No pin action required.
+clean;"Abendlauf ""Baunatal rennt"" KSV Baunatal";abendlauf-baunatal-rennt-ksv-baunatal-baunatal-20-06-2026;Baunatal;Germany;Baunatal, Germany;51.2550775;9.4119007;;0.0;;0.95;;;No pin action required.
+clean;"Trail ""Rund Um Die Sporkenburg"" - Neuhäusel";trail-rund-um-die-sporkenburg-neuhausel-neuhausel-20-06-2026;Neuhäusel;Germany;Neuhäusel, Germany;50.3841642;7.7094272;;0.0;;0.95;;;No pin action required.
+clean;Zweigkanal-Brücken-Marathon - Wallenhorst;zweigkanal-brucken-marathon-wallenhorst-wallenhorst-20-06-2026;Wallenhorst;Germany;Wallenhorst, Germany;52.3494712;8.0162591;;0.0;;0.95;;;No pin action required.
+clean;Altmühlfrankenlauf - Weißenburg in Bayern;altmuhlfrankenlauf-wei-enburg-in-bayern-wei-enburg-in-bayern-20-06-2026;Weißenburg in Bayern;Germany;Weißenburg in Bayern, Germany;49.0305748;10.9718974;;0.0;;0.95;;;No pin action required.
+clean;Cross & Quer in Oberbrügge - Halver;cross-quer-in-oberbrugge-halver-halver-20-06-2026;Halver;Germany;Halver, Germany;51.1874423;7.4987312;;0.0;;0.95;;;No pin action required.
+clean;Marienloher Volkslauf - Paderborn;marienloher-volkslauf-paderborn-paderborn-20-06-2026;Paderborn;Germany;Paderborn, Germany;51.7177044;8.752653;;0.0;;0.95;;;No pin action required.
+clean;Angermünder Wiesel Strandbadlauf am Wolletzsee;angermunder-wiesel-strandbadlauf-am-wolletzsee-angermunde-20-06-2026;Angermünde;Germany;Angermünde, Germany;53.017276;13.9981503;;0.0;;0.95;;;No pin action required.
+clean;Lauf in die Sonne - Leutenbach;lauf-in-die-sonne-leutenbach-leutenbach-21-06-2026;Leutenbach;Germany;Leutenbach, Germany;49.7096512;11.1720678;;0.0;;0.95;;;No pin action required.
+clean;Hunsrück-Trail - Mörschied;hunsruck-trail-morschied-morschied-21-06-2026;Mörschied;Germany;Mörschied, Germany;49.7887533;7.3054504;;0.0;;0.95;;;No pin action required.
+clean;Der Rigolator - Riegel am Kaiserstuhl;der-rigolator-riegel-am-kaiserstuhl-riegel-am-kaiserstuhl-21-06-2026;Riegel am Kaiserstuhl;Germany;Riegel am Kaiserstuhl, Germany;48.1509439;7.7504953;;0.0;;0.95;;;No pin action required.
+clean;Eichberglauf Glottertal;eichberglauf-glottertal-glottertal-21-06-2026;Glottertal;Germany;Glottertal, Germany;48.0485271;7.9544046;;0.0;;0.95;;;No pin action required.
+clean;Apfellauf der Kelterei-Heil - Weilmünster;apfellauf-der-kelterei-heil-weilmunster-weilmunster-21-06-2026;Weilmünster;Germany;Weilmünster, Germany;50.4223522;8.3761422;;0.0;;0.95;;;No pin action required.
+clean;Töpfermarktlauf Bürgel;topfermarktlauf-burgel-burgel-21-06-2026;Bürgel;Germany;Bürgel, Germany;50.9424523;11.7574105;;0.0;;0.95;;;No pin action required.
+clean;Wildes Wendland Trailrunning - Küsten;wildes-wendland-trailrunning-kusten-kusten-21-06-2026;Küsten;Germany;Küsten, Germany;52.9777966;11.063684;;0.0;;0.95;;;No pin action required.
+clean;KSC-Schlossparklauf - Karlsruhe;ksc-schlossparklauf-karlsruhe-karlsruhe-21-06-2026;Karlsruhe;Germany;Karlsruhe, Germany;49.0068705;8.4034195;;0.0;;0.95;;;No pin action required.
+clean;pro kids Lauf - Emmerich am Rhein;pro-kids-lauf-emmerich-am-rhein-emmerich-am-rhein-21-06-2026;Emmerich am Rhein;Germany;Emmerich am Rhein, Germany;51.8322137;6.2428283;;0.0;;0.95;;;No pin action required.
+clean;Meerathon - Meerane;meerathon-meerane-meerane-21-06-2026;Meerane;Germany;Meerane, Germany;50.8427835;12.4581578;;0.0;;0.95;;;No pin action required.
+clean;Störmthaler Seelauf - Großpösna;stormthaler-seelauf-gro-posna-gro-posna-21-06-2026;Großpösna;Germany;Großpösna, Germany;51.2563243;12.4752187;;0.0;;0.95;;;No pin action required.
+clean;Grevesmühlener Stadtlauf;grevesmuhlener-stadtlauf-grevesmuhlen-21-06-2026;Grevesmühlen;Germany;Grevesmühlen, Germany;53.8644705;11.1898839;;0.0;;0.95;;;No pin action required.
+clean;Erfurter Campuslauf;erfurter-campuslauf-erfurt-24-06-2026;Erfurt;Germany;Erfurt, Germany;50.9777974;11.0287364;;0.0;;0.95;;;No pin action required.
+clean;Kirschfestlauf - Naumburg (Saale);kirschfestlauf-naumburg-saale-naumburg-saale-24-06-2026;Naumburg (Saale);Germany;Naumburg (Saale), Germany;51.1525648;11.8099186;;0.0;;0.95;;;No pin action required.
+clean;Campus Run Berlin - Krumme Lanke;campus-run-berlin-krumme-lanke-krumme-lanke-25-06-2026;Krumme Lanke;Germany;Krumme Lanke, Germany;52.7648373;13.5686007;;0.0;;0.95;;;No pin action required.
+clean;Retzbachlauf Gaimersheim;retzbachlauf-gaimersheim-gaimersheim-26-06-2026;Gaimersheim;Germany;Gaimersheim, Germany;48.813935;11.3642803;;0.0;;0.95;;;No pin action required.
+clean;Sonnwendlauf Oy-Mittelberg;sonnwendlauf-oy-mittelberg-oy-mittelberg-26-06-2026;Oy-Mittelberg;Germany;Oy-Mittelberg, Germany;47.6512775;10.4484188;;0.0;;0.95;;;No pin action required.
+clean;Osterrönfelder Moorlauf;osterronfelder-moorlauf-osterronfeld-26-06-2026;Osterrönfeld;Germany;Osterrönfeld, Germany;54.2882722;9.6942571;;0.0;;0.95;;;No pin action required.
+clean;Geiersberglauf Waigolshausen;geiersberglauf-waigolshausen-waigolshausen-26-06-2026;Waigolshausen;Germany;Waigolshausen, Germany;49.9534552;10.1392613;;0.0;;0.95;;;No pin action required.
+clean;Bietigheimer Fackellauf - Bietigheim-Bissingen;bietigheimer-fackellauf-bietigheim-bissingen-bietigheim-bissingen-26-06-2026;Bietigheim-Bissingen;Germany;Bietigheim-Bissingen, Germany;48.9493243;9.1364229;;0.0;;0.95;;;No pin action required.
+clean;Bergischer 6 Stunden Lauf - Remscheid;bergischer-6-stunden-lauf-remscheid-remscheid-27-06-2026;Remscheid;Germany;Remscheid, Germany;51.1798706;7.1943544;;0.0;;0.95;;;No pin action required.
+clean;Deadly Dozen Wolfsburg;deadly-dozen-wolfsburg-wolfsburg-27-06-2026;Wolfsburg;Germany;Wolfsburg, Germany;52.4205588;10.7861682;;0.0;;0.95;;;No pin action required.
+clean;Oberlichtenauer Sommerlauf - Pulsnitz;oberlichtenauer-sommerlauf-pulsnitz-pulsnitz-27-06-2026;Pulsnitz;Germany;Pulsnitz, Germany;51.1825771;14.0139733;;0.0;;0.95;;;No pin action required.
+clean;CherryMan - Witzenhausen;cherryman-witzenhausen-witzenhausen-27-06-2026;Witzenhausen;Germany;Witzenhausen, Germany;51.3331901;9.8434192;;0.0;;0.95;;;No pin action required.
+warning;Hohenschönhausener Gartenlauf - Berlin;hohenschonhausener-gartenlauf-berlin-berlin-27-06-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Landkreislauf Schwandorf;landkreislauf-schwandorf-schwandorf-27-06-2026;Schwandorf;Germany;Schwandorf, Germany;49.3152832;12.0866152;;0.0;;0.95;;;No pin action required.
+clean;Delligser Hilskammlauf - Delligsen;delligser-hilskammlauf-delligsen-delligsen-27-06-2026;Delligsen;Germany;Delligsen, Germany;51.9429111;9.7985793;;0.0;;0.95;;;No pin action required.
+clean;Internationaler Eggelauf - Marsberg;internationaler-eggelauf-marsberg-marsberg-27-06-2026;Marsberg;Germany;Marsberg, Germany;51.4602168;8.8552071;;0.0;;0.95;;;No pin action required.
+clean;Running Paule Marathon - Bad Münder am Deister;running-paule-marathon-bad-munder-am-deister-bad-munder-am-deister-27-06-2026;Bad Münder am Deister;Germany;Bad Münder am Deister, Germany;52.1952894;9.4633959;;0.0;;0.95;;;No pin action required.
+clean;BikeNavy Run - Wurster Nordseeküste;bikenavy-run-wurster-nordseekuste-wurster-nordseekuste-28-06-2026;Wurster Nordseeküste;Germany;Wurster Nordseeküste, Germany;53.7044885;8.568845;;0.0;;0.95;;;No pin action required.
+clean;Eschelbronner Schreinerdorflauf;eschelbronner-schreinerdorflauf-eschelbronn-28-06-2026;Eschelbronn;Germany;Eschelbronn, Germany;49.3216701;8.8628361;;0.0;;0.95;;;No pin action required.
+clean;Trailrun Stammbach;trailrun-stammbach-stammbach-28-06-2026;Stammbach;Germany;Stammbach, Germany;50.1455698;11.6917018;;0.0;;0.95;;;No pin action required.
+clean;Sonnwendlauf Großostheim;sonnwendlauf-gro-ostheim-gro-ostheim-28-06-2026;Großostheim;Germany;Großostheim, Germany;49.913254;9.0684725;;0.0;;0.95;;;No pin action required.
+clean;Hohner See Lauf;hohner-see-lauf-hohn-01-07-2026;Hohn;Germany;Hohn, Germany;54.298156;9.5063907;;0.0;;0.95;;;No pin action required.
+clean;Stadtlauf Saarburg;stadtlauf-saarburg-saarburg-03-07-2026;Saarburg;Germany;Saarburg, Germany;49.6082527;6.548746;;0.0;;0.95;;;No pin action required.
+clean;Heuchelberg Trail - Leingarten;heuchelberg-trail-leingarten-leingarten-04-07-2026;Leingarten;Germany;Leingarten, Germany;49.1434266;9.1240565;;0.0;;0.95;;;No pin action required.
+clean;Kit Meisterschaft - Karlsruhe;kit-meisterschaft-karlsruhe-karlsruhe-04-07-2026;Karlsruhe;Germany;Karlsruhe, Germany;49.0068705;8.4034195;;0.0;;0.95;;;No pin action required.
+clean;Attler Lauf Wasserburg - Wasserburg am Inn;attler-lauf-wasserburg-wasserburg-am-inn-wasserburg-am-inn-04-07-2026;Wasserburg am Inn;Germany;Wasserburg am Inn, Germany;48.0615171;12.220026;;0.0;;0.95;;;No pin action required.
+clean;Happe Run 'n' Roll - Delbrück;happe-run-n-roll-delbruck-delbruck-04-07-2026;Delbrück;Germany;Delbrück, Germany;51.7649178;8.5594953;;0.0;;0.95;;;No pin action required.
+clean;KinzigCross - Gengenbach;kinzigcross-gengenbach-gengenbach-04-07-2026;Gengenbach;Germany;Gengenbach, Germany;48.4035425;8.0153059;;0.0;;0.95;;;No pin action required.
+clean;Sportivo Orne Lauf - Titisee-Neustadt;sportivo-orne-lauf-titisee-neustadt-titisee-neustadt-04-07-2026;Titisee-Neustadt;Germany;Titisee-Neustadt, Germany;47.9173421;8.1735161;;0.0;;0.95;;;No pin action required.
+clean;Heckenlauf Eicherscheid - Simmerath;heckenlauf-eicherscheid-simmerath-simmerath-04-07-2026;Simmerath;Germany;Simmerath, Germany;50.6072499;6.3005267;;0.0;;0.95;;;No pin action required.
+clean;Oberstdorfer Nebelhornberglauf;oberstdorfer-nebelhornberglauf-oberstdorf-05-07-2026;Oberstdorf;Germany;Oberstdorf, Germany;47.3708539;10.3119292;;0.0;;0.95;;;No pin action required.
+clean;Petersberg Berg-Crosslauf - Marktbergel;petersberg-berg-crosslauf-marktbergel-marktbergel-05-07-2026;Marktbergel;Germany;Marktbergel, Germany;49.4412134;10.3646574;;0.0;;0.95;;;No pin action required.
+clean;InSchildesche Lauf - Bielefeld;inschildesche-lauf-bielefeld-bielefeld-05-07-2026;Bielefeld;Germany;Bielefeld, Germany;52.0191005;8.531007;;0.0;;0.95;;;No pin action required.
+warning;Berlin Running Festival Half Marathon;berlin-running-festival-half-marathon-berlin-05-07-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Dorfener Stadtlauf;dorfener-stadtlauf-dorfen-05-07-2026;Dorfen;Germany;Dorfen, Germany;48.272779;12.1505507;;0.0;;0.95;;;No pin action required.
+clean;Rats-Run - Möckmühl;rats-run-mockmuhl-mockmuhl-05-07-2026;Möckmühl;Germany;Möckmühl, Germany;49.3233013;9.3611411;;0.0;;0.95;;;No pin action required.
+clean;Bieg bez Granic - Frankfurt (Oder);bieg-bez-granic-frankfurt-oder-frankfurt-oder-08-07-2026;Frankfurt (Oder);Germany;Frankfurt (Oder), Germany;52.3412273;14.549452;;0.0;;0.95;;;No pin action required.
+clean;Lauf um den Wolfsberg - Ochsenburg;lauf-um-den-wolfsberg-ochsenburg-ochsenburg-09-07-2026;Ochsenburg;Germany;Ochsenburg, Germany;49.0749176;8.8946844;;0.0;;0.95;;;No pin action required.
+clean;Taubertaltrail - Rothenburg ob der Tauber;taubertaltrail-rothenburg-ob-der-tauber-rothenburg-ob-der-tauber-11-07-2026;Rothenburg ob der Tauber;Germany;Rothenburg ob der Tauber, Germany;49.3658042;10.1629182;;0.0;;0.95;;;No pin action required.
+clean;WertachXrun - Schwabmünchen;wertachxrun-schwabmunchen-schwabmunchen-11-07-2026;Schwabmünchen;Germany;Schwabmünchen, Germany;48.1805562;10.7578121;;0.0;;0.95;;;No pin action required.
+clean;Lauf10 - Wolnzach;lauf10-wolnzach-wolnzach-11-07-2026;Wolnzach;Germany;Wolnzach, Germany;48.603;11.6269977;;0.0;;0.95;;;No pin action required.
+clean;Rhön-Grabfeld-Cup – Hausen - Fladungen;rhon-grabfeld-cup-hausen-fladungen-fladungen-11-07-2026;Fladungen;Germany;Fladungen, Germany;50.5210371;10.1458492;;0.0;;0.95;;;No pin action required.
+clean;Tanzenhaider-Weiherlauf - Oberreichenbach;tanzenhaider-weiherlauf-oberreichenbach-oberreichenbach-11-07-2026;Oberreichenbach;Germany;Oberreichenbach, Germany;48.7341559;8.6635903;;0.0;;0.95;;;No pin action required.
+clean;Teufelstisch-Trail - Hinterweidenthal;teufelstisch-trail-hinterweidenthal-hinterweidenthal-11-07-2026;Hinterweidenthal;Germany;Hinterweidenthal, Germany;49.1956519;7.754733;;0.0;;0.95;;;No pin action required.
+clean;Monzinger Wingertslauf - Monzingen;monzinger-wingertslauf-monzingen-monzingen-12-07-2026;Monzingen;Germany;Monzingen, Germany;49.7999154;7.5916448;;0.0;;0.95;;;No pin action required.
+clean;Plankenfelser Waldlauf;plankenfelser-waldlauf-plankenfels-12-07-2026;Plankenfels;Germany;Plankenfels, Germany;49.8939869;11.3445052;;0.0;;0.95;;;No pin action required.
+clean;Brezelfestlauf Speyer;brezelfestlauf-speyer-speyer-12-07-2026;Speyer;Germany;Speyer, Germany;49.3165553;8.433615;;0.0;;0.95;;;No pin action required.
+clean;Gläserner Mönch Lauf - Langenstein;glaserner-monch-lauf-langenstein-langenstein-12-07-2026;Langenstein;Germany;Langenstein, Germany;50.8324488;8.9588248;;0.0;;0.95;;;No pin action required.
+warning;Havellauf Berlin;havellauf-berlin-berlin-12-07-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Gibacht Berglauf Furth im Wald;gibacht-berglauf-furth-im-wald-furth-im-wald-12-07-2026;Furth im Wald;Germany;Furth im Wald, Germany;49.3081639;12.8452826;;0.0;;0.95;;;No pin action required.
+clean;SC Lüchow – Langstrecken auf der Bahn;sc-luchow-langstrecken-auf-der-bahn-luchow-13-07-2026;Lüchow;Germany;Lüchow, Germany;53.6893717;10.5322354;;0.0;;0.95;;;No pin action required.
+clean;Schwanberglauf Iphofen;schwanberglauf-iphofen-iphofen-17-07-2026;Iphofen;Germany;Iphofen, Germany;49.6782889;10.33346;;0.0;;0.95;;;No pin action required.
+clean;Kölner Zoolauf;kolner-zoolauf-koln-17-07-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;Hembser Drei-Dörfer-Lauf - Brakel;hembser-drei-dorfer-lauf-brakel-brakel-17-07-2026;Brakel;Germany;Brakel, Germany;51.7168889;9.1841762;;0.0;;0.95;;;No pin action required.
+clean;Wiesenlauf - Klein Meckelsen;wiesenlauf-klein-meckelsen-klein-meckelsen-18-07-2026;Klein Meckelsen;Germany;Klein Meckelsen, Germany;53.3040039;9.4514145;;0.0;;0.95;;;No pin action required.
+clean;Hakro-Stadtlauf - Schrozberg;hakro-stadtlauf-schrozberg-schrozberg-18-07-2026;Schrozberg;Germany;Schrozberg, Germany;49.3457515;9.9815378;;0.0;;0.95;;;No pin action required.
+clean;Neusitz Lauf;neusitz-lauf-neusitz-18-07-2026;Neusitz;Germany;Neusitz, Germany;49.3711064;10.2227044;;0.0;;0.95;;;No pin action required.
+clean;Karlsfelder Triathlon;karlsfelder-triathlon-karlsfeld-19-07-2026;Karlsfeld;Germany;Karlsfeld, Germany;48.2266316;11.4676387;;0.0;;0.95;;;No pin action required.
+clean;Barbarossa Lauf - Erlenbach am Main;barbarossa-lauf-erlenbach-am-main-erlenbach-am-main-19-07-2026;Erlenbach am Main;Germany;Erlenbach am Main, Germany;49.8089685;9.1635136;;0.0;;0.95;;;No pin action required.
+warning;Mittsommer-Lauf Berlin;mittsommer-lauf-berlin-berlin-19-07-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Sommernachtslauf München;sommernachtslauf-munchen-munchen-22-07-2026;München;Germany;München, Germany;48.1371079;11.5753822;;0.0;;0.95;;;No pin action required.
+clean;Bokeler Windmühlenlauf;bokeler-windmuhlenlauf-bokel-24-07-2026;Bokel;Germany;Bokel, Germany;54.215784;9.7940518;;0.0;;0.95;;;No pin action required.
+clean;Towerman - Stoibermühlsee;towerman-stoibermuhlsee-stoibermuhlsee-24-07-2026;Stoibermühlsee;Germany;Stoibermühlsee, Germany;48.3861752;11.7921685;;0.0;;0.95;;;No pin action required.
+clean;Klettgaulauf;klettgaulauf-klettgau-24-07-2026;Klettgau;Germany;Klettgau, Germany;47.635682;8.4089759;;0.0;;0.95;;;No pin action required.
+clean;Norderney - Meine Insel Lauf;norderney-meine-insel-lauf-norderney-25-07-2026;Norderney;Germany;Norderney, Germany;53.7056126;7.1438175;;0.0;;0.95;;;No pin action required.
+clean;Crazy Runners Frankenwald Trail - Geroldsgrün;crazy-runners-frankenwald-trail-geroldsgrun-geroldsgrun-25-07-2026;Geroldsgrün;Germany;Geroldsgrün, Germany;50.3428907;11.5797447;;0.0;;0.95;;;No pin action required.
+clean;Friesencross - Wangerland;friesencross-wangerland-wangerland-25-07-2026;Wangerland;Germany;Wangerland, Germany;53.6469448;7.9404425;;0.0;;0.95;;;No pin action required.
+clean;Triathlon Bundesliga Hannover Steinhude - Steinhuder Meer;triathlon-bundesliga-hannover-steinhude-steinhuder-meer-steinhuder-meer-25-07-20;Steinhuder Meer;Germany;Steinhuder Meer, Germany;52.4731759;9.3291726;;0.0;;0.95;;;No pin action required.
+clean;Hasborner Freundschaftslauf;hasborner-freundschaftslauf-hasborn-25-07-2026;Hasborn;Germany;Hasborn, Germany;50.0525886;6.910133;;0.0;;0.95;;;No pin action required.
+clean;Augsburger Nachtlauf - Siebentischwald;augsburger-nachtlauf-siebentischwald-siebentischwald-25-07-2026;Siebentischwald;Germany;Siebentischwald, Germany;48.3347399;10.9210872;;0.0;;0.95;;;No pin action required.
+clean;Böblingen Stadtlauf - Sindelfingen;boblingen-stadtlauf-sindelfingen-sindelfingen-26-07-2026;Sindelfingen;Germany;Sindelfingen, Germany;48.7084162;9.0035455;;0.0;;0.95;;;No pin action required.
+clean;Weinheim Trails;weinheim-trails-weinheim-26-07-2026;Weinheim;Germany;Weinheim, Germany;49.5462349;8.6717458;;0.0;;0.95;;;No pin action required.
+clean;Rückenwindlauf - Garching bei München;ruckenwindlauf-garching-bei-munchen-garching-bei-munchen-26-07-2026;Garching bei München;Germany;Garching bei München, Germany;48.2513878;11.6509662;;0.0;;0.95;;;No pin action required.
+clean;Pobershauer Schwarzwassertallauf - Marienberg;pobershauer-schwarzwassertallauf-marienberg-marienberg-26-07-2026;Marienberg;Germany;Marienberg, Germany;50.6507279;13.163188;;0.0;;0.95;;;No pin action required.
+clean;Esenser Volksbanklauf;esenser-volksbanklauf-esens-31-07-2026;Esens;Germany;Esens, Germany;53.6468107;7.6118499;;0.0;;0.95;;;No pin action required.
+clean;SWE Halbmarathon Ettlingen;swe-halbmarathon-ettlingen-ettlingen-01-08-2026;Ettlingen;Germany;Ettlingen, Germany;48.9414188;8.4076347;;0.0;;0.95;;;No pin action required.
+clean;Schwindegger Schlosslauf;schwindegger-schlosslauf-schwindegg-01-08-2026;Schwindegg;Germany;Schwindegg, Germany;48.2720696;12.2611725;;0.0;;0.95;;;No pin action required.
+clean;Mehrstetter Crosslauf - Mehrstetten;mehrstetter-crosslauf-mehrstetten-mehrstetten-01-08-2026;Mehrstetten;Germany;Mehrstetten, Germany;48.3766336;9.5662039;;0.0;;0.95;;;No pin action required.
+clean;Nordkirchener Halbmarathon;nordkirchener-halbmarathon-nordkirchen-02-08-2026;Nordkirchen;Germany;Nordkirchen, Germany;51.7380176;7.5251792;;0.0;;0.95;;;No pin action required.
+clean;Wyker Stadtlauf - Wyk auf Föhr;wyker-stadtlauf-wyk-auf-fohr-wyk-auf-fohr-02-08-2026;Wyk auf Föhr;Germany;Wyk auf Föhr, Germany;54.6892888;8.5561518;;0.0;;0.95;;;No pin action required.
+clean;Tegelberglauf - Schwangau;tegelberglauf-schwangau-schwangau-02-08-2026;Schwangau;Germany;Schwangau, Germany;47.5796844;10.7589108;;0.0;;0.95;;;No pin action required.
+clean;Bärenkopplauf - Waldbreitbach;barenkopplauf-waldbreitbach-waldbreitbach-07-08-2026;Waldbreitbach;Germany;Waldbreitbach, Germany;50.5520464;7.4177638;;0.0;;0.95;;;No pin action required.
+clean;Stauseelauf Bad Wörishofer - Bad Wörishofen;stauseelauf-bad-worishofer-bad-worishofen-bad-worishofen-07-08-2026;Bad Wörishofen;Germany;Bad Wörishofen, Germany;48.0048187;10.5926373;;0.0;;0.95;;;No pin action required.
+clean;Fockbeker Dorflauf;fockbeker-dorflauf-fockbek-07-08-2026;Fockbek;Germany;Fockbek, Germany;54.3065487;9.6067007;;0.0;;0.95;;;No pin action required.
+clean;Schierker Sommerlauf - Wernigerode;schierker-sommerlauf-wernigerode-wernigerode-08-08-2026;Wernigerode;Germany;Wernigerode, Germany;51.8344172;10.7862526;;0.0;;0.95;;;No pin action required.
+warning;Nacht der Zehner - Hamburg;nacht-der-zehner-hamburg-hamburg-08-08-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Shoe Workers Hard Trail-Run - Hauenstein;shoe-workers-hard-trail-run-hauenstein-hauenstein-08-08-2026;Hauenstein;Germany;Hauenstein, Germany;49.1922047;7.8529006;;0.0;;0.95;;;No pin action required.
+clean;Licher Cross-Triathlon;licher-cross-triathlon-lich-08-08-2026;Lich;Germany;Lich, Germany;50.50516;8.84162;;0.0;;0.95;;;No pin action required.
+clean;Stefan Andres Freundschaftslauf - Schweich;stefan-andres-freundschaftslauf-schweich-schweich-09-08-2026;Schweich;Germany;Schweich, Germany;49.8224303;6.7515418;;0.0;;0.95;;;No pin action required.
+clean;The Last Light Backyard Ultra - Frankfurt (Oder);the-last-light-backyard-ultra-frankfurt-oder-frankfurt-oder-14-08-2026;Frankfurt (Oder);Germany;Frankfurt (Oder), Germany;52.3412273;14.549452;;0.0;;0.95;;;No pin action required.
+clean;Josef-Kaderhandt Waldlauf - Menden (Sauerland);josef-kaderhandt-waldlauf-menden-sauerland-menden-sauerland-15-08-2026;Menden (Sauerland);Germany;Menden (Sauerland), Germany;51.43779;7.7953822;;0.0;;0.95;;;No pin action required.
+clean;GaPa Everesting-Festival - Garmisch-Partenkirchen;gapa-everesting-festival-garmisch-partenkirchen-garmisch-partenkirchen-15-08-202;Garmisch-Partenkirchen;Germany;Garmisch-Partenkirchen, Germany;47.4923741;11.0962815;;0.0;;0.95;;;No pin action required.
+clean;Detmolder Residenzlauf;detmolder-residenzlauf-detmold-15-08-2026;Detmold;Germany;Detmold, Germany;51.936284;8.8791526;;0.0;;0.95;;;No pin action required.
+clean;Stadtlauf in Gedern;stadtlauf-in-gedern-gedern-15-08-2026;Gedern;Germany;Gedern, Germany;50.4051;9.2135;;0.0;;0.95;;;No pin action required.
+clean;Kelheimer Volksfestlauf;kelheimer-volksfestlauf-kelheim-15-08-2026;Kelheim;Germany;Kelheim, Germany;48.91849;11.8722777;;0.0;;0.95;;;No pin action required.
+clean;Kerwelauf Hüttenfeld - Lampertheim;kerwelauf-huttenfeld-lampertheim-lampertheim-15-08-2026;Lampertheim;Germany;Lampertheim, Germany;49.6239449;8.4093474;;0.0;;0.95;;;No pin action required.
+clean;Hunsbuckeltrail (HuBuT) - Laubach, Hunsrück;hunsbuckeltrail-hubut-laubach-hunsruck-laubach-16-08-2026;Laubach;Germany;Laubach, Germany;50.0557179;7.5099389;;0.0;;0.95;;;No pin action required.
+clean;Sengbach-Talsperrenlauf - Leichlingen (Rheinland);sengbach-talsperrenlauf-leichlingen-rheinland-leichlingen-rheinland-16-08-2026;Leichlingen (Rheinland);Germany;Leichlingen (Rheinland), Germany;51.103975;7.0164;;0.0;;0.95;;;No pin action required.
+clean;Wössner Halbmarathon - Unterwössen;wossner-halbmarathon-unterwossen-unterwossen-16-08-2026;Unterwössen;Germany;Unterwössen, Germany;47.7357886;12.4594234;;0.0;;0.95;;;No pin action required.
+clean;"Wöhler-Lauf ""Rund um die Aabachtalsperre"" - Bad Wünnenberg";wohler-lauf-rund-um-die-aabachtalsperre-bad-wunnenberg-bad-wunnenberg-16-08-2026;Bad Wünnenberg;Germany;Bad Wünnenberg, Germany;51.5169114;8.6986809;;0.0;;0.95;;;No pin action required.
+clean;Stadtwerke Halle Triathlon - Halle (Saale);stadtwerke-halle-triathlon-halle-saale-halle-saale-16-08-2026;Halle (Saale);Germany;Halle (Saale), Germany;51.4824354;11.9712985;;0.0;;0.95;;;No pin action required.
+clean;Wohldenberger Waldlauf - Holle;wohldenberger-waldlauf-holle-holle-16-08-2026;Holle;Germany;Holle, Germany;52.0872985;10.1605747;;0.0;;0.95;;;No pin action required.
+clean;Volkslauf rund um Zehnhausen - Landau in der Pfalz;volkslauf-rund-um-zehnhausen-landau-in-der-pfalz-landau-in-der-pfalz-21-08-2026;Landau in der Pfalz;Germany;Landau in der Pfalz, Germany;49.1982825;8.1123441;;0.0;;0.95;;;No pin action required.
+clean;Herxheimer Abendstraßenlauf mit Pfalzmeisterschaften 10k - Herxheim bei Landau (Pfalz);herxheimer-abendstra-enlauf-mit-pfalzmeisterschaften-10k-herxheim-bei-landau-pfa;Herxheim bei Landau (Pfalz);Germany;Herxheim bei Landau (Pfalz), Germany;49.1463456;8.2156228;;0.0;;0.95;;;No pin action required.
+clean;Ahnepark-Lauf der Laufgemeinschaft Vellmar;ahnepark-lauf-der-laufgemeinschaft-vellmar-vellmar-21-08-2026;Vellmar;Germany;Vellmar, Germany;51.3622487;9.4692331;;0.0;;0.95;;;No pin action required.
+clean;Lemgoer Hanselauf;lemgoer-hanselauf-lemgo-21-08-2026;Lemgo;Germany;Lemgo, Germany;52.0280674;8.9012894;;0.0;;0.95;;;No pin action required.
+clean;Exter FlexRun - Vlotho;exter-flexrun-vlotho-vlotho-22-08-2026;Vlotho;Germany;Vlotho, Germany;52.1664861;8.8619172;;0.0;;0.95;;;No pin action required.
+clean;Emder Vielfaltslauf - Emden;emder-vielfaltslauf-emden-emden-22-08-2026;Emden;Germany;Emden, Germany;53.3670541;7.2058304;;0.0;;0.95;;;No pin action required.
+clean;Stadtwerkelauf Delitzsch;stadtwerkelauf-delitzsch-delitzsch-22-08-2026;Delitzsch;Germany;Delitzsch, Germany;51.5255661;12.342857;;0.0;;0.95;;;No pin action required.
+clean;Seven Summits Siegen;seven-summits-siegen-siegen-22-08-2026;Siegen;Germany;Siegen, Germany;50.8751175;8.0256131;;0.0;;0.95;;;No pin action required.
+clean;Jedermanntriathlon - Neustrelitz;jedermanntriathlon-neustrelitz-neustrelitz-22-08-2026;Neustrelitz;Germany;Neustrelitz, Germany;53.3617163;13.0630004;;0.0;;0.95;;;No pin action required.
+clean;Gebirgsmarathon Immenstadt - Immenstadt im Allgäu;gebirgsmarathon-immenstadt-immenstadt-im-allgau-immenstadt-im-allgau-22-08-2026;Immenstadt im Allgäu;Germany;Immenstadt im Allgäu, Germany;47.5713422;10.1888003;;0.0;;0.95;;;No pin action required.
+clean;Michelsmarktlauf - Reichelsheim (Odenwald);michelsmarktlauf-reichelsheim-odenwald-reichelsheim-odenwald-22-08-2026;Reichelsheim (Odenwald);Germany;Reichelsheim (Odenwald), Germany;49.6985;8.8495;;0.0;;0.95;;;No pin action required.
+clean;Muldental-Triathlon - Grimma;muldental-triathlon-grimma-grimma-23-08-2026;Grimma;Germany;Grimma, Germany;51.2383379;12.7287511;;0.0;;0.95;;;No pin action required.
+clean;Hachede-Triathlon - Geesthacht;hachede-triathlon-geesthacht-geesthacht-23-08-2026;Geesthacht;Germany;Geesthacht, Germany;53.4374683;10.3678235;;0.0;;0.95;;;No pin action required.
+warning;Rag Hartfüssler Trail - Saarbrücken;rag-hartfussler-trail-saarbrucken-saarbrucken-23-08-2026;Saarbrücken;Germany;Saarbrücken, Germany;49.234362;6.996379;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+warning;Berliner Straßenlauf - Die Generalprobe;berliner-stra-enlauf-die-generalprobe-berlin-23-08-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Breisgau Triathlon - Malterdingen;breisgau-triathlon-malterdingen-malterdingen-23-08-2026;Malterdingen;Germany;Malterdingen, Germany;48.1621664;7.7951587;;0.0;;0.95;;;No pin action required.
+clean;Breitunger Pleßlauf - Breitungen/Werra;breitunger-ple-lauf-breitungen-werra-breitungen-werra-23-08-2026;Breitungen/Werra;Germany;Breitungen/Werra, Germany;50.7581715;10.3336776;;0.0;;0.95;;;No pin action required.
+clean;Viernheimer Triathlon;viernheimer-triathlon-viernheim-23-08-2026;Viernheim;Germany;Viernheim, Germany;49.5401213;8.5785313;;0.0;;0.95;;;No pin action required.
+clean;Bürostadtlauf Frankfurt - Frankfurt am Main;burostadtlauf-frankfurt-frankfurt-am-main-frankfurt-am-main-27-08-2026;Frankfurt am Main;Germany;Frankfurt am Main, Germany;50.1106444;8.6820917;;0.0;;0.95;;;No pin action required.
+clean;Ibbenbürener Aaseelauf;ibbenburener-aaseelauf-ibbenburen-28-08-2026;Ibbenbüren;Germany;Ibbenbüren, Germany;52.2774772;7.7151417;;0.0;;0.95;;;No pin action required.
+clean;Sommerabendlauf des TuS Köln;sommerabendlauf-des-tus-koln-koln-28-08-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;"Straßenlauf ""Rund um den Holtenauer Leuchtturm"" - Kiel";stra-enlauf-rund-um-den-holtenauer-leuchtturm-kiel-kiel-28-08-2026;Kiel;Germany;Kiel, Germany;54.3227085;10.135555;;0.0;;0.95;;;No pin action required.
+clean;Panoramalauf Rund Um Die Burg Are - Altenahr;panoramalauf-rund-um-die-burg-are-altenahr-altenahr-29-08-2026;Altenahr;Germany;Altenahr, Germany;50.5169469;6.9920517;;0.0;;0.95;;;No pin action required.
+clean;RWW-Ruhrauenlauf - Mülheim an der Ruhr;rww-ruhrauenlauf-mulheim-an-der-ruhr-mulheim-an-der-ruhr-29-08-2026;Mülheim an der Ruhr;Germany;Mülheim an der Ruhr, Germany;51.4272925;6.8829192;;0.0;;0.95;;;No pin action required.
+clean;Beuchaer Triathlon Day - Brandis;beuchaer-triathlon-day-brandis-brandis-29-08-2026;Brandis;Germany;Brandis, Germany;51.3346604;12.6089036;;0.0;;0.95;;;No pin action required.
+clean;Lebacher 12 Stunden Lionslauf;lebacher-12-stunden-lionslauf-lebach-29-08-2026;Lebach;Germany;Lebach, Germany;49.4132377;6.9091348;;0.0;;0.95;;;No pin action required.
+clean;Limlauf Kirkel;limlauf-kirkel-kirkel-29-08-2026;Kirkel;Germany;Kirkel, Germany;49.2833031;7.2333295;;0.0;;0.95;;;No pin action required.
+clean;Altenhainer Weißbiermeile - Frankenberg/Sa.;altenhainer-wei-biermeile-frankenberg-sa-frankenberg-sa-29-08-2026;Frankenberg/Sa.;Germany;Frankenberg/Sa., Germany;50.9110365;13.0331023;;0.0;;0.95;;;No pin action required.
+clean;Sprint Triathlon in Ingelheim - Ingelheim am Rhein;sprint-triathlon-in-ingelheim-ingelheim-am-rhein-ingelheim-am-rhein-30-08-2026;Ingelheim am Rhein;Germany;Ingelheim am Rhein, Germany;49.9752749;8.0547274;;0.0;;0.95;;;No pin action required.
+clean;Kallinchen Triathlon - Zossen;kallinchen-triathlon-zossen-zossen-30-08-2026;Zossen;Germany;Zossen, Germany;52.2159073;13.4488958;;0.0;;0.95;;;No pin action required.
+clean;Otterndorf Triathlon;otterndorf-triathlon-otterndorf-30-08-2026;Otterndorf;Germany;Otterndorf, Germany;53.8073939;8.8956836;;0.0;;0.95;;;No pin action required.
+clean;Covestro Triathlon - Krefeld;covestro-triathlon-krefeld-krefeld-30-08-2026;Krefeld;Germany;Krefeld, Germany;51.3331205;6.5623343;;0.0;;0.95;;;No pin action required.
+clean;Sechtemer Burgenlauf - Bornheim;sechtemer-burgenlauf-bornheim-bornheim-30-08-2026;Bornheim;Germany;Bornheim, Germany;50.7627913;6.9890508;;0.0;;0.95;;;No pin action required.
+warning;Elbe-Triathlon Hamburg;elbe-triathlon-hamburg-hamburg-30-08-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Brombachseetriathlon - Pleinfeld;brombachseetriathlon-pleinfeld-pleinfeld-30-08-2026;Pleinfeld;Germany;Pleinfeld, Germany;49.1053751;10.98564;;0.0;;0.95;;;No pin action required.
+clean;Windmühlenberglauf - Wolfsburg;windmuhlenberglauf-wolfsburg-wolfsburg-30-08-2026;Wolfsburg;Germany;Bezirkssportanlage am Windmühlenberg, Fallersleben, Wolfsburg, Germany;52.396659;10.829273;;4.0;;0.95;;;No pin action required.
+clean;GochNESS-TRIathlon;gochness-triathlon-goch-30-08-2026;Goch;Germany;Goch, Germany;51.6755765;6.1593045;;0.0;;0.95;;;No pin action required.
+clean;Freiburger Laufveranstaltung - Freiburg (Elbe);freiburger-laufveranstaltung-freiburg-elbe-freiburg-elbe-30-08-2026;Freiburg (Elbe);Germany;Freiburg (Elbe), Germany;53.825248;9.28872;;0.0;;0.95;;;No pin action required.
+clean;Riesenbecker Triathlon - Hörstel;riesenbecker-triathlon-horstel-horstel-30-08-2026;Hörstel;Germany;Hörstel, Germany;52.2973664;7.5862462;;0.0;;0.95;;;No pin action required.
+clean;Cross Fun Run Natur-Freizeitlauf für Alle - Ahrensburg;cross-fun-run-natur-freizeitlauf-fur-alle-ahrensburg-ahrensburg-30-08-2026;Ahrensburg;Germany;Ahrensburg, Germany;53.6736529;10.2358999;;0.0;;0.95;;;No pin action required.
+clean;Ökorun in Wächtersbach;okorun-in-wachtersbach-wachtersbach-30-08-2026;Wächtersbach;Germany;Wächtersbach, Germany;50.2724;9.2857;;0.0;;0.95;;;No pin action required.
+clean;Gerhard-Hamann-Gedenklauf-Crosslauf - Krostitz;gerhard-hamann-gedenklauf-crosslauf-krostitz-krostitz-30-08-2026;Krostitz;Germany;Krostitz, Germany;51.462961;12.4486969;;0.0;;0.95;;;No pin action required.
+clean;"Team Magenta Lauf ""Münster""";team-magenta-lauf-munster-munster-03-09-2026;Münster;Germany;Münster, Germany;51.9625101;7.6251879;;0.0;;0.95;;;No pin action required.
+clean;Weikersheimer Kärwelauf;weikersheimer-karwelauf-weikersheim-04-09-2026;Weikersheim;Germany;Weikersheim, Germany;49.4806473;9.8976809;;0.0;;0.95;;;No pin action required.
+clean;Höinger Heidelauf - Ense;hoinger-heidelauf-ense-ense-04-09-2026;Ense;Germany;Ense, Germany;51.502011;7.9722118;;0.0;;0.95;;;No pin action required.
+clean;Weidatalcross - Weißendorf;weidatalcross-wei-endorf-wei-endorf-05-09-2026;Weißendorf;Germany;Weißendorf, Germany;50.6734356;11.9949476;;0.0;;0.95;;;No pin action required.
+clean;WILDMAN Harz - Wildemann;wildman-harz-wildemann-wildemann-05-09-2026;Wildemann;Germany;Wildemann, Germany;51.8274621;10.2836353;;0.0;;0.95;;;No pin action required.
+clean;Kurstadtlauf - Heilbad Heiligenstadt;kurstadtlauf-heilbad-heiligenstadt-heilbad-heiligenstadt-05-09-2026;Heilbad Heiligenstadt;Germany;Heilbad Heiligenstadt, Germany;51.3788295;10.1369526;;0.0;;0.95;;;No pin action required.
+clean;Sparkassenlauf Aurich;sparkassenlauf-aurich-aurich-05-09-2026;Aurich;Germany;Aurich, Germany;53.4695604;7.4823808;;0.0;;0.95;;;No pin action required.
+clean;Brockenlauf Ilsenburg - Ilsenburg (Harz);brockenlauf-ilsenburg-ilsenburg-harz-ilsenburg-harz-05-09-2026;Ilsenburg (Harz);Germany;Ilsenburg (Harz), Germany;51.8667349;10.6831785;;0.0;;0.95;;;No pin action required.
+clean;Cottbuser Triathlon;cottbuser-triathlon-cottbus-05-09-2026;Cottbus;Germany;Cottbus, Germany;51.7567447;14.3357307;;0.0;;0.95;;;No pin action required.
+clean;Herbstwaldlauf des Ski-Club Fretter - Finnentrop;herbstwaldlauf-des-ski-club-fretter-finnentrop-finnentrop-05-09-2026;Finnentrop;Germany;Finnentrop, Germany;51.1729173;7.9724578;;0.0;;0.95;;;No pin action required.
+clean;Zehn Freunde Team Triathlon Darmstadt;zehn-freunde-team-triathlon-darmstadt-darmstadt-06-09-2026;Darmstadt;Germany;Darmstadt, Germany;49.872775;8.651177;;0.0;;0.95;;;No pin action required.
+clean;Rostocker Frauenlauf;rostocker-frauenlauf-rostock-06-09-2026;Rostock;Germany;Rostock, Germany;54.0886707;12.1400211;;0.0;;0.95;;;No pin action required.
+clean;Top Race Germany - Bostalsee;top-race-germany-bostalsee-bostalsee-06-09-2026;Bostalsee;Germany;Bostalsee, Germany;49.5649708;7.0730757;;0.0;;0.95;;;No pin action required.
+clean;Hochheimer Weinbergslauf - Hochheim am Main;hochheimer-weinbergslauf-hochheim-am-main-hochheim-am-main-06-09-2026;Hochheim am Main;Germany;Hochheim am Main, Germany;50.0277;8.3587;;0.0;;0.95;;;No pin action required.
+clean;Kö Meile Düsseldorf;ko-meile-dusseldorf-dusseldorf-06-09-2026;Düsseldorf;Germany;Düsseldorf, Germany;51.2254018;6.7763137;;0.0;;0.95;;;No pin action required.
+clean;Eintracht MainSprint Triathlon - Neu-Isenburg;eintracht-mainsprint-triathlon-neu-isenburg-neu-isenburg-06-09-2026;Neu-Isenburg;Germany;Neu-Isenburg, Germany;50.0464196;8.6717748;;0.0;;0.95;;;No pin action required.
+clean;Bismarckturmlauf - Herford;bismarckturmlauf-herford-herford-06-09-2026;Herford;Germany;Herford, Germany;52.1152245;8.6711118;;0.0;;0.95;;;No pin action required.
+warning;BSV Sommer-Cup - Hamburg;bsv-sommer-cup-hamburg-hamburg-09-09-2026;Hamburg;Germany;Hamburg, Germany;53.5501721;10.0013165;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Kölner gastRUNomie Lauf;kolner-gastrunomie-lauf-koln-10-09-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;10-Teiche-Marathon - Goslar;10-teiche-marathon-goslar-goslar-12-09-2026;Goslar;Germany;Goslar, Germany;51.9059936;10.4266284;;0.0;;0.95;;;No pin action required.
+clean;Weitersburg Halbmarathon;weitersburg-halbmarathon-weitersburg-12-09-2026;Weitersburg;Germany;Weitersburg, Germany;50.412493;7.598594;;0.0;;0.95;;;No pin action required.
+clean;Rudelsburglauf - Bad Kösen - Naumburg (Saale);rudelsburglauf-bad-kosen-naumburg-saale-naumburg-saale-12-09-2026;Naumburg (Saale);Germany;Naumburg (Saale), Germany;51.1525648;11.8099186;;0.0;;0.95;;;No pin action required.
+clean;Deutsche Ultramarathon Meisterschaften 100km - Orankesee;deutsche-ultramarathon-meisterschaften-100km-orankesee-orankesee-12-09-2026;Orankesee;Germany;Orankesee, Germany;52.5487672;13.4823462;;0.0;;0.95;;;No pin action required.
+clean;Klosterlauf Wiedenbrück - Rheda-Wiedenbrück;klosterlauf-wiedenbruck-rheda-wiedenbruck-rheda-wiedenbruck-12-09-2026;Rheda-Wiedenbrück;Germany;Rheda-Wiedenbrück, Germany;51.8428202;8.2985615;;0.0;;0.95;;;No pin action required.
+clean;Zooparklauf Erfurt;zooparklauf-erfurt-erfurt-12-09-2026;Erfurt;Germany;Erfurt, Germany;50.9777974;11.0287364;;0.0;;0.95;;;No pin action required.
+clean;DRK-Hospizlauf - Neustrelitz;drk-hospizlauf-neustrelitz-neustrelitz-12-09-2026;Neustrelitz;Germany;Neustrelitz, Germany;53.3617163;13.0630004;;0.0;;0.95;;;No pin action required.
+clean;Nordhorner Meile;nordhorner-meile-nordhorn-12-09-2026;Nordhorn;Germany;Nordhorn, Germany;52.4359731;7.0707659;;0.0;;0.95;;;No pin action required.
+clean;Sportmeilen Run Rosstal;sportmeilen-run-rosstal-ro-tal-12-09-2026;Roßtal;Germany;Roßtal, Germany;49.3977926;10.8849103;;0.0;;0.95;;;No pin action required.
+clean;Zeuthener Jedermannslauf - Eichwalde;zeuthener-jedermannslauf-eichwalde-eichwalde-13-09-2026;Eichwalde;Germany;Eichwalde, Germany;52.373076;13.6219208;;0.0;;0.95;;;No pin action required.
+clean;Brooks Ruhr Trail Run - Hagen;brooks-ruhr-trail-run-hagen-hagen-13-09-2026;Hagen;Germany;Hagen, Germany;51.3582945;7.473296;;0.0;;0.95;;;No pin action required.
+clean;Zwickau Triathlon;zwickau-triathlon-zwickau-13-09-2026;Zwickau;Germany;Zwickau, Germany;50.7185043;12.4939267;;0.0;;0.95;;;No pin action required.
+clean;Brückenlauf Halbmarathon des ASV Köln;bruckenlauf-halbmarathon-des-asv-koln-koln-13-09-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;Weplauf Hückelhoven;weplauf-huckelhoven-huckelhoven-13-09-2026;Hückelhoven;Germany;Hückelhoven, Germany;51.0552368;6.2247322;;0.0;;0.95;;;No pin action required.
+clean;Algemarin SV3sathlon - Mühltal;algemarin-sv3sathlon-muhltal-muhltal-13-09-2026;Mühltal;Germany;Mühltal, Germany;49.8077;8.6941;;0.0;;0.95;;;No pin action required.
+clean;Laufend Glauben Laufwallfahrt - Werl;laufend-glauben-laufwallfahrt-werl-werl-13-09-2026;Werl;Germany;Werl, Germany;51.5533457;7.9155558;;0.0;;0.95;;;No pin action required.
+warning;Kreuzberger Viertelmarathon - Berlin;kreuzberger-viertelmarathon-berlin-berlin-13-09-2026;Berlin;Germany;Berlin, Germany;52.5173885;13.3951309;shared_coordinates_multiple_places;0.0;;0.65;;;No pin action required.
+clean;Bitburger Stadtlauf;bitburger-stadtlauf-bitburg-13-09-2026;Bitburg;Germany;Bitburg, Germany;49.9732762;6.524947;;0.0;;0.95;;;No pin action required.
+clean;City Move Bielefeld;city-move-bielefeld-bielefeld-13-09-2026;Bielefeld;Germany;Bielefeld, Germany;52.0191005;8.531007;;0.0;;0.95;;;No pin action required.
+clean;Werner-Bünger-Gedenklauf - Havelland;werner-bunger-gedenklauf-havelland-havelland-13-09-2026;Havelland;Germany;Havelland, Germany;52.6244438;12.6847264;;0.0;;0.95;;;No pin action required.
+clean;Womens-Run-Siegen;womens-run-siegen-siegen-13-09-2026;Siegen;Germany;Siegen, Germany;50.8751175;8.0256131;;0.0;;0.95;;;No pin action required.
+clean;Herbstkammlauf - Klingenthal;herbstkammlauf-klingenthal-klingenthal-13-09-2026;Klingenthal;Germany;Klingenthal, Germany;50.3581046;12.4678923;;0.0;;0.95;;;No pin action required.
+clean;Förderturmlauf - Essen;forderturmlauf-essen-essen-17-09-2026;Essen;Germany;Essen, Germany;51.4582235;7.0158171;;0.0;;0.95;;;No pin action required.
+clean;Delbrücker Katharinenlauf;delbrucker-katharinenlauf-delbruck-18-09-2026;Delbrück;Germany;Delbrück, Germany;51.7649178;8.5594953;;0.0;;0.95;;;No pin action required.
+clean;Ladage Lauf - Wennigsen (Deister);ladage-lauf-wennigsen-deister-wennigsen-deister-19-09-2026;Wennigsen (Deister);Germany;Wennigsen (Deister), Germany;52.2762744;9.5671846;;0.0;;0.95;;;No pin action required.
+clean;Hochhausmarathon Köln;hochhausmarathon-koln-koln-19-09-2026;Köln;Germany;Köln, Germany;50.938361;6.959974;;0.0;;0.95;;;No pin action required.
+clean;Center Run - Pösna Park - Großpösna;center-run-posna-park-gro-posna-gro-posna-19-09-2026;Großpösna;Germany;Großpösna, Germany;51.2563243;12.4752187;;0.0;;0.95;;;No pin action required.
+clean;Mühlenlauf in Laar;muhlenlauf-in-laar-laar-19-09-2026;Laar;Germany;Laar, Germany;52.6138228;6.7414485;;0.0;;0.95;;;No pin action required.
+clean;Arberland Ultra Trail - Bodenmais;arberland-ultra-trail-bodenmais-bodenmais-19-09-2026;Bodenmais;Germany;Bodenmais, Germany;49.0792229;13.1082414;;0.0;;0.95;;;No pin action required.
+clean;Messelauf Lauda-Königshofen;messelauf-lauda-konigshofen-lauda-konigshofen-19-09-2026;Lauda-Königshofen;Germany;Lauda-Königshofen, Germany;49.5577854;9.7190669;;0.0;;0.95;;;No pin action required.
+clean;Stadtparklauf Sondershausen;stadtparklauf-sondershausen-sondershausen-19-09-2026;Sondershausen;Germany;Sondershausen, Germany;51.3666041;10.8668419;;0.0;;0.95;;;No pin action required.
+clean;Obernzenner Seelauf;obernzenner-seelauf-obernzenn-19-09-2026;Obernzenn;Germany;Obernzenn, Germany;49.45;10.4667;;0.0;;0.95;;;No pin action required.
+clean;Freimarktslauf Garrel;freimarktslauf-garrel-garrel-19-09-2026;Garrel;Germany;Garrel, Germany;52.9554303;8.0225529;;0.0;;0.95;;;No pin action required.
+clean;Klausdorfer Kranichlauf;klausdorfer-kranichlauf-klausdorf-19-09-2026;Klausdorf;Germany;Klausdorf, Germany;54.4040082;13.0134809;;0.0;;0.95;;;No pin action required.
+clean;Belchen-Berglauf - Schönau im Schwarzwald;belchen-berglauf-schonau-im-schwarzwald-schonau-im-schwarzwald-19-09-2026;Schönau im Schwarzwald;Germany;Schönau im Schwarzwald, Germany;47.7861792;7.8933977;;0.0;;0.95;;;No pin action required.
+clean;Stadtwald-Cross in Lutherstadt Wittenberg;stadtwald-cross-in-lutherstadt-wittenberg-lutherstadt-wittenberg-19-09-2026;Lutherstadt Wittenberg;Germany;Lutherstadt Wittenberg, Germany;51.8666527;12.646761;;0.0;;0.95;;;No pin action required.
+clean;Lauf in die Mönau - Erlangen;lauf-in-die-monau-erlangen-erlangen-19-09-2026;Erlangen;Germany;Erlangen, Germany;49.5977469;11.0037372;;0.0;;0.95;;;No pin action required.
+clean;Duinger Berglauf - Duingen;duinger-berglauf-duingen-duingen-19-09-2026;Duingen;Germany;Duingen, Germany;52.0057957;9.6970268;;0.0;;0.95;;;No pin action required.
+clean;Heidener Teufelslauf;heidener-teufelslauf-heiden-19-09-2026;Heiden;Germany;Heiden, Germany;51.8265212;6.9340589;;0.0;;0.95;;;No pin action required.
+clean;Baaber Heidelauf;baaber-heidelauf-baabe-19-09-2026;Baabe;Germany;Baabe, Germany;54.3602126;13.7043671;;0.0;;0.95;;;No pin action required.
+clean;Dresden Frauenlauf;dresden-frauenlauf-dresden-19-09-2026;Dresden;Germany;Dresden, Germany;51.0493286;13.7381437;;0.0;;0.95;;;No pin action required.
+clean;Hermannslauf Bielefeld;hermannslauf-bielefeld-detmold-26-04-2026;Detmold;Germany;Hermannsdenkmal, 32760 Detmold, Germany;51.9111;8.8391;;3.9;;0.95;;;No pin action required.
+info;NN Marathon Rotterdam;nn-marathon-rotterdam-rotterdam-12-04-2026;Rotterdam;Netherlands;Coolsingel, Rotterdam, Netherlands;51.92195;4.47915;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+info;Schneider Electric Marathon de Paris;schneider-electric-marathon-de-paris-paris-12-04-2026;Paris;France;Avenue des Champs-Elysees, Paris, France;48.8698;2.3078;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+info;Vodafone Prague Marathon;vodafone-prague-marathon-prague-03-05-2026;Prague;Czech Republic;Old Town Square, Prague, Czech Republic;50.0870;14.4208;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+info;Mozart 100 by UTMB;mozart-100-by-utmb-salzburg-05-06-2027;Salzburg;Austria;Kapitelplatz, Salzburg, Austria;47.7973;13.0478;city_level_pin_with_precise_address;0.1;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.
+info;Transvulcania;transvulcania-fuencaliente-de-la-palma-08-05-2027;Fuencaliente de La Palma;Spain;Faro de Fuencaliente, La Palma, Spain;28.4565;-17.8453;no_cached_city_reference;;;0.82;;;Add this city to the geocode cache during the next controlled geocoding run.
+info;Paderborner Osterlauf;paderborner-osterlauf-paderborn-04-04-2026;Paderborn;Germany;Heierswall, 33098 Paderborn, Germany;51.7209;8.7536;city_level_pin_with_precise_address;0.4;;0.72;;;Geocode the precise venue/address and replace city-center pins after review.

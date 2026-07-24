@@ -1,4 +1,5 @@
 import path from "node:path";
+import os from "node:os";
 import { fileURLToPath } from "node:url";
 import http from "node:http";
 import { spawn, spawnSync } from "node:child_process";
@@ -15,6 +16,16 @@ process.env.PLAYWRIGHT_BROWSERS_PATH ||= path.join(
 );
 
 const port = Number(process.env.E2E_PORT || 4174);
+const runToken =
+  process.env.PLAYWRIGHT_RUN_TOKEN ||
+  `${Date.now()}-${process.pid}`;
+const artifactRoot = path.join(
+  os.tmpdir(),
+  "sport-event-map-playwright",
+  runToken
+);
+const testOutputDir = path.join(artifactRoot, "test-results");
+const htmlReportDir = path.join(artifactRoot, "html-report");
 const server = spawn(
   process.execPath,
   [
@@ -101,15 +112,19 @@ try {
     {
       cwd: root,
       env: {
-        ...process.env,
-        E2E_PORT: String(port),
-        E2E_SKIP_WEB_SERVER: "1"
-      },
+      ...process.env,
+      E2E_PORT: String(port),
+      E2E_SKIP_WEB_SERVER: "1",
+      PLAYWRIGHT_OUTPUT_DIR: testOutputDir,
+      PLAYWRIGHT_HTML_REPORT: htmlReportDir
+    },
       stdio: "inherit"
     }
   );
 } finally {
   stopServer();
 }
+
+console.log(`Playwright artifacts: ${artifactRoot}`);
 
 process.exit(result.status ?? 1);

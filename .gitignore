@@ -18,6 +18,7 @@ dist/
 # Local test and browser artifacts
 .playwright-browsers/
 test-results/
+test-results-*/
 playwright-report/
 reports/responsive-screenshots/
 

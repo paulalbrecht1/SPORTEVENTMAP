@@ -3829,10 +3829,6 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
 }
 
 function removeGeneratedPages() {
-  if (!process.argv.includes("--clean")) {
-    return;
-  }
-
   fs.rmSync(EVENT_DIR, {
     recursive: true,
     force: true

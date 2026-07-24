@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-20T11:12:34.972Z",
+  "generated_at": "2026-07-20T13:45:44.655Z",
   "css": "css/style.css",
   "html": "index.html",
   "status": "pass",
@@ -8,22 +8,22 @@
     {
       "name": "small phones",
       "present": true,
-      "matches": 6
+      "matches": 7
     },
     {
       "name": "large phones",
       "present": true,
-      "matches": 19
+      "matches": 21
     },
     {
       "name": "tablets",
       "present": true,
-      "matches": 14
+      "matches": 16
     },
     {
       "name": "small laptops",
       "present": true,
-      "matches": 6
+      "matches": 7
     },
     {
       "name": "common laptops",

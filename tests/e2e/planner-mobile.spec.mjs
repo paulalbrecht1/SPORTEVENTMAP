@@ -28,11 +28,14 @@ test("Mobile discovery and planner have no horizontal overflow", async ({ page }
   );
   await expect(page.locator("#sidebar")).not.toHaveClass(/closed/);
 
-  await panelToggle.click();
+  await page.getByTestId("discovery-panel-close").click();
   await expect(panelToggle).toHaveAttribute(
     "aria-expanded",
     "false"
   );
+  await expect.poll(() =>
+    page.evaluate(() => document.activeElement?.id)
+  ).toBe("toggleSidebar");
   await assertNoHorizontalOverflow(page);
 
   await openEventDrawer(page, longEvent.event_name);
@@ -46,14 +49,16 @@ test("Mobile discovery and planner have no horizontal overflow", async ({ page }
   await expect(page.getByTestId("planner-countdown")).toBeVisible();
 
   await selectPlannerTab(page, "events");
+  await page.getByTestId("planner-event-card").click();
+  await expect(page.getByTestId("planner-events-back")).toBeVisible();
   await expect(page.getByTestId("planner-event-edit-card")).toContainText(longEvent.event_name);
   await assertNoHorizontalOverflow(page);
 
-  await page.getByTestId("planner-section-equipment").click();
-  await expect(page.getByTestId("planner-section-equipment")).toBeVisible();
+  await page.getByTestId("planner-section-equipment-and-nutrition").click();
+  await expect(page.getByTestId("planner-section-equipment-and-nutrition")).toBeVisible();
   await assertNoHorizontalOverflow(page);
 
-  await page.locator(".season-planner-card").evaluate(node => {
+  await page.locator(".platform-pages").evaluate(node => {
     node.scrollTop = node.scrollHeight;
   });
   await assertNoHorizontalOverflow(page);

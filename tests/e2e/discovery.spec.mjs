@@ -48,10 +48,13 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
 
   await waitForEventList(page);
   await page.getByTestId("filter-sport-triathlon").click();
+  await expect(page.locator("#discoveryFilterCount")).toBeVisible();
+  await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
   await expect(page.getByTestId("event-card")).toHaveCount(1);
   await expect(page.getByTestId("event-card").first()).toContainText(tri.event_name);
 
   await page.getByTestId("filter-reset").click();
+  await expect(page.locator("#discoveryFilterCount")).toBeHidden();
   await page.waitForFunction(() =>
     document.querySelectorAll("[data-testid='event-card']").length === 4
   );

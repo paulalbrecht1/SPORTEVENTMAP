@@ -9106,10 +9106,10 @@ function getPossibleDuplicateKeys(rows) {
 
         if (similar) {
           duplicates.add(
-            createEventKey(group[firstIndex])
+            createAdminEventKey(group[firstIndex])
           );
           duplicates.add(
-            createEventKey(group[secondIndex])
+            createAdminEventKey(group[secondIndex])
           );
         }
       }
@@ -9175,7 +9175,7 @@ function getQualityReviewIssue(event, duplicateKeys) {
 
   if (
     duplicateKeys.has(
-      createEventKey(event)
+      createAdminEventKey(event)
     )
   ) {
     return {
@@ -9365,7 +9365,7 @@ function isDateInPast(value) {
   return date < today;
 }
 
-function createEventKey(event) {
+function createAdminEventKey(event) {
   return [
     normalizeQualityReviewName(event.event_name),
     String(event.date || "").trim(),
@@ -9443,7 +9443,7 @@ function formatAdminDateForCsv(date = new Date()) {
 
 function getQualityDecisionForEvent(event) {
   return getAdminQualityReviewDecisions()[
-    createEventKey(event)
+    createAdminEventKey(event)
   ] || null;
 }
 
@@ -9589,7 +9589,7 @@ function getQualityUpdatePayload(action, options = {}) {
 
 async function persistQualityReviewDecision(event, action, options = {}) {
   const eventKey =
-    createEventKey(event);
+    createAdminEventKey(event);
 
   const payload =
     getQualityUpdatePayload(
@@ -9705,7 +9705,7 @@ async function persistQualityReviewDecision(event, action, options = {}) {
 
   localQualityRows =
     localQualityRows.map(row =>
-      createEventKey(row) === eventKey
+      createAdminEventKey(row) === eventKey
         ? applyQualityDecisionToEvent({
             ...row,
             date:
@@ -9877,7 +9877,7 @@ function getDuplicateGroups(rows) {
 
     group.forEach(event => {
       const key =
-        createEventKey(event);
+        createAdminEventKey(event);
 
       if (
         decisions[key]?.decision === "not_duplicate" ||
@@ -9888,7 +9888,7 @@ function getDuplicateGroups(rows) {
 
       const others =
         group.filter(candidate =>
-          createEventKey(candidate) !== key
+          createAdminEventKey(candidate) !== key
         );
 
       if (others.length) {
@@ -10079,7 +10079,7 @@ function getQualityReviewIssues(event, duplicateMap) {
 
   const duplicateCandidates =
     duplicateMap.get(
-      createEventKey(event)
+      createAdminEventKey(event)
     );
 
   if (duplicateCandidates?.length) {
@@ -10153,7 +10153,7 @@ function getQualityAnalysisRows(rows) {
         getQualityScore(issues),
       duplicateCandidates:
         duplicateMap.get(
-          createEventKey(reviewedEvent)
+          createAdminEventKey(reviewedEvent)
         ) || []
     };
   });
@@ -10474,7 +10474,7 @@ function renderQualityPriorityQueue(rows) {
             issues[0];
 
           const eventKey =
-            createEventKey(event);
+            createAdminEventKey(event);
 
           return `
             <article class="admin-quality-priority-item ${score >= 85 ? "is-low-risk" : score >= 65 ? "is-medium-risk" : "is-high-risk"}" data-quality-event-key="${escapeAdminHTML(eventKey)}">
@@ -10708,8 +10708,8 @@ function findQualityEventByKey(key) {
   }
 
   return localQualityRows.find(row =>
-    createEventKey(row) === key ||
-    createEventKey(
+    createAdminEventKey(row) === key ||
+    createAdminEventKey(
       applyQualityDecisionToEvent(row)
     ) === key
   ) || null;

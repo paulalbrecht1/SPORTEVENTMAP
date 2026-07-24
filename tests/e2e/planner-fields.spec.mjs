@@ -36,12 +36,12 @@ test("Planner detail sections can be edited without tab jumps or lost state", as
   await openPlanner(page);
   await selectPlannerTab(page, "events");
 
-  const scrollBefore = await page.locator(".season-planner-card").evaluate(node => node.scrollTop);
+  const scrollBefore = await page.locator(".platform-pages").evaluate(node => node.scrollTop);
 
-  await ensurePlannerSectionOpen(page, "planner-section-equipment");
+  await ensurePlannerSectionOpen(page, "planner-section-equipment-and-nutrition");
   await page.getByTestId("planner-equipment-input").fill("E2E Ersatzbrille");
   await page.getByTestId("planner-equipment-add").click();
-  await expect(page.getByTestId("planner-section-equipment")).toContainText("E2E Ersatzbrille");
+  await expect(page.getByTestId("planner-section-equipment-and-nutrition")).toContainText("E2E Ersatzbrille");
 
   const firstEquipmentCheckbox = page.locator("[data-season-equipment-check]").first();
   await firstEquipmentCheckbox.check();
@@ -49,28 +49,27 @@ test("Planner detail sections can be edited without tab jumps or lost state", as
   await expect(page.getByTestId("planner-tab-events")).toHaveClass(/active/);
   await expect(page.getByTestId("planner-event-edit-card")).toContainText(tri.event_name);
 
-  await ensurePlannerSectionOpen(page, "planner-section-verpflegung");
+  await ensurePlannerSectionOpen(page, "planner-section-equipment-and-nutrition");
   await page.getByTestId("planner-nutrition-trigger").fill("km 10");
   await page.getByTestId("planner-nutrition-product").fill("E2E Gel");
   await page.getByTestId("planner-nutrition-amount").fill("1");
   await page.getByTestId("planner-nutrition-add").click();
-  await expect(page.getByTestId("planner-section-verpflegung")).toContainText("E2E Gel");
+  await expect(page.getByTestId("planner-section-equipment-and-nutrition")).toContainText("E2E Gel");
 
-  await ensurePlannerSectionOpen(page, "planner-section-travel-and-booking");
+  await ensurePlannerSectionOpen(page, "planner-section-travel-and-logistics");
   await page.locator("[data-season-detail-field='logistics.accommodation_status']").selectOption("not_needed");
   await expect(page.locator("[data-season-detail-field='logistics.accommodation_status']")).toHaveValue("not_needed");
 
-  const scrollAfter = await page.locator(".season-planner-card").evaluate(node => node.scrollTop);
+  const scrollAfter = await page.locator(".platform-pages").evaluate(node => node.scrollTop);
   expect(scrollAfter).toBeGreaterThanOrEqual(scrollBefore);
 
   await page.reload();
   await openPlanner(page);
   await selectPlannerTab(page, "events");
-  await ensurePlannerSectionOpen(page, "planner-section-equipment");
-  await expect(page.getByTestId("planner-section-equipment")).toContainText("E2E Ersatzbrille");
-  await ensurePlannerSectionOpen(page, "planner-section-verpflegung");
-  await expect(page.getByTestId("planner-section-verpflegung")).toContainText("E2E Gel");
-  await ensurePlannerSectionOpen(page, "planner-section-travel-and-booking");
+  await ensurePlannerSectionOpen(page, "planner-section-equipment-and-nutrition");
+  await expect(page.getByTestId("planner-section-equipment-and-nutrition")).toContainText("E2E Ersatzbrille");
+  await expect(page.getByTestId("planner-section-equipment-and-nutrition")).toContainText("E2E Gel");
+  await ensurePlannerSectionOpen(page, "planner-section-travel-and-logistics");
   await expect(page.locator("[data-season-detail-field='logistics.accommodation_status']")).toHaveValue("not_needed");
 });
 
@@ -93,6 +92,7 @@ test("Removing one planner event keeps other planned events", async ({ page }) =
     .filter({ hasText: run.event_name })
     .click();
   await expect(page.getByTestId("planner-event-edit-card")).toContainText(run.event_name);
+  await page.getByTestId("planner-event-edit-button").click();
   await page.getByTestId("planner-remove-event").click();
 
   await expect(page.getByTestId("planner-event-list")).not.toContainText(run.event_name);

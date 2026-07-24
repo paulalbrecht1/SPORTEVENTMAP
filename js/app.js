@@ -41,13 +41,23 @@ function updateSidebarToggleState() {
     isExpanded
       ? "Events & Filter schließen"
       : "Events & Filter öffnen";
+  const activeFilterCount =
+    Number(toggleBtn.dataset.activeFilterCount || 0);
+  const accessibleLabel =
+    activeFilterCount > 0
+      ? `${actionLabel}, ${activeFilterCount} aktive Filter`
+      : actionLabel;
 
   toggleBtn.setAttribute(
     "aria-expanded",
     String(isExpanded)
   );
-  toggleBtn.setAttribute("aria-label", actionLabel);
-  toggleBtn.title = actionLabel;
+  toggleBtn.setAttribute("aria-label", accessibleLabel);
+  toggleBtn.title = accessibleLabel;
+  sidebar.setAttribute(
+    "aria-hidden",
+    String(!isExpanded)
+  );
 }
 
 function syncSidebarState() {
@@ -60,8 +70,16 @@ function syncSidebarState() {
     sidebar.classList.contains("closed")
   );
 
+  document.body.classList.toggle(
+    "discovery-panel-open",
+    !sidebar.classList.contains("closed")
+  );
+
   updateSidebarToggleState();
 }
+
+window.updateSidebarToggleState =
+  updateSidebarToggleState;
 
 function setSidebarExpanded(expanded, options = {}) {
   if (!sidebar) {
@@ -201,6 +219,22 @@ function openWelcomeModal() {
   }
 }
 
+function setLandingBackgroundInert(isInert) {
+  document
+    .querySelectorAll(
+      "#topbar, #platformMobileOverlay, #platformMobileMenu, #app, #eventDrawer, #floatingActions, #discoveryFooter, [data-platform-page]"
+    )
+    .forEach(element => {
+      element.toggleAttribute("inert", isInert);
+
+      if (isInert) {
+        element.setAttribute("aria-hidden", "true");
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+}
+
 function showLandingPage(options = {}) {
   if (
     !options.keepHash &&
@@ -216,6 +250,7 @@ function showLandingPage(options = {}) {
   document.body.classList.remove("landing-revealing-app");
   document.body.classList.remove("landing-exiting");
   document.body.classList.add("landing-open");
+  setLandingBackgroundInert(true);
 
   if (typeof trackEvent === "function") {
     trackEvent("landing_viewed", {
@@ -258,6 +293,7 @@ function hideLandingPage(afterHide, options = {}) {
   setTimeout(() => {
     document.body.classList.remove("landing-open");
     document.body.classList.remove("landing-exiting");
+    setLandingBackgroundInert(false);
 
     if (typeof refreshMapLayout === "function") {
       refreshMapLayout();
@@ -581,6 +617,13 @@ function showPlatformRoute(routeInfo, options = {}) {
       ? "events"
       : route;
 
+  if (
+    route !== "planner" &&
+    typeof closeSeasonPlanner === "function"
+  ) {
+    closeSeasonPlanner();
+  }
+
   closePlatformMobileMenu();
   setPlatformActiveRoute(route);
 
@@ -622,16 +665,18 @@ function showPlatformRoute(routeInfo, options = {}) {
 
   if (route === "planner") {
     closeEventDrawerOnly();
-    setPlatformRouteClasses("discovery");
-    showPlatformPage("");
+    setPlatformRouteClasses("planner");
+    showPlatformPage("planner");
 
     if (typeof openSeasonPlanner === "function") {
       openSeasonPlanner();
     }
 
-    if (typeof refreshMapLayout === "function") {
-      refreshMapLayout(180);
-    }
+    document.querySelector(".platform-pages")?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto"
+    });
 
     return;
   }
@@ -713,9 +758,35 @@ function initPlatformShell() {
     document.getElementById("platformMobileMenu");
   const overlay =
     document.getElementById("platformMobileOverlay");
+  const mobileActionButtons =
+    menu?.querySelectorAll("[data-platform-mobile-action]") || [];
+
+  const syncPlatformMobileActions = () => {
+    mobileActionButtons.forEach(button => {
+      const target =
+        document.getElementById(
+          button.dataset.platformMobileAction
+        );
+      const isAvailable = Boolean(
+        target &&
+        !target.hidden &&
+        target.getAttribute("aria-hidden") !== "true" &&
+        target.style.display !== "none"
+      );
+
+      button.hidden = !isAvailable;
+
+      if (isAvailable) {
+        button.textContent =
+          target.textContent.trim();
+      }
+    });
+  };
 
   if (menuButton && menu && overlay) {
     menuButton.addEventListener("click", () => {
+      syncPlatformMobileActions();
+
       const isOpen =
         menu.classList.toggle("open");
 
@@ -735,6 +806,18 @@ function initPlatformShell() {
   if (overlay) {
     overlay.addEventListener("click", closePlatformMobileMenu);
   }
+
+  mobileActionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const target =
+        document.getElementById(
+          button.dataset.platformMobileAction
+        );
+
+      closePlatformMobileMenu();
+      target?.click();
+    });
+  });
 
   document
     .querySelectorAll("[data-platform-route]")
@@ -971,6 +1054,32 @@ if (landingSystemThemeQuery) {
   });
 }
 
+function updateLandingEventCount(eventList) {
+  const sourceEvents =
+    Array.isArray(eventList)
+      ? eventList
+      : typeof events !== "undefined" && Array.isArray(events)
+        ? events
+        : null;
+
+  if (!sourceEvents) {
+    return;
+  }
+
+  const formattedCount =
+    new Intl.NumberFormat("en-US")
+      .format(sourceEvents.length);
+
+  document
+    .querySelectorAll("[data-landing-event-count]")
+    .forEach(element => {
+      element.textContent = formattedCount;
+    });
+}
+
+window.updateLandingEventCount =
+  updateLandingEventCount;
+
 function initLandingPage() {
   const landingPage =
     document.getElementById("landingPage");
@@ -1041,12 +1150,247 @@ function initLandingPage() {
     document.getElementById("landingSearchBtn");
 
   const landingAddEventBtn =
-    document.getElementById("landingAddEventBtn");
+    document.getElementById("homeAddEventBtn");
 
   const landingThemeButtons =
     document.querySelectorAll("[data-landing-theme]");
 
+  const landingMenuButton =
+    document.getElementById("landingMenuBtn");
+
+  const landingMenuCloseButton =
+    document.getElementById("landingMenuCloseBtn");
+
+  const landingMenu =
+    document.getElementById("landingMobileMenu");
+
+  const landingMenuOverlay =
+    document.getElementById("landingMenuOverlay");
+
+  const landingAuthButtons =
+    [
+      document.getElementById("landingAuthBtn"),
+      document.getElementById("landingMobileAuthBtn")
+    ].filter(Boolean);
+
   applyLandingTheme();
+
+  const syncLandingEnglishCtas = () => {
+    if (discoverBtn) {
+      discoverBtn.textContent = "Explore Events";
+    }
+
+    if (seasonBtn) {
+      seasonBtn.textContent = "Open Season Planner";
+    }
+  };
+
+  syncLandingEnglishCtas();
+
+  document.addEventListener(
+    "app-language-changed",
+    syncLandingEnglishCtas
+  );
+
+  updateLandingEventCount();
+
+  let landingMenuReturnFocus = null;
+
+  const closeLandingMenu = () => {
+    if (!landingMenu || !landingMenuButton) {
+      return;
+    }
+
+    landingMenu.classList.remove("open");
+    landingMenuOverlay?.classList.remove("open");
+    landingPage.classList.remove("menu-open");
+    document.body.classList.remove("sem-menu-open");
+    landingMenu.setAttribute("aria-hidden", "true");
+    landingMenuButton.setAttribute("aria-expanded", "false");
+
+    if (landingMenuReturnFocus instanceof HTMLElement) {
+      landingMenuReturnFocus.focus();
+      landingMenuReturnFocus = null;
+    }
+  };
+
+  const openLandingMenu = () => {
+    if (!landingMenu || !landingMenuButton) {
+      return;
+    }
+
+    landingMenuReturnFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : landingMenuButton;
+
+    landingMenu.classList.add("open");
+    landingMenuOverlay?.classList.add("open");
+    landingPage.classList.add("menu-open");
+    document.body.classList.add("sem-menu-open");
+    landingMenu.setAttribute("aria-hidden", "false");
+    landingMenuButton.setAttribute("aria-expanded", "true");
+
+    window.setTimeout(() => {
+      landingMenu
+        .querySelector("a, button")
+        ?.focus();
+    }, 0);
+  };
+
+  landingMenuButton?.addEventListener("click", () => {
+    if (landingMenu?.classList.contains("open")) {
+      closeLandingMenu();
+    } else {
+      openLandingMenu();
+    }
+  });
+
+  landingMenuCloseButton
+    ?.addEventListener("click", closeLandingMenu);
+
+  landingMenuOverlay
+    ?.addEventListener("click", closeLandingMenu);
+
+  landingMenu
+    ?.querySelectorAll("a")
+    .forEach(link => {
+      link.addEventListener("click", closeLandingMenu);
+    });
+
+  document.addEventListener("keydown", event => {
+    if (
+      event.key === "Escape" &&
+      landingMenu?.classList.contains("open")
+    ) {
+      closeLandingMenu();
+    }
+  });
+
+  const loginButton =
+    document.getElementById("loginBtn");
+
+  const profileButton =
+    document.getElementById("profileBtn");
+
+  const isProfileAvailable = () =>
+    Boolean(
+      profileButton &&
+      profileButton.style.display !== "none"
+    );
+
+  const syncLandingAuthButtons = () => {
+    const label =
+      isProfileAvailable()
+        ? "Profile"
+        : "Login";
+
+    landingAuthButtons.forEach(button => {
+      button.textContent = label;
+      button.setAttribute(
+        "aria-label",
+        isProfileAvailable()
+          ? "Open profile"
+          : "Log in"
+      );
+    });
+  };
+
+  const activateLandingAuth = () => {
+    closeLandingMenu();
+
+    if (isProfileAvailable()) {
+      profileButton?.click();
+    } else {
+      loginButton?.click();
+    }
+  };
+
+  landingAuthButtons.forEach(button => {
+    button.addEventListener("click", activateLandingAuth);
+  });
+
+  [loginButton, profileButton]
+    .filter(Boolean)
+    .forEach(button => {
+      new MutationObserver(syncLandingAuthButtons)
+        .observe(button, {
+          attributes: true,
+          attributeFilter: ["style", "hidden", "aria-hidden"]
+        });
+    });
+
+  syncLandingAuthButtons();
+
+  const sportTabs =
+    [...document.querySelectorAll("[data-sport-tab]")];
+
+  const sportPanels =
+    [...document.querySelectorAll("[data-sport-panel]")];
+
+  const activateSportTab = tab => {
+    const sport =
+      tab.dataset.sportTab;
+
+    sportTabs.forEach(button => {
+      const isActive =
+        button === tab;
+
+      button.setAttribute(
+        "aria-selected",
+        isActive ? "true" : "false"
+      );
+      button.tabIndex =
+        isActive ? 0 : -1;
+    });
+
+    sportPanels.forEach(panel => {
+      panel.hidden =
+        panel.dataset.sportPanel !== sport;
+    });
+  };
+
+  sportTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+      activateSportTab(tab);
+    });
+
+    tab.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const direction =
+        event.key === "ArrowRight" ? 1 : -1;
+
+      const nextTab =
+        sportTabs[
+          (index + direction + sportTabs.length) % sportTabs.length
+        ];
+
+      activateSportTab(nextTab);
+      nextTab.focus();
+    });
+  });
+
+  landingPage
+    .querySelectorAll("[data-landing-route]")
+    .forEach(link => {
+      link.addEventListener("click", event => {
+        const route =
+          link.dataset.landingRoute;
+
+        if (!route) {
+          return;
+        }
+
+        event.preventDefault();
+        closeLandingMenu();
+        navigateToPlatformRoute(route);
+      });
+    });
 
   if (brandHomeLink) {
     brandHomeLink.addEventListener("click", goToAppHome);
@@ -1194,6 +1538,33 @@ if (toggleBtn && sidebar) {
     );
   });
 }
+
+const closeDiscoveryPanelBtn =
+  document.getElementById("closeDiscoveryPanelBtn");
+
+function closeDiscoveryPanelAndRestoreFocus() {
+  setSidebarExpanded(false);
+
+  window.requestAnimationFrame(() => {
+    toggleBtn?.focus({ preventScroll: true });
+  });
+}
+
+closeDiscoveryPanelBtn?.addEventListener(
+  "click",
+  closeDiscoveryPanelAndRestoreFocus
+);
+
+document.addEventListener("keydown", event => {
+  if (
+    event.key === "Escape" &&
+    sidebar &&
+    !sidebar.classList.contains("closed") &&
+    document.body.classList.contains("platform-route-discovery")
+  ) {
+    closeDiscoveryPanelAndRestoreFocus();
+  }
+});
 
 
 // FAVORITES VIEW

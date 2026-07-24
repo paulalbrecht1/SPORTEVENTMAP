@@ -25,7 +25,7 @@
   />
 
   <!-- DEIN CSS -->
-  <link rel="stylesheet" href="css/style.css?v=20260720-discovery-controls-v29" />
+  <link rel="stylesheet" href="css/style.css?v=20260724-release-hardening-v43" />
 </head>
 
 <body>
@@ -64,300 +64,336 @@
 
 <section
   id="landingPage"
-  class="landing-page"
+  class="landing-page sem-home"
   aria-label="Sport Event Map landing page"
 >
-  <div class="landing-hero">
-    <div class="landing-brand">
-      <img
-        class="landing-brand-icon"
-        src="assets/brand/sport-event-map-icon.svg"
-        alt=""
-        aria-hidden="true"
-      />
-      <strong>Sport Event Map</strong>
-      <select
-        id="landingLanguageSelect"
-        class="app-language-select"
-        aria-label="Language"
-      >
-        <option value="en">EN</option>
-        <option value="de">DE</option>
-      </select>
-      <nav class="landing-platform-nav" aria-label="Platform navigation">
-        <a href="#/home" data-platform-route="home">Home</a>
-        <a href="#/discovery" data-platform-route="discovery">Discovery</a>
-        <a href="#/events" data-platform-route="events">Event Wiki</a>
-        <a href="#/planner" data-platform-route="planner">Season Planner</a>
-        <a href="#/community" data-platform-route="community">Community</a>
+  <header class="sem-header">
+    <div class="sem-container sem-header-inner">
+      <a class="sem-brand" href="#/home" data-landing-route="home" aria-label="Sport Event Map home">
+        <img src="assets/brand/sport-event-map-icon.svg" alt="" aria-hidden="true" />
+        <span>Sport Event Map</span>
+      </a>
+
+      <nav class="sem-desktop-nav" aria-label="Primary navigation">
+        <a href="#/discovery" data-landing-route="discovery">Discovery</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
+        <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/community" data-landing-route="community">Community</a>
+      </nav>
+
+      <div class="sem-header-actions">
+        <select id="landingLanguageSelect" class="app-language-select" aria-label="Language">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
+        <button class="sem-auth-button" id="landingAuthBtn" type="button">Login</button>
+        <a class="sem-button sem-button-primary sem-header-cta" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+        <button
+          class="sem-menu-button"
+          id="landingMenuBtn"
+          type="button"
+          aria-label="Open navigation"
+          aria-controls="landingMobileMenu"
+          aria-expanded="false"
+        >
+          <span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="sem-menu-overlay" id="landingMenuOverlay"></div>
+  <nav class="sem-mobile-menu" id="landingMobileMenu" aria-label="Mobile navigation" aria-hidden="true">
+    <div class="sem-mobile-menu-head">
+      <strong>Navigation</strong>
+      <button id="landingMenuCloseBtn" type="button" aria-label="Close navigation">&times;</button>
+    </div>
+    <a href="#/home" data-landing-route="home">Home</a>
+    <a href="#/discovery" data-landing-route="discovery">Discovery</a>
+    <a href="#/planner" data-landing-route="planner">Season Planner</a>
+    <a href="#/events" data-landing-route="events">Event Wiki</a>
+    <a href="#/community" data-landing-route="community">Community</a>
+    <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
+    <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+  </nav>
+
+  <main>
+    <section class="sem-hero" aria-labelledby="sem-home-title">
+      <div class="sem-container sem-hero-grid">
+        <div class="sem-hero-copy">
+          <p class="sem-eyebrow">Sport events. One season.</p>
+          <h1 id="sem-home-title">Find your next race.<br><span>Build your entire season.</span></h1>
+          <p class="sem-hero-description">Discover running, trail, ultra and triathlon events across Germany and Europe. Compare races, save your favorites and turn them into a realistic season plan.</p>
+          <div class="sem-actions">
+            <button class="sem-button sem-button-primary" type="button" id="landingDiscoverBtn">Explore Events</button>
+            <button class="sem-button sem-button-secondary" type="button" id="landingSeasonBtn">Open Season Planner</button>
+          </div>
+          <p class="sem-hero-note"><span aria-hidden="true">✓</span> No spreadsheets. No scattered race tabs. Everything in one place.</p>
+        </div>
+
+        <div class="sem-product-frame sem-hero-product" aria-label="Product preview showing the event map and season planner" role="img">
+          <div class="sem-browser-bar" aria-hidden="true">
+            <span></span><span></span><span></span>
+            <strong>sporteventmap.com</strong>
+          </div>
+          <div class="sem-preview-shell" aria-hidden="true">
+            <div class="sem-preview-topbar">
+              <b>Sport Event Map</b>
+              <span>Discovery</span>
+              <span>Season Planner</span>
+              <i></i>
+            </div>
+            <div class="sem-preview-body">
+              <aside class="sem-preview-list">
+                <div class="sem-mini-search">Find your next race...</div>
+                <div class="sem-mini-filters"><span>Running</span><span>2026</span></div>
+                <article class="sem-mini-event">
+                  <span class="sem-mini-status">Registration open</span>
+                  <strong>Berlin Half Marathon</strong>
+                  <small>12 Apr 2026 · Berlin</small>
+                  <b>21.1 km</b>
+                </article>
+                <article class="sem-mini-event sem-mini-event-muted">
+                  <span class="sem-mini-status">Registration open</span>
+                  <strong>Black Forest Trail</strong>
+                  <small>9 May 2026 · Freiburg</small>
+                </article>
+              </aside>
+              <div class="sem-preview-map">
+                <span class="sem-road sem-road-one"></span>
+                <span class="sem-road sem-road-two"></span>
+                <i class="sem-pin sem-pin-one"></i>
+                <i class="sem-pin sem-pin-two"></i>
+                <i class="sem-pin sem-pin-three"></i>
+                <article class="sem-next-race-card">
+                  <div><span>Next race</span><b>Berlin Half Marathon</b></div>
+                  <strong>84 <small>days</small></strong>
+                  <em>A</em>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sem-trust" aria-label="Platform status">
+      <div class="sem-container sem-trust-row">
+        <p><strong data-landing-event-count aria-live="polite">Loading</strong> <span>events and growing</span></p>
+        <p><span class="sem-trust-dot" aria-hidden="true"></span>Germany &amp; Europe</p>
+        <p><span class="sem-trust-dot" aria-hidden="true"></span>Running · Trail · Ultra · Triathlon</p>
+        <p><span class="sem-trust-dot" aria-hidden="true"></span>Structured event information</p>
+      </div>
+    </section>
+
+    <section class="sem-section sem-workflow" aria-labelledby="sem-workflow-title">
+      <div class="sem-container">
+        <div class="sem-section-heading">
+          <p class="sem-eyebrow">One connected workflow</p>
+          <h2 id="sem-workflow-title">From race discovery to race day</h2>
+          <p>Sport Event Map connects event discovery, detailed race information and personal season planning in one workflow.</p>
+        </div>
+        <ol class="sem-workflow-list">
+          <li>
+            <span>01</span>
+            <h3>Discover</h3>
+            <p>Search events by sport, location, date, distance and registration status.</p>
+          </li>
+          <li>
+            <span>02</span>
+            <h3>Compare and save</h3>
+            <p>Open structured event information, compare options and save the races that matter to you.</p>
+          </li>
+          <li>
+            <span>03</span>
+            <h3>Plan your season</h3>
+            <p>Turn saved events into a realistic season with priorities, countdowns and training blocks.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sem-section sem-features" aria-labelledby="sem-features-title">
+      <div class="sem-container">
+        <div class="sem-section-heading sem-section-heading-wide">
+          <p class="sem-eyebrow">Built around your race calendar</p>
+          <h2 id="sem-features-title">Everything you need to plan your racing season</h2>
+        </div>
+        <div class="sem-feature-grid">
+          <a class="sem-feature-card" href="#/discovery" data-landing-route="discovery">
+            <span class="sem-feature-icon sem-icon-map" aria-hidden="true"></span>
+            <h3>Interactive event map</h3>
+            <p>Explore events geographically and keep the map, results and event details synchronized.</p>
+            <em>Explore Discovery <span aria-hidden="true">→</span></em>
+          </a>
+          <a class="sem-feature-card" href="#/discovery" data-landing-route="discovery">
+            <span class="sem-feature-icon sem-icon-filter" aria-hidden="true"></span>
+            <h3>Powerful event filters</h3>
+            <p>Filter by sport, distance, date, location and registration status without losing your search context.</p>
+            <em>Filter events <span aria-hidden="true">→</span></em>
+          </a>
+          <a class="sem-feature-card" href="#/events" data-landing-route="events">
+            <span class="sem-feature-icon sem-icon-info" aria-hidden="true"></span>
+            <h3>Structured event details</h3>
+            <p>Find course information, cut-offs, registration details, race-day information and official sources.</p>
+            <em>Open Event Wiki <span aria-hidden="true">→</span></em>
+          </a>
+          <a class="sem-feature-card" href="#/discovery" data-landing-route="discovery">
+            <span class="sem-feature-icon sem-icon-heart" aria-hidden="true"></span>
+            <h3>Favorites and shortlists</h3>
+            <p>Save interesting events and build a shortlist before committing to your season.</p>
+            <em>Find favorites <span aria-hidden="true">→</span></em>
+          </a>
+          <a class="sem-feature-card" href="#/planner" data-landing-route="planner">
+            <span class="sem-feature-icon sem-icon-calendar" aria-hidden="true"></span>
+            <h3>Personal season planner</h3>
+            <p>Organize A-, B- and C-races, add goals and keep your race calendar realistic.</p>
+            <em>Open planner <span aria-hidden="true">→</span></em>
+          </a>
+          <a class="sem-feature-card" href="#/planner" data-landing-route="planner">
+            <span class="sem-feature-icon sem-icon-timer" aria-hidden="true"></span>
+            <h3>Countdown and preparation</h3>
+            <p>See what race is next and track the information that matters before race day.</p>
+            <em>Start planning <span aria-hidden="true">→</span></em>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="sem-section sem-spotlight" aria-labelledby="sem-discovery-title">
+      <div class="sem-container sem-spotlight-grid">
+        <div class="sem-spotlight-copy">
+          <p class="sem-eyebrow">Event discovery</p>
+          <h2 id="sem-discovery-title">Explore events without losing context</h2>
+          <p>Search, filter and open event details while the map and event list remain synchronized.</p>
+          <a class="sem-text-link" href="#/discovery" data-landing-route="discovery">Explore the map <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="sem-product-frame sem-discovery-product" aria-label="Discovery interface preview" role="img">
+          <div class="sem-browser-bar" aria-hidden="true"><span></span><span></span><span></span><strong>Event Discovery</strong></div>
+          <div class="sem-discovery-ui" aria-hidden="true">
+            <div class="sem-discovery-controls">
+              <div class="sem-ui-search">Search events, cities and distances</div>
+              <div class="sem-ui-chip-row"><span>Running</span><span>Germany</span><span>Apr – Oct</span></div>
+              <p><strong data-landing-event-count>—</strong> matching events</p>
+            </div>
+            <div class="sem-discovery-results">
+              <div class="sem-result-stack">
+                <article><i></i><div><strong>Hamburg Marathon</strong><span>26 Apr · Hamburg · 42.2 km</span></div></article>
+                <article><i></i><div><strong>Rhein Trail Challenge</strong><span>17 May · Koblenz · 32 km</span></div></article>
+                <article><i></i><div><strong>City Triathlon</strong><span>7 Jun · Berlin · Olympic</span></div></article>
+              </div>
+              <div class="sem-result-map"><i></i><i></i><i></i><i></i><span class="sem-map-route"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sem-section sem-spotlight sem-spotlight-planner" aria-labelledby="sem-planner-title">
+      <div class="sem-container sem-spotlight-grid">
+        <div class="sem-spotlight-copy">
+          <p class="sem-eyebrow">Season planner</p>
+          <h2 id="sem-planner-title">Build a season you can actually execute</h2>
+          <p>Prioritize your races, avoid crowded race periods and keep every important event in one personal overview.</p>
+          <ul class="sem-check-list">
+            <li>Countdown to the next race</li>
+            <li>A/B/C race priorities</li>
+            <li>Calendar and season overview</li>
+            <li>Goals, notes and race results</li>
+          </ul>
+          <a class="sem-text-link" href="#/planner" data-landing-route="planner">Start planning <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="sem-product-frame sem-planner-product" aria-label="Season planner interface preview" role="img">
+          <div class="sem-browser-bar" aria-hidden="true"><span></span><span></span><span></span><strong>My 2026 season</strong></div>
+          <div class="sem-planner-ui" aria-hidden="true">
+            <div class="sem-planner-summary">
+              <div><span>Next race</span><strong>Berlin Half Marathon</strong><small>12 Apr · Priority A</small></div>
+              <b>84 <small>days</small></b>
+            </div>
+            <div class="sem-season-stats"><span><b>5</b> planned races</span><span><b>2</b> key races</span><span><b>24</b> weeks</span></div>
+            <div class="sem-season-line"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="sem-season-events">
+              <article><em>A</em><div><strong>Berlin Half Marathon</strong><span>April · Goal 01:38</span></div></article>
+              <article><em>B</em><div><strong>Black Forest Trail</strong><span>May · Build race</span></div></article>
+              <article><em>C</em><div><strong>City Night Run</strong><span>July · Tune-up race</span></div></article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sem-section sem-sports" aria-labelledby="sem-sports-title">
+      <div class="sem-container sem-sports-layout">
+        <div class="sem-section-heading">
+          <p class="sem-eyebrow">Made for the start line</p>
+          <h2 id="sem-sports-title">Built for endurance athletes</h2>
+          <p>Choose your discipline and see the event information that supports better race decisions.</p>
+        </div>
+        <div class="sem-sport-explorer">
+          <div class="sem-sport-tabs" role="tablist" aria-label="Endurance sports">
+            <button type="button" id="sportTabRunning" role="tab" aria-selected="true" aria-controls="sportPanelRunning" data-sport-tab="running">Running</button>
+            <button type="button" id="sportTabTrail" role="tab" aria-selected="false" aria-controls="sportPanelTrail" data-sport-tab="trail">Trail Running</button>
+            <button type="button" id="sportTabUltra" role="tab" aria-selected="false" aria-controls="sportPanelUltra" data-sport-tab="ultra">Ultra Running</button>
+            <button type="button" id="sportTabTriathlon" role="tab" aria-selected="false" aria-controls="sportPanelTriathlon" data-sport-tab="triathlon">Triathlon</button>
+          </div>
+          <div class="sem-sport-panel" id="sportPanelRunning" role="tabpanel" aria-labelledby="sportTabRunning" data-sport-panel="running">
+            <span class="sem-sport-mark">5K—42K</span><div><h3>Running</h3><p>Find road races from local 5K events to major city marathons.</p></div>
+          </div>
+          <div class="sem-sport-panel" id="sportPanelTrail" role="tabpanel" aria-labelledby="sportTabTrail" data-sport-panel="trail" hidden>
+            <span class="sem-sport-mark">TRAIL</span><div><h3>Trail Running</h3><p>Compare terrain, elevation, distance and event location.</p></div>
+          </div>
+          <div class="sem-sport-panel" id="sportPanelUltra" role="tabpanel" aria-labelledby="sportTabUltra" data-sport-panel="ultra" hidden>
+            <span class="sem-sport-mark">50K+</span><div><h3>Ultra Running</h3><p>Keep cut-offs, course details and preparation requirements organized.</p></div>
+          </div>
+          <div class="sem-sport-panel" id="sportPanelTriathlon" role="tabpanel" aria-labelledby="sportTabTriathlon" data-sport-panel="triathlon" hidden>
+            <span class="sem-sport-mark">SWIM<br>BIKE<br>RUN</span><div><h3>Triathlon</h3><p>Plan race distances, priorities and your complete multi-sport season.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sem-final-cta" aria-labelledby="sem-cta-title">
+      <div class="sem-container sem-cta-inner">
+        <div>
+          <p class="sem-eyebrow">Ready when you are</p>
+          <h2 id="sem-cta-title">Your next season starts with the right event.</h2>
+          <p>Explore the event database, save the races that inspire you and build a season that fits your goals.</p>
+        </div>
+        <div class="sem-actions">
+          <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Find Events</a>
+          <a class="sem-button sem-button-secondary" href="#/planner" data-landing-route="planner">Build My Season</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="sem-footer">
+    <div class="sem-container sem-footer-main">
+      <div class="sem-footer-brand">
+        <a class="sem-brand" href="#/home" data-landing-route="home">
+          <img src="assets/brand/sport-event-map-icon.svg" alt="" aria-hidden="true" />
+          <span>Sport Event Map</span>
+        </a>
+        <p>Discover the right event. Build a better season.</p>
+      </div>
+      <nav aria-label="Footer navigation">
+        <a href="#/discovery" data-landing-route="discovery">Discovery</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
+        <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/community" data-landing-route="community">Community</a>
+        <button type="button" id="homeAddEventBtn">Submit an event</button>
+      </nav>
+      <nav aria-label="Legal links">
+        <a href="imprint.html">Imprint</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="legal.html">Terms</a>
+        <a href="mailto:kontakt@sporteventmap.com">Contact</a>
       </nav>
     </div>
-
-    <div class="landing-hero-main">
-      <div class="landing-hero-content">
-        <span class="landing-kicker">Sport Event Map</span>
-        <h2>
-          <span>Plan your</span>
-          <span>racing</span>
-          <span>season.</span>
-          <strong>Discover races,<br class="landing-mobile-break"> save favorites<br class="landing-mobile-break"> and build your season.</strong>
-        </h2>
-        <p>
-          Discover running, trail, ultra and triathlon events across Europe. Plan A-, B- and C-races with countdowns, training blocks and realistic recovery windows.
-        </p>
-
-        <div class="landing-hero-actions">
-          <button type="button" id="landingDiscoverBtn">
-            Explore Events
-          </button>
-          <button type="button" id="landingSeasonBtn">
-            Plan Your Season
-          </button>
-          <button type="button" id="landingSubmitHeroBtn">
-            Submit Event
-          </button>
-        </div>
-
-        <div class="landing-proof-strip" aria-label="Platform highlights">
-          <span>
-            <strong>994</strong>
-            curated events
-          </span>
-          <span>
-            <strong>Europe</strong>
-            running, trail & triathlon
-          </span>
-          <span>
-            <strong>Map + Planner</strong>
-            from discovery to race calendar
-          </span>
-        </div>
-
-        <div class="landing-search-section">
-          <div class="landing-search-box">
-            <input
-              type="text"
-              id="landingSearchInput"
-              placeholder="Search by event, city, sport, distance or month..."
-              autocomplete="off"
-            />
-            <button type="button" id="landingSearchBtn">
-              Search
-            </button>
-          </div>
-
-          <div class="landing-popular-searches">
-            <span>Popular searches:</span>
-            <button type="button" data-landing-query="Marathon im Oktober">Marathon im Oktober</button>
-            <button type="button" data-landing-query="Triathlon Hamburg">Triathlon Hamburg</button>
-            <button type="button" data-landing-query="Ultramarathon">Ultramarathon</button>
-            <button type="button" data-landing-query="Trailrunning Alpen">Trailrunning Alpen</button>
-            <button type="button" data-landing-query="Halbmarathon Berlin">Halbmarathon Berlin</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="landing-map-visual" aria-hidden="true">
-        <div class="landing-map-panel">
-          <span class="landing-map-line line-one"></span>
-          <span class="landing-map-line line-two"></span>
-          <span class="landing-map-line line-three"></span>
-          <span class="landing-pin pin-running"></span>
-          <span class="landing-pin pin-trail"></span>
-          <span class="landing-pin pin-triathlon"></span>
-          <span class="landing-pin pin-ultra"></span>
-          <span class="landing-pin pin-city"></span>
-        </div>
-
-        <div class="landing-visual-card events-card">
-        <strong>994</strong>
-        <span>Curated events</span>
-        </div>
-        <div class="landing-visual-card sports-card">
-          <strong>Running &middot; Trail &middot; Triathlon</strong>
-          <span>Germany & Europe</span>
-        </div>
-        <div class="landing-visual-card planner-card">
-          <strong>Season Planner</strong>
-          <span>Countdown &middot; Priorities &middot; Warnings</span>
-        </div>
-      </div>
+    <div class="sem-container sem-footer-bottom">
+      <span>© 2026 Sport Event Map</span>
+      <span>Public beta · Event data is reviewed continuously.</span>
     </div>
-  </div>
-
-  <div class="landing-benefits">
-    <article>
-      <span>Map</span>
-      <h3>Discover Events</h3>
-      <p>Find road, trail, ultra and triathlon races by place, date, distance and registration status.</p>
-    </article>
-    <article>
-      <span>Filter</span>
-      <h3>Find Better Timing</h3>
-      <p>Compare race dates and avoid stacking key events too close together.</p>
-    </article>
-    <article>
-      <span>Season</span>
-      <h3>Build Your Season</h3>
-      <p>Organize A-, B- and C-races, track training blocks and keep your calendar realistic.</p>
-    </article>
-  </div>
-
-  <div class="landing-feature landing-screenshot-section">
-    <div>
-      <span>Event discovery</span>
-      <h3>Explore events without losing context</h3>
-      <p>Search, filter and open event details while the map and list stay synchronized.</p>
-    </div>
-    <div class="landing-feature-panel landing-discovery-panel" aria-label="Event discovery highlights">
-      <div class="landing-panel-header">
-        <strong>Discovery engine</strong>
-        <span>Structured filters</span>
-      </div>
-      <div class="landing-panel-grid">
-        <span>Interactive map</span>
-        <strong>994 events</strong>
-        <em>Germany & Europe</em>
-      </div>
-      <div class="landing-panel-row">
-        <span class="landing-status-dot"></span>
-        <strong>Registration Open</strong>
-        <em>Official websites prioritized</em>
-      </div>
-      <div class="landing-panel-tags">
-        <span>Running</span>
-        <span>Trail</span>
-        <span>Triathlon</span>
-        <span>Ultra</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="landing-feature landing-season-section">
-    <div class="landing-feature-panel landing-planner-panel" aria-label="Season planner highlights">
-      <div class="landing-panel-header">
-        <strong>Season overview</strong>
-        <span>Personal plan</span>
-      </div>
-      <div class="landing-countdown-card">
-        <span>Next race</span>
-        <strong>Countdown</strong>
-        <em>Prioritize A / B / C races</em>
-      </div>
-      <div class="landing-mini-chart" aria-hidden="true">
-        <span style="height: 34%"></span>
-        <span style="height: 58%"></span>
-        <span style="height: 42%"></span>
-        <span style="height: 76%"></span>
-        <span style="height: 49%"></span>
-      </div>
-      <div class="landing-panel-row">
-        <span class="landing-warning-dot"></span>
-        <strong>Recovery warnings</strong>
-        <em>Spot races that are too close together</em>
-      </div>
-    </div>
-    <div>
-      <span>Season Planner</span>
-      <h3>Build a season you can actually execute</h3>
-      <ul>
-        <li>Countdown to the next race</li>
-        <li>A/B/C race priorities</li>
-        <li>Monthly race load</li>
-        <li>Recovery warnings for tight spacing</li>
-        <li>Distance and sport distribution</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="landing-return-section">
-    <span>Weekly planning dashboard</span>
-    <h3>Open it before you commit to another race.</h3>
-    <div>
-      <article>
-        <strong>Next race</strong>
-        <p>Keep the next important start date, priority and location visible.</p>
-      </article>
-      <article>
-        <strong>Season overview</strong>
-        <p>Review race load, sport mix, spacing and monthly density in one place.</p>
-      </article>
-      <article>
-        <strong>Training blocks</strong>
-        <p>Spot useful build phases and tight recovery gaps before they surprise you.</p>
-      </article>
-      <article>
-        <strong>Better suggestions</strong>
-        <p>Discover events that fit your current distance, sport and timing profile.</p>
-      </article>
-    </div>
-  </div>
-
-  <div class="landing-quality-section">
-    <span>Data quality</span>
-    <h3>Event data built for planning</h3>
-    <div>
-      <span>Official organizer websites</span>
-      <span>Status checked</span>
-      <span>Date validated</span>
-      <span>Duplicates removed</span>
-      <span>Coordinates reviewed</span>
-    </div>
-  </div>
-
-  <div class="landing-add-event-section">
-    <div>
-      <span>Community data</span>
-      <h3>Missing race?</h3>
-      <p>Submit races with an official website so they can be reviewed before they appear on the map.</p>
-    </div>
-    <button type="button" id="landingAddEventBtn">
-      + Add Event
-    </button>
-  </div>
-
-  <footer class="landing-footer">
-    <div>
-      <strong>Sport Event Map</strong>
-      <span>Discover. Plan. Race. Beta event data may change.</span>
-    </div>
-    <div class="landing-appearance-control" aria-label="Appearance">
-      <div role="group" aria-label="Landing page appearance">
-        <button
-          type="button"
-          class="active"
-          data-landing-theme="system"
-          aria-label="Use system appearance"
-          title="System"
-        >
-          <span aria-hidden="true" class="theme-icon theme-icon-device"></span>
-          <span class="sr-only">System</span>
-        </button>
-        <button
-          type="button"
-          data-landing-theme="light"
-          aria-label="Use light appearance"
-          title="Light"
-        >
-          <span aria-hidden="true" class="theme-icon theme-icon-sun"></span>
-          <span class="sr-only">Light</span>
-        </button>
-        <button
-          type="button"
-          data-landing-theme="dark"
-          aria-label="Use dark appearance"
-          title="Dark"
-        >
-          <span aria-hidden="true" class="theme-icon theme-icon-moon"></span>
-          <span class="sr-only">Dark</span>
-        </button>
-      </div>
-    </div>
-    <nav aria-label="Landing legal links">
-      <a href="imprint.html">Impressum</a>
-      <a href="privacy.html">Datenschutz</a>
-      <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
-    </nav>
   </footer>
 </section>
 
@@ -380,6 +416,12 @@
       <i></i><i></i><i></i>
     </span>
     <span class="sidebar-toggle-label">Events &amp; Filter</span>
+    <span
+      id="discoveryFilterCount"
+      class="sidebar-toggle-filter-count"
+      aria-hidden="true"
+      hidden
+    >0</span>
   </button>
 
   <button
@@ -550,6 +592,13 @@
     data-admin-nav
     style="display:none;"
   >Admin</a>
+  <div class="platform-mobile-menu-actions" aria-label="Account and feedback">
+    <button type="button" data-platform-mobile-action="loginBtn">Login</button>
+    <button type="button" data-platform-mobile-action="registerBtn">Register</button>
+    <button type="button" data-platform-mobile-action="profileBtn" hidden>Profile</button>
+    <button type="button" data-platform-mobile-action="logoutBtn" hidden>Logout</button>
+    <button type="button" data-platform-mobile-action="feedbackBtn">Feedback</button>
+  </div>
 </nav>
 
 <div id="mobileFilterBackdrop"></div>
@@ -617,39 +666,8 @@
     data-platform-page="planner"
     aria-labelledby="plannerPageTitle"
   >
-    <div class="platform-page-shell">
-      <div class="platform-page-hero">
-        <span>Season Planner</span>
-        <h1 id="plannerPageTitle">Plane A-, B- und C-Rennen in einem ruhigen Saisonüberblick.</h1>
-        <p>
-          Der bestehende Planner bleibt erhalten und ist jetzt als eigener
-          Plattformbereich erreichbar. Events können aus Discovery und
-          Eventdetails heraus hinzugefügt werden.
-        </p>
-        <div class="platform-page-actions">
-          <button type="button" id="plannerPageOpenBtn">Season Planner öffnen</button>
-          <a href="#/discovery" data-platform-route="discovery">Events für die Saison finden</a>
-        </div>
-      </div>
-
-      <div class="platform-feature-grid">
-        <article>
-          <span>Countdown</span>
-          <h2>Nächstes Rennen sichtbar halten</h2>
-          <p>Der Planner zeigt gespeicherte Events, Countdown, Prioritäten, Notizen, Kalender und Training Blocks.</p>
-        </article>
-        <article>
-          <span>Login</span>
-          <h2>Persönliche Planung schützen</h2>
-          <p>Wenn du nicht eingeloggt bist, bekommst du eine klare Login-Aufforderung statt eines stillen Fehlers.</p>
-        </article>
-        <article>
-          <span>Sync</span>
-          <h2>Supabase bleibt die Quelle für Nutzerpläne</h2>
-          <p>Akzeptierte Planner-Aktionen verwenden weiterhin die bestehende Favoriten- und Supabase-Synchronisierung.</p>
-        </article>
-      </div>
-    </div>
+    <h1 id="plannerPageTitle" class="sr-only">Season Planner</h1>
+    <div id="plannerPageMount" class="planner-page-mount"></div>
   </section>
 
   <section
@@ -723,7 +741,20 @@
   <div id="app">
 
     <!-- SIDEBAR -->
-    <div id="sidebar">
+    <div id="sidebar" role="complementary" aria-label="Events and filters" aria-hidden="true">
+
+      <div class="discovery-panel-mobile-header">
+        <strong id="discoveryPanelTitle">Events &amp; Filter</strong>
+        <button
+          id="closeDiscoveryPanelBtn"
+          type="button"
+          data-testid="discovery-panel-close"
+          aria-label="Events &amp; Filter schlieÃŸen"
+          title="Events &amp; Filter schlieÃŸen"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
       <!-- SIDEBAR HEADER -->
       <div id="sidebar-header">
@@ -1500,10 +1531,6 @@
 
   <div class="season-planner-card">
 
-    <button id="closeSeasonPlanner" aria-label="Close season planner">
-      &times;
-    </button>
-
     <div class="season-planner-header">
       <span>Season Planning</span>
       <h2>Your Race Calendar</h2>
@@ -1512,13 +1539,13 @@
       </p>
     </div>
 
-    <div class="season-tabs">
-      <button type="button" class="season-tab active" data-season-tab="overview" data-testid="planner-tab-overview">Overview</button>
-      <button type="button" class="season-tab" data-season-tab="events" data-testid="planner-tab-events">Events</button>
-      <button type="button" class="season-tab" data-season-tab="calendar" data-testid="planner-tab-calendar">Calendar</button>
+    <div class="season-tabs" role="tablist" aria-label="Season Planner sections">
+      <button type="button" id="seasonTabOverview" class="season-tab active" role="tab" aria-selected="true" aria-controls="seasonOverviewPanel" tabindex="0" data-season-tab="overview" data-testid="planner-tab-overview">Overview</button>
+      <button type="button" id="seasonTabEvents" class="season-tab" role="tab" aria-selected="false" aria-controls="seasonEventsPanel" tabindex="-1" data-season-tab="events" data-testid="planner-tab-events">Events</button>
+      <button type="button" id="seasonTabCalendar" class="season-tab" role="tab" aria-selected="false" aria-controls="seasonCalendarPanel" tabindex="-1" data-season-tab="calendar" data-testid="planner-tab-calendar">Calendar</button>
     </div>
 
-    <div class="season-tab-panel active" id="seasonOverviewPanel" data-testid="planner-overview-panel">
+    <div class="season-tab-panel active" id="seasonOverviewPanel" role="tabpanel" aria-labelledby="seasonTabOverview" data-testid="planner-overview-panel">
 
       <div class="season-overview-hero">
         <div class="season-next-card">
@@ -1637,7 +1664,7 @@
 
     </div>
 
-    <div class="season-tab-panel" id="seasonEventsPanel" data-testid="planner-events-panel">
+    <div class="season-tab-panel" id="seasonEventsPanel" role="tabpanel" aria-labelledby="seasonTabEvents" data-testid="planner-events-panel">
       <div class="season-events-workspace">
         <aside class="season-events-list-panel" aria-label="Planned races">
           <div class="season-section-title">
@@ -1648,12 +1675,16 @@
         </aside>
 
         <section class="season-events-editor-panel" aria-label="Selected race planner">
+          <button type="button" id="seasonEventsBackButton" class="season-events-back-button" data-testid="planner-events-back">
+            <span aria-hidden="true">&larr;</span>
+            Alle Rennen
+          </button>
           <div id="seasonPriorityList" data-testid="planner-event-editor"></div>
         </section>
       </div>
     </div>
 
-    <div class="season-tab-panel" id="seasonCalendarPanel" data-testid="planner-calendar-panel">
+    <div class="season-tab-panel" id="seasonCalendarPanel" role="tabpanel" aria-labelledby="seasonTabCalendar" data-testid="planner-calendar-panel">
 
       <div class="season-calendar-section">
         <div class="season-calendar-header">
@@ -3297,13 +3328,13 @@
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
-  data-supabase-src="js/supabase.js?v=20260706-header-nav-v67"
+  data-supabase-src="js/supabase.js?v=20260724-release-hardening-v75"
 ></script>
 
-<script defer src="js/events.js?v=20260716-season-stability-v18"></script>
-<script defer src="js/map.js?v=20260716-discovery-default-v68"></script>
-<script defer src="js/search.js?v=20260720-discovery-controls-v68"></script>
-<script defer src="js/app.js?v=20260720-discovery-controls-v70"></script>
+<script defer src="js/events.js?v=20260724-planning-key-v21"></script>
+<script defer src="js/map.js?v=20260720-discovery-responsive-v69"></script>
+<script defer src="js/search.js?v=20260720-discovery-responsive-v69"></script>
+<script defer src="js/app.js?v=20260720-home-landing-v74"></script>
 
 </body>
 </html>

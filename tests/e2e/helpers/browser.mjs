@@ -270,12 +270,30 @@ export async function enablePlannerTestAuth(page) {
 }
 
 export async function openPlanner(page) {
-  await waitForEventList(page);
+  await waitForEventList(page, { openPanel: false });
   await enablePlannerTestAuth(page);
+  const planner = page.getByTestId("season-planner");
   await page.evaluate(async () => {
     await window.openSeasonPlanner();
   });
-  await expect(page.getByTestId("season-planner")).toHaveClass(/open/);
+  await expect(planner).toHaveClass(/open/);
+
+  const plannedEventCount = await page.evaluate(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+      return Array.isArray(stored) ? new Set(stored).size : 0;
+    } catch (_error) {
+      return 0;
+    }
+  });
+
+  if (plannedEventCount > 0) {
+    await expect(page.getByTestId("planner-event-card"))
+      .toHaveCount(plannedEventCount);
+  } else {
+    await expect(page.getByTestId("planner-event-list"))
+      .toContainText(/No planned races|Keine/i);
+  }
 }
 
 export async function selectPlannerTab(page, tabName) {

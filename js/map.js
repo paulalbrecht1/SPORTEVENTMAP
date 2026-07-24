@@ -201,6 +201,8 @@ let markerLayer = createMarkerLayer();
 
 let baseLayer;
 let mapLayoutRefreshTimer;
+let mapLayoutObserver;
+let mapLayoutRefreshInitialized = false;
 let eventsRefreshToken = 0;
 let deferMarkerLayerUpdates = false;
 
@@ -311,6 +313,13 @@ function refreshMapLayout(delay = 0) {
 }
 
 function setupMapLayoutRefresh() {
+  if (mapLayoutRefreshInitialized) {
+    refreshMapLayout(80);
+    return;
+  }
+
+  mapLayoutRefreshInitialized = true;
+
   const mapElement =
     document.getElementById("map");
 
@@ -318,17 +327,22 @@ function setupMapLayoutRefresh() {
     mapElement &&
     typeof ResizeObserver !== "undefined"
   ) {
-    const observer =
+    mapLayoutObserver =
       new ResizeObserver(() => {
         refreshMapLayout(40);
       });
 
-    observer.observe(mapElement);
+    mapLayoutObserver.observe(mapElement);
   }
 
   window.addEventListener(
     "resize",
     () => refreshMapLayout(80)
+  );
+
+  window.addEventListener(
+    "orientationchange",
+    () => refreshMapLayout(120)
   );
 
   document.addEventListener(

@@ -1,14 +1,14 @@
 # Responsive Layout Audit
 
-Generated: 2026-07-20T11:12:34.972Z
+Generated: 2026-07-20T13:45:44.655Z
 Status: pass
 
 ## Breakpoints
 
-- small phones: present (6)
-- large phones: present (19)
-- tablets: present (14)
-- small laptops: present (6)
+- small phones: present (7)
+- large phones: present (21)
+- tablets: present (16)
+- small laptops: present (7)
 - common laptops: present (4)
 - large laptops: present (2)
 - desktop: present (3)

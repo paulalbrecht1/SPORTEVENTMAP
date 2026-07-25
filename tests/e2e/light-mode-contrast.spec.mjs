@@ -367,6 +367,66 @@ test("Light mode keeps Profile account and race history readable", async ({ page
 });
 
 
+test("Light mode keeps global status messages readable and transient", async ({ page }) => {
+  await page.setViewportSize({
+    width: 390,
+    height: 844
+  });
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+  await page.waitForFunction(() =>
+    typeof window.showToast === "function"
+  );
+  await page.evaluate(() => {
+    window.SportEventMapTheme.apply("light", {
+      persist: true
+    });
+    window.showToast(
+      "Season saved",
+      "Your event changes were saved successfully."
+    );
+  });
+
+  const toast = page.locator(".app-toast");
+  await expect(toast).toHaveClass(/is-visible/);
+  await expectReadable(page, ".app-toast strong");
+  await expectReadable(page, ".app-toast span");
+
+  const toastStyles = await toast.evaluate(element => {
+    const style = getComputedStyle(element);
+    const title = getComputedStyle(element.querySelector("strong"));
+    const message = getComputedStyle(element.querySelector("span"));
+    const stack = element.parentElement;
+    const stackRect = stack.getBoundingClientRect();
+
+    return {
+      background: style.backgroundColor,
+      borderLeft: style.borderLeftColor,
+      titleColor: title.color,
+      messageColor: message.color,
+      stackLeft: stackRect.left,
+      stackRight: stackRect.right,
+      viewportWidth: document.documentElement.clientWidth
+    };
+  });
+
+  expect(toastStyles).toMatchObject({
+    background: "rgba(255, 255, 255, 0.98)",
+    borderLeft: "rgb(21, 128, 61)",
+    titleColor: "rgb(18, 32, 25)",
+    messageColor: "rgb(64, 86, 74)"
+  });
+  expect(toastStyles.stackLeft).toBeGreaterThanOrEqual(13);
+  expect(toastStyles.stackRight)
+    .toBeLessThanOrEqual(toastStyles.viewportWidth - 13);
+
+  await expect(toast).toHaveCount(0, {
+    timeout: 3500
+  });
+});
+
+
 test("Light mode keeps Discovery footer, popup and drawer readable", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const run = fixtureByName["SEM E2E Future Run"];

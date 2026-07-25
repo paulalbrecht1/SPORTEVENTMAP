@@ -166,6 +166,21 @@ assert.match(detailPageSource, /theme.js/);
 assert.match(detailPageSource, /ensureControls/);
 pass("global light and dark themes cover application, detail and legal views");
 
+[
+  "Discovery professional visual system",
+  "body.platform-route-discovery:not(.landing-open) .platform-nav a",
+  "body.platform-route-discovery:not(.landing-open) .event-card",
+  "body.platform-route-discovery:not(.landing-open) #sidebar-header",
+  "body.platform-route-discovery:not(.landing-open) #topbar-search input",
+  '.filter-chip[data-filter="Ultramarathon"]'
+].forEach(fragment => {
+  assert.ok(
+    css.includes(fragment),
+    `Professional Discovery styling is missing: ${fragment}`
+  );
+});
+pass("Discovery uses the professional Home-aligned visual system");
+
 assert.doesNotMatch(
   html,
   /href=["']#\/community["']/i,

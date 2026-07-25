@@ -39802,3 +39802,695 @@ html[data-theme="light"] .event-detail-language-control {
   color: #21342a !important;
   box-shadow: inset 0 1px 0 #ffffff;
 }
+
+/* Discovery professional visual system ------------------------------------- */
+body.platform-route-discovery:not(.landing-open) {
+  --discovery-surface: rgba(13, 29, 25, 0.96);
+  --discovery-surface-raised: #10231d;
+  --discovery-surface-soft: rgba(255, 255, 255, 0.055);
+  --discovery-surface-accent: rgba(34, 197, 94, 0.13);
+  --discovery-border: rgba(183, 197, 190, 0.18);
+  --discovery-border-strong: rgba(183, 197, 190, 0.28);
+  --discovery-text: #f7faf8;
+  --discovery-muted: #b7c5be;
+  --discovery-subtle: #82938a;
+  --discovery-shadow: 0 18px 44px rgba(0, 0, 0, 0.22);
+  --discovery-shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.15);
+  font-family: Inter, Arial, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) {
+  --discovery-surface: rgba(255, 255, 255, 0.96);
+  --discovery-surface-raised: #ffffff;
+  --discovery-surface-soft: #f3f7f4;
+  --discovery-surface-accent: rgba(34, 197, 94, 0.1);
+  --discovery-border: rgba(15, 23, 42, 0.12);
+  --discovery-border-strong: rgba(15, 23, 42, 0.2);
+  --discovery-text: #122019;
+  --discovery-muted: #4d6257;
+  --discovery-subtle: #718278;
+  --discovery-shadow: 0 18px 44px rgba(15, 23, 42, 0.11);
+  --discovery-shadow-soft: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  button,
+  input,
+  select,
+  textarea,
+  a
+) {
+  font-family: inherit;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar {
+  border-bottom: 1px solid var(--discovery-border) !important;
+  background: color-mix(in srgb, var(--discovery-surface) 94%, transparent) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07) !important;
+  backdrop-filter: blur(18px) saturate(1.15);
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav {
+  gap: 8px !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav a {
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 999px !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav a:is(
+  :hover,
+  :focus-visible,
+  .active
+) {
+  border-color: rgba(34, 197, 94, 0.35) !important;
+  background: var(--discovery-surface-accent) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.08) !important;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) .platform-nav a:is(
+  :hover,
+  :focus-visible,
+  .active
+) {
+  color: #14532d !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav a:is(:hover, :focus-visible) {
+  transform: translateY(-1px);
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-search input {
+  min-height: 46px !important;
+  height: 46px !important;
+  padding-inline: 48px 18px !important;
+  border: 1px solid var(--discovery-border-strong) !important;
+  border-radius: 16px !important;
+  background: var(--discovery-surface-raised) !important;
+  color: var(--discovery-text) !important;
+  box-shadow:
+    var(--discovery-shadow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  font-size: 0.94rem !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.012em;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-search input::placeholder {
+  color: var(--discovery-subtle) !important;
+  opacity: 1;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-search:focus-within input {
+  border-color: rgba(34, 197, 94, 0.48) !important;
+  box-shadow:
+    0 0 0 4px rgba(34, 197, 94, 0.11),
+    var(--discovery-shadow-soft) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #authArea {
+  gap: 8px !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #authArea :is(button, .app-language-select),
+body.platform-route-discovery:not(.landing-open) #topbarProductActions button {
+  min-height: 40px !important;
+  height: 40px !important;
+  border-radius: 999px !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.005em;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar #authArea #loginBtn {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--discovery-muted) !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar #authArea #loginBtn:is(:hover, :focus-visible) {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-text) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar #authArea #registerBtn {
+  border-color: rgba(34, 197, 94, 0.62) !important;
+  background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 22px rgba(22, 163, 74, 0.2) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #feedbackOpenBtn {
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.16) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar {
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 20px !important;
+  background: var(--discovery-surface) !important;
+  box-shadow: var(--discovery-shadow) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header {
+  padding: 14px !important;
+  gap: 10px !important;
+  border-bottom: 1px solid var(--discovery-border) !important;
+  background: transparent !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .filter-select-card,
+  .filter-accordion,
+  .filter-actions-row
+) {
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 14px !important;
+  background: var(--discovery-surface-raised) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.055) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .filter-select-card {
+  padding: 11px !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .filter-select-card > label,
+  .filter-group-label,
+  .distance-filter-group-title
+) {
+  color: var(--discovery-subtle) !important;
+  font-size: 0.68rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.08em !important;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  #sortSelect,
+  #dateFilter,
+  #dateRangeFilter input,
+  .filter-select-card select
+) {
+  min-height: 42px !important;
+  height: 42px !important;
+  margin-top: 7px !important;
+  padding-inline: 13px 34px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 11px !important;
+  background-color: var(--discovery-surface-soft) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  font-size: 0.82rem !important;
+  font-weight: 650 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .filter-accordion-toggle {
+  min-height: 44px !important;
+  padding: 0 12px !important;
+  color: var(--discovery-text) !important;
+  font-size: 0.78rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.025em !important;
+  text-transform: uppercase;
+}
+
+body.platform-route-discovery:not(.landing-open) .filter-accordion-toggle::after,
+body.platform-route-discovery:not(.landing-open) .filter-accordion-toggle .filter-accordion-icon {
+  border-color: var(--discovery-border-strong) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #filters,
+body.platform-route-discovery:not(.landing-open) .distance-filter-options {
+  gap: 8px !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .filter-chip,
+  .distance-filter-chip,
+  #resetFiltersBtn,
+  #toggleEventCardDensity,
+  #eventListFavoritesToggle,
+  #toggleEventListFullscreen,
+  #eventListPagination button
+) {
+  min-height: 38px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 999px !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.005em;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .filter-chip,
+  .distance-filter-chip,
+  #resetFiltersBtn,
+  #toggleEventCardDensity,
+  #eventListFavoritesToggle,
+  #toggleEventListFullscreen,
+  #eventListPagination button
+):is(:hover, :focus-visible) {
+  transform: translateY(-1px);
+  border-color: rgba(34, 197, 94, 0.34) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.1) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .filter-chip.active,
+  .distance-filter-chip.active,
+  #eventListFavoritesToggle.active,
+  #eventListFavoritesToggle[aria-pressed="true"]
+) {
+  border-color: rgba(34, 197, 94, 0.58) !important;
+  background: linear-gradient(135deg, #168447, #116c3a) !important;
+  color: #ffffff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    0 8px 18px rgba(22, 132, 71, 0.18) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #activeFilterSummary {
+  color: var(--discovery-muted) !important;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventListToolbar {
+  min-height: 58px !important;
+  padding: 10px 14px !important;
+  gap: 8px !important;
+  border-bottom: 1px solid var(--discovery-border) !important;
+  background: var(--discovery-surface) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.045) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventListSummary {
+  color: var(--discovery-text) !important;
+  font-size: 0.88rem !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.015em;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventList {
+  padding: 12px !important;
+  gap: 12px !important;
+  background: transparent !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card {
+  overflow: hidden;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 16px !important;
+  background: var(--discovery-surface-raised) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07) !important;
+  transition:
+    transform 170ms ease,
+    border-color 170ms ease,
+    box-shadow 170ms ease !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card:is(:hover, :focus-within, .active) {
+  transform: translateY(-2px);
+  border-color: rgba(34, 197, 94, 0.38) !important;
+  box-shadow: 0 15px 34px rgba(15, 23, 42, 0.13) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-top {
+  min-height: 70px !important;
+  padding: 14px 14px 12px !important;
+  gap: 12px !important;
+  border-bottom: 1px solid var(--discovery-border) !important;
+  background:
+    linear-gradient(135deg, var(--discovery-surface-accent), transparent 78%) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-title {
+  color: var(--discovery-text) !important;
+  font-size: 0.98rem !important;
+  font-weight: 750 !important;
+  letter-spacing: -0.022em;
+  line-height: 1.3 !important;
+  text-wrap: balance;
+}
+
+body.platform-route-discovery:not(.landing-open) .favorite-btn {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 50% !important;
+  background: var(--discovery-surface-raised) !important;
+  color: #e5485f !important;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.08) !important;
+  font-size: 1rem !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .favorite-btn:is(:hover, :focus-visible, .active) {
+  transform: translateY(-1px);
+  border-color: rgba(229, 72, 95, 0.34) !important;
+  background: rgba(229, 72, 95, 0.1) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-facts-grid {
+  padding: 13px 14px !important;
+  gap: 10px 12px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-facts-grid > div {
+  min-width: 0;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-facts-grid span {
+  color: var(--discovery-subtle) !important;
+  font-size: 0.62rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.075em !important;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-facts-grid strong {
+  margin-top: 4px !important;
+  color: var(--discovery-text) !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  line-height: 1.35 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-status-bar {
+  min-height: 42px !important;
+  margin: 0 12px 12px !important;
+  padding: 7px 9px 7px 11px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 11px !important;
+  background: var(--discovery-surface-soft) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-status-text {
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-status-action {
+  min-height: 30px !important;
+  padding-inline: 10px !important;
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 999px !important;
+  background: var(--discovery-surface-raised) !important;
+  color: var(--discovery-text) !important;
+  font-size: 0.68rem !important;
+  font-weight: 750 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #map {
+  border: 1px solid var(--discovery-border) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--discovery-shadow) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .leaflet-control-zoom,
+  #mapToolsToggle,
+  #mapToolsMenu
+) {
+  border-color: var(--discovery-border) !important;
+  border-radius: 13px !important;
+  box-shadow: var(--discovery-shadow-soft) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #mapToolsToggle {
+  background: var(--discovery-surface) !important;
+  color: var(--discovery-text) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .discovery-footer {
+  font-family: inherit;
+}
+
+body.platform-route-discovery:not(.landing-open) #legalLinks :is(a, button),
+body.platform-route-discovery:not(.landing-open) .discovery-footer-note {
+  font-weight: 600 !important;
+  letter-spacing: -0.005em;
+}
+
+@media (max-width: 900px) {
+  body.platform-route-discovery:not(.landing-open) #sidebar {
+    border-radius: 0 20px 20px 0 !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) .discovery-panel-mobile-header {
+    min-height: 64px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--discovery-border);
+    background: var(--discovery-surface);
+  }
+
+  body.platform-route-discovery:not(.landing-open) .discovery-panel-mobile-header strong {
+    color: var(--discovery-text);
+    font-size: 1rem;
+    font-weight: 750;
+    letter-spacing: -0.02em;
+  }
+}
+
+@media (max-width: 640px) {
+  body.platform-route-discovery:not(.landing-open) #topbar-search input {
+    min-height: 44px !important;
+    height: 44px !important;
+    border-radius: 14px !important;
+    font-size: 0.9rem !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) :is(
+    .filter-chip,
+    .distance-filter-chip,
+    #resetFiltersBtn,
+    #toggleEventCardDensity,
+    #eventListFavoritesToggle,
+    #toggleEventListFullscreen,
+    #eventListPagination button
+  ) {
+    min-height: 44px !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) .event-card {
+    border-radius: 14px !important;
+  }
+}
+
+/* Discovery filter specificity refinements */
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-select-card,
+  .filter-accordion,
+  #dateRangeFilter.active,
+  .distance-filter-group
+) {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-raised) !important;
+  box-shadow: 0 7px 20px rgba(15, 23, 42, 0.055) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-select-card:hover,
+  .filter-select-card:focus-within,
+  .filter-accordion:hover,
+  .filter-accordion:focus-within,
+  .filter-accordion.open
+) {
+  border-color: rgba(34, 197, 94, 0.3) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 10px 24px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-select-card label,
+  .filter-accordion-toggle span,
+  .distance-filter-group-title,
+  .date-range-title,
+  #dateRangeFilter label,
+  .active-filter-label
+) {
+  color: var(--discovery-subtle) !important;
+  font-size: 0.68rem !important;
+  font-weight: 750 !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  #sortSelect,
+  #dateFilter,
+  #dateRangeFilter input[type="date"],
+  .filter-select-card select
+) {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  #sortSelect,
+  #dateFilter,
+  #dateRangeFilter input[type="date"],
+  .filter-select-card select
+):is(:hover, :focus-visible) {
+  border-color: rgba(34, 197, 94, 0.4) !important;
+  background: var(--discovery-surface-raised) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.11) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-distance-card .filter-accordion-toggle {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--discovery-text) !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion:hover .filter-accordion-toggle,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion.open .filter-accordion-toggle,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle:is(:hover, :focus-visible) {
+  background: var(--discovery-surface-accent) !important;
+  color: var(--discovery-text) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle :is(span, strong) {
+  color: inherit !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle strong {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+  font-size: 0.7rem !important;
+  font-weight: 700 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle::after,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle .filter-accordion-icon,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-distance-card .filter-accordion-toggle::after {
+  border-color: var(--discovery-border-strong) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion.open .filter-accordion-toggle::after,
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle:is(:hover, :focus-visible)::after {
+  border-color: rgba(34, 197, 94, 0.48) !important;
+  background: #168447 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1) !important;
+}
+
+/* Discovery desktop density refinements */
+@media (max-width: 1400px) and (min-width: 901px) {
+  body.platform-route-discovery:not(.landing-open) .platform-nav {
+    gap: 6px !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) .platform-nav a {
+    padding-inline: 12px !important;
+    font-size: 0.79rem !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #authArea :is(button, .app-language-select),
+  body.platform-route-discovery:not(.landing-open) #topbarProductActions button {
+    font-size: 0.76rem !important;
+  }
+}
+
+/* Discovery fullscreen toolbar refinements */
+body.platform-route-discovery:not(.landing-open) #sidebar-header #resetFiltersBtn {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-muted) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header #resetFiltersBtn:is(:hover, :focus-visible) {
+  border-color: rgba(34, 197, 94, 0.34) !important;
+  background: var(--discovery-surface-accent) !important;
+  color: var(--discovery-text) !important;
+}
+
+@media (min-width: 1101px) {
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header {
+    grid-template-columns:
+      minmax(180px, 0.82fr)
+      minmax(180px, 0.82fr)
+      minmax(395px, 1.82fr)
+      minmax(185px, 0.84fr)
+      minmax(146px, 154px) !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header .filter-chip {
+    min-height: 34px !important;
+    height: 34px !important;
+    padding-inline: 8px !important;
+    font-size: 0.7rem !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header #resetFiltersBtn {
+    padding-inline: 10px !important;
+    font-size: 0.72rem !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header .filter-chip[data-filter="All"] {
+    flex-grow: 0.7 !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header .filter-chip[data-filter="Running"] {
+    flex-grow: 1 !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header .filter-chip[data-filter="Triathlon"] {
+    flex-grow: 1.2 !important;
+  }
+
+  body.platform-route-discovery.event-list-fullscreen:not(.landing-open) #sidebar-header .filter-chip[data-filter="Ultramarathon"] {
+    flex-grow: 1.75 !important;
+  }
+}

@@ -41341,6 +41341,241 @@ html[data-theme="light"] #seasonPlannerModal .season-guidance-copy strong {
   color: #122019 !important;
 }
 
+/* Season Planner complete light-mode contrast pass */
+html[data-theme="light"] #seasonPlannerModal {
+  --season-light-text: #122019;
+  --season-light-muted: #40564a;
+  --season-light-green: #14532d;
+  --season-light-border: rgba(15, 23, 42, 0.16);
+  --season-light-surface: #ffffff;
+  --season-light-soft: #f1f6f3;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-section-title,
+  .season-title-copy > span,
+  .season-workspace-heading > span,
+  .season-next-action-card > span,
+  .season-event-selector-group > span
+) {
+  color: #166534 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .countdown-number,
+  .season-calendar-month-toolbar span,
+  .season-month-title span
+) {
+  color: var(--season-light-text) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .countdown-label,
+  .season-title-copy small,
+  .season-workspace-edit-actions > span,
+  .season-calendar-month-toolbar em,
+  .season-month-title em,
+  .season-calendar-more
+) {
+  color: var(--season-light-muted) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-orientation-main,
+  .season-orientation-list > div,
+  .season-focus-layout > div,
+  .season-training-opportunity,
+  .season-calendar-month-toolbar,
+  .season-calendar-month-grid,
+  .season-export-card,
+  .season-empty,
+  .season-summary-empty,
+  .season-overview-mini-event,
+  .season-recommendation-card
+) {
+  border-color: var(--season-light-border) !important;
+  background: var(--season-light-surface) !important;
+  color: var(--season-light-text) !important;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.07) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-distance-control,
+  .season-priority-control
+) {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--season-light-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-distance-control > span,
+  .season-priority-control > span
+) {
+  color: var(--season-light-green) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-edit-done,
+  .season-events-back-button,
+  .season-export-actions button
+) {
+  border-color: #14532d !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 18px rgba(22, 101, 52, 0.16) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-task-list span.is-open b {
+  color: #92400e !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-view-toggle {
+  border: 1px solid var(--season-light-border) !important;
+  background: #e7efea !important;
+  box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-view-toggle button {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: #33473c !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-view-toggle button:is(
+  .active,
+  :hover,
+  :focus-visible
+) {
+  border-color: #14532d !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: 0 6px 16px rgba(22, 101, 52, 0.18) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-month-toolbar {
+  background: #eef5f1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-month-toolbar button {
+  border-color: #166534 !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-month-toolbar button:disabled {
+  border-color: #b8c7be !important;
+  background: #dfe8e3 !important;
+  color: #40564a !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-month-grid {
+  border-color: rgba(21, 128, 61, 0.2) !important;
+  background: #f8fbf9 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-month-grid .season-month-title {
+  border-bottom-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-weekdays span {
+  color: #33473c !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-cell {
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  background: #ffffff !important;
+  color: var(--season-light-text) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-cell.has-race {
+  border-color: rgba(21, 128, 61, 0.36) !important;
+  background: #eef8f1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-cell.is-outside-month {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  background: #f3f7f4 !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-cell-date {
+  color: #33473c !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-cell.has-race .season-calendar-cell-date {
+  background: #166534 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-event-pill {
+  border-color: rgba(21, 128, 61, 0.28) !important;
+  background: #e2f3e8 !important;
+  color: var(--season-light-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-event-pill:is(
+  :hover,
+  :focus-visible,
+  .season-event-a-race
+) {
+  border-color: rgba(21, 128, 61, 0.46) !important;
+  background: #d7efdf !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-event-pill.season-event-close-warning {
+  border-color: #d97706 !important;
+  background: #fff7e6 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-event-pill span {
+  background: #166534 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-event-pill strong {
+  color: var(--season-light-text) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-race-card {
+  border-color: var(--season-light-border) !important;
+  background: #ffffff !important;
+  color: var(--season-light-text) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-race-card :is(
+  .season-event-main strong,
+  .season-calendar-day
+) {
+  color: var(--season-light-text) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-calendar-race-card :is(
+  .season-event-main em,
+  .season-event-place
+) {
+  color: var(--season-light-muted) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-next-card #seasonCountdown .countdown-label {
+  color: var(--season-light-green) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-orientation-main .season-balance-heading {
+  border-color: rgba(21, 128, 61, 0.2) !important;
+  background: #eef5f1 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-orientation-main .season-balance-heading > span {
+  color: var(--season-light-green) !important;
+}
+
 
 /* Discovery light-mode readability hardening */
 html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #discoveryFooter {

@@ -1,5 +1,7 @@
 import {
+  closeEventDrawer,
   expect,
+  openEventDrawer,
   openPlanner,
   prepareApp,
   selectPlannerTab,
@@ -152,4 +154,53 @@ test("Light mode remains readable on mobile Home and Planner views", async ({ pa
   await page.locator(".season-event-selector").first().click();
   await expectReadable(page, ".season-event-edit-button");
   await expectReadable(page, ".season-detail-check span");
+});
+
+
+test("Light mode keeps Discovery footer, popup and drawer readable", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const run = fixtureByName["SEM E2E Future Run"];
+
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() => window.SportEventMapTheme.apply("light", { persist: true }));
+
+  await expectReadable(page, "#discoveryFooter #legalLinks a");
+  await expectReadable(page, "#discoveryFooter #legalLinks button");
+  await expectReadable(page, "#discoveryFooter .discovery-footer-note");
+
+  await page.evaluate(event => {
+    const popup = document.createElement("div");
+    popup.id = "e2eLightPopup";
+    popup.className = "leaflet-popup";
+    popup.innerHTML =
+      '<div class="leaflet-popup-content-wrapper">' +
+        '<div class="leaflet-popup-content">' + createPopup(event) + '</div>' +
+      '</div><div class="leaflet-popup-tip"></div>';
+    document.querySelector("#map").append(popup);
+  }, run);
+
+  await expect(page.locator("#e2eLightPopup .leaflet-popup-content-wrapper"))
+    .toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expectReadable(page, "#e2eLightPopup .popup-title");
+  await expectReadable(page, "#e2eLightPopup .popup-chip");
+  await expectReadable(page, "#e2eLightPopup .popup-meta-grid span");
+  await expectReadable(page, "#e2eLightPopup .popup-distance");
+  await expectReadable(page, "#e2eLightPopup .popup-link");
+  await expectReadable(page, "#e2eLightPopup .popup-detail-link");
+
+  await openEventDrawer(page, run.event_name);
+  await expect(page.getByTestId("drawer-event-name")).toBeVisible();
+  await expect(page.locator("#drawerContent")).toHaveCSS("opacity", "1");
+  await expectReadable(page, "#eventDrawer [data-testid=\"drawer-event-name\"]");
+  await expectReadable(page, "#eventDrawer .drawer-title-meta");
+  await expectReadable(page, "#eventDrawer .drawer-action-row button");
+  await expectReadable(page, "#eventDrawer .drawer-label");
+  await expectReadable(page, "#eventDrawer .drawer-overview-grid span");
+  await expectReadable(page, "#eventDrawer .drawer-overview-grid strong");
+  await expectReadable(page, "#eventDrawer .drawer-trust-note");
+  await expectReadable(page, "#eventDrawer .drawer-button");
+  await expect(page.locator("#eventDrawer .drawer-button")).toHaveCSS("position", "static");
+  await closeEventDrawer(page);
 });

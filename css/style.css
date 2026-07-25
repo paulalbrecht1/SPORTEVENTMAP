@@ -41942,8 +41942,10 @@ html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #event
 }
 
 
-html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-button {
+body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-button {
   position: static !important;
+  bottom: auto !important;
+  z-index: auto !important;
   margin-top: 12px !important;
 }
 

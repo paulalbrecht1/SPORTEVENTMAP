@@ -62,3 +62,23 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   await searchForEvent(page, run.event_name);
   await expect(page.getByTestId("event-card")).toHaveCount(1);
 });
+
+test("official website button stays in the drawer flow in both themes", async ({ page }) => {
+  const run = fixtureByName["SEM E2E Future Run"];
+
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await prepareApp(page, { openDiscoveryPanel: false });
+  await openEventDrawer(page, run.event_name);
+
+  const websiteButton = page.locator("#eventDrawer .drawer-button");
+
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(activeTheme => {
+      document.documentElement.setAttribute("data-theme", activeTheme);
+    }, theme);
+
+    await expect(websiteButton).toHaveCSS("position", "static");
+    await expect(websiteButton).toHaveCSS("bottom", "auto");
+    await expect(websiteButton).toHaveCSS("z-index", "auto");
+  }
+});

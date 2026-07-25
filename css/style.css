@@ -42115,3 +42115,331 @@ html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel :is(input, texta
 html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel input[type="checkbox"] {
   accent-color: #166534;
 }
+
+/* Profile modal: complete light-mode surfaces, states and account history. */
+html[data-theme="light"] #profileModal {
+  --profile-light-text: #122019;
+  --profile-light-muted: #40564a;
+  --profile-light-green: #14532d;
+  --profile-light-border: rgba(15, 23, 42, 0.15);
+  background:
+    radial-gradient(circle at 18% 12%, rgba(21, 128, 61, 0.14), transparent 30%),
+    rgba(15, 23, 42, 0.72) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-card {
+  border-color: rgba(21, 128, 61, 0.22) !important;
+  background: #f7faf8 !important;
+  color: var(--profile-light-text) !important;
+  box-shadow:
+    0 28px 80px rgba(15, 23, 42, 0.28),
+    inset 0 1px 0 #ffffff !important;
+  scrollbar-color: #86c99d #e7efea;
+}
+
+html[data-theme="light"] #profileModal #closeProfileModal {
+  border-color: #b7c9be !important;
+  background: #eef5f1 !important;
+  color: #233b2f !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12) !important;
+}
+
+html[data-theme="light"] #profileModal #closeProfileModal:is(:hover, :focus-visible) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-header span,
+html[data-theme="light"] #profileModal .profile-section-heading span {
+  border-color: rgba(21, 128, 61, 0.22) !important;
+  background: #e2f3e8 !important;
+  color: #166534 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-header h2,
+html[data-theme="light"] #profileModal .profile-section h3,
+html[data-theme="light"] #profileModal .profile-section-heading h3 {
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-header p,
+html[data-theme="light"] #profileModal .profile-settings-hint {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-section {
+  border-color: var(--profile-light-border) !important;
+  background: #ffffff !important;
+  color: var(--profile-light-text) !important;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 12px 28px rgba(15, 23, 42, 0.07) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-account-card {
+  border-color: rgba(21, 128, 61, 0.2) !important;
+  background: #eef5f1 !important;
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal :is(
+  .profile-account-card span,
+  .profile-form-grid label span,
+  .profile-security-section label span
+) {
+  color: #40564a !important;
+}
+
+html[data-theme="light"] #profileModal .profile-account-card strong {
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-account-card p {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-card label {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-card input {
+  border-color: rgba(15, 23, 42, 0.2) !important;
+  background: #ffffff !important;
+  color: var(--profile-light-text) !important;
+  box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+html[data-theme="light"] #profileModal .profile-card input::placeholder {
+  color: #52675c !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-card input:focus {
+  border-color: #15803d !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.14) !important;
+}
+
+html[data-theme="light"] #profileModal #profilePasswordBtn {
+  border-color: #14532d !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(22, 101, 52, 0.16) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-secondary-btn {
+  border-color: #86c99d !important;
+  background: #eef5f1 !important;
+  color: #14532d !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #profileModal :is(
+  #profilePasswordBtn,
+  .profile-secondary-btn
+):is(:hover, :focus-visible):not(:disabled) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12) !important;
+}
+
+html[data-theme="light"] #profileModal #profilePasswordBtn:is(:hover, :focus-visible):not(:disabled) {
+  background: #14532d !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] #profileModal :is(
+  #profilePasswordBtn,
+  .profile-secondary-btn
+):disabled {
+  border-color: #c8d4cd !important;
+  background: #e7ece9 !important;
+  color: #52675c !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html[data-theme="light"] #profileModal .profile-danger-btn {
+  border-color: #b91c1c !important;
+  background: #b91c1c !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(185, 28, 28, 0.14) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-danger-btn:is(:hover, :focus-visible) {
+  border-color: #991b1b !important;
+  background: #991b1b !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.14) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-card {
+  border-color: var(--profile-light-border) !important;
+  background: #f1f5f2 !important;
+  color: var(--profile-light-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-card.is-unlocked {
+  border-color: #86c99d !important;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(34, 197, 94, 0.16), transparent 48%),
+    #e8f5ed !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-card.is-locked {
+  border-color: rgba(15, 23, 42, 0.13) !important;
+  background: #eef2ef !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-icon {
+  background: #dcebe1 !important;
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-card strong {
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-achievement-card small {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-empty {
+  border-color: var(--profile-light-border) !important;
+  background: #f1f6f3 !important;
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-empty.is-success {
+  border-color: rgba(21, 128, 61, 0.24) !important;
+  background: #e8f5ed !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-empty strong {
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-empty span {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-filterbar button {
+  border-color: var(--profile-light-border) !important;
+  background: #eef2ef !important;
+  color: #33473c !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-filterbar button strong {
+  background: #dbe5df !important;
+  color: #233b2f !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-filterbar button:is(
+  .active,
+  :hover,
+  :focus-visible
+) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.1) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-filterbar button.active strong {
+  background: #166534 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-archive-card {
+  border-color: var(--profile-light-border) !important;
+  background: #f8fbf9 !important;
+  color: var(--profile-light-text) !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+html[data-theme="light"] #profileModal :is(
+  .profile-completed-archive-head span,
+  .profile-completed-archive-meta em,
+  .profile-completed-context-row em,
+  .profile-completed-result-row em,
+  .profile-completed-planning-row em
+) {
+  color: #166534 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-archive-head strong,
+html[data-theme="light"] #profileModal .profile-completed-primary-metric strong,
+html[data-theme="light"] #profileModal :is(
+  .profile-completed-archive-meta strong,
+  .profile-completed-context-row strong,
+  .profile-completed-planning-row strong
+) {
+  color: var(--profile-light-text) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-archive-head em {
+  color: var(--profile-light-muted) !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-status {
+  border-color: var(--profile-light-border) !important;
+  background: #e8edf0 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-status.has-result {
+  border-color: #86efac !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-status.needs-result {
+  border-color: #f5c46b !important;
+  background: #fff7e6 !important;
+  color: #78350f !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-primary-metric {
+  border-color: rgba(21, 128, 61, 0.22) !important;
+  background: #e8f5ed !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-archive-meta > span,
+html[data-theme="light"] #profileModal .profile-completed-planning-row > span {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  background: #eef5f1 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-rating-stars span {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] #profileModal .profile-rating-stars span.is-active {
+  color: #a16207 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-race-report {
+  border-left-color: #15803d !important;
+  background: #eef5f1 !important;
+  color: #33473c !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-result-link {
+  color: #166534 !important;
+}
+
+html[data-theme="light"] #profileModal .profile-completed-result-link:is(:hover, :focus-visible) {
+  color: #14532d !important;
+}
+
+html[data-theme="light"] #profileModal .profile-logout-section {
+  border-color: rgba(185, 28, 28, 0.16) !important;
+  background: #fffafa !important;
+}

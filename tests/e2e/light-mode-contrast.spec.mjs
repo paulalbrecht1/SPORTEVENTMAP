@@ -105,6 +105,25 @@ test("Light mode keeps Home and Season Planner text readable", async ({ page }) 
   await expectReadable(page, ".sem-sport-tabs button[aria-selected=\"true\"]");
   await expectReadable(page, ".sem-trust-row p");
   await expectReadable(page, ".sem-planner-summary > b small");
+  await expectReadable(page, ".sem-final-cta h2");
+  await expectReadable(page, ".sem-final-cta > .sem-cta-inner > div:first-child > p:last-child");
+  await expectReadable(page, ".sem-final-cta .sem-button");
+
+  const homeCta = await page.locator(".sem-final-cta").evaluate((section) => {
+    const sectionStyle = getComputedStyle(section);
+    const card = section.querySelector(".sem-cta-inner");
+    const cardStyle = getComputedStyle(card);
+
+    return {
+      sectionBackground: sectionStyle.backgroundImage,
+      cardPadding: parseFloat(cardStyle.paddingInlineStart),
+      cardRadius: parseFloat(cardStyle.borderRadius)
+    };
+  });
+
+  expect(homeCta.sectionBackground).not.toContain("rgb(11, 29, 23)");
+  expect(homeCta.cardPadding).toBeGreaterThanOrEqual(32);
+  expect(homeCta.cardRadius).toBeGreaterThanOrEqual(24);
 
   await page.goto("/index.html#/discovery");
   await openPlanner(page);

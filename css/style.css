@@ -41576,6 +41576,130 @@ html[data-theme="light"] #seasonPlannerModal .season-orientation-main .season-ba
   color: var(--season-light-green) !important;
 }
 
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) {
+  background:
+    radial-gradient(circle at 24% 12%, rgba(34, 197, 94, 0.14), transparent 32%),
+    rgba(15, 23, 42, 0.38) !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-card {
+  border-color: rgba(21, 128, 61, 0.24) !important;
+  background: linear-gradient(145deg, #ffffff, #f3f8f5), #ffffff !important;
+  color: #122019 !important;
+  box-shadow:
+    0 30px 80px rgba(15, 23, 42, 0.24),
+    inset 0 1px 0 #ffffff !important;
+}
+
+html[data-theme="light"] :is(
+  #closeSeasonScoreInfo,
+  #closeSeasonBalanceInfo,
+  #closeSportMixInfo,
+  #closeTrainingBlockInfo
+) {
+  border-color: rgba(15, 23, 42, 0.16) !important;
+  background: #eef5f1 !important;
+  color: #233b2f !important;
+}
+
+html[data-theme="light"] :is(
+  #closeSeasonScoreInfo,
+  #closeSeasonBalanceInfo,
+  #closeSportMixInfo,
+  #closeTrainingBlockInfo
+):is(:hover, :focus-visible) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-kicker {
+  border-color: rgba(21, 128, 61, 0.28) !important;
+  background: #e2f3e8 !important;
+  color: #14532d !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-card h2 {
+  color: #122019 !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-card p {
+  color: #40564a !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) :is(
+  .season-score-info-grid article,
+  .season-score-info-scale,
+  .season-score-info-note
+) {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #f7faf8 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-grid strong {
+  color: #14532d !important;
+}
+
+html[data-theme="light"] #seasonScoreInfoModal .season-score-info-scale div {
+  border-color: rgba(21, 128, 61, 0.2) !important;
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] #seasonScoreInfoModal .season-score-info-scale span {
+  color: #52675c !important;
+}
+
+html[data-theme="light"] #seasonScoreInfoModal .season-score-info-scale strong {
+  color: #122019 !important;
+}
+
+html[data-theme="light"] :is(
+  #seasonScoreInfoModal,
+  #seasonBalanceInfoModal,
+  #sportMixInfoModal,
+  #trainingBlockInfoModal
+) .season-score-info-note {
+  border-color: rgba(21, 128, 61, 0.22) !important;
+  background: #e7f5ec !important;
+  color: #233b2f !important;
+}
+
 
 /* Discovery light-mode readability hardening */
 html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #discoveryFooter {

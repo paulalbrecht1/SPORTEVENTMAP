@@ -16,8 +16,12 @@ function eventKey(event) {
   ].map(value => String(value || "").trim()).join("|").toLowerCase();
 }
 
-async function expectEveryPlannerTextReadable(page, viewName) {
-  const failures = await page.locator("#seasonPlannerModal").evaluate((root) => {
+async function expectEveryPlannerTextReadable(
+  page,
+  viewName,
+  rootSelector = "#seasonPlannerModal"
+) {
+  const failures = await page.locator(rootSelector).evaluate((root) => {
     const parseColor = value => {
       const match = String(value || "").match(/rgba?\(([^)]+)\)/i);
 
@@ -188,6 +192,47 @@ test("Light Season Planner keeps every visible text element readable", async ({ 
 
   await selectPlannerTab(page, "overview");
   await expectEveryPlannerTextReadable(page, "Overview");
+
+  const infoDialogs = [
+    {
+      name: "Season Score info",
+      opener: "#seasonScoreInfoBtn",
+      modal: "#seasonScoreInfoModal",
+      closer: "#closeSeasonScoreInfo"
+    },
+    {
+      name: "Season Balance info",
+      opener: "#seasonBalanceInfoBtn",
+      modal: "#seasonBalanceInfoModal",
+      closer: "#closeSeasonBalanceInfo"
+    },
+    {
+      name: "Race Mix info",
+      opener: "#sportMixInfoBtn",
+      modal: "#sportMixInfoModal",
+      closer: "#closeSportMixInfo"
+    },
+    {
+      name: "Training Block info",
+      opener: "[data-training-block-info]",
+      modal: "#trainingBlockInfoModal",
+      closer: "#closeTrainingBlockInfo"
+    }
+  ];
+
+  for (const infoDialog of infoDialogs) {
+    await page.locator(infoDialog.opener).click();
+    await expect(page.locator(infoDialog.modal))
+      .toHaveClass(/open/);
+    await expectEveryPlannerTextReadable(
+      page,
+      infoDialog.name,
+      infoDialog.modal
+    );
+    await page.locator(infoDialog.closer).click();
+    await expect(page.locator(infoDialog.modal))
+      .not.toHaveClass(/open/);
+  }
 
   await selectPlannerTab(page, "events");
   await expectEveryPlannerTextReadable(page, "Events list");

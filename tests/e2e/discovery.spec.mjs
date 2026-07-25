@@ -82,3 +82,53 @@ test("official website button stays in the drawer flow in both themes", async ({
     await expect(websiteButton).toHaveCSS("z-index", "auto");
   }
 });
+
+test("fullscreen custom range aligns and sport pills are not clipped", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 800 });
+  await prepareApp(page);
+  await page.locator("#toggleEventListFullscreen").click();
+  await page.locator("#dateFilter").selectOption("custom");
+
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(activeTheme => {
+      document.documentElement.setAttribute("data-theme", activeTheme);
+    }, theme);
+
+    const geometry = await page.evaluate(() => {
+      const range = document.querySelector("#dateRangeFilter.active");
+      const dateCard = range.closest(".filter-date-card");
+      const actions = range.querySelector(".date-range-actions");
+      const filters = document.querySelector(".filter-sport-card #filters");
+      const activePill = filters.querySelector(".filter-chip.active");
+      const rect = element => {
+        const bounds = element.getBoundingClientRect();
+
+        return {
+          top: bounds.top,
+          right: bounds.right,
+          bottom: bounds.bottom,
+          left: bounds.left,
+          width: bounds.width,
+          height: bounds.height
+        };
+      };
+
+      return {
+        range: rect(range),
+        dateCard: rect(dateCard),
+        actions: rect(actions),
+        filters: rect(filters),
+        activePill: rect(activePill),
+        maxWidth: getComputedStyle(range).maxWidth,
+        rangeOverflows: range.scrollWidth > range.clientWidth + 1
+      };
+    });
+
+    expect(geometry.maxWidth).toBe("none");
+    expect(geometry.range.width).toBeGreaterThan(geometry.dateCard.width * 0.9);
+    expect(geometry.actions.right).toBeLessThanOrEqual(geometry.range.right + 1);
+    expect(geometry.rangeOverflows).toBe(false);
+    expect(geometry.activePill.top).toBeGreaterThanOrEqual(geometry.filters.top);
+    expect(geometry.activePill.bottom).toBeLessThanOrEqual(geometry.filters.bottom);
+  }
+});

@@ -42805,3 +42805,29 @@ html[data-theme="light"] .event-detail-page .race-guide-chip {
   background: #19372a !important;
   color: #bbf7d0 !important;
 }
+
+/* Fullscreen Discovery filters: align custom range and protect pill borders. */
+body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+  #sidebar-header #dateRangeFilter.active {
+  width: 100% !important;
+  max-width: none !important;
+  justify-self: stretch;
+  box-sizing: border-box;
+}
+
+body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+  #sidebar-header .filter-sport-card #filters {
+  padding-block: 2px !important;
+}
+
+@media (min-width: 1181px) {
+  body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+    #sidebar-header #dateRangeFilter.active {
+    grid-template-columns:
+      auto
+      minmax(170px, 220px)
+      minmax(170px, 220px)
+      auto
+      minmax(0, 1fr) !important;
+  }
+}

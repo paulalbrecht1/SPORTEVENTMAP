@@ -40759,3 +40759,28 @@ body.platform-page-open #topbar {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
+
+
+/* Language pill legibility */
+.app-language-select,
+.sem-home #landingLanguageSelect,
+#topbarLanguageSelect {
+  width: 76px;
+  min-width: 76px;
+  padding-left: 15px;
+  padding-right: 31px;
+  letter-spacing: 0.04em;
+  text-align: left;
+  text-align-last: left;
+}
+
+@media (max-width: 700px) {
+  #topbar-right .app-language-select,
+  body.platform-route-discovery:not(.landing-open) #topbarLanguageSelect {
+    width: 62px !important;
+    min-width: 62px !important;
+    padding-left: 10px !important;
+    padding-right: 23px !important;
+    letter-spacing: 0;
+  }
+}

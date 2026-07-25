@@ -519,6 +519,116 @@ test("Light mode keeps both Add Event select fields consistent", async ({ page }
 });
 
 
+test("Light mode keeps the Feedback dialog consistently readable", async ({ page }) => {
+  await page.setViewportSize({
+    width: 1280,
+    height: 900
+  });
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() => {
+    window.SportEventMapTheme.apply("light", {
+      persist: true
+    });
+    document.getElementById("feedbackModal").classList.add("open");
+  });
+
+  await expect(page.locator("#feedbackModal"))
+    .toHaveClass(/open/);
+  await expect(page.locator("#feedbackModal .feedback-card"))
+    .toHaveCSS("background-color", "rgb(255, 255, 255)");
+
+  await expectReadable(page, "#feedbackModal h2");
+  await expectReadable(page, "#feedbackModal .feedback-card > p");
+  await expectReadable(page, "#feedbackModal .feedback-prompt-list span");
+  await expectReadable(page, "#feedbackModal .feedback-prompt-list li");
+  await expectReadable(page, "#feedbackModal label");
+  await expectReadable(page, "#feedbackCategory");
+  await expectReadable(page, "#feedbackProductArea");
+  await expectReadable(page, "#feedbackSummary");
+  await expectReadable(page, "#feedbackMessage");
+  await expectReadable(page, "#submitFeedbackBtn");
+
+  const componentStyles = await page.evaluate(() => {
+    const styleOf = selector => {
+      const style = getComputedStyle(document.querySelector(selector));
+      return {
+        background: style.backgroundColor,
+        color: style.color,
+        border: style.borderColor
+      };
+    };
+
+    return {
+      info: styleOf("#feedbackModal .feedback-prompt-list"),
+      select: styleOf("#feedbackCategory"),
+      input: styleOf("#feedbackSummary"),
+      textarea: styleOf("#feedbackMessage"),
+      rating: styleOf('#feedbackModal [data-feedback-rating="5"]'),
+      close: styleOf("#closeFeedbackModal")
+    };
+  });
+
+  expect(componentStyles).toEqual({
+    info: {
+      background: "rgb(237, 248, 241)",
+      color: "rgb(18, 32, 25)",
+      border: "rgb(184, 224, 198)"
+    },
+    select: {
+      background: "rgb(248, 251, 249)",
+      color: "rgb(18, 32, 25)",
+      border: "rgba(15, 23, 42, 0.17)"
+    },
+    input: {
+      background: "rgb(248, 251, 249)",
+      color: "rgb(18, 32, 25)",
+      border: "rgba(15, 23, 42, 0.17)"
+    },
+    textarea: {
+      background: "rgb(248, 251, 249)",
+      color: "rgb(18, 32, 25)",
+      border: "rgba(15, 23, 42, 0.17)"
+    },
+    rating: {
+      background: "rgb(241, 246, 243)",
+      color: "rgb(18, 32, 25)",
+      border: "rgb(199, 217, 206)"
+    },
+    close: {
+      background: "rgb(243, 247, 244)",
+      color: "rgb(18, 32, 25)",
+      border: "rgb(183, 201, 190)"
+    }
+  });
+
+  await page.locator("#feedbackSummary").focus();
+  await expect(page.locator("#feedbackSummary"))
+    .toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(page.locator("#feedbackSummary"))
+    .toHaveCSS("border-color", "rgb(21, 128, 61)");
+
+  await page.setViewportSize({
+    width: 390,
+    height: 844
+  });
+  const modalOverflow = await page.locator("#feedbackModal .feedback-card")
+    .evaluate(card => ({
+      left: card.getBoundingClientRect().left,
+      right: card.getBoundingClientRect().right,
+      viewportWidth: document.documentElement.clientWidth,
+      scrollWidth: card.scrollWidth,
+      clientWidth: card.clientWidth
+    }));
+  expect(modalOverflow.left).toBeGreaterThanOrEqual(7);
+  expect(modalOverflow.right)
+    .toBeLessThanOrEqual(modalOverflow.viewportWidth - 7);
+  expect(modalOverflow.scrollWidth)
+    .toBeLessThanOrEqual(modalOverflow.clientWidth + 1);
+});
+
+
 test("Light mode keeps Discovery footer, popup and drawer readable", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const run = fixtureByName["SEM E2E Future Run"];

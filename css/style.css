@@ -42511,3 +42511,144 @@ html[data-theme="light"] #eventModal .event-modal-card :is(
   background: #ffffff !important;
   color: #122019 !important;
 }
+
+/* Feedback modal: complete light appearance with accessible contrast. */
+html[data-theme="light"] #feedbackModal {
+  color-scheme: light;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(21, 128, 61, 0.12), transparent 38%),
+    rgba(15, 23, 42, 0.54) !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card {
+  border-color: #b8d9c4 !important;
+  background: #ffffff !important;
+  color: #122019 !important;
+  box-shadow:
+    0 30px 72px rgba(15, 23, 42, 0.22),
+    inset 0 1px 0 #ffffff !important;
+  scrollbar-color: #91aa9b #edf4ef;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card::-webkit-scrollbar {
+  width: 10px;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card::-webkit-scrollbar-track {
+  background: #edf4ef;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card::-webkit-scrollbar-thumb {
+  border: 2px solid #edf4ef;
+  border-radius: 999px;
+  background: #91aa9b;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card h2 {
+  color: #0f172a !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card :is(p, label),
+html[data-theme="light"] #feedbackModal .feedback-prompt-list ul {
+  color: #40534a !important;
+}
+
+html[data-theme="light"] #feedbackModal :is(
+  .feedback-email-note,
+  .feedback-prompt-list
+) {
+  border-color: #b8e0c6 !important;
+  background: #edf8f1 !important;
+}
+
+html[data-theme="light"] #feedbackModal :is(
+  .feedback-email-note a,
+  .feedback-prompt-list span
+) {
+  color: #0b6b32 !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card :is(
+  input:not([type="hidden"]),
+  textarea,
+  select
+) {
+  border-color: rgba(15, 23, 42, 0.17) !important;
+  background: #f8fbf9 !important;
+  color: #122019 !important;
+  color-scheme: light !important;
+  box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card :is(
+  input:not([type="hidden"]),
+  textarea,
+  select
+)::placeholder {
+  color: #64748b !important;
+  opacity: 1;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card select option {
+  background: #ffffff !important;
+  color: #122019 !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card :is(
+  input:not([type="hidden"]),
+  textarea,
+  select
+):is(:hover, :focus-visible) {
+  border-color: #15803d !important;
+  background: #ffffff !important;
+  color: #122019 !important;
+  outline: none !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-card :is(
+  input:not([type="hidden"]),
+  textarea,
+  select
+):focus-visible {
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.14) !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-rating-options button {
+  border-color: #c7d9ce !important;
+  background: #f1f6f3 !important;
+  color: #122019 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] #feedbackModal .feedback-rating-options button:is(
+  :hover,
+  :focus-visible,
+  .active
+) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12) !important;
+}
+
+html[data-theme="light"] #feedbackModal #closeFeedbackModal {
+  border-color: #b7c9be !important;
+  background: #f3f7f4 !important;
+  color: #122019 !important;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14) !important;
+}
+
+html[data-theme="light"] #feedbackModal #closeFeedbackModal:is(
+  :hover,
+  :focus-visible
+) {
+  border-color: #15803d !important;
+  background: #e7f7ec !important;
+  color: #0b6b32 !important;
+}
+
+html[data-theme="light"] #feedbackModal #submitFeedbackBtn {
+  border-color: #166534 !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 26px rgba(21, 128, 61, 0.2) !important;
+}

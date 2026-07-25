@@ -84,6 +84,13 @@ pass("HTML ids are unique");
 });
 pass("required beta views and modals exist");
 
+assert.doesNotMatch(
+  html,
+  /href=["']#\/community["']/i,
+  "Deferred Community must not appear in primary beta navigation"
+);
+pass("beta navigation stays focused on event discovery and season planning");
+
 const requiredScripts = [
   "js/config.js",
   "js/i18n.js",
@@ -219,6 +226,26 @@ assert.match(
   /status\s*=\s*'pending'/i
 );
 pass("closed-beta migration covers all protected tables");
+
+const gateHardeningMigration =
+  read("supabase/migrations/20260725_closed_beta_gate_hardening.sql");
+
+[
+  /drop function if exists public\.handle_new_user\(\)/i,
+  /drop function if exists public\.set_updated_at\(\)/i,
+  /drop policy if exists events_admin_read_all on public\.events/i,
+  /create policy "Authenticated can read accessible events"/i,
+  /create policy "Authenticated can update accessible profiles"/i,
+  /drop index if exists public\.analytics_events_event_name_idx/i,
+  /create policy sem_authenticated_read_accessible/i
+].forEach(pattern => {
+  assert.match(
+    gateHardeningMigration,
+    pattern,
+    `Closed-beta gate hardening is missing: ${pattern}`
+  );
+});
+pass("closed-beta gate migration removes production drift and policy overlap");
 
 const adminWorkflowMigration =
   read("supabase/migrations/20260609_admin_workflow.sql");

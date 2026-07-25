@@ -1,113 +1,65 @@
-# Sport Event Map Launch Checklist
+# Sport Event Map - Launch Checklist
 
-Use this before opening the public beta to real users.
+Use this before inviting closed-beta testers. Automated checks marked complete were
+last verified for `20260725-closed-beta-gate-v77` on 2026-07-25.
 
-## Legal
+## Automated release and database gate
 
-- [ ] Replace all placeholders in `impressum.html`.
-- [ ] Replace all placeholders in `privacy.html`.
-- [ ] Replace all placeholders in `contact.html`.
-- [ ] Replace all placeholders in `terms.html`.
-- [ ] Have Impressum, Privacy Policy and Terms reviewed for your jurisdiction.
-- [ ] Confirm the final contact email is working.
-- [ ] Confirm event data disclaimer is visible in legal pages and event details.
+- [x] Run `npm run test:gate`.
+- [x] Run `npm run test:event-detail`.
+- [x] Generate the public package with `npm run prepare-package`.
+- [x] Apply and align all nine Supabase migrations.
+- [x] Confirm RLS on every public table.
+- [x] Confirm the database security and performance advisors have no findings.
+- [x] Confirm anonymous production access cannot read private user or pending-event data.
+- [x] Confirm no `service_role` or secret key appears in frontend code or `dist`.
+- [ ] Enable leaked-password protection in the signed-in Supabase Auth dashboard.
 
-## Privacy / Cookies
+## Production Auth and admin security
 
-- [ ] Confirm no third-party marketing or advertising tracking is loaded.
-- [ ] Confirm first-party beta analytics are documented in `privacy.html`.
-- [ ] Confirm LocalStorage / SessionStorage usage is documented.
-- [ ] Add a consent banner before launch if optional third-party tracking is added later.
-- [ ] Confirm Supabase Auth and database processing are documented.
-- [ ] Confirm OpenStreetMap / Leaflet map loading is documented.
+- [ ] Configure the final HTTPS Site URL and exact Auth redirect URLs.
+- [ ] Test registration and email confirmation on the production domain.
+- [ ] Test login, logout, session restore and password reset on the production domain.
+- [ ] Test Auth emails with two providers.
+- [ ] Run `npm run test:rls` with two normal production users and one admin.
+- [ ] Confirm admin assignment is performed by Auth UUID, never by frontend email logic.
+- [ ] Complete event submission, approval and rejection end to end.
+- [ ] Confirm normal users cannot read admin feedback or analytics lists.
 
-## Supabase RLS
+## Mobile and browsers
 
-- [ ] Review `supabase/launch_security_rls.sql`.
-- [ ] Run the RLS SQL in the Supabase SQL Editor only after reviewing schema names.
-- [ ] Confirm RLS is enabled on `profiles`.
-- [ ] Confirm RLS is enabled on `events`.
-- [ ] Confirm RLS is enabled on `favorites`.
-- [ ] Confirm RLS is enabled on `season_planner_events`.
-- [ ] Confirm RLS is enabled on `user_feedback`.
-- [ ] Confirm RLS is enabled on `analytics_events`.
-- [ ] Confirm normal users cannot read another user's profile.
-- [ ] Confirm normal users cannot read another user's favorites.
-- [ ] Confirm normal users cannot read another user's Season Planner.
-- [ ] Confirm normal users cannot approve or reject events.
+- [x] Run automated viewport/layout checks at 360, 375, 390, 412, 768 and 1280 px.
+- [ ] Test the core flow on one real iOS device.
+- [ ] Test the core flow on one real Android device.
+- [ ] Test virtual keyboards in login, registration, feedback and event submission forms.
+- [ ] Smoke-test Chrome, Edge, Safari/iOS and a private/incognito session on production.
+- [ ] Confirm external organizer links open safely in a new tab.
 
-## Admin Security
+## Data quality and backups
 
-- [ ] Confirm admin role is set manually in Supabase and not through the frontend.
-- [ ] Confirm only admins can open admin data.
-- [ ] Confirm admin event updates fail for a normal user.
-- [ ] Confirm feedback and analytics lists are admin-only.
-- [ ] Confirm no `service_role` key appears in frontend code or `dist`.
+- [x] Validate 994 public events and confirm no exact duplicates.
+- [x] Back up `data/events.csv`.
+- [x] Generate the closed-beta review queue.
+- [ ] Improve the 357 city-level or broad-venue coordinates progressively.
+- [ ] Verify official websites for all high-priority events.
+- [ ] Confirm newly reviewed public events include `last_checked`.
+- [ ] Export or back up the production Supabase schema and relevant tables.
+- [ ] Keep the previous known-good `dist` release.
 
-## Mobile Testing
+## Legal and privacy
 
-- [ ] Test landing page at 360 px.
-- [ ] Test landing page at 390 px.
-- [ ] Test map/sidebar/drawer at 360 px.
-- [ ] Test event detail drawer on mobile.
-- [ ] Test filter panel on mobile.
-- [ ] Test Season Planner on mobile.
-- [ ] Test Profile and Feedback modals on mobile.
-- [ ] Test Admin dashboard on tablet width.
-- [ ] Confirm no horizontal scrolling.
-- [ ] Confirm touch targets are comfortable.
+- [ ] Replace every placeholder in `impressum.html`, `privacy.html`, `contact.html` and `terms.html`.
+- [ ] Add the actual hosting provider, operator address and working contact email.
+- [ ] Confirm Supabase Auth, first-party analytics, storage and OpenStreetMap/Leaflet use are documented.
+- [ ] Confirm the organizer-data disclaimer is visible.
+- [ ] Obtain legal review for the actual operator and jurisdiction.
+- [ ] Add consent handling before any optional marketing or advertising tracker is introduced.
 
-## Browser Testing
+## Closed-beta operations
 
-- [ ] Test Chrome desktop.
-- [ ] Test Edge desktop.
-- [ ] Test Safari / iOS if available.
-- [ ] Test Android Chrome if available.
-- [ ] Test private/incognito session.
-- [ ] Confirm login, logout and session restore work.
-- [ ] Confirm external organizer links open in a new tab.
-
-## Data Quality
-
-- [ ] Confirm all public events have event name, sport, date, city, country and distance.
-- [ ] Confirm all public events have valid latitude and longitude.
-- [ ] Confirm official websites are prioritized over aggregators.
-- [ ] Confirm no obvious duplicates in `data/events.csv`.
-- [ ] Confirm outdated events are marked for review or date expected.
-- [ ] Confirm `last_checked` exists for newly reviewed data where possible.
-- [ ] Confirm users are told official organizer websites are authoritative.
-
-## Backup
-
-- [ ] Back up `data/events.csv`.
-- [ ] Back up Supabase schema or export relevant tables.
-- [ ] Back up current publishable `dist` package.
-- [ ] Keep a copy of the last known working local version.
-
-## Analytics
-
-- [ ] Confirm analytics table exists and RLS is active.
-- [ ] Confirm app works if analytics insert fails.
-- [ ] Confirm searches are tracked without sensitive data.
-- [ ] Confirm event opens are tracked.
-- [ ] Confirm favorites and planner actions are tracked.
-- [ ] Confirm feedback submissions are visible to admins.
-
-## Closed Beta
-
-- [ ] Prepare a list of 20-50 beta testers.
-- [ ] Ask testers to search for a real event they would consider.
-- [ ] Ask testers to save at least one favorite.
-- [ ] Ask testers to add at least one event to the Season Planner.
+- [ ] Select 20-50 invited testers.
+- [ ] Share `KNOWN_ISSUES.md` and the supported feedback channel.
+- [ ] Ask each tester to search, compare, favorite and plan a real event.
 - [ ] Ask testers to report one missing or incorrect event.
-- [ ] Review feedback after the first week.
-- [ ] Prioritize fixes before adding major new features.
-
-## Domain / Hosting / HTTPS
-
-- [ ] Choose final domain.
-- [ ] Configure HTTPS.
-- [ ] Configure Supabase Auth Site URL.
-- [ ] Configure Supabase redirect URLs for login, signup, email confirmation and password reset.
-- [ ] Replace `[HOSTING PROVIDER]` in Privacy Policy.
-- [ ] Confirm `SPORT_EVENT_MAP_SITE_URL` uses HTTPS for production builds.
+- [ ] Assign a feedback owner and a fixed review cadence.
+- [ ] Fix gate-blocking defects before adding broader product scope.

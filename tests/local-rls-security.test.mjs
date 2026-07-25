@@ -42,6 +42,18 @@ function runSupabase(args) {
   return result.stdout;
 }
 
+function queryLocal(sql) {
+  const output = runSupabase([
+    "db",
+    "query",
+    "--local",
+    "--output",
+    "json",
+    sql
+  ]);
+  return JSON.parse(output).rows;
+}
+
 function parseStatusEnvironment(output) {
   return Object.fromEntries(
     output
@@ -85,6 +97,76 @@ assert.ok(
   local.SERVICE_ROLE_KEY,
   "Local Supabase SERVICE_ROLE_KEY is missing."
 );
+
+const [hardeningState] = queryLocal(`
+  with expanded_policies as (
+    select
+      schemaname,
+      tablename,
+      role_name,
+      action_name
+    from pg_policies
+    cross join lateral unnest(roles) as role_name
+    cross join lateral unnest(
+      case
+        when cmd = 'ALL' then array['SELECT', 'INSERT', 'UPDATE', 'DELETE']
+        else array[cmd]
+      end
+    ) as action_name
+    where schemaname = 'public'
+  ), duplicate_policy_groups as (
+    select schemaname, tablename, role_name, action_name
+    from expanded_policies
+    group by schemaname, tablename, role_name, action_name
+    having count(*) > 1
+  )
+  select
+    not exists (
+      select 1
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public'
+        and p.proname in ('handle_new_user', 'set_updated_at', 'is_admin')
+    ) as legacy_public_functions_removed,
+    not exists (
+      select 1
+      from pg_policies
+      where schemaname = 'public'
+        and policyname in (
+          'analytics_admin_select',
+          'analytics_insert_privacy_safe',
+          'events_admin_read_all',
+          'events_public_read_approved',
+          'favorites_select_own',
+          'profiles_select_own_or_admin',
+          'season_select_own',
+          'feedback_admin_select'
+        )
+    ) as legacy_policies_removed,
+    not exists (
+      select 1 from duplicate_policy_groups
+    ) as permissive_policy_overlap_removed,
+    to_regclass('public.analytics_events_event_name_idx') is null
+      as duplicate_analytics_index_removed,
+    not has_function_privilege(
+      'anon',
+      'private.handle_new_user()',
+      'execute'
+    ) as signup_trigger_not_public
+`);
+
+assert.deepEqual(
+  hardeningState,
+  {
+    legacy_public_functions_removed: true,
+    legacy_policies_removed: true,
+    permissive_policy_overlap_removed: true,
+    duplicate_analytics_index_removed: true,
+    signup_trigger_not_public: true
+  },
+  "Local database hardening state is incomplete."
+);
+console.log("Local Supabase hardening assertions passed.");
 
 const password = `Local-RLS-${runId}-Aa1!`;
 const users = [];

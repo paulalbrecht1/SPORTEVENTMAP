@@ -1130,21 +1130,32 @@ function initLandingPage() {
 
   applyLandingTheme();
 
-  const syncLandingEnglishCtas = () => {
+  const translateLandingLabel = (key, fallback) =>
+    typeof window.t === "function"
+      ? window.t(key, fallback)
+      : fallback;
+
+  const syncLandingCtas = () => {
     if (discoverBtn) {
-      discoverBtn.textContent = "Explore Events";
+      discoverBtn.textContent = translateLandingLabel(
+        "landing.discover",
+        "Explore Events"
+      );
     }
 
     if (seasonBtn) {
-      seasonBtn.textContent = "Open Season Planner";
+      seasonBtn.textContent = translateLandingLabel(
+        "landing.openPlanner",
+        "Open Season Planner"
+      );
     }
   };
 
-  syncLandingEnglishCtas();
+  syncLandingCtas();
 
   document.addEventListener(
     "app-language-changed",
-    syncLandingEnglishCtas
+    syncLandingCtas
   );
 
   updateLandingEventCount();
@@ -1235,19 +1246,17 @@ function initLandingPage() {
     );
 
   const syncLandingAuthButtons = () => {
-    const label =
-      isProfileAvailable()
-        ? "Profile"
-        : "Login";
+    const profileAvailable = isProfileAvailable();
+    const label = profileAvailable
+      ? translateLandingLabel("nav.profile", "Profile")
+      : translateLandingLabel("nav.login", "Login");
+    const ariaLabel = profileAvailable
+      ? translateLandingLabel("landing.openProfile", "Open profile")
+      : translateLandingLabel("landing.logIn", "Log in");
 
     landingAuthButtons.forEach(button => {
       button.textContent = label;
-      button.setAttribute(
-        "aria-label",
-        isProfileAvailable()
-          ? "Open profile"
-          : "Log in"
-      );
+      button.setAttribute("aria-label", ariaLabel);
     });
   };
 
@@ -1264,6 +1273,11 @@ function initLandingPage() {
   landingAuthButtons.forEach(button => {
     button.addEventListener("click", activateLandingAuth);
   });
+
+  document.addEventListener(
+    "app-language-changed",
+    syncLandingAuthButtons
+  );
 
   [loginButton, profileButton]
     .filter(Boolean)

@@ -15,7 +15,10 @@ const I18N = {
     "landing.subheadline": "Find races. Save favorites. Plan your season.",
     "landing.copy": "Discover running, trail, ultra and triathlon events across Europe. Plan A-, B- and C-races with countdowns, training blocks and realistic recovery windows.",
     "landing.discover": "Explore Events",
-    "landing.plan": "Plan Your Season",
+    "landing.plan": "Open Season Planner",
+    "landing.openPlanner": "Open Season Planner",
+    "landing.openProfile": "Open profile",
+    "landing.logIn": "Log in",
     "landing.search": "Search by event, city, sport, distance or month...",
     "landing.searchButton": "Search",
     "landing.popular": "Popular searches:",
@@ -555,7 +558,10 @@ const I18N = {
     "landing.subheadline": "Rennen finden. Favoriten speichern. Saison planen.",
     "landing.copy": "Finde Lauf-, Trail-, Ultra- und Triathlon-Events in Europa. Plane A-, B- und C-Rennen mit Countdowns, Trainingsblöcken und realistischen Erholungsfenstern.",
     "landing.discover": "Events entdecken",
-    "landing.plan": "Saison planen",
+    "landing.plan": "Saisonplaner öffnen",
+    "landing.openPlanner": "Saisonplaner öffnen",
+    "landing.openProfile": "Profil öffnen",
+    "landing.logIn": "Anmelden",
     "landing.search": "Suche nach Event, Ort, Sportart, Distanz oder Monat...",
     "landing.searchButton": "Suchen",
     "landing.popular": "Beliebte Suchen:",
@@ -1598,9 +1604,242 @@ const CONTROL_LABEL_BINDINGS = [
   ["#adminAnalyticsRange", "analytics.period"]
 ];
 
+const SEM_HOME_TEXT_TRANSLATIONS = {
+  "Home": "Start",
+  "Discovery": "Entdecken",
+  "Season Planner": "Saisonplaner",
+  "Event Wiki": "Event-Wiki",
+  "Login": "Anmelden",
+  "Explore Events": "Events entdecken",
+  "Navigation": "Navigation",
+  "Sport events. One season.": "Sportevents. Eine Saison.",
+  "Find your next race.": "Finde dein nächstes Rennen.",
+  "Build your entire season.": "Plane deine gesamte Saison.",
+  "Discover running, trail, ultra and triathlon events across Germany and Europe. Compare races, save your favorites and turn them into a realistic season plan.": "Entdecke Lauf-, Trail-, Ultra- und Triathlon-Events in Deutschland und Europa. Vergleiche Rennen, speichere Favoriten und erstelle daraus einen realistischen Saisonplan.",
+  "Open Season Planner": "Saisonplaner öffnen",
+  "No spreadsheets. No scattered race tabs. Everything in one place.": "Keine Tabellen. Keine verstreuten Renntabs. Alles an einem Ort.",
+  "Find your next race...": "Finde dein nächstes Rennen...",
+  "Running": "Laufen",
+  "Registration open": "Anmeldung offen",
+  "Next race": "Nächstes Rennen",
+  "days": "Tage",
+  "Loading": "Lädt",
+  "events and growing": "Events und es werden mehr",
+  "Germany & Europe": "Deutschland & Europa",
+  "Running · Trail · Ultra · Triathlon": "Laufen · Trail · Ultra · Triathlon",
+  "Structured event information": "Strukturierte Eventinformationen",
+  "One connected workflow": "Ein durchgängiger Ablauf",
+  "From race discovery to race day": "Von der Eventsuche bis zum Renntag",
+  "Sport Event Map connects event discovery, detailed race information and personal season planning in one workflow.": "Sport Event Map verbindet Eventsuche, detaillierte Renninformationen und persönliche Saisonplanung in einem Ablauf.",
+  "Discover": "Entdecken",
+  "Search events by sport, location, date, distance and registration status.": "Suche Events nach Sportart, Ort, Datum, Distanz und Anmeldestatus.",
+  "Compare and save": "Vergleichen und speichern",
+  "Open structured event information, compare options and save the races that matter to you.": "Öffne strukturierte Eventinformationen, vergleiche Optionen und speichere die Rennen, die dir wichtig sind.",
+  "Plan your season": "Saison planen",
+  "Turn saved events into a realistic season with priorities, countdowns and training blocks.": "Erstelle aus gespeicherten Events eine realistische Saison mit Prioritäten, Countdowns und Trainingsblöcken.",
+  "Built around your race calendar": "Rund um deinen Rennkalender entwickelt",
+  "Everything you need to plan your racing season": "Alles, was du für deine Rennsaison brauchst",
+  "Interactive event map": "Interaktive Eventkarte",
+  "Explore events geographically and keep the map, results and event details synchronized.": "Entdecke Events geografisch und halte Karte, Ergebnisse und Eventdetails synchron.",
+  "Explore Discovery": "Discovery öffnen",
+  "Powerful event filters": "Leistungsstarke Eventfilter",
+  "Filter by sport, distance, date, location and registration status without losing your search context.": "Filtere nach Sportart, Distanz, Datum, Ort und Anmeldestatus, ohne deinen Suchkontext zu verlieren.",
+  "Filter events": "Events filtern",
+  "Structured event details": "Strukturierte Eventdetails",
+  "Find course information, cut-offs, registration details, race-day information and official sources.": "Finde Streckeninformationen, Cut-offs, Anmeldedetails, Renntag-Informationen und offizielle Quellen.",
+  "Open Event Wiki": "Event-Wiki öffnen",
+  "Favorites and shortlists": "Favoriten und Auswahllisten",
+  "Save interesting events and build a shortlist before committing to your season.": "Speichere interessante Events und erstelle eine Auswahlliste, bevor du deine Saison festlegst.",
+  "Find favorites": "Favoriten finden",
+  "Personal season planner": "Persönlicher Saisonplaner",
+  "Organize A-, B- and C-races, add goals and keep your race calendar realistic.": "Ordne A-, B- und C-Rennen, ergänze Ziele und halte deinen Rennkalender realistisch.",
+  "Open planner": "Planer öffnen",
+  "Countdown and preparation": "Countdown und Vorbereitung",
+  "See what race is next and track the information that matters before race day.": "Sieh, welches Rennen als Nächstes ansteht, und behalte die wichtigen Informationen bis zum Renntag im Blick.",
+  "Start planning": "Planung starten",
+  "Event discovery": "Eventsuche",
+  "Explore events without losing context": "Events entdecken, ohne den Überblick zu verlieren",
+  "Search, filter and open event details while the map and event list remain synchronized.": "Suche, filtere und öffne Eventdetails, während Karte und Eventliste synchron bleiben.",
+  "Explore the map": "Karte entdecken",
+  "Event Discovery": "Eventsuche",
+  "Search events, cities and distances": "Events, Orte und Distanzen suchen",
+  "Germany": "Deutschland",
+  "matching events": "passende Events",
+  "Season planner": "Saisonplaner",
+  "Build a season you can actually execute": "Plane eine Saison, die du wirklich umsetzen kannst",
+  "Prioritize your races, avoid crowded race periods and keep every important event in one personal overview.": "Priorisiere deine Rennen, vermeide überfüllte Rennphasen und behalte alle wichtigen Events in einer persönlichen Übersicht.",
+  "Countdown to the next race": "Countdown bis zum nächsten Rennen",
+  "A/B/C race priorities": "A-/B-/C-Rennprioritäten",
+  "Calendar and season overview": "Kalender- und Saisonübersicht",
+  "Goals, notes and race results": "Ziele, Notizen und Rennergebnisse",
+  "My 2026 season": "Meine Saison 2026",
+  "Priority A": "Priorität A",
+  "planned races": "geplante Rennen",
+  "key races": "Schlüsselrennen",
+  "weeks": "Wochen",
+  "May · Build race": "Mai · Aufbaurennen",
+  "July · Tune-up race": "Juli · Vorbereitungsrennen",
+  "Made for the start line": "Für die Startlinie gemacht",
+  "Built for endurance athletes": "Für Ausdauersportler entwickelt",
+  "Choose your discipline and see the event information that supports better race decisions.": "Wähle deine Disziplin und finde die Eventinformationen, die bessere Rennentscheidungen unterstützen.",
+  "Trail Running": "Trailrunning",
+  "Ultra Running": "Ultralauf",
+  "Find road races from local 5K events to major city marathons.": "Finde Straßenläufe vom lokalen 5-km-Rennen bis zum großen Stadtmarathon.",
+  "Compare terrain, elevation, distance and event location.": "Vergleiche Gelände, Höhenmeter, Distanz und Veranstaltungsort.",
+  "Keep cut-offs, course details and preparation requirements organized.": "Behalte Cut-offs, Streckendetails und Anforderungen an die Vorbereitung übersichtlich.",
+  "Plan race distances, priorities and your complete multi-sport season.": "Plane Renndistanzen, Prioritäten und deine komplette Multisport-Saison.",
+  "Ready when you are": "Bereit, wenn du es bist",
+  "Your next season starts with the right event.": "Deine nächste Saison beginnt mit dem richtigen Event.",
+  "Explore the event database, save the races that inspire you and build a season that fits your goals.": "Entdecke die Eventdatenbank, speichere Rennen, die dich inspirieren, und plane eine Saison, die zu deinen Zielen passt.",
+  "Find Events": "Events finden",
+  "Build My Season": "Meine Saison planen",
+  "Discover the right event. Build a better season.": "Finde das richtige Event. Plane eine bessere Saison.",
+  "Submit an event": "Event einreichen",
+  "Imprint": "Impressum",
+  "Privacy": "Datenschutz",
+  "Terms": "Nutzungsbedingungen",
+  "Contact": "Kontakt",
+  "Public beta · Event data is reviewed continuously.": "Öffentliche Beta · Eventdaten werden fortlaufend geprüft."
+};
+
+const SEM_HOME_REVERSE_TRANSLATIONS = Object.fromEntries(
+  Object.entries(SEM_HOME_TEXT_TRANSLATIONS).map(([english, german]) => [german, english])
+);
+
+const SEM_HOME_TEXT_KEYS = new WeakMap();
+
+const SEM_HOME_ATTRIBUTE_TRANSLATIONS = [
+  [
+    "#landingPage",
+    "aria-label",
+    "Sport Event Map landing page",
+    "Sport Event Map Startseite"
+  ],
+  [
+    ".sem-header .sem-brand",
+    "aria-label",
+    "Sport Event Map home",
+    "Sport Event Map Startseite"
+  ],
+  [
+    ".sem-desktop-nav",
+    "aria-label",
+    "Primary navigation",
+    "Hauptnavigation"
+  ],
+  [
+    "#landingMenuBtn",
+    "aria-label",
+    "Open navigation",
+    "Navigation öffnen"
+  ],
+  [
+    "#landingMenuCloseBtn",
+    "aria-label",
+    "Close navigation",
+    "Navigation schließen"
+  ],
+  [
+    "#landingMobileMenu",
+    "aria-label",
+    "Mobile navigation",
+    "Mobile Navigation"
+  ],
+  [
+    ".sem-trust",
+    "aria-label",
+    "Platform status",
+    "Plattformstatus"
+  ],
+  [
+    ".sem-hero-product",
+    "aria-label",
+    "Product preview showing the event map and season planner",
+    "Produktvorschau mit Eventkarte und Saisonplaner"
+  ],
+  [
+    ".sem-discovery-product",
+    "aria-label",
+    "Discovery interface preview",
+    "Vorschau der Eventsuche"
+  ],
+  [
+    ".sem-planner-product",
+    "aria-label",
+    "Season planner interface preview",
+    "Vorschau des Saisonplaners"
+  ],
+  [
+    ".sem-sport-tabs",
+    "aria-label",
+    "Endurance sports",
+    "Ausdauersportarten"
+  ],
+  [
+    ".sem-footer nav:first-of-type",
+    "aria-label",
+    "Footer navigation",
+    "Footer-Navigation"
+  ],
+  [
+    ".sem-footer nav:last-of-type",
+    "aria-label",
+    "Legal links",
+    "Rechtliche Links"
+  ]
+];
+
+function applySemHomeLanguage(language = getAppLanguage()) {
+  const root = document.querySelector(".sem-home");
+
+  if (!root) {
+    return;
+  }
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+
+  while (node) {
+    const sourceText = node.textContent;
+    const visibleText = sourceText.trim();
+    let englishText = SEM_HOME_TEXT_KEYS.get(node);
+
+    if (!englishText) {
+      if (Object.hasOwn(SEM_HOME_TEXT_TRANSLATIONS, visibleText)) {
+        englishText = visibleText;
+      } else {
+        englishText = SEM_HOME_REVERSE_TRANSLATIONS[visibleText];
+      }
+
+      if (englishText) {
+        SEM_HOME_TEXT_KEYS.set(node, englishText);
+      }
+    }
+
+    if (englishText) {
+      const leadingWhitespace = sourceText.match(/^\s*/)?.[0] || "";
+      const trailingWhitespace = sourceText.match(/\s*$/)?.[0] || "";
+      const translatedText = language === "de"
+        ? SEM_HOME_TEXT_TRANSLATIONS[englishText]
+        : englishText;
+
+      node.textContent = leadingWhitespace + translatedText + trailingWhitespace;
+    }
+
+    node = walker.nextNode();
+  }
+
+  SEM_HOME_ATTRIBUTE_TRANSLATIONS.forEach(([selector, attribute, english, german]) => {
+    document.querySelectorAll(selector).forEach(element => {
+      element.setAttribute(attribute, language === "de" ? german : english);
+    });
+  });
+}
+
 function applyStaticLanguage() {
   const language = getAppLanguage();
   document.documentElement.lang = language;
+  applySemHomeLanguage(language);
 
   TEXT_BINDINGS.forEach(([selector, key]) =>
     setText(selector, key)

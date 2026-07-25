@@ -17475,24 +17475,52 @@ body.event-list-fullscreen #eventListPagination {
 
 /* Shared language control */
 .app-language-select {
-  min-width: 62px;
-  min-height: 38px;
-  padding: 7px 28px 7px 11px;
-  border: 1px solid rgba(134, 239, 172, 0.34);
-  border-radius: 12px;
-  background-color: rgba(8, 18, 26, 0.82);
-  color: #ffffff;
+  min-width: 68px;
+  min-height: 42px;
+  padding: 0 34px 0 14px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  appearance: none;
+  -webkit-appearance: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M2 2L6 6L10 2' stroke='%23CBD5E1' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 13px center / 12px 8px,
+    linear-gradient(180deg, rgba(30, 41, 59, 0.86), rgba(15, 23, 42, 0.9));
+  color: #f8fafc;
+  color-scheme: dark;
   font: inherit;
-  font-size: 12px;
-  font-weight: 900;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 8px 20px rgba(2, 6, 23, 0.16);
   cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
-.app-language-select:hover,
+.app-language-select:hover {
+  border-color: rgba(134, 239, 172, 0.46);
+  transform: translateY(-1px);
+}
+
 .app-language-select:focus-visible {
-  border-color: var(--accent-green);
+  border-color: rgba(74, 222, 128, 0.72);
   outline: none;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.13);
+  box-shadow:
+    0 0 0 3px rgba(34, 197, 94, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 10px 24px rgba(2, 6, 23, 0.2);
+}
+
+.app-language-select option {
+  background: #0f172a;
+  color: #f8fafc;
+  font-weight: 700;
 }
 
 .landing-brand .app-language-select {
@@ -37399,14 +37427,14 @@ body.landing-theme-dark .sem-home,
 }
 
 .sem-home #landingLanguageSelect {
-  width: 58px;
-  min-width: 58px;
+  width: 68px;
+  min-width: 68px;
   min-height: 44px;
-  padding: 0 21px 0 10px;
-  border: 1px solid var(--sem-line);
-  border-radius: 10px;
-  background-color: transparent;
-  color: var(--sem-muted);
+  padding: 0 34px 0 14px;
+  border-color: var(--sem-line-strong);
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.045);
+  color: var(--sem-text);
 }
 
 .sem-auth-button,

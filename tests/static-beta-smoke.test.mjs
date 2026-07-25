@@ -103,6 +103,18 @@ assert.match(
 );
 pass("Home and platform navigation labels render as pills");
 
+assert.match(
+  css,
+  /\.app-language-select\s*\{[\s\S]*?appearance:\s*none;[\s\S]*?background:[\s\S]*?data:image\/svg\+xml/i,
+  "Language controls must use the polished custom pill treatment"
+);
+assert.match(
+  css,
+  /\.app-language-select:focus-visible\s*\{[\s\S]*?box-shadow:[\s\S]*?rgba\(34, 197, 94, 0\.16\)/i,
+  "Language controls must expose a visible keyboard focus state"
+);
+pass("language controls use a polished custom appearance");
+
 assert.doesNotMatch(
   html,
   /href=["']#\/community["']/i,

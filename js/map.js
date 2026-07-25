@@ -250,31 +250,8 @@ const EVENT_MARKER_TYPES = {
 };
 
 function getEventMarkerType(event) {
-  const context =
-    [
-      event?.sport,
-      event?.event_name,
-      event?.distance,
-      event?.distance_category,
-      event?.description
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-  if (/triathlon|ironman|70\.3|duathlon/.test(context)) {
-    return "triathlon";
-  }
-
-  if (
-    /ultra|ultramarathon|backyard|trail|berglauf|mountain|skyrace|\b(?:50|60|80|100|160)\s?(?:k|km|kilometer|miles?|mi)\b|\b(?:12|24)\s?h\b/.test(
-      context
-    )
-  ) {
-    return "ultra";
-  }
-
-  return "running";
+  return window.SportEventMapMarkerTypes
+    .getEventMarkerType(event);
 }
 
 function renderEventMarkerPin(type) {

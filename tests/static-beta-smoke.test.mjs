@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import eventMarkerTypes from "../js/event-marker-types.js";
 import eventTableUtils from "../tools/event-table-utils.js";
 
 const {
@@ -194,6 +195,7 @@ const requiredScripts = [
   "js/i18n.js",
   "js/supabase.js",
   "js/events.js",
+  "js/event-marker-types.js",
   "js/map.js",
   "js/search.js",
   "js/app.js"
@@ -220,6 +222,7 @@ const frontendSource =
     "js/config.js",
     "js/supabase.js",
     "js/events.js",
+    "js/event-marker-types.js",
     "js/map.js",
     "js/search.js",
     "js/app.js"
@@ -272,6 +275,30 @@ events.forEach((event, index) => {
   );
 });
 pass(`${events.length} event rows pass schema validation`);
+
+const expectedMarkerTypeBySport = {
+  Running: "running",
+  "Trail Running": "running",
+  Ultramarathon: "ultra",
+  Triathlon: "triathlon"
+};
+const markerTypeMismatches =
+  events
+    .map(event => ({
+      event_name: event.event_name,
+      sport: event.sport,
+      distance: event.distance,
+      expected: expectedMarkerTypeBySport[event.sport],
+      actual: eventMarkerTypes.getEventMarkerType(event)
+    }))
+    .filter(event => !event.expected || event.actual !== event.expected);
+
+assert.deepEqual(
+  markerTypeMismatches,
+  [],
+  "Event marker colors do not match the reviewed sport categories"
+);
+pass("all event rows match the red, green and blue marker categories");
 
 assert.match(
   css,

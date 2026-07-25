@@ -42652,3 +42652,65 @@ html[data-theme="light"] #feedbackModal #submitFeedbackBtn {
   color: #ffffff !important;
   box-shadow: 0 12px 26px rgba(21, 128, 61, 0.2) !important;
 }
+
+/* Event details: present long registration warnings as calm status cards. */
+.event-detail-page .race-guide-status-panel > .event-detail-badge.pending {
+  position: relative;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  justify-content: stretch;
+  gap: 11px;
+  width: 100%;
+  min-height: 0;
+  padding: 13px 14px;
+  border: 1px solid var(--detail-border) !important;
+  border-left: 4px solid #f59e0b !important;
+  border-radius: 14px;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-text) !important;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.16);
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.5;
+  text-align: left;
+}
+
+.event-detail-page .race-guide-status-panel > .event-detail-badge.pending::before {
+  content: "!";
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 1px solid rgba(245, 158, 11, 0.34);
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.14);
+  color: #fbbf24;
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+html[data-theme="light"] .event-detail-page
+  .race-guide-status-panel > .event-detail-badge.pending {
+  border-color: rgba(15, 23, 42, 0.13) !important;
+  border-left-color: #b7791f !important;
+  background: #f2f7f4 !important;
+  color: #122019 !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="light"] .event-detail-page
+  .race-guide-status-panel > .event-detail-badge.pending::before {
+  border-color: rgba(183, 121, 31, 0.3);
+  background: #fff3d6;
+  color: #795012;
+}
+
+@media (max-width: 620px) {
+  .event-detail-page .race-guide-status-panel > .event-detail-badge.pending {
+    gap: 10px;
+    padding: 12px;
+    font-size: 0.82rem;
+  }
+}

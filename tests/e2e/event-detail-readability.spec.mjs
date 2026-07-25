@@ -166,3 +166,60 @@ for (const detail of detailPages) {
     }
   });
 }
+
+test("registration warning uses a calm readable status card", async ({ page }) => {
+  await preparePage(page, "/event/bmw-berlin-marathon-2026/");
+
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 }
+  ]) {
+    await page.setViewportSize(viewport);
+
+    for (const theme of ["light", "dark"]) {
+      await page.evaluate(activeTheme => {
+        document.documentElement.setAttribute("data-theme", activeTheme);
+      }, theme);
+
+      const result = await page.locator(
+        ".race-guide-status-panel > .event-detail-badge.pending"
+      ).evaluate(card => {
+        const style = getComputedStyle(card);
+        const iconStyle = getComputedStyle(card, "::before");
+
+        return {
+          display: style.display,
+          background: style.backgroundColor,
+          color: style.color,
+          borderLeft: style.borderLeftColor,
+          icon: iconStyle.content,
+          iconBackground: iconStyle.backgroundColor,
+          iconColor: iconStyle.color,
+          overflows:
+            card.scrollWidth > card.clientWidth + 1 ||
+            card.scrollHeight > card.clientHeight + 1
+        };
+      });
+
+      expect(result.display).toBe("grid");
+      expect(result.icon).toBe('"!"');
+      expect(result.overflows).toBe(false);
+      expect(
+        contrastRatio(result.color, result.background),
+        theme + " warning text lacks contrast at " + viewport.width + "px"
+      ).toBeGreaterThanOrEqual(4.5);
+
+      if (theme === "light") {
+        expect(result.background).toBe("rgb(242, 247, 244)");
+        expect(result.color).toBe("rgb(18, 32, 25)");
+        expect(result.borderLeft).toBe("rgb(183, 121, 31)");
+        expect(result.iconBackground).toBe("rgb(255, 243, 214)");
+        expect(result.iconColor).toBe("rgb(121, 80, 18)");
+      } else {
+        expect(result.background).toBe("rgb(23, 44, 37)");
+        expect(result.color).toBe("rgb(248, 250, 252)");
+        expect(result.borderLeft).toBe("rgb(245, 158, 11)");
+      }
+    }
+  }
+});

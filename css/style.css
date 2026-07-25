@@ -42747,3 +42747,59 @@ html[data-theme="light"] .event-detail-page
     color: var(--detail-muted) !important;
   }
 }
+
+/* Event detail accordions and chips: explicit contrast in both themes. */
+.event-detail-page .race-guide-accordion > div {
+  color: #d4ded8 !important;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+.event-detail-page .race-guide-accordion[open] > div {
+  padding: 13px 15px 15px;
+  border-top: 1px solid var(--detail-border);
+  background: #12251f;
+}
+
+.event-detail-page .race-guide-chip-group > span {
+  color: var(--detail-muted) !important;
+}
+
+.event-detail-page .race-guide-chip {
+  border-color: rgba(134, 239, 172, 0.28) !important;
+  background: #173d2a !important;
+  color: #dcfce7 !important;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+html[data-theme="light"] .event-detail-page
+  .race-guide-accordion[open] > div {
+  border-top-color: rgba(15, 23, 42, 0.11);
+  background: #ffffff;
+  color: #40564a !important;
+}
+
+html[data-theme="light"] .event-detail-page
+  .race-guide-accordion summary::after {
+  border-color: #9bd4ad !important;
+  background: #e9f8ee !important;
+  color: #166534 !important;
+}
+
+html[data-theme="light"] .event-detail-page
+  .race-guide-chip-group > span {
+  color: #4d6257 !important;
+}
+
+html[data-theme="light"] .event-detail-page .race-guide-chip {
+  border-color: #a7d8b7 !important;
+  background: #e7f8ed !important;
+  color: #14532d !important;
+}
+
+.event-detail-page .race-guide-accordion summary::after {
+  background: #19372a !important;
+  color: #bbf7d0 !important;
+}

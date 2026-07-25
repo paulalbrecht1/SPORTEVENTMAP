@@ -297,3 +297,108 @@ test("Berlin registration dates and fee context are clear", async ({ page }) => 
     )
   ).toBeGreaterThanOrEqual(4.5);
 });
+
+test("detail accordions and green chips stay readable in both themes", async ({ page }) => {
+  await preparePage(page, "/event/bmw-berlin-marathon-2026/");
+
+  const accordion = page.locator(
+    "#registration .race-guide-accordion"
+  ).first();
+  await accordion.evaluate(details => {
+    details.open = true;
+  });
+
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 1280, height: 800 }
+  ]) {
+    await page.setViewportSize(viewport);
+
+    for (const theme of ["light", "dark"]) {
+      await page.evaluate(activeTheme => {
+        document.documentElement.setAttribute("data-theme", activeTheme);
+      }, theme);
+
+      const styles = await page.evaluate(() => {
+        const content = document.querySelector(
+          "#registration .race-guide-accordion[open] > div"
+        );
+        const summary = content.parentElement.querySelector("summary");
+        const toggleStyle = getComputedStyle(summary, "::after");
+        const chip = document.querySelector("#course .race-guide-chip");
+        const chipGroup = chip.closest(".race-guide-chip-group");
+        const label = chipGroup.querySelector(":scope > span");
+        const section = chip.closest(".event-detail-card");
+        const readStyle = element => {
+          const style = getComputedStyle(element);
+
+          return {
+            background: style.backgroundColor,
+            color: style.color
+          };
+        };
+
+        return {
+          content: readStyle(content),
+          chip: readStyle(chip),
+          label: {
+            color: getComputedStyle(label).color,
+            background: getComputedStyle(section).backgroundColor
+          },
+          toggle: {
+            background: toggleStyle.backgroundColor,
+            color: toggleStyle.color
+          },
+          accordionOverflows:
+            content.scrollWidth > content.clientWidth + 1 ||
+            content.scrollHeight > content.clientHeight + 1,
+          chipOverflows:
+            chip.scrollWidth > chip.clientWidth + 1 ||
+            chip.scrollHeight > chip.clientHeight + 1
+        };
+      });
+
+      for (const component of [
+        styles.content,
+        styles.chip,
+        styles.label,
+        styles.toggle
+      ]) {
+        expect(
+          contrastRatio(component.color, component.background),
+          theme + " detail component lacks contrast at " + viewport.width + "px"
+        ).toBeGreaterThanOrEqual(4.5);
+      }
+      expect(styles.accordionOverflows).toBe(false);
+      expect(styles.chipOverflows).toBe(false);
+
+      if (theme === "light") {
+        expect(styles.content).toEqual({
+          background: "rgb(255, 255, 255)",
+          color: "rgb(64, 86, 74)"
+        });
+        expect(styles.chip).toEqual({
+          background: "rgb(231, 248, 237)",
+          color: "rgb(20, 83, 45)"
+        });
+        expect(styles.toggle).toEqual({
+          background: "rgb(233, 248, 238)",
+          color: "rgb(22, 101, 52)"
+        });
+      } else {
+        expect(styles.content).toEqual({
+          background: "rgb(18, 37, 31)",
+          color: "rgb(212, 222, 216)"
+        });
+        expect(styles.chip).toEqual({
+          background: "rgb(23, 61, 42)",
+          color: "rgb(220, 252, 231)"
+        });
+        expect(styles.toggle).toEqual({
+          background: "rgb(25, 55, 42)",
+          color: "rgb(187, 247, 208)"
+        });
+      }
+    }
+  }
+});

@@ -2639,15 +2639,6 @@ function renderFactCard(iconName, labelKey, value, options = {}) {
         </article>`;
 }
 
-function renderHeroChip(iconName, labelKey, value) {
-  const display =
-    hasUsefulValue(value)
-      ? clean(value)
-      : detailTranslation("detail.tba");
-
-  return `<span class="event-detail-chip">${detailIcon(iconName)}<span ${detailI18nAttr(labelKey)}>${escapeHtml(detailTranslation(labelKey))}</span><strong>${escapeHtml(display)}</strong></span>`;
-}
-
 function renderStatusBadge(value) {
   if (!hasUsefulValue(value)) {
     return "";
@@ -3180,10 +3171,6 @@ function getFeeRows(registration = {}, detailRows = []) {
 }
 
 function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website = "") {
-  const basis =
-    getRichDetailsSection(richDetails, "basis");
-  const course =
-    getRichDetailsSection(richDetails, "course");
   const registration =
     getRichDetailsSection(richDetails, "registration");
   const teaser =
@@ -3197,13 +3184,6 @@ function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website
         <span class="event-detail-kicker">${escapeHtml(clean(event.sport) || "Event")}</span>
         <h1>${escapeHtml(event.event_name)}</h1>
         <p>${escapeHtml(teaser)}</p>
-        <div class="event-detail-hero-chips" aria-label="Key event facts">
-          ${renderHeroChip("calendar", "detail.date", event.date)}
-          ${renderHeroChip("location", "detail.location", `${clean(event.city) || detailTranslation("detail.tba")}, ${clean(event.country) || detailTranslation("detail.tba")}`)}
-          ${renderHeroChip("sport", "detail.sport", event.sport)}
-          ${renderHeroChip("distance", "detail.distance", firstUsefulValue(course.main_distance, formatDistanceSummary(event.distance)))}
-          ${renderHeroChip("map", "detail.eventType", firstUsefulValue(basis.category, course.course_type))}
-        </div>
       </div>
       <div class="event-detail-cta-card">
         <div class="race-guide-status-panel">
@@ -3770,7 +3750,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260706-header-nav-v67" />
+  <link rel="stylesheet" href="../../css/style.css?v=20260725-detail-readability-v88" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,

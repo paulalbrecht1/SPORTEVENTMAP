@@ -40494,3 +40494,42 @@ body.platform-route-discovery:not(.landing-open) #sidebar-header #resetFiltersBt
     flex-grow: 1.75 !important;
   }
 }
+/* Event detail readability hardening */
+body.event-detail-page{--detail-surface-soft:#172c25;--detail-text:#f8fafc;--detail-muted:#bdcac3;--detail-border:rgba(183,197,190,.2);--detail-accent-soft:rgba(34,197,94,.13);--detail-warning-surface:#493511;--detail-warning-text:#fff2b2;--detail-warning-muted:#f4daa1;overflow-x:hidden}
+html[data-theme="light"] body.event-detail-page{--detail-surface-soft:#f2f7f4;--detail-text:#122019;--detail-muted:#4d6257;--detail-border:rgba(15,23,42,.13);--detail-accent-soft:rgba(34,197,94,.1);--detail-warning-surface:#fff8df;--detail-warning-text:#674711;--detail-warning-muted:#765b28}
+.event-detail-page :is(.event-detail-hero-main,.event-detail-cta-card,.event-detail-action-group,.event-detail-card,.race-guide-fact-grid,.race-guide-action-grid,.race-guide-fact-card,.race-guide-registration-status,.race-guide-registration-link,.race-guide-info-box,.race-guide-highlight,.race-guide-table-wrap,.race-guide-timeline,.race-guide-accordion,.event-sources-section){min-width:0}
+.event-detail-page .event-detail-hero-main h1{max-width:100%;overflow-wrap:anywhere;text-wrap:balance}
+.event-detail-page :is(.event-detail-hero-main p,.race-guide-section-heading p,.event-detail-status-note){overflow-wrap:anywhere}
+.event-detail-page .event-detail-tabs{max-width:100%;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.event-detail-page .event-detail-tabs::-webkit-scrollbar{display:none}
+.event-detail-page .event-detail-tabs a{flex:0 0 auto}
+.event-detail-page :is(.race-guide-fact-grid,.race-guide-action-grid,.race-guide-fact-grid.is-tight){grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))}
+.event-detail-page .race-guide-fact-card{min-height:104px;height:auto;border-color:var(--detail-border)!important;background:var(--detail-surface-soft)!important;color:var(--detail-text)!important;box-shadow:none!important}
+.event-detail-page :is(.race-guide-fact-card.is-highlight,.race-guide-highlight){border-color:rgba(34,197,94,.34)!important;background:var(--detail-accent-soft)!important}
+.event-detail-page .race-guide-fact-card .event-detail-icon{color:#22c55e!important;border-color:rgba(34,197,94,.25)!important;background:var(--detail-accent-soft)!important}
+.event-detail-page :is(.race-guide-fact-card span,.race-guide-highlight span,.race-guide-timeline span){color:var(--detail-muted)!important}
+.event-detail-page :is(.race-guide-fact-card strong,.race-guide-highlight strong,.race-guide-timeline strong){color:var(--detail-text)!important;overflow-wrap:anywhere;hyphens:auto}
+.event-detail-page .race-guide-registration-status{min-height:96px;height:auto;align-content:start;border-color:rgba(180,120,13,.36)!important;background:var(--detail-warning-surface)!important;color:var(--detail-warning-text)!important;box-shadow:none!important}
+.event-detail-page .race-guide-registration-status .event-detail-icon{color:var(--detail-warning-text)!important;border-color:rgba(180,120,13,.28)!important;background:rgba(245,158,11,.12)!important}
+.event-detail-page :is(.race-guide-registration-status span,.race-guide-registration-status strong,.race-guide-registration-status small){min-width:0;display:block!important;overflow:visible!important;color:var(--detail-warning-text)!important;overflow-wrap:anywhere;hyphens:auto;-webkit-box-orient:initial!important;-webkit-line-clamp:unset!important}
+.event-detail-page .race-guide-registration-status small{color:var(--detail-warning-muted)!important}
+.event-detail-page .race-guide-registration-link{min-height:96px;height:auto;padding:18px;color:#052e16!important;overflow-wrap:anywhere}
+.event-detail-page :is(.race-guide-info-box,.race-guide-table-wrap,.race-guide-timeline,.race-guide-accordion,.event-sources-section.is-subtle){border-color:var(--detail-border)!important;background:var(--detail-surface-soft)!important;color:var(--detail-text)!important;box-shadow:none!important}
+.event-detail-page :is(.race-guide-section-heading h2,.race-guide-accordion summary){color:var(--detail-text)!important}
+.event-detail-page :is(.race-guide-section-heading p,.race-guide-info-box,.race-guide-accordion p,.event-source-list){color:var(--detail-muted)!important}
+.event-detail-page .race-guide-table{width:100%;table-layout:fixed}
+.event-detail-page :is(.race-guide-table th,.race-guide-table td){border-color:var(--detail-border)!important;overflow-wrap:anywhere;hyphens:auto}
+.event-detail-page .race-guide-table th{color:var(--detail-muted)!important}
+.event-detail-page .race-guide-table td{color:var(--detail-text)!important}
+.event-detail-page .race-guide-timeline article{min-width:0;border-color:var(--detail-border)!important}
+.event-detail-page :is(.event-detail-badge,.event-detail-primary,.event-detail-secondary,.race-guide-inline-action,.event-source-list a){max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.event-detail-page .event-detail-badge{height:auto;min-height:28px;line-height:1.4;text-align:left}
+.event-detail-page .event-detail-badge.verified{border-color:rgba(34,197,94,.36)!important;background:rgba(34,197,94,.14)!important;color:#9ff4bd!important}
+.event-detail-page .event-detail-badge.pending{border-color:rgba(245,158,11,.36)!important;background:rgba(245,158,11,.14)!important;color:#fde68a!important}
+.event-detail-page .event-detail-badge.reference{border-color:rgba(96,165,250,.38)!important;background:rgba(59,130,246,.15)!important;color:#bfdbfe!important}
+.event-detail-page .event-detail-badge.sold-out{border-color:rgba(248,113,113,.38)!important;background:rgba(239,68,68,.15)!important;color:#fecaca!important}
+html[data-theme="light"] .event-detail-page .event-detail-badge.verified{color:#14532d!important}
+html[data-theme="light"] .event-detail-page .event-detail-badge.pending{color:#674711!important}
+html[data-theme="light"] .event-detail-page .event-detail-badge.reference{color:#1e3a8a!important}
+html[data-theme="light"] .event-detail-page .event-detail-badge.sold-out{color:#7f1d1d!important}
+@media(max-width:620px){.event-detail-page :is(.race-guide-fact-grid,.race-guide-action-grid,.race-guide-fact-grid.is-tight){grid-template-columns:1fr}.event-detail-page :is(.race-guide-fact-card,.race-guide-registration-status,.race-guide-registration-link){min-height:0}.event-detail-page .race-guide-table{min-width:460px}}

@@ -29477,8 +29477,9 @@ body:not(.event-list-fullscreen) .filter-distance-card.open .filter-accordion-to
   align-items: center;
   min-height: 34px;
   padding: 0 12px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(148, 163, 184, 0.24);
   border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
   color: rgba(226, 232, 240, 0.78);
   font-size: 0.82rem;
   font-weight: 850;
@@ -29492,6 +29493,8 @@ body:not(.event-list-fullscreen) .filter-distance-card.open .filter-accordion-to
 }
 
 .landing-platform-nav a {
+  border-color: rgba(15, 23, 42, 0.12);
+  background: rgba(255, 255, 255, 0.72);
   color: rgba(15, 23, 42, 0.72);
 }
 
@@ -37352,40 +37355,40 @@ body.landing-theme-dark .sem-home,
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(18px, 2vw, 34px);
+  gap: clamp(7px, 1vw, 12px);
 }
 
 .sem-desktop-nav a {
-  position: relative;
-  min-height: 44px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  padding: 0 clamp(13px, 1.4vw, 18px);
+  border: 1px solid var(--sem-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.035);
   color: var(--sem-muted);
   font-size: 0.875rem;
   font-weight: 700;
   white-space: nowrap;
-}
-
-.sem-desktop-nav a::after {
-  content: "";
-  position: absolute;
-  right: 0;
-  bottom: 5px;
-  left: 0;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--sem-green);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 160ms ease;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 }
 
 .sem-desktop-nav a:is(:hover, :focus-visible, .active) {
   color: var(--sem-text);
+  border-color: rgba(69, 212, 117, 0.52);
+  background: rgba(69, 212, 117, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(69, 212, 117, 0.08);
+  outline: none;
 }
 
-.sem-desktop-nav a:is(:hover, :focus-visible, .active)::after {
-  transform: scaleX(1);
+.sem-desktop-nav a:is(:hover, :focus-visible) {
+  transform: translateY(-1px);
 }
 
 .sem-header-actions {
@@ -38537,7 +38540,8 @@ body.landing-theme-dark .sem-home,
 @media (max-width: 1279px) {
   body.landing-open .sem-home { --sem-header-height: 70px; }
   .sem-header-inner { gap: 22px; }
-  .sem-desktop-nav { gap: 18px; }
+  .sem-desktop-nav { gap: 7px; }
+  .sem-desktop-nav a { padding-inline: 12px; }
   .sem-header-cta { padding-inline: 15px; }
   .sem-hero-grid { grid-template-columns: minmax(0, 0.92fr) minmax(430px, 1.08fr); gap: 40px; }
   .sem-hero h1 { font-size: clamp(2.75rem, 4.5vw, 4rem); }

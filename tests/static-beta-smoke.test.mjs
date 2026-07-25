@@ -30,6 +30,8 @@ function pass(message) {
 
 const html =
   read("index.html");
+const css =
+  read("css/style.css");
 
 const ids =
   [...html.matchAll(/\sid=["']([^"']+)["']/g)]
@@ -83,6 +85,23 @@ pass("HTML ids are unique");
   );
 });
 pass("required beta views and modals exist");
+
+assert.match(
+  html,
+  /<nav class="sem-desktop-nav"[^>]*>[\s\S]*?<a class="active" href="#\/home"[^>]*>Home<\/a>/i,
+  "Home landing navigation must expose an active Home pill"
+);
+assert.match(
+  css,
+  /\.sem-desktop-nav a\s*\{[\s\S]*?border-radius:\s*999px;[\s\S]*?background:/i,
+  "Home landing navigation links must render as pills"
+);
+assert.match(
+  css,
+  /\.platform-nav a\s*\{[\s\S]*?border:\s*1px solid rgba\(148, 163, 184, 0\.24\);[\s\S]*?border-radius:\s*999px;[\s\S]*?background:/i,
+  "Platform navigation links must render as visible pills"
+);
+pass("Home and platform navigation labels render as pills");
 
 assert.doesNotMatch(
   html,
@@ -174,9 +193,6 @@ events.forEach((event, index) => {
   );
 });
 pass(`${events.length} event rows pass schema validation`);
-
-const css =
-  read("css/style.css");
 
 assert.match(
   css,

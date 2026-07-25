@@ -1,7 +1,7 @@
 Sport Event Map - Cloudflare beta release
-Version: 20260724-release-hardening-v75
+Version: 20260725-release-hardening-v76
 Built for upload: use the complete dist folder contents
-Includes: responsive product landing page, Discovery, Event Wiki, Season Planner, account flows, 50 priority event detail pages, legal pages, sitemap, icons, css, js and 994 validated events
+Includes: responsive product landing page, Discovery, Event Wiki, Season Planner, account flows, 50 priority event detail pages, legal pages, sitemap, icons, css, js, 994 validated events and a reproducible Supabase migration baseline
 
 
 

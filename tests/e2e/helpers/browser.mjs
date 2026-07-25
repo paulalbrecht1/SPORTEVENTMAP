@@ -209,7 +209,16 @@ export async function waitForEventList(page, options = {}) {
   const { openPanel = true } = options;
   await expect(page.getByTestId("event-list")).toBeAttached();
 
+  await page.waitForFunction(() =>
+    document.querySelectorAll("[data-testid='event-card']").length > 0 ||
+    document.querySelector(".event-empty")
+  );
+
   if (openPanel) {
+    await page.waitForFunction(() =>
+      document.body.classList.contains("platform-route-discovery")
+    );
+
     const panelToggle = page.getByTestId("discovery-panel-toggle");
 
     if ((await panelToggle.getAttribute("aria-expanded")) !== "true") {
@@ -219,11 +228,6 @@ export async function waitForEventList(page, options = {}) {
     await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
     await expect(page.getByTestId("event-list")).toBeVisible();
   }
-
-  await page.waitForFunction(() =>
-    document.querySelectorAll("[data-testid='event-card']").length > 0 ||
-    document.querySelector(".event-empty")
-  );
 }
 
 export async function searchForEvent(page, name) {

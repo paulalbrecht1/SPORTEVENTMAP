@@ -27,6 +27,11 @@
     "batch:validate": "node tools/validate-event-batch.js",
     "review:beta": "node tools/create-beta-review-queue.js",
     "audit:anon": "node tests/live-anon-access-audit.mjs",
+    "audit:supabase-baseline": "node tools/audit-supabase-migration-baseline.mjs",
+    "supabase:start": "supabase start -x edge-runtime,imgproxy,logflare,mailpit,postgres-meta,realtime,storage-api,studio,supavisor,vector",
+    "supabase:reset": "supabase db reset --local --no-seed",
+    "supabase:status": "supabase status",
+    "test:rls:local": "node tests/local-rls-security.test.mjs",
     "test:static": "node tests/static-beta-smoke.test.mjs",
     "test:event-detail": "node tests/event-detail-toggle.test.mjs",
     "test:rls": "node tests/rls-security.test.mjs",
@@ -37,6 +42,7 @@
     "test:all": "npm run check && npm run test:static && npm run audit:layout && npm run test:e2e"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.61.1",
+    "supabase": "2.109.1"
   }
 }

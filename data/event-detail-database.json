@@ -37,10 +37,7 @@
       "entry_fee_min": "205 EUR",
       "entry_fee_max": "205 EUR",
       "currency": "EUR",
-      "price_tiers": [
-        "Regular marathon entry: 205 EUR.",
-        "Clothing bag drop-off can be booked during registration for an additional fee; otherwise runners receive a finisher poncho."
-      ],
+      "price_tiers": [],
       "lottery_available": true,
       "charity_entries": true,
       "tour_operator_entries": true,

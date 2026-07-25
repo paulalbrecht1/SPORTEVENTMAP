@@ -42714,3 +42714,36 @@ html[data-theme="light"] .event-detail-page
     font-size: 0.82rem;
   }
 }
+
+/* Registration dates: use a clear tabular presentation in both themes. */
+.event-detail-page #registration
+  :is(
+    .race-guide-fact-card.is-registration-period,
+    .race-guide-fact-card.is-registration-deadline
+  ) strong {
+  color: var(--detail-text) !important;
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 900;
+  letter-spacing: 0.015em;
+  line-height: 1.4;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+}
+
+@media (max-width: 620px) {
+  .event-detail-page #registration .race-guide-table-wrap.is-compact {
+    overflow-x: clip !important;
+  }
+
+  .event-detail-page #registration
+    .race-guide-table-wrap.is-compact .race-guide-table {
+    min-width: 0 !important;
+  }
+
+  .event-detail-page #registration
+    .race-guide-table-wrap.is-compact .race-guide-table td::before {
+    color: var(--detail-muted) !important;
+  }
+}

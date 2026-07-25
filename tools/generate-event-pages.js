@@ -3125,7 +3125,7 @@ function getFeeRows(registration = {}, detailRows = []) {
         rows.push({
           tier: tier.tier || tier.name || `Tier ${index + 1}`,
           price: tier.price || tier.fee || tier.value,
-          until: tier.until || tier.deadline || tier.valid_until
+          until: formatDetailDate(tier.until || tier.deadline || tier.valid_until)
         });
         return;
       }
@@ -3134,6 +3134,23 @@ function getFeeRows(registration = {}, detailRows = []) {
         tier: `Tier ${index + 1}`,
         price: clean(tier),
         until: ""
+      });
+    });
+  }
+
+  if (!rows.length) {
+    detailRows.forEach(row => {
+      const fee =
+        getFee2026(row) || getFee2025(row);
+
+      if (!hasUsefulValue(fee)) {
+        return;
+      }
+
+      rows.push({
+        tier: clean(row.category_name || "Entry Fee"),
+        price: formatMoney(fee, row.currency || "EUR").replace(/&euro;/g, "EUR "),
+        until: formatDetailDate(row.registration_deadline)
       });
     });
   }
@@ -3148,26 +3165,20 @@ function getFeeRows(registration = {}, detailRows = []) {
           : "",
         registration.entry_fee_min
       ),
-      until: registration.registration_deadline || registration.registration_close_date
+      until: formatDetailDate(registration.registration_deadline || registration.registration_close_date)
     });
   }
 
-  detailRows.forEach(row => {
-    const fee =
-      getFee2026(row) || getFee2025(row);
-
-    if (!hasUsefulValue(fee)) {
-      return;
-    }
-
-    rows.push({
-      tier: clean(row.category_name || "Entry Fee"),
-      price: formatMoney(fee, row.currency || "EUR").replace(/&euro;/g, "EUR "),
-      until: row.registration_deadline
-    });
-  });
-
   return rows;
+}
+
+function formatDetailDate(value) {
+  const text = clean(value);
+  const match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  return match
+    ? `${match[3]}.${match[2]}.${match[1]}`
+    : text;
 }
 
 function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website = "") {
@@ -3272,11 +3283,11 @@ function buildRaceGuideRegistration(event, detailRows = [], richDetails = null, 
     [
       registration.registration_open_date,
       registration.registration_close_date
-    ].filter(hasUsefulValue).join(" - ");
+    ].filter(hasUsefulValue).map(formatDetailDate).join(" – ");
   const blocks = [
     renderRegistrationStatusCard(firstUsefulValue(registration.registration_status, detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "))),
-    renderFactCard("calendar", "detail.registrationPeriod", period),
-    renderFactCard("calendar", "detail.deadline", firstUsefulValue(registration.registration_deadline, registration.registration_close_date), { kind: "date" }),
+    renderFactCard("calendar", "detail.registrationPeriod", period, { tone: "registration-period" }),
+    renderFactCard("calendar", "detail.deadline", formatDetailDate(firstUsefulValue(registration.registration_close_date, registration.registration_deadline)), { kind: "date", tone: "registration-deadline" }),
     renderFactCard("fee", "detail.entryFee", getPriceSummary(registration, detailRows)),
     registrationUrl ? `<a class="race-guide-registration-link" href="${registrationUrl}" target="_blank" rel="noopener noreferrer"><span ${detailI18nAttr("detail.openRegistration")}>${escapeHtml(detailTranslation("detail.openRegistration"))}</span></a>` : ""
   ].filter(Boolean).join("");
@@ -3750,7 +3761,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260725-detail-readability-v88" />
+  <link rel="stylesheet" href="../../css/style.css?v=20260725-registration-detail-v89" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,

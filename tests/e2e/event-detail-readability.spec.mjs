@@ -223,3 +223,77 @@ test("registration warning uses a calm readable status card", async ({ page }) =
     }
   }
 });
+
+test("Berlin registration dates and fee context are clear", async ({ page }) => {
+  await preparePage(page, "/event/bmw-berlin-marathon-2026/");
+
+  const periodCard = page.locator(
+    "#registration .race-guide-fact-card.is-registration-period"
+  );
+  await expect(periodCard.locator("strong"))
+    .toHaveText("25.09.2025 – 06.11.2025");
+  await expect(page.locator(
+    "#registration .race-guide-fact-card.is-registration-deadline strong"
+  )).toHaveText("06.11.2025");
+
+  const typography = await periodCard.locator("strong")
+    .evaluate(value => {
+      const style = getComputedStyle(value);
+
+      return {
+        color: style.color,
+        background: getComputedStyle(value.closest("article")).backgroundColor,
+        fontSize: parseFloat(style.fontSize),
+        fontWeight: Number(style.fontWeight),
+        wordBreak: style.wordBreak
+      };
+    });
+  expect(typography.fontSize).toBeGreaterThanOrEqual(16);
+  expect(typography.fontWeight).toBeGreaterThanOrEqual(700);
+  expect(typography.wordBreak).toBe("keep-all");
+  expect(
+    contrastRatio(typography.color, typography.background)
+  ).toBeGreaterThanOrEqual(4.5);
+
+  const feeRows = page.locator(
+    "#registration .race-guide-table tbody tr"
+  );
+  await expect(feeRows).toHaveCount(1);
+  await expect(feeRows.locator("td")).toHaveText([
+    "Marathon",
+    "EUR 205",
+    "06.11.2025"
+  ]);
+  await expect(page.locator("#registration .race-guide-table"))
+    .not.toContainText("Tier 1");
+  await expect(page.locator("#registration .race-guide-table"))
+    .not.toContainText("Tier 2");
+  await expect(page.locator("#registration .race-guide-table"))
+    .not.toContainText("Clothing bag");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.evaluate(() => {
+    document.documentElement.setAttribute("data-theme", "light");
+  });
+  const mobileFeeTable = await page.locator(
+    "#registration .race-guide-table-wrap.is-compact"
+  ).evaluate(table => {
+    const cell = table.querySelector("td");
+    const labelStyle = getComputedStyle(cell, "::before");
+
+    return {
+      scrollWidth: table.scrollWidth,
+      clientWidth: table.clientWidth,
+      labelColor: labelStyle.color,
+      background: getComputedStyle(table).backgroundColor
+    };
+  });
+  expect(mobileFeeTable.scrollWidth)
+    .toBeLessThanOrEqual(mobileFeeTable.clientWidth + 1);
+  expect(
+    contrastRatio(
+      mobileFeeTable.labelColor,
+      mobileFeeTable.background
+    )
+  ).toBeGreaterThanOrEqual(4.5);
+});

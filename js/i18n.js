@@ -216,6 +216,10 @@ const I18N = {
     "map.standard": "Standard",
     "map.light": "Light",
     "map.outdoor": "Outdoor",
+    "map.legend": "Event types",
+    "map.legendRunning": "Running",
+    "map.legendUltra": "Ultra",
+    "map.legendTriathlon": "Triathlon",
     "drawer.placeholder": "Select an event to view details.",
 
     "event.addTitle": "Add Event",
@@ -752,6 +756,10 @@ const I18N = {
     "map.standard": "Standard",
     "map.light": "Hell",
     "map.outdoor": "Outdoor",
+    "map.legend": "Eventarten",
+    "map.legendRunning": "Laufevent",
+    "map.legendUltra": "Ultra",
+    "map.legendTriathlon": "Triathlon",
     "drawer.placeholder": "Wähle ein Event aus, um die Details zu sehen.",
 
     "event.addTitle": "Event hinzufügen",
@@ -1340,6 +1348,10 @@ const TEXT_BINDINGS = [
   ["#mapStyleSelect option[value='standard']", "map.standard"],
   ["#mapStyleSelect option[value='light']", "map.light"],
   ["#mapStyleSelect option[value='outdoor']", "map.outdoor"],
+  ["#eventMapLegendTitle", "map.legend"],
+  ["#eventMapLegendRunning", "map.legendRunning"],
+  ["#eventMapLegendUltra", "map.legendUltra"],
+  ["#eventMapLegendTriathlon", "map.legendTriathlon"],
   [".drawer-placeholder", "drawer.placeholder"],
 
   ["#eventModal h2", "event.addTitle"],

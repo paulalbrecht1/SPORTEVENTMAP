@@ -27,7 +27,7 @@
   <script src="js/theme.js?v=20260725-global-theme-v80"></script>
 
   <!-- DEIN CSS -->
-  <link rel="stylesheet" href="css/style.css?v=20260725-detail-readability-v88" />
+  <link rel="stylesheet" href="css/style.css?v=20260725-event-markers-v89" />
 </head>
 
 <body>
@@ -1071,6 +1071,29 @@
 
     <!-- MAP -->
     <div id="map" data-testid="map"></div>
+
+    <aside
+      id="eventMapLegend"
+      class="event-map-legend"
+      data-testid="map-legend"
+      aria-label="Event marker colors"
+    >
+      <strong id="eventMapLegendTitle">Event types</strong>
+      <div class="event-map-legend-list">
+        <span class="event-map-legend-item">
+          <i class="event-map-legend-swatch" aria-hidden="true"></i>
+          <span id="eventMapLegendRunning">Running</span>
+        </span>
+        <span class="event-map-legend-item">
+          <i class="event-map-legend-swatch event-map-legend-swatch--ultra" aria-hidden="true"></i>
+          <span id="eventMapLegendUltra">Ultra</span>
+        </span>
+        <span class="event-map-legend-item">
+          <i class="event-map-legend-swatch event-map-legend-swatch--triathlon" aria-hidden="true"></i>
+          <span id="eventMapLegendTriathlon">Triathlon</span>
+        </span>
+      </div>
+    </aside>
 
     <!-- FLOATING ACTIONS -->
 <div id="floatingActions">
@@ -3322,7 +3345,7 @@
   defer
   src="js/config.js?v=20260706-header-nav-v67"
 ></script>
-<script defer src="js/i18n.js?v=20260720-discovery-controls-v68"></script>
+<script defer src="js/i18n.js?v=20260725-event-markers-v89"></script>
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
@@ -3330,7 +3353,7 @@
 ></script>
 
 <script defer src="js/events.js?v=20260724-planning-key-v21"></script>
-<script defer src="js/map.js?v=20260720-discovery-responsive-v69"></script>
+<script defer src="js/map.js?v=20260725-event-markers-v89"></script>
 <script defer src="js/search.js?v=20260720-discovery-responsive-v69"></script>
 <script defer src="js/app.js?v=20260720-home-landing-v74"></script>
 

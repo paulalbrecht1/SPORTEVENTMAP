@@ -236,19 +236,69 @@ const MAP_STYLES = {
   }
 };
 
-// CUSTOM RED MARKER
-const redIcon = L.icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+// SPORT-SPECIFIC EVENT MARKERS
+const EVENT_MARKER_TYPES = {
+  running: {
+    label: "R",
+    title: "Running event"
+  },
+  ultra: {
+    label: "U",
+    title: "Ultra event"
+  },
+  triathlon: {
+    label: "T",
+    title: "Triathlon event"
+  }
+};
 
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+function getEventMarkerType(event) {
+  const context =
+    [
+      event?.sport,
+      event?.event_name,
+      event?.distance,
+      event?.distance_category,
+      event?.description
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
 
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+  if (/triathlon|ironman|70\.3|duathlon/.test(context)) {
+    return "triathlon";
+  }
+
+  if (
+    /ultra|ultramarathon|backyard|trail|berglauf|mountain|skyrace|\b(?:50|60|80|100|160)\s?(?:k|km|kilometer|miles?|mi)\b|\b(?:12|24)\s?h\b/.test(
+      context
+    )
+  ) {
+    return "ultra";
+  }
+
+  return "running";
+}
+
+function createEventMarkerPresentation(event) {
+  const type =
+    getEventMarkerType(event);
+  const meta =
+    EVENT_MARKER_TYPES[type];
+
+  return {
+    type,
+    title: meta.title,
+    icon: L.divIcon({
+      className: `custom-marker custom-marker--${type}`,
+      html:
+        `<span class="event-map-pin event-map-pin--${type}" data-event-marker-type="${type}" aria-hidden="true"><span class="event-map-pin-label">${meta.label}</span></span>`,
+      iconSize: [38, 46],
+      iconAnchor: [19, 44],
+      popupAnchor: [0, -40]
+    })
+  };
+}
 
 // INIT MAP
 function initMap() {
@@ -517,7 +567,16 @@ function addMarker(event) {
     return;
   }
 
-  const marker = L.marker([lat, lng], { icon: redIcon });
+  const markerPresentation =
+    createEventMarkerPresentation(event);
+  const marker = L.marker([lat, lng], {
+    icon: markerPresentation.icon,
+    title:
+      `${event.event_name || markerPresentation.title} · ${markerPresentation.title}`,
+    alt:
+      `${event.event_name || markerPresentation.title} · ${markerPresentation.title}`,
+    riseOnHover: true
+  });
 
   marker.bindPopup(createPopup(event));
 

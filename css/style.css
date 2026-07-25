@@ -40533,3 +40533,173 @@ html[data-theme="light"] .event-detail-page .event-detail-badge.pending{color:#6
 html[data-theme="light"] .event-detail-page .event-detail-badge.reference{color:#1e3a8a!important}
 html[data-theme="light"] .event-detail-page .event-detail-badge.sold-out{color:#7f1d1d!important}
 @media(max-width:620px){.event-detail-page :is(.race-guide-fact-grid,.race-guide-action-grid,.race-guide-fact-grid.is-tight){grid-template-columns:1fr}.event-detail-page :is(.race-guide-fact-card,.race-guide-registration-status,.race-guide-registration-link){min-height:0}.event-detail-page .race-guide-table{min-width:460px}}
+/* Discovery event type markers */
+body.platform-route-discovery:not(.landing-open) #app {
+  position: relative;
+}
+
+.custom-marker {
+  border: 0;
+  background: transparent;
+}
+
+.event-map-pin {
+  --event-marker-color: #dc2626;
+  --event-marker-glow: rgba(220, 38, 38, 0.32);
+  position: relative;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 3px solid #ffffff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--event-marker-color);
+  color: #ffffff;
+  box-shadow:
+    0 8px 18px var(--event-marker-glow),
+    0 2px 5px rgba(15, 23, 42, 0.34);
+  transform: rotate(-45deg);
+  transform-origin: 50% 50%;
+  transition:
+    transform 150ms ease,
+    filter 150ms ease;
+}
+
+.event-map-pin--running {
+  --event-marker-color: #dc2626;
+  --event-marker-glow: rgba(220, 38, 38, 0.34);
+}
+
+.event-map-pin--ultra {
+  --event-marker-color: #15803d;
+  --event-marker-glow: rgba(21, 128, 61, 0.36);
+}
+
+.event-map-pin--triathlon {
+  --event-marker-color: #2563eb;
+  --event-marker-glow: rgba(37, 99, 235, 0.36);
+}
+
+.event-map-pin-label {
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 950;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.48);
+  transform: rotate(45deg);
+}
+
+.custom-marker:hover .event-map-pin,
+.custom-marker:focus .event-map-pin {
+  filter: brightness(1.08) saturate(1.08);
+  transform: rotate(-45deg) scale(1.1);
+}
+
+.event-map-legend {
+  position: absolute;
+  top: max(var(--map-control-edge, 16px), env(safe-area-inset-top));
+  right: max(var(--map-control-edge, 16px), env(safe-area-inset-right));
+  z-index: 800;
+  min-width: 132px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 7px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.24);
+  backdrop-filter: blur(12px);
+  pointer-events: none;
+}
+
+.event-map-legend strong {
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.event-map-legend-list {
+  display: grid;
+  gap: 6px;
+}
+
+.event-map-legend-item {
+  display: grid;
+  grid-template-columns: 13px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  color: #e2e8f0;
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.event-map-legend-swatch {
+  width: 11px;
+  height: 11px;
+  border: 2px solid rgba(255, 255, 255, 0.92);
+  border-radius: 50%;
+  background: #dc2626;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.24);
+}
+
+.event-map-legend-swatch--ultra {
+  background: #15803d;
+}
+
+.event-map-legend-swatch--triathlon {
+  background: #2563eb;
+}
+
+html[data-theme="light"] .event-map-legend {
+  border-color: rgba(15, 23, 42, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  color: #122019;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.14);
+}
+
+html[data-theme="light"] .event-map-legend strong {
+  color: #122019;
+}
+
+html[data-theme="light"] .event-map-legend-item {
+  color: #33473c;
+}
+
+body.event-list-fullscreen #eventMapLegend,
+body.landing-open #eventMapLegend {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .event-map-legend {
+    top: 8px;
+    right: 8px;
+    min-width: 108px;
+    padding: 8px 9px;
+    gap: 5px;
+    border-radius: 12px;
+  }
+
+  .event-map-legend strong {
+    font-size: 0.61rem;
+  }
+
+  .event-map-legend-item {
+    grid-template-columns: 11px minmax(0, 1fr);
+    gap: 6px;
+    font-size: 0.69rem;
+  }
+
+  .event-map-legend-swatch {
+    width: 10px;
+    height: 10px;
+  }
+}

@@ -41306,6 +41306,18 @@ html[data-theme="light"] #seasonPlannerModal .season-health-card .season-warning
   background: #fff1f2 !important;
 }
 
+html[data-theme="light"] #seasonPlannerModal .season-warning-item strong {
+  color: #78350f !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-warning-item.high strong {
+  color: #991b1b !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-warning-item span {
+  color: #33473c !important;
+}
+
 
 html[data-theme="light"] #seasonPlannerModal :is(
   .season-focus-card,

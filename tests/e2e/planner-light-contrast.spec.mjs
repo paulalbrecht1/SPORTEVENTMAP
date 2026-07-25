@@ -193,6 +193,20 @@ test("Light Season Planner keeps every visible text element readable", async ({ 
   await selectPlannerTab(page, "overview");
   await expectEveryPlannerTextReadable(page, "Overview");
 
+  await page.locator("#seasonOverviewWarnings").evaluate(container => {
+    container.innerHTML = `
+      <div class="season-warning-item high">
+        <strong>5 days apart · 15 recommended</strong>
+        <span>First race → Second race</span>
+      </div>
+      <div class="season-warning-item">
+        <strong>23 days apart · 30 recommended</strong>
+        <span>Second race → Third race</span>
+      </div>
+    `;
+  });
+  await expectEveryPlannerTextReadable(page, "Schedule warnings");
+
   const infoDialogs = [
     {
       name: "Season Score info",

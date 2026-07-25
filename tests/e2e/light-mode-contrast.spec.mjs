@@ -427,6 +427,98 @@ test("Light mode keeps global status messages readable and transient", async ({ 
 });
 
 
+test("Light mode keeps both Add Event select fields consistent", async ({ page }) => {
+  await page.setViewportSize({
+    width: 1280,
+    height: 900
+  });
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() => {
+    window.SportEventMapTheme.apply("light", {
+      persist: true
+    });
+    document.getElementById("eventModal").classList.add("open");
+  });
+
+  await expect(page.locator("#eventModal"))
+    .toHaveClass(/open/);
+  await expectReadable(page, "#eventModal h2");
+  await expectReadable(page, "#eventSportInput");
+  await expectReadable(page, "#eventCourseTypeInput");
+
+  const selectStyles = await page.locator(
+    "#eventSportInput, #eventCourseTypeInput"
+  ).evaluateAll(selects => selects.map(select => {
+    const style = getComputedStyle(select);
+    const optionStyle = getComputedStyle(select.options[0]);
+
+    return {
+      id: select.id,
+      background: style.backgroundColor,
+      color: style.color,
+      border: style.borderColor,
+      optionBackground: optionStyle.backgroundColor,
+      optionColor: optionStyle.color
+    };
+  }));
+
+  expect(selectStyles).toEqual([
+    {
+      id: "eventSportInput",
+      background: "rgb(248, 251, 249)",
+      color: "rgb(18, 32, 25)",
+      border: "rgba(15, 23, 42, 0.16)",
+      optionBackground: "rgb(255, 255, 255)",
+      optionColor: "rgb(18, 32, 25)"
+    },
+    {
+      id: "eventCourseTypeInput",
+      background: "rgb(248, 251, 249)",
+      color: "rgb(18, 32, 25)",
+      border: "rgba(15, 23, 42, 0.16)",
+      optionBackground: "rgb(255, 255, 255)",
+      optionColor: "rgb(18, 32, 25)"
+    }
+  ]);
+
+  await page.locator("#eventSportInput").focus();
+  const focusedStyle = await page.locator("#eventSportInput")
+    .evaluate(select => {
+      const style = getComputedStyle(select);
+      return {
+        background: style.backgroundColor,
+        border: style.borderColor,
+        color: style.color
+      };
+    });
+  expect(focusedStyle).toEqual({
+    background: "rgb(255, 255, 255)",
+    border: "rgb(21, 128, 61)",
+    color: "rgb(18, 32, 25)"
+  });
+
+  await page.setViewportSize({
+    width: 390,
+    height: 844
+  });
+  const modalOverflow = await page.locator(".event-modal-card")
+    .evaluate(card => ({
+      left: card.getBoundingClientRect().left,
+      right: card.getBoundingClientRect().right,
+      viewportWidth: document.documentElement.clientWidth,
+      scrollWidth: card.scrollWidth,
+      clientWidth: card.clientWidth
+    }));
+  expect(modalOverflow.left).toBeGreaterThanOrEqual(7);
+  expect(modalOverflow.right)
+    .toBeLessThanOrEqual(modalOverflow.viewportWidth - 7);
+  expect(modalOverflow.scrollWidth)
+    .toBeLessThanOrEqual(modalOverflow.clientWidth + 1);
+});
+
+
 test("Light mode keeps Discovery footer, popup and drawer readable", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   const run = fixtureByName["SEM E2E Future Run"];

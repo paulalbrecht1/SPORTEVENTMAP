@@ -42472,3 +42472,42 @@ html[data-theme="light"] .app-toast span {
     width: auto;
   }
 }
+
+/* Add Event modal: keep native select fields consistent in light mode. */
+html[data-theme="light"] #eventModal .event-modal-card :is(
+  #eventSportInput,
+  #eventCourseTypeInput
+) {
+  border-color: rgba(15, 23, 42, 0.16) !important;
+  background-color: #f8fbf9 !important;
+  color: #122019 !important;
+  color-scheme: light !important;
+  box-shadow: inset 0 1px 0 #ffffff !important;
+}
+
+html[data-theme="light"] #eventModal .event-modal-card :is(
+  #eventSportInput,
+  #eventCourseTypeInput
+):hover {
+  border-color: #86c99d !important;
+  background-color: #ffffff !important;
+}
+
+html[data-theme="light"] #eventModal .event-modal-card :is(
+  #eventSportInput,
+  #eventCourseTypeInput
+):focus-visible {
+  border-color: #15803d !important;
+  background-color: #ffffff !important;
+  color: #122019 !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.14) !important;
+}
+
+html[data-theme="light"] #eventModal .event-modal-card :is(
+  #eventSportInput,
+  #eventCourseTypeInput
+) option {
+  background: #ffffff !important;
+  color: #122019 !important;
+}

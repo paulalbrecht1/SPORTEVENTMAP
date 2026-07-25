@@ -251,10 +251,64 @@ test("Light Season Planner keeps every visible text element readable", async ({ 
   await selectPlannerTab(page, "events");
   await expectEveryPlannerTextReadable(page, "Events list");
 
+  const eventStateStyles = await page
+    .getByTestId("planner-event-card")
+    .evaluateAll(cards => cards.map(card => ({
+      active: card.classList.contains("active"),
+      past: card.classList.contains("is-past-event"),
+      background: getComputedStyle(card).backgroundColor,
+      opacity: getComputedStyle(card).opacity
+    })));
+  expect(eventStateStyles.find(state => state.active)).toMatchObject({
+    background: "rgb(226, 243, 232)",
+    opacity: "1"
+  });
+  expect(eventStateStyles.find(state => state.past)).toMatchObject({
+    background: "rgb(243, 247, 244)",
+    opacity: "1"
+  });
+
   await page.getByTestId("planner-event-edit-button")
     .first()
     .click();
   await expectEveryPlannerTextReadable(page, "Event editor");
+
+  await page.locator("#seasonEventsPanel details")
+    .evaluateAll(details => details.forEach(panel => {
+      panel.open = true;
+    }));
+  await expectEveryPlannerTextReadable(page, "Expanded event editor");
+
+  const detailToggleStyle = await page
+    .locator("#seasonEventsPanel details summary")
+    .first()
+    .evaluate(summary => {
+      const toggle = getComputedStyle(summary, "::after");
+
+      return {
+        background: toggle.backgroundColor,
+        color: toggle.color
+      };
+    });
+  expect(detailToggleStyle).toEqual({
+    background: "rgb(238, 245, 241)",
+    color: "rgb(20, 83, 45)"
+  });
+
+  const removeButtonStyle = await page
+    .getByTestId("planner-remove-event")
+    .evaluate(button => {
+      const style = getComputedStyle(button);
+
+      return {
+        background: style.backgroundColor,
+        color: style.color
+      };
+    });
+  expect(removeButtonStyle).toEqual({
+    background: "rgb(254, 226, 226)",
+    color: "rgb(153, 27, 27)"
+  });
 
   await selectPlannerTab(page, "calendar");
   await expectEveryPlannerTextReadable(page, "Calendar");

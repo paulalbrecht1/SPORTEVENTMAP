@@ -41946,3 +41946,172 @@ html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #event
   position: static !important;
   margin-top: 12px !important;
 }
+
+/* Season Planner events workspace: complete light-mode interaction states. */
+html[data-theme="light"] #seasonPlannerModal .season-events-list-panel {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #f8fbf9 !important;
+  color: #122019 !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-events-list-panel > p {
+  color: #40564a !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-event-selector:is(:hover, :focus-visible) {
+  border-color: #86c99d !important;
+  background: #eef8f1 !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12) !important;
+  outline: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-event-selector.active,
+html[data-theme="light"] #seasonPlannerModal .season-event-selector[aria-pressed="true"] {
+  border-color: #4ade80 !important;
+  background: #e2f3e8 !important;
+  box-shadow: inset 4px 0 0 #15803d !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-event-selector.is-past-event:not(.active) {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #f3f7f4 !important;
+  color: #33473c !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-event-selector.is-past-event.active {
+  border-color: #7dd3fc !important;
+  background: #e7f3f9 !important;
+  box-shadow: inset 4px 0 0 #0369a1 !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-event-selector.is-archived-event {
+  background: #edf2ef !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-post-status-badge,
+  .season-post-race-status
+) {
+  border-color: rgba(15, 23, 42, 0.14) !important;
+  background: #e8edf0 !important;
+  color: #334155 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-post-status-ergebnis-ausstehend,
+  .season-post-race-status-ergebnis-ausstehend
+) {
+  border-color: #f5c46b !important;
+  background: #fff7e6 !important;
+  color: #78350f !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-post-status-reflexion-ausstehend,
+  .season-post-race-status-reflexion-ausstehend
+) {
+  border-color: #7dd3fc !important;
+  background: #e0f2fe !important;
+  color: #075985 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-post-status-vollst-ndig-dokumentiert,
+  .season-post-race-status-vollst-ndig-dokumentiert
+) {
+  border-color: #86efac !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-post-status-dns,
+  .season-post-status-dnf,
+  .season-post-status-dsq,
+  .season-post-race-status-dns,
+  .season-post-race-status-dnf,
+  .season-post-race-status-dsq
+) {
+  border-color: #fca5a5 !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-workspace-accordions > .season-detail-panel[open] {
+  border-color: rgba(21, 128, 61, 0.24) !important;
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-workspace-accordions > .season-detail-panel > summary {
+  background: #ffffff !important;
+  color: #122019 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-detail-panel summary strong {
+  color: #122019 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-detail-panel summary em {
+  color: #40564a !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-detail-panel summary::after {
+  border-color: #b7c9be !important;
+  background: #eef5f1 !important;
+  color: #14532d !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-detail-panel summary:is(:hover, :focus-visible) {
+  background: #f1f6f3 !important;
+  box-shadow: inset 3px 0 0 #15803d !important;
+  outline: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel .season-workspace-edit-actions .season-priority-remove-icon {
+  border-color: #fca5a5 !important;
+  background: #fee2e2 !important;
+  color: #991b1b !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel .season-workspace-edit-actions .season-priority-remove-icon:is(:hover, :focus-visible) {
+  border-color: #991b1b !important;
+  background: #b91c1c !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.14) !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal :is(
+  .season-goal-type-grid button,
+  .season-template-row button,
+  .season-empty-detail button,
+  .season-result-actions button,
+  .season-result-actions a,
+  .season-inline-add button,
+  .season-nutrition-add button
+):is(:hover, :focus-visible) {
+  border-color: #15803d !important;
+  background: #dcfce7 !important;
+  color: #14532d !important;
+  box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.12) !important;
+  outline: none !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal .season-goal-type-grid button:is(.active, [aria-pressed="true"]) {
+  border-color: #14532d !important;
+  background: #166534 !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel :is(input, textarea)::placeholder {
+  color: #52675c !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="light"] #seasonPlannerModal #seasonEventsPanel input[type="checkbox"] {
+  accent-color: #166534;
+}

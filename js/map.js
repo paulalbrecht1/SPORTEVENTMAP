@@ -239,15 +239,12 @@ const MAP_STYLES = {
 // SPORT-SPECIFIC EVENT MARKERS
 const EVENT_MARKER_TYPES = {
   running: {
-    label: "R",
     title: "Running event"
   },
   ultra: {
-    label: "U",
     title: "Ultra event"
   },
   triathlon: {
-    label: "T",
     title: "Triathlon event"
   }
 };
@@ -280,6 +277,10 @@ function getEventMarkerType(event) {
   return "running";
 }
 
+function renderEventMarkerPin(type) {
+  return `<span class="event-map-pin event-map-pin--${type}" data-event-marker-type="${type}" aria-hidden="true"></span>`;
+}
+
 function createEventMarkerPresentation(event) {
   const type =
     getEventMarkerType(event);
@@ -292,7 +293,7 @@ function createEventMarkerPresentation(event) {
     icon: L.divIcon({
       className: `custom-marker custom-marker--${type}`,
       html:
-        `<span class="event-map-pin event-map-pin--${type}" data-event-marker-type="${type}" aria-hidden="true"><span class="event-map-pin-label">${meta.label}</span></span>`,
+        renderEventMarkerPin(type),
       iconSize: [38, 46],
       iconAnchor: [19, 44],
       popupAnchor: [0, -40]

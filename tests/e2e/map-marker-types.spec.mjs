@@ -42,6 +42,18 @@ test("Discovery distinguishes running, ultra and triathlon markers", async ({ pa
     "triathlon"
   ]);
 
+  const markerMarkup = await page.evaluate(() => [
+    renderEventMarkerPin("running"),
+    renderEventMarkerPin("ultra"),
+    renderEventMarkerPin("triathlon")
+  ]);
+
+  expect(markerMarkup).toEqual([
+    '<span class="event-map-pin event-map-pin--running" data-event-marker-type="running" aria-hidden="true"></span>',
+    '<span class="event-map-pin event-map-pin--ultra" data-event-marker-type="ultra" aria-hidden="true"></span>',
+    '<span class="event-map-pin event-map-pin--triathlon" data-event-marker-type="triathlon" aria-hidden="true"></span>'
+  ]);
+
   await page.setViewportSize({
     width: 320,
     height: 720

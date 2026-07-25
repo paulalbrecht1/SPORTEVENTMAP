@@ -1,3 +1,31 @@
+(function loadGlobalThemeForEventDetails() {
+  if (window.SportEventMapTheme) {
+    window.SportEventMapTheme.ensureControls();
+    return;
+  }
+
+  if (
+    typeof document.createElement !== "function" ||
+    !document.head ||
+    document.querySelector("script[data-global-theme-loader]")
+  ) {
+    return;
+  }
+
+  const currentScript = document.currentScript;
+  const themeUrl = currentScript && currentScript.src
+    ? new URL("theme.js", currentScript.src).href
+    : "../../js/theme.js";
+  const themeScript = document.createElement("script");
+
+  themeScript.src = themeUrl;
+  themeScript.dataset.globalThemeLoader = "true";
+  themeScript.addEventListener("load", () => {
+    window.SportEventMapTheme?.ensureControls();
+  });
+  document.head.appendChild(themeScript);
+})();
+
 (function () {
   const detailConfig =
     window.sportEventMapDetailConfig || {};

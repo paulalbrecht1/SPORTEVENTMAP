@@ -115,6 +115,57 @@ assert.match(
 );
 pass("language controls use a polished custom appearance");
 
+const themeSource =
+  read("js/theme.js");
+const detailPageSource =
+  read("js/event-detail.js");
+
+[
+  "sportEventMapTheme",
+  "document.documentElement.dataset.theme",
+  'querySelectorAll("[data-theme-toggle]")',
+  '".sem-header-actions"',
+  '"#authArea"',
+  '".event-detail-header"',
+  '".legal-page-content"'
+].forEach(fragment => {
+  assert.ok(
+    themeSource.includes(fragment),
+    `Global theme system is missing: ${fragment}`
+  );
+});
+
+[
+  'html[data-theme="light"]',
+  ".global-theme-toggle",
+  ".sem-home",
+  "#topbar",
+  "#seasonPlannerModal",
+  ".event-detail-page"
+].forEach(fragment => {
+  assert.ok(
+    css.includes(fragment),
+    `Global theme CSS coverage is missing: ${fragment}`
+  );
+});
+
+[
+  "imprint.html",
+  "privacy.html",
+  "legal.html",
+  "contact.html"
+].forEach(page => {
+  assert.match(
+    read(page),
+    /js\/theme.js/,
+    `Theme script missing from ${page}`
+  );
+});
+
+assert.match(detailPageSource, /theme.js/);
+assert.match(detailPageSource, /ensureControls/);
+pass("global light and dark themes cover application, detail and legal views");
+
 assert.doesNotMatch(
   html,
   /href=["']#\/community["']/i,
@@ -123,6 +174,7 @@ assert.doesNotMatch(
 pass("beta navigation stays focused on event discovery and season planning");
 
 const requiredScripts = [
+  "js/theme.js",
   "js/config.js",
   "js/i18n.js",
   "js/supabase.js",

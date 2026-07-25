@@ -993,65 +993,20 @@ function applyLandingSearch(query) {
 }
 
 const LANDING_THEME_KEY =
-  "sportEventMap.landingTheme";
-
-const landingSystemThemeQuery =
-  window.matchMedia
-    ? window.matchMedia("(prefers-color-scheme: dark)")
-    : null;
+  "sportEventMapTheme";
 
 function getLandingThemePreference() {
-  return (
-    localStorage.getItem(LANDING_THEME_KEY) ||
-    "system"
-  );
+  return window.SportEventMapTheme
+    ? window.SportEventMapTheme.getPreference()
+    : "system";
 }
 
 function applyLandingTheme(theme = getLandingThemePreference()) {
-  const normalizedTheme =
-    ["system", "dark", "light"].includes(theme)
-      ? theme
-      : "system";
+  if (window.SportEventMapTheme) {
+    return window.SportEventMapTheme.apply(theme);
+  }
 
-  const resolvedTheme =
-    normalizedTheme === "system"
-      ? landingSystemThemeQuery?.matches
-        ? "dark"
-        : "light"
-      : normalizedTheme;
-
-  document.body.classList.toggle(
-    "landing-theme-dark",
-    resolvedTheme === "dark"
-  );
-
-  document.body.classList.toggle(
-    "landing-theme-light",
-    resolvedTheme === "light"
-  );
-
-  document.body.dataset.landingTheme =
-    normalizedTheme;
-
-  document.body.dataset.landingResolvedTheme =
-    resolvedTheme;
-
-  document
-    .querySelectorAll("[data-landing-theme]")
-    .forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.landingTheme === normalizedTheme
-      );
-    });
-}
-
-if (landingSystemThemeQuery) {
-  landingSystemThemeQuery.addEventListener("change", () => {
-    if (getLandingThemePreference() === "system") {
-      applyLandingTheme("system");
-    }
-  });
+  return theme;
 }
 
 function updateLandingEventCount(eventList) {

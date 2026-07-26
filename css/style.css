@@ -43018,14 +43018,16 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
     height: 44px !important;
     min-height: 44px !important;
   }
-  body.platform-route-discovery:not(.landing-open):not(.sidebar-collapsed):not(.event-list-fullscreen) #sidebar-header {
-    flex: 0 0 auto !important;
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open):not(.sidebar-collapsed):not(.event-list-fullscreen):not(.mobile-filter-open) #sidebar-header {
+    flex: 0 0 min(46dvh, 420px) !important;
     width: 100% !important;
-    height: auto !important;
-    min-height: min(238px, 42dvh) !important;
-    max-height: 46dvh !important;
+    height: min(46dvh, 420px) !important;
+    min-height: min(238px, 46dvh) !important;
+    max-height: min(46dvh, 420px) !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    grid-auto-rows: max-content !important;
+    align-content: start !important;
     gap: 9px !important;
     padding: 10px !important;
     overflow-x: hidden !important;

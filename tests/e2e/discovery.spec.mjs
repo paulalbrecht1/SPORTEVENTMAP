@@ -63,6 +63,31 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   await expect(page.getByTestId("event-card")).toHaveCount(1);
 });
 
+test("Mobile Discovery filters stay tappable", async ({ page }) => {
+  const run = fixtureByName["SEM E2E Future Run"];
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await prepareApp(page, { openDiscoveryPanel: false });
+
+  const panelToggle = page.getByTestId("discovery-panel-toggle");
+  const runningFilter = page.getByTestId("filter-sport-running");
+
+  await panelToggle.click();
+  await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
+  await page.waitForFunction(() =>
+    !document.body.classList.contains("sidebar-is-transitioning")
+  );
+  await expect(runningFilter).toBeVisible();
+  await runningFilter.click();
+
+  await expect(runningFilter).toHaveClass(/active/);
+  await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
+  await expect(page.getByTestId("event-card")).toHaveCount(3);
+  await expect(
+    page.getByTestId("event-card").filter({ hasText: run.event_name })
+  ).toHaveCount(1);
+});
+
 test("official website button stays in the drawer flow in both themes", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];
 

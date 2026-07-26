@@ -14,8 +14,8 @@
 
   const currentScript = document.currentScript;
   const themeUrl = currentScript && currentScript.src
-    ? new URL("theme.js", currentScript.src).href
-    : "../../js/theme.js";
+    ? new URL("theme.js?v=20260725-publish-runtime-v96", currentScript.src).href
+    : "../../js/theme.js?v=20260725-publish-runtime-v96";
   const themeScript = document.createElement("script");
 
   themeScript.src = themeUrl;

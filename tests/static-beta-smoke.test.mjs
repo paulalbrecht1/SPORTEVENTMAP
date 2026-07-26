@@ -217,6 +217,27 @@ requiredScripts.forEach(script => {
 });
 pass("application scripts load in the required order");
 
+const publishPackageSource =
+  read("tools/create-publish-package.js");
+
+const publishEntriesSource =
+  publishPackageSource.match(
+    /const COPY_ENTRIES = \[([\s\S]*?)\n\];/
+  )?.[1] || "";
+
+[
+  "js/theme.js",
+  "js/event-marker-types.js",
+  "js/event-detail.js",
+  "js/event-detail-supabase.js"
+].forEach(script => {
+  assert.ok(
+    publishEntriesSource.includes(`"${script}"`),
+    `Publish package is missing runtime dependency ${script}`
+  );
+});
+pass("publish package includes all shared and detail-page runtime scripts");
+
 const frontendSource =
   [
     "js/config.js",

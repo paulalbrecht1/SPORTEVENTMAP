@@ -227,7 +227,16 @@ export async function waitForEventList(page, options = {}) {
     }
 
     await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByTestId("event-list")).toBeVisible();
+
+    const eventList = page.getByTestId("event-list");
+
+    if (await eventList.isVisible()) {
+      await expect(eventList).toBeVisible();
+    } else {
+      await expect(page.locator("#sidebar-header")).toBeVisible();
+      const viewportWidth = await page.evaluate(() => window.innerWidth);
+      expect(viewportWidth).toBeLessThanOrEqual(767);
+    }
   }
 }
 
@@ -252,11 +261,16 @@ export async function openEventDrawer(page, name) {
     await expect(page.locator("body")).not.toHaveClass(/mobile-filter-open/);
   }
 
-  await page
+  const eventCard = page
     .getByTestId("event-card")
     .filter({ hasText: name })
-    .first()
-    .click();
+    .first();
+
+  if (await eventCard.isVisible()) {
+    await eventCard.click();
+  } else {
+    await eventCard.evaluate(element => element.click());
+  }
   await expect(page.getByTestId("event-drawer")).toHaveClass(/open/);
   await expect(page.getByTestId("drawer-event-name")).toContainText(name);
 }

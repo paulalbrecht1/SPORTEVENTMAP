@@ -90,6 +90,8 @@ test("Phone filters open as a complete touch workspace", async ({ page }) => {
   await panelToggle.click();
   await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
   await expect(sidebar).toBeVisible();
+  await expect(page.getByTestId("event-list")).toBeHidden();
+  await expect(page.locator("#eventListToolbar")).toBeHidden();
 
   const workspace = await sidebar.evaluate(element => {
     const bounds = element.getBoundingClientRect();

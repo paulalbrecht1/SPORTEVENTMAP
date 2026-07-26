@@ -74,6 +74,9 @@ test("Mobile Discovery filters stay tappable", async ({ page }) => {
 
   await panelToggle.click();
   await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#eventListToolbar")).toBeHidden();
+  await expect(page.locator("#eventList")).toBeHidden();
+  await expect(page.locator("#sidebar-header")).toHaveCSS("overflow-y", "auto");
   await page.waitForFunction(() =>
     !document.body.classList.contains("sidebar-is-transitioning")
   );

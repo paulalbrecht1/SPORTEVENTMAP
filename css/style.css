@@ -42972,7 +42972,8 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
   body.platform-route-discovery:not(.landing-open) #eventListToolbar::-webkit-scrollbar { display: none; }
   body.platform-route-discovery:not(.landing-open) #legalLinks :is(a, button) { min-height: 30px !important; font-size: 0.68rem !important; }
 
-  /* Filters and results become one predictable full-screen workspace. */
+  /* Filters become a predictable full-screen workspace. Keep the very large
+     result list out of the layout while the phone filter sheet is open. */
   body.platform-route-discovery:not(.landing-open):not(.event-list-fullscreen) #sidebar {
     position: fixed !important;
     inset: 0 !important;
@@ -43019,11 +43020,11 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
     min-height: 44px !important;
   }
   body.platform-route-discovery.discovery-panel-open:not(.landing-open):not(.sidebar-collapsed):not(.event-list-fullscreen):not(.mobile-filter-open) #sidebar-header {
-    flex: 0 0 min(46dvh, 420px) !important;
+    flex: 1 1 auto !important;
     width: 100% !important;
-    height: min(46dvh, 420px) !important;
-    min-height: min(238px, 46dvh) !important;
-    max-height: min(46dvh, 420px) !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
     display: grid !important;
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     grid-auto-rows: max-content !important;
@@ -43035,6 +43036,9 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
     overscroll-behavior-y: contain;
     border-radius: 0 !important;
     scrollbar-gutter: auto !important;
+  }
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open):not(.event-list-fullscreen) :is(#eventListToolbar, #eventList, #eventListPagination) {
+    display: none !important;
   }
   body.platform-route-discovery:not(.landing-open) #sidebar-header :is(.filter-accordion, .filter-actions-row, .active-filter-label, #activeFilterSummary, #dateRangeFilter.active) { grid-column: 1 / -1; }
   body.platform-route-discovery:not(.landing-open) #sidebar-header :is(.filter-select-card, .filter-accordion) { min-width: 0 !important; border-radius: 12px !important; }

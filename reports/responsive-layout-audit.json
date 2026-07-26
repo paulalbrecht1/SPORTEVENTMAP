@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-26T10:21:38.394Z",
+  "generated_at": "2026-07-26T13:28:47.585Z",
   "css": "css/style.css",
   "html": "index.html",
   "status": "pass",
@@ -13,7 +13,7 @@
     {
       "name": "large phones",
       "present": true,
-      "matches": 23
+      "matches": 24
     },
     {
       "name": "tablets",

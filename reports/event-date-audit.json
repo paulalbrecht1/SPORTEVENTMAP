@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-07-10T10:45:06.441Z",
+  "generated_at": "2026-07-26T09:12:00.989Z",
   "input": "data/events.csv",
   "total_events": 994,
   "summary": {
     "critical": 0,
     "warning": 0,
-    "info": 746,
-    "clean": 248
+    "info": 750,
+    "clean": 244
   },
   "events": [
     {
@@ -34,12 +34,18 @@
       "city": "Björnlunda",
       "country": "Sweden",
       "current_date": "11.09.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "IRONMAN Hamburg European Championship",
@@ -104,18 +110,12 @@
       "city": "Leipzig",
       "country": "Germany",
       "current_date": "23.08.2026",
-      "severity": "info",
-      "issues": [
-        "next_check_overdue"
-      ],
-      "reasons": [
-        "Next check date is already in the past."
-      ],
-      "actions": [
-        "Run source verification and move next_check forward."
-      ],
-      "reason": "Next check date is already in the past.",
-      "recommended_action": "Run source verification and move next_check forward."
+      "severity": "clean",
+      "issues": [],
+      "reasons": [],
+      "actions": [],
+      "reason": "",
+      "recommended_action": "No date action required."
     },
     {
       "event_name": "IRONMAN 70.3 Erkner",
@@ -123,18 +123,12 @@
       "city": "Erkner",
       "country": "Germany",
       "current_date": "13.09.2026",
-      "severity": "info",
-      "issues": [
-        "next_check_overdue"
-      ],
-      "reasons": [
-        "Next check date is already in the past."
-      ],
-      "actions": [
-        "Run source verification and move next_check forward."
-      ],
-      "reason": "Next check date is already in the past.",
-      "recommended_action": "Run source verification and move next_check forward."
+      "severity": "clean",
+      "issues": [],
+      "reasons": [],
+      "actions": [],
+      "reason": "",
+      "recommended_action": "No date action required."
     },
     {
       "event_name": "IRONMAN Kaernten-Klagenfurt Austria",
@@ -301,18 +295,12 @@
       "city": "Köln",
       "country": "Germany",
       "current_date": "06.09.2026",
-      "severity": "info",
-      "issues": [
-        "next_check_overdue"
-      ],
-      "reasons": [
-        "Next check date is already in the past."
-      ],
-      "actions": [
-        "Run source verification and move next_check forward."
-      ],
-      "reason": "Next check date is already in the past.",
-      "recommended_action": "Run source verification and move next_check forward."
+      "severity": "clean",
+      "issues": [],
+      "reasons": [],
+      "actions": [],
+      "reason": "",
+      "recommended_action": "No date action required."
     },
     {
       "event_name": "Haspa Marathon Hamburg",
@@ -339,12 +327,18 @@
       "city": "Berlin",
       "country": "Germany",
       "current_date": "27.09.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Mainova Frankfurt Marathon",
@@ -6495,18 +6489,12 @@
       "city": "Berlin",
       "country": "Germany",
       "current_date": "04.04.2027",
-      "severity": "info",
-      "issues": [
-        "next_check_overdue"
-      ],
-      "reasons": [
-        "Next check date is already in the past."
-      ],
-      "actions": [
-        "Run source verification and move next_check forward."
-      ],
-      "reason": "Next check date is already in the past.",
-      "recommended_action": "Run source verification and move next_check forward."
+      "severity": "clean",
+      "issues": [],
+      "reasons": [],
+      "actions": [],
+      "reason": "",
+      "recommended_action": "No date action required."
     },
     {
       "event_name": "HOKA UTMB Mont-Blanc",
@@ -7857,12 +7845,18 @@
       "city": "Lübeck",
       "country": "Germany",
       "current_date": "18.10.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Marburger Nacht-Marathon",
@@ -17318,10 +17312,10 @@
     },
     {
       "event_name": "Hermannslauf Bielefeld",
-      "event_id": "hermannslauf-bielefeld-detmold-24-04-2027",
+      "event_id": "hermannslauf-bielefeld-detmold-25-04-2027",
       "city": "Detmold",
       "country": "Germany",
-      "current_date": "24.04.2027",
+      "current_date": "25.04.2027",
       "severity": "clean",
       "issues": [],
       "reasons": [],
@@ -17335,12 +17329,18 @@
       "city": "Rotterdam",
       "country": "Netherlands",
       "current_date": "12.04.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Schneider Electric Marathon de Paris",
@@ -17348,12 +17348,18 @@
       "city": "Paris",
       "country": "France",
       "current_date": "12.04.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Vodafone Prague Marathon",
@@ -17361,12 +17367,18 @@
       "city": "Prague",
       "country": "Czech Republic",
       "current_date": "03.05.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Mozart 100 by UTMB",
@@ -17387,12 +17399,18 @@
       "city": "Fuencaliente de La Palma",
       "country": "Spain",
       "current_date": "08.05.2027",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     },
     {
       "event_name": "Paderborner Osterlauf",
@@ -17400,12 +17418,18 @@
       "city": "Paderborn",
       "country": "Germany",
       "current_date": "04.04.2026",
-      "severity": "clean",
-      "issues": [],
-      "reasons": [],
-      "actions": [],
-      "reason": "",
-      "recommended_action": "No date action required."
+      "severity": "info",
+      "issues": [
+        "next_check_overdue"
+      ],
+      "reasons": [
+        "Next check date is already in the past."
+      ],
+      "actions": [
+        "Run source verification and move next_check forward."
+      ],
+      "reason": "Next check date is already in the past.",
+      "recommended_action": "Run source verification and move next_check forward."
     }
   ]
 }

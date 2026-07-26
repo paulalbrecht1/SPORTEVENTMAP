@@ -195,7 +195,7 @@ function hasCityOnlyAddress(event) {
     return true;
   }
 
-  return !/\d|straße|strasse|weg|allee|platz|park|stadion|see|halle|zentrum|arena|ufer|brücke|bruecke/i.test(
+  return !/\d|straße|strasse|weg|allee|platz|park|stadion|see|halle|zentrum|arena|ufer|brücke|bruecke|gate|tor|denkmal|monument|memorial|castle|schloss/i.test(
     address
   );
 }

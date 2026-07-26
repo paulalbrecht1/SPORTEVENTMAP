@@ -37,6 +37,14 @@ const completeRows = auditEvents([validEvent()], {
 assert.equal(completeRows[0].quality_status, "complete");
 assert.equal(completeRows[0].issue_count, 0);
 
+const landmarkRows = auditEvents(
+  [validEvent({ address: "Brandenburg Gate, Berlin" })],
+  { today: fixedToday }
+);
+
+assert.equal(landmarkRows[0].quality_status, "complete");
+assert.equal(landmarkRows[0].issue_count, 0);
+
 const incompleteRows = auditEvents(
   [
     validEvent({

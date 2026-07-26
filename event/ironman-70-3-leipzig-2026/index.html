@@ -297,7 +297,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     window.sportEventMapDetailConfig = {
-      event: {"event_key":"ironman 70.3 leipzig|23.08.2026|leipzig","event_slug":"ironman-70-3-leipzig-2026","event_name":"IRONMAN 70.3 Leipzig","date":"23.08.2026","city":"Leipzig","country":"Germany","sport":"Triathlon","distance":"Middle","event_url":"https://www.ironman.com/races/im703-leipzig","latitude":"51.3406321","longitude":"12.3747329"}
+      event: {"event_key":"ironman 70.3 leipzig|23.08.2026|leipzig","event_slug":"ironman-70-3-leipzig-2026","event_name":"IRONMAN 70.3 Leipzig","date":"23.08.2026","city":"Leipzig","country":"Germany","sport":"Triathlon","distance":"Middle","event_url":"https://www.ironman.com/races/im703-leipzig","latitude":"51.2669343","longitude":"12.3338537"}
     };
   </script>
   <script src="../../js/config.js"></script>
@@ -313,14 +313,14 @@
 
       var map = L.map("eventDetailMap", {
         scrollWheelZoom: false
-      }).setView([51.3406321, 12.3747329], 13);
+      }).setView([51.2669343, 12.3338537], 13);
 
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: "&copy; OpenStreetMap contributors"
       }).addTo(map);
 
-      L.marker([51.3406321, 12.3747329]).addTo(map);
+      L.marker([51.2669343, 12.3338537]).addTo(map);
     });
   </script>
 </body>

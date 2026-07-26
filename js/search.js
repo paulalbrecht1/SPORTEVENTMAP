@@ -1520,12 +1520,24 @@ function initSearch() {
     document.body.classList.remove(
       "mobile-filter-open"
     );
+
+    if (typeof window.setSidebarExpanded === "function") {
+      window.setSidebarExpanded(false);
+    } else {
+      document.getElementById("sidebar")?.classList.add("closed");
+    }
   };
 
   if (mobileFilterBtn) {
     mobileFilterBtn.addEventListener(
       "click",
       () => {
+        if (typeof window.setSidebarExpanded === "function") {
+          window.setSidebarExpanded(true);
+        } else {
+          document.getElementById("sidebar")?.classList.remove("closed");
+        }
+
         document.body.classList.add(
           "mobile-filter-open"
         );

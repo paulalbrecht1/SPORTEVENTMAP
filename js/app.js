@@ -81,6 +81,12 @@ function syncSidebarState() {
 window.updateSidebarToggleState =
   updateSidebarToggleState;
 
+// Keep every filter trigger on the same state transition. The legacy mobile
+// trigger lives in search.js, which is loaded before this file, so expose the
+// canonical controller once the platform shell is ready.
+window.setSidebarExpanded =
+  setSidebarExpanded;
+
 function setSidebarExpanded(expanded, options = {}) {
   if (!sidebar) {
     return;
@@ -617,6 +623,15 @@ function showPlatformRoute(routeInfo, options = {}) {
       ? "events"
       : route;
 
+  if (route !== "discovery") {
+    document.body.classList.remove("mobile-filter-open");
+
+    if (sidebar && !sidebar.classList.contains("closed")) {
+      setSidebarExpanded(false, {
+        refresh: false
+      });
+    }
+  }
   if (
     route !== "planner" &&
     typeof closeSeasonPlanner === "function"

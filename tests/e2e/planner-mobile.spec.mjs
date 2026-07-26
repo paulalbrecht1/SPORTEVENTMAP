@@ -119,6 +119,67 @@ test("Phone filters open as a complete touch workspace", async ({ page }) => {
   await assertNoHorizontalOverflow(page);
 });
 
+test("Phone planner keeps its header compact and training blocks readable", async ({ page }) => {
+  const plannedEvents = [
+    fixtureByName["SEM E2E Olympic Triathlon"],
+    fixtureByName["SEM E2E Future Run"],
+    fixtureByName["SEM E2E Very Long Event Name For Responsive Planner Overflow Regression Coverage"]
+  ];
+
+  await prepareApp(page, {
+    allowPlanner: true,
+    openDiscoveryPanel: false,
+    favorites: plannedEvents.map(event => event.event_key)
+  });
+
+  await openPlanner(page);
+  await selectPlannerTab(page, "overview");
+
+  await expect(page.getByTestId("filter-open")).toBeHidden();
+  await expect(page.getByTestId("discovery-panel-toggle")).toBeHidden();
+
+  const headerLayout = await page.locator("#topbar").evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+
+    return {
+      height: bounds.height,
+      bottom: bounds.bottom
+    };
+  });
+
+  expect(headerLayout.height).toBeLessThanOrEqual(66);
+
+  const blocks = page.locator(".season-training-block-item");
+  await expect(blocks).toHaveCount(2);
+
+  const blockLayout = await blocks.evaluateAll(elements =>
+    elements.map(element => {
+      const children = [...element.children].map(child => {
+        const bounds = child.getBoundingClientRect();
+
+        return {
+          top: bounds.top,
+          bottom: bounds.bottom
+        };
+      });
+
+      return {
+        display: getComputedStyle(element).display,
+        height: element.getBoundingClientRect().height,
+        scrollHeight: element.scrollHeight,
+        children
+      };
+    })
+  );
+
+  expect(blockLayout.every(block => block.display === "flex")).toBe(true);
+  expect(blockLayout.every(block => block.scrollHeight <= block.height + 1)).toBe(true);
+  expect(blockLayout.every(block => block.children.every((child, index) =>
+    index === 0 || child.top >= block.children[index - 1].bottom - 1
+  ))).toBe(true);
+  await assertNoHorizontalOverflow(page);
+});
+
 test("Phone planner defaults to the readable calendar list", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];
 

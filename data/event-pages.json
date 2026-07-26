@@ -7703,7 +7703,7 @@
     "city": "Erlangen",
     "country": "Germany",
     "sport": "Triathlon",
-    "distance": "Triathlon",
+    "distance": "Short / Middle",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7729,7 +7729,7 @@
     "city": "Wörthsee",
     "country": "Germany",
     "sport": "Triathlon",
-    "distance": "Triathlon",
+    "distance": "Olympic / Popular",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7755,7 +7755,7 @@
     "city": "Leipzig",
     "country": "Germany",
     "sport": "Triathlon",
-    "distance": "Triathlon",
+    "distance": "Olympic / Fitness / Youth",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7781,7 +7781,7 @@
     "city": "Stuhr",
     "country": "Germany",
     "sport": "Triathlon",
-    "distance": "Olympic Triathlon",
+    "distance": "Sprint / Olympic",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms | Sport Event Map</title>
+  <title data-i18n="terms.metaTitle">Terms of use - Sport Event Map</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
@@ -13,67 +13,76 @@
   <link rel="manifest" href="/site.webmanifest">
   <meta
     name="description"
-    content="Nutzungsbedingungen und rechtliche Hinweise für die Sport Event Map Beta."
+    content="Terms of use and legal information for the Sport Event Map beta."
+    data-i18n-content="terms.metaDescription"
   />
   <script src="js/theme.js?v=20260725-global-theme-v80"></script>
+  <script src="js/i18n.js?v=20260726-legal-pages-v1" defer></script>
   <link rel="stylesheet" href="css/style.css?v=20260725-language-pill-v91" />
 </head>
 <body class="legal-page">
   <main class="legal-page-content">
-    <a href="index.html#app" class="legal-back-link legal-brand-link" aria-label="Zur Event Map">
+    <a
+      href="index.html#app"
+      class="legal-back-link legal-brand-link"
+      aria-label="Back to Sport Event Map"
+      data-i18n-aria-label="legal.back"
+    >
       <img src="assets/logo.png" alt="" aria-hidden="true" />
       <span>Sport Event Map</span>
     </a>
-    <h1>Nutzungsbedingungen</h1>
+    <h1 data-i18n="terms.title">Terms of use</h1>
 
-    <h2>1. Nutzung der Plattform</h2>
-    <p>
-      Sport Event Map unterstützt Nutzer dabei, Ausdauersportveranstaltungen zu finden, zu speichern
-      und die eigene Saison zu planen. Die Plattform befindet sich in der Beta und wird laufend
-      weiterentwickelt.
+    <h2 data-i18n="terms.useHeading">1. Use of the platform</h2>
+    <p data-i18n="terms.useCopy">
+      Sport Event Map helps users find and save endurance sports events and plan their season. The platform is in
+      beta and is being continuously developed.
     </p>
 
-    <h2>2. Eventdaten</h2>
-    <p>
-      Eventdaten werden mit Sorgfalt gepflegt. Termine, Distanzen, Anmeldestatus, Austragungsorte
-      und Links können sich jedoch kurzfristig ändern. Vor Anmeldung, Reiseplanung oder Teilnahme
-      sollten Nutzer immer die offizielle Veranstalterseite prüfen.
+    <h2 data-i18n="terms.eventsHeading">2. Event data</h2>
+    <p data-i18n="terms.eventsCopy">
+      Event data is maintained with care. However, dates, distances, registration status, venues and links may
+      change at short notice. Users should always check the official organizer website before registering, planning
+      travel or participating.
     </p>
 
-    <h2>3. Externe Links</h2>
-    <p>
-      Die Plattform verweist auf externe Veranstalter-Websites. Für deren Inhalte, Verfügbarkeit,
-      Datenschutz und Anmeldeprozesse sind ausschließlich die jeweiligen Betreiber verantwortlich.
+    <h2 data-i18n="terms.linksHeading">3. External links</h2>
+    <p data-i18n="terms.linksCopy">
+      The platform links to external organizer websites. The respective operators are solely responsible for their
+      content, availability, privacy practices and registration processes.
     </p>
 
-    <h2>4. Benutzerkonten und Inhalte</h2>
-    <p>
-      Nutzer sind selbst für die Richtigkeit der von ihnen eingereichten Informationen verantwortlich.
-      Eingereichte Events können vor Veröffentlichung geprüft, bearbeitet, abgelehnt oder entfernt
-      werden.
+    <h2 data-i18n="terms.accountsHeading">4. User accounts and content</h2>
+    <p data-i18n="terms.accountsCopy">
+      Users are responsible for the accuracy of the information they submit. Submitted events may be reviewed,
+      edited, rejected or removed before publication.
     </p>
 
-    <h2>5. Verfügbarkeit</h2>
-    <p>
-      Es besteht kein Anspruch auf ständige Verfügbarkeit der Plattform oder einzelner Funktionen.
-      Funktionen können während der Beta angepasst, erweitert oder entfernt werden.
+    <h2 data-i18n="terms.availabilityHeading">5. Availability</h2>
+    <p data-i18n="terms.availabilityCopy">
+      There is no entitlement to uninterrupted availability of the platform or individual features. Features may
+      be changed, expanded or removed during the beta.
     </p>
 
-    <h2>6. Kontakt</h2>
+    <h2 data-i18n="terms.contactHeading">6. Contact</h2>
     <p>
-      Fragen zu diesen Bedingungen können per E-Mail an
+      <span data-i18n="terms.contactBefore">Questions about these terms can be sent by email to</span>
       <a href="mailto:kontakt@sporteventmap.com">kontakt@sporteventmap.com</a>
-      gesendet werden.
+      <span data-i18n="terms.contactAfter">.</span>
     </p>
   </main>
 
-  <footer class="legal-page-footer" aria-label="Rechtliche Links">
-    <a href="imprint.html">Impressum</a>
-    <a href="privacy.html">Datenschutz</a>
-    <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
-    <a href="legal.html">Legal</a>
-    <a href="index.html#landing">Landingpage</a>
-    <span>Public beta - event data may change.</span>
+  <footer
+    class="legal-page-footer"
+    aria-label="Legal links"
+    data-i18n-aria-label="legal.footerLabel"
+  >
+    <a href="imprint.html" data-i18n="footer.imprint">Legal notice</a>
+    <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+    <a href="mailto:kontakt@sporteventmap.com" data-i18n="footer.contact">Contact</a>
+    <a href="legal.html" data-i18n="footer.legal">Terms</a>
+    <a href="index.html#landing" data-i18n="footer.landingPage">Landing page</a>
+    <span data-i18n="footer.publicBeta">Public beta - event data may change.</span>
   </footer>
 </body>
 </html>

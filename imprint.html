@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Impressum - Sport Event Map</title>
+  <title data-i18n="imprint.metaTitle">Legal notice - Sport Event Map</title>
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
@@ -12,66 +12,73 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
   <script src="js/theme.js?v=20260725-global-theme-v80"></script>
+  <script src="js/i18n.js?v=20260726-legal-pages-v1" defer></script>
   <link rel="stylesheet" href="css/style.css?v=20260725-discovery-polish-v87" />
 </head>
 <body class="legal-page">
   <main class="legal-page-content">
-    <a href="index.html#app" class="legal-back-link legal-brand-link" aria-label="Zur Event Map">
+    <a
+      href="index.html#app"
+      class="legal-back-link legal-brand-link"
+      aria-label="Back to Sport Event Map"
+      data-i18n-aria-label="legal.back"
+    >
       <img src="assets/logo.png" alt="" aria-hidden="true" />
       <span>Sport Event Map</span>
     </a>
 
-    <h1>Impressum</h1>
+    <h1 data-i18n="imprint.title">Legal notice</h1>
 
-    <h2>Angaben gemäß § 5 DDG</h2>
+    <h2 data-i18n="imprint.providerHeading">Information pursuant to Section 5 DDG</h2>
     <p>
       Paul Albrecht<br />
       Altenbrede 7<br />
       33613 Bielefeld<br />
-      Deutschland
+      <span data-i18n="legal.countryGermany">Germany</span>
     </p>
 
     <p>
-      E-Mail:
+      <span data-i18n="legal.email">Email:</span>
       <a href="mailto:kontakt@sporteventmap.com">kontakt@sporteventmap.com</a>
     </p>
 
-    <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
+    <h2 data-i18n="imprint.responsibleHeading">Responsible for content pursuant to Section 18 (2) MStV</h2>
     <p>
       Paul Albrecht<br />
       Altenbrede 7<br />
       33613 Bielefeld<br />
-      Deutschland
+      <span data-i18n="legal.countryGermany">Germany</span>
     </p>
 
-    <h2>Haftung für Inhalte</h2>
-    <p>
-      Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt.
-      Für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten
-      Inhalte wird jedoch keine Gewähr übernommen.
+    <h2 data-i18n="imprint.contentHeading">Liability for content</h2>
+    <p data-i18n="imprint.contentCopy">
+      The content of this website has been created with the greatest possible care. However, no guarantee is given
+      for the accuracy, completeness or timeliness of the information provided.
     </p>
 
-    <h2>Haftung für Links</h2>
-    <p>
-      Diese Website enthält Links zu externen Websites Dritter. Auf deren Inhalte
-      besteht kein Einfluss. Für die Inhalte der verlinkten Seiten sind
-      ausschließlich deren Betreiber verantwortlich.
+    <h2 data-i18n="imprint.linksHeading">Liability for links</h2>
+    <p data-i18n="imprint.linksCopy">
+      This website contains links to external third-party websites. We have no influence over their content. The
+      respective operators are solely responsible for the content of linked pages.
     </p>
 
-    <h2>Urheberrecht</h2>
-    <p>
-      Die durch den Betreiber erstellten Inhalte und Werke auf dieser Website
-      unterliegen dem deutschen Urheberrecht.
+    <h2 data-i18n="imprint.copyrightHeading">Copyright</h2>
+    <p data-i18n="imprint.copyrightCopy">
+      The content and works created by the operator of this website are subject to German copyright law.
     </p>
   </main>
 
-  <footer class="legal-page-footer" aria-label="Rechtliche Links">
-    <a href="imprint.html">Impressum</a>
-    <a href="privacy.html">Datenschutz</a>
-    <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
-    <a href="legal.html">Legal</a>
-    <a href="index.html#landing">Landingpage</a>
-    <span>Public beta - event data may change.</span>
+  <footer
+    class="legal-page-footer"
+    aria-label="Legal links"
+    data-i18n-aria-label="legal.footerLabel"
+  >
+    <a href="imprint.html" data-i18n="footer.imprint">Legal notice</a>
+    <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+    <a href="mailto:kontakt@sporteventmap.com" data-i18n="footer.contact">Contact</a>
+    <a href="legal.html" data-i18n="footer.legal">Terms</a>
+    <a href="index.html#landing" data-i18n="footer.landingPage">Landing page</a>
+    <span data-i18n="footer.publicBeta">Public beta - event data may change.</span>
   </footer>
 </body>
 </html>

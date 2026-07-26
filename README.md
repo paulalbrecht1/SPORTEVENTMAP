@@ -43,6 +43,7 @@ Weitere Prüfungen und End-to-End-Tests sind in `package.json` sowie unter
 
 ```powershell
 pnpm run audit:quality
+pnpm run review:quality
 ```
 
 Der wiederholbare Check bewertet jedes Event als `complete`,
@@ -51,6 +52,10 @@ URL-Formate, Geodaten, mögliche Dubletten sowie weitere Qualitätssignale. Die
 vollständige Prüfliste und eine Zusammenfassung werden unter
 `data/imports/review/event-quality-audit.*` erzeugt; die Eventdaten selbst
 werden nicht verändert.
+
+Die priorisierte Review-Queue enthält standardmäßig die 100 wichtigsten
+deutschen Problemfälle. Bevorstehende Events und echte Datenblocker stehen
+dabei vor vergangenen Veranstaltungen und weichen Qualitätshinweisen.
 
 ## Sicherheit
 

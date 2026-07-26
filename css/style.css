@@ -42831,3 +42831,397 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
       minmax(0, 1fr) !important;
   }
 }
+
+/* Smartphone experience pass ---------------------------------------------
+   Intentionally capped below the 768px tablet breakpoint. */
+@media (max-width: 767px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  :where(button, a, input, select, textarea, summary) {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  :where(input, select, textarea) {
+    font-size: 16px;
+  }
+
+  /* Landing page */
+  .sem-container { width: min(calc(100% - 28px), 1440px); }
+  .sem-section { padding-block: 56px; }
+  .sem-hero-grid { gap: 34px; padding-block: 38px 52px; }
+  .sem-hero h1 {
+    max-width: 12ch;
+    font-size: clamp(2.2rem, 11.5vw, 3.25rem);
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+  .sem-hero-description,
+  .sem-spotlight-copy p,
+  .sem-feature-card p,
+  .sem-sport-panel p { font-size: 0.98rem; line-height: 1.62; }
+  .sem-actions .sem-button,
+  .sem-menu-button,
+  .sem-mobile-menu a,
+  .sem-mobile-auth { min-height: 48px; }
+  .sem-mobile-menu {
+    width: min(92vw, 380px);
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+  .sem-product-frame { border-radius: 16px; }
+
+  /* Discovery: clear phone header and a calmer map. */
+  body.platform-route-discovery:not(.landing-open) {
+    --discovery-edge-gap: 6px;
+    --map-control-edge: 12px;
+    --map-control-size: 42px;
+  }
+  body.platform-route-discovery:not(.landing-open) #topbar {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    grid-template-areas: "left right" "search search" !important;
+    gap: 8px 10px !important;
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 9px max(10px, env(safe-area-inset-left)) !important;
+    background: var(--discovery-surface) !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #topbar-left {
+    width: 100% !important;
+    min-width: 0 !important;
+    gap: 7px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #brandHomeLink { order: 1; flex: 0 0 auto; }
+  body.platform-route-discovery:not(.landing-open) #brandHomeLink .brand-name { display: none !important; }
+  body.platform-route-discovery:not(.landing-open) #brandHomeLink .brand-icon { width: 32px !important; height: 32px !important; }
+  body.platform-route-discovery:not(.landing-open) #toggleSidebar {
+    order: 2;
+    width: auto !important;
+    min-width: 112px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    margin: 0 0 0 auto !important;
+    padding: 0 13px !important;
+    gap: 8px !important;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #168447, #116c3a) !important;
+    color: #ffffff !important;
+    box-shadow: 0 7px 18px rgba(11, 83, 53, 0.2) !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #toggleSidebar .sidebar-toggle-chevron { display: none !important; }
+  body.platform-route-discovery:not(.landing-open) #toggleSidebar .sidebar-toggle-label { display: inline-block !important; font-size: 0 !important; }
+  body.platform-route-discovery:not(.landing-open) #toggleSidebar .sidebar-toggle-label::after { content: "Filter"; font-size: 0.8rem; font-weight: 850; line-height: 1; }
+  body.platform-route-discovery:not(.landing-open) #platformMenuBtn {
+    order: 3;
+    flex: 0 0 44px;
+    width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #topbar-right { width: auto !important; max-width: none !important; overflow: visible !important; }
+  body.platform-route-discovery:not(.landing-open) #authArea { width: auto !important; overflow: visible !important; }
+  body.platform-route-discovery:not(.landing-open) #authArea > :not(#topbarLanguageSelect) { display: none !important; }
+  body.platform-route-discovery:not(.landing-open) #topbarLanguageSelect {
+    display: block !important;
+    width: 62px !important;
+    min-width: 62px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 23px 0 10px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #topbar-center,
+  body.platform-route-discovery:not(.landing-open) #topbar-search,
+  body.platform-route-discovery:not(.landing-open) #topbar-search input { height: 46px !important; min-height: 46px !important; }
+  body.platform-route-discovery:not(.landing-open) #topbar-search input {
+    padding-inline: 44px 14px !important;
+    border-radius: 13px !important;
+    box-shadow: none !important;
+    font-size: 16px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #app {
+    width: calc(100% - 12px) !important;
+    min-height: 190px !important;
+    margin: 6px 6px 4px !important;
+    border-radius: 16px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #map {
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    contain: layout paint;
+  }
+  body.platform-route-discovery:not(.landing-open) .leaflet-control-zoom,
+  body.platform-route-discovery:not(.landing-open) #eventMapLegend { display: none !important; }
+  body.platform-route-discovery:not(.landing-open) #floatingActions { right: 12px !important; bottom: 12px !important; }
+  body.platform-route-discovery:not(.landing-open) #discoveryFooter {
+    min-height: 38px !important;
+    gap: 2px 12px !important;
+    padding: 4px max(10px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)) !important;
+  }
+  body.platform-route-discovery:not(.landing-open) .discovery-footer-note { display: none !important; }
+  body.platform-route-discovery:not(.landing-open) #legalLinks {
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+  }
+  body.platform-route-discovery:not(.landing-open) #legalLinks::-webkit-scrollbar,
+  body.platform-route-discovery:not(.landing-open) #eventListToolbar::-webkit-scrollbar { display: none; }
+  body.platform-route-discovery:not(.landing-open) #legalLinks :is(a, button) { min-height: 30px !important; font-size: 0.68rem !important; }
+
+  /* Filters and results become one predictable full-screen workspace. */
+  body.platform-route-discovery:not(.landing-open):not(.event-list-fullscreen) #sidebar {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 5200 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: var(--discovery-surface) !important;
+    box-shadow: none !important;
+    transform: translateX(0) !important;
+  }
+  body.platform-route-discovery.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #sidebar,
+  body.platform-route-discovery:not(.landing-open):not(.event-list-fullscreen) #sidebar.closed {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transform: translateX(-100%) !important;
+  }
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open) { overflow: hidden !important; }
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open) #app {
+    z-index: 6000 !important;
+    overflow: visible !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #app > #sidebar {
+    position: fixed !important;
+  }
+  body.platform-route-discovery:not(.landing-open) .discovery-panel-mobile-header {
+    flex: 0 0 auto !important;
+    min-height: 58px !important;
+    padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) 8px max(14px, env(safe-area-inset-left)) !important;
+    background: var(--discovery-surface) !important;
+  }
+  body.platform-route-discovery:not(.landing-open) .discovery-panel-mobile-header strong { font-size: 1rem !important; }
+  body.platform-route-discovery:not(.landing-open) #closeDiscoveryPanelBtn {
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+  body.platform-route-discovery:not(.landing-open):not(.sidebar-collapsed):not(.event-list-fullscreen) #sidebar-header {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: min(238px, 42dvh) !important;
+    max-height: 46dvh !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 9px !important;
+    padding: 10px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior-y: contain;
+    border-radius: 0 !important;
+    scrollbar-gutter: auto !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #sidebar-header :is(.filter-accordion, .filter-actions-row, .active-filter-label, #activeFilterSummary, #dateRangeFilter.active) { grid-column: 1 / -1; }
+  body.platform-route-discovery:not(.landing-open) #sidebar-header :is(.filter-select-card, .filter-accordion) { min-width: 0 !important; border-radius: 12px !important; }
+  body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-select-card { padding: 9px !important; }
+  body.platform-route-discovery:not(.landing-open) #sidebar-header :is(#sortSelect, #dateFilter, #dateRangeFilter input, .filter-select-card select) {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding-inline: 10px 28px !important;
+    font-size: 16px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) .filter-accordion-toggle { width: 100% !important; min-height: 48px !important; }
+  body.platform-route-discovery:not(.landing-open) .filter-accordion.open > .filter-accordion-content {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #filters,
+  body.platform-route-discovery:not(.landing-open) .distance-filter-options {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) :is(.filter-chip, .distance-filter-chip, #resetFiltersBtn) {
+    width: 100% !important;
+    min-height: 46px !important;
+    padding-inline: 10px !important;
+    border-radius: 12px !important;
+    white-space: normal !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #eventListToolbar {
+    flex: 0 0 auto !important;
+    min-height: 56px !important;
+    padding: 7px 10px !important;
+    gap: 7px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
+  }
+  body.platform-route-discovery:not(.landing-open) #eventListToolbar > * { flex: 0 0 auto; }
+  body.platform-route-discovery:not(.landing-open) #eventList {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    padding: 10px !important;
+    gap: 10px !important;
+    overflow-y: auto !important;
+  }
+  body.platform-route-discovery:not(.landing-open) .event-card { border-radius: 13px !important; box-shadow: none !important; transform: none !important; }
+  body.platform-route-discovery:not(.landing-open) .event-top { min-height: 64px !important; padding: 12px !important; }
+  body.platform-route-discovery:not(.landing-open) .event-title { font-size: 1rem !important; line-height: 1.35 !important; text-wrap: pretty; }
+  body.platform-route-discovery:not(.landing-open) .event-facts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; padding: 12px !important; }
+
+  /* Event drawer */
+  body.platform-route-discovery:not(.landing-open) #eventDrawer {
+    inset: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    padding-bottom: env(safe-area-inset-bottom) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    overscroll-behavior-y: contain;
+  }
+  body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-titlebar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+    min-height: 62px !important;
+    padding: max(10px, env(safe-area-inset-top)) 10px 10px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-title-copy h2 { font-size: clamp(1.1rem, 5.4vw, 1.35rem) !important; line-height: 1.2 !important; }
+  body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-action-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    padding: 10px !important;
+  }
+  body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-action-row > * { width: 100% !important; min-height: 48px !important; }
+  body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-section { margin-inline: 10px !important; padding: 14px !important; border-radius: 13px !important; }
+
+  /* Season Planner */
+  body.platform-route-planner .platform-pages { overscroll-behavior-y: contain; scrollbar-gutter: auto; }
+  #seasonPlannerModal.open.season-planner-page-mode .season-planner-card {
+    padding: 14px max(11px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(11px, env(safe-area-inset-left)) !important;
+  }
+  #seasonPlannerModal.season-planner-page-mode .season-planner-header { margin-bottom: 12px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-planner-header h2 { margin: 0 0 5px !important; font-size: clamp(1.55rem, 7vw, 1.9rem) !important; line-height: 1.08 !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-planner-header p { max-width: 38ch !important; font-size: 0.9rem !important; line-height: 1.5 !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-tabs {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    width: 100% !important;
+    margin: 0 0 14px !important;
+    padding: 4px !important;
+    overflow: visible !important;
+    border: 1px solid rgba(148, 163, 184, 0.18) !important;
+    border-radius: 12px !important;
+    background: rgba(8, 17, 31, 0.97) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16) !important;
+  }
+  #seasonPlannerModal.season-planner-page-mode .season-tab {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 44px !important;
+    padding: 7px 5px !important;
+    border-radius: 9px !important;
+    font-size: clamp(0.7rem, 3.2vw, 0.8rem) !important;
+    white-space: nowrap !important;
+  }
+  #seasonPlannerModal.season-planner-page-mode :is(.season-overview-hero, .season-cockpit-grid, .season-focus-layout, .season-detail-grid, .season-event-planner-shell, .season-priority-row, .season-priority-controls, .season-calendar-header, .season-calendar-race-card, .season-workspace-header, .season-workspace-edit-panel, .season-workspace-edit-fields, .season-detail-fields, .season-detail-fields-compact) { grid-template-columns: minmax(0, 1fr) !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 9px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-score-kpi { grid-column: 1 / -1; }
+  #seasonPlannerModal.season-planner-page-mode :is(.season-countdown-grid, .season-recommendation-grid) { grid-template-columns: minmax(0, 1fr) !important; gap: 10px !important; }
+  #seasonPlannerModal.season-planner-page-mode :is(.season-next-card, .season-countdown-section, .season-countdown-card, .season-health-card, .season-focus-card, .season-training-card, .season-calendar-section, .season-recommendation-section, .season-events-list-panel, .season-workspace-header, .season-workspace-edit-panel, .season-next-action-card, .season-task-progress, .season-detail-panel, .season-sidebar-card, .season-race-overview-card) { padding: 14px !important; border-radius: 13px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-next-card #seasonCountdown { gap: 5px !important; font-size: clamp(1.7rem, 9.5vw, 2.35rem) !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-next-meta { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+  #seasonPlannerModal.season-planner-page-mode :is(.season-next-meta > div, .season-kpi-grid > div) { min-height: 0 !important; padding: 11px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-calendar-view-toggle { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; width: 100% !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-calendar-view-toggle button { width: 100% !important; min-height: 44px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-calendar-view-month { max-width: 100% !important; overflow-x: auto !important; overscroll-behavior-x: contain; }
+  #seasonPlannerModal.season-planner-page-mode .season-calendar-view-month > * { min-width: 560px; }
+  #seasonPlannerModal.season-planner-page-mode .season-events-list-panel { padding: 10px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-event-selector { min-height: 76px !important; padding: 11px !important; }
+  #seasonPlannerModal.season-planner-page-mode :is(button, select, input:not([type="checkbox"]):not([type="radio"]), textarea, summary) { min-height: 44px; }
+  #seasonPlannerModal.season-planner-page-mode :is(input, select, textarea) { font-size: 16px !important; }
+  #seasonPlannerModal.season-planner-page-mode :is(.season-workspace-header .season-event-edit-button, .season-next-action-card button, .season-workspace-edit-actions button, .season-events-back-button) { width: 100% !important; min-height: 48px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-task-list { grid-template-columns: minmax(0, 1fr) !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-task-list span { min-height: 36px !important; border-radius: 9px !important; }
+
+  /* Other platform pages and event guides */
+  body.platform-page-open .platform-page-shell { width: 100% !important; padding: 24px max(14px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)) !important; }
+  body.platform-page-open .platform-page-hero h1 { font-size: clamp(2rem, 9vw, 2.75rem) !important; line-height: 1.04 !important; text-wrap: balance; }
+  body.platform-page-open .platform-page-hero p,
+  body.platform-page-open .platform-feature-grid p { font-size: 0.96rem !important; line-height: 1.6 !important; }
+  body.platform-page-open .platform-feature-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  .event-detail-page .event-detail-shell { width: 100% !important; padding-inline: max(14px, env(safe-area-inset-left)) max(14px, env(safe-area-inset-right)) !important; }
+  .event-detail-page .event-detail-hero h1 { font-size: clamp(2rem, 9.5vw, 2.75rem) !important; line-height: 1.04 !important; text-wrap: balance; }
+  .event-detail-page :is(.event-detail-card, .race-guide-section, .event-detail-cta-card) { padding: 16px !important; border-radius: 15px !important; }
+  .event-detail-page :is(p, li, .race-guide-accordion > div) { line-height: 1.62; }
+}
+
+@media (max-width: 360px) {
+  body.platform-route-discovery:not(.landing-open) #toggleSidebar { min-width: 100px !important; padding-inline: 10px !important; }
+  body.platform-route-discovery:not(.landing-open) #topbarLanguageSelect { width: 62px !important; min-width: 62px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-next-meta,
+  #seasonPlannerModal.season-planner-page-mode .season-kpi-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-score-kpi { grid-column: auto; }
+}
+
+/* Landscape phones are selected by their short height; tablets are excluded. */
+@media (max-width: 960px) and (max-height: 500px) and (orientation: landscape) {
+  body.platform-route-discovery:not(.landing-open) #topbar {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    grid-template-areas: "left search" !important;
+    gap: 8px !important;
+    padding: 7px 9px !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #topbar-right {
+    display: none !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #app {
+    min-height: 0 !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #sidebar {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 5200 !important;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border-radius: 0 !important;
+  }
+  body.platform-route-discovery:not(.landing-open):not(.sidebar-collapsed) #sidebar-header { max-height: calc(100dvh - 48px) !important; }
+  body.platform-route-discovery:not(.landing-open) #eventListToolbar,
+  body.platform-route-discovery:not(.landing-open) #eventList,
+  body.platform-route-discovery:not(.landing-open) #eventListPagination { display: none !important; }
+  #seasonPlannerModal.open.season-planner-page-mode .season-planner-card { padding-inline: 12px !important; }
+  #seasonPlannerModal.season-planner-page-mode .season-tabs { position: static !important; }
+}

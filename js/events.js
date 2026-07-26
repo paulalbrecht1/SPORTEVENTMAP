@@ -8196,7 +8196,20 @@ function getUpcomingSeasonEvents(favoriteEvents) {
 }
 
 function getSeasonCalendarView() {
-  return localStorage.getItem("seasonCalendarView") === "list"
+  const storedView =
+    localStorage.getItem("seasonCalendarView");
+
+  if (storedView === "list" || storedView === "month") {
+    return storedView;
+  }
+
+  const usePhoneLayout =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(
+      "(max-width: 767px), (max-width: 960px) and (max-height: 500px) and (orientation: landscape)"
+    ).matches;
+
+  return usePhoneLayout
     ? "list"
     : "month";
 }

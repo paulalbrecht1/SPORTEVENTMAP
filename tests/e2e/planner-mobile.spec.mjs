@@ -63,3 +63,74 @@ test("Mobile discovery and planner have no horizontal overflow", async ({ page }
   });
   await assertNoHorizontalOverflow(page);
 });
+
+test("Phone filters open as a complete touch workspace", async ({ page }) => {
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+
+  const panelToggle = page.getByTestId("discovery-panel-toggle");
+  const sidebar = page.locator("#sidebar");
+
+  await expect(panelToggle).toBeVisible();
+  await expect(panelToggle).toHaveAttribute("aria-expanded", "false");
+
+  const triggerSize = await panelToggle.evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+
+    return {
+      width: bounds.width,
+      height: bounds.height
+    };
+  });
+
+  expect(triggerSize.width).toBeGreaterThanOrEqual(100);
+  expect(triggerSize.height).toBeGreaterThanOrEqual(44);
+
+  await panelToggle.click();
+  await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(sidebar).toBeVisible();
+
+  const workspace = await sidebar.evaluate(element => {
+    const bounds = element.getBoundingClientRect();
+
+    return {
+      position: getComputedStyle(element).position,
+      width: bounds.width,
+      height: bounds.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight
+    };
+  });
+
+  expect(workspace.position).toBe("fixed");
+  expect(workspace.width).toBeGreaterThanOrEqual(workspace.viewportWidth - 1);
+  expect(workspace.height).toBeGreaterThanOrEqual(workspace.viewportHeight - 1);
+
+  const distanceToggle = page.locator("#distanceFilterToggle");
+
+  await distanceToggle.scrollIntoViewIfNeeded();
+  await distanceToggle.click();
+  await expect(distanceToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("[data-distance-filter='10k']")).toBeVisible();
+
+  await page.locator("[data-distance-filter='10k']").click();
+  await expect(page.locator("[data-distance-filter='10k']")).toHaveClass(/active/);
+  await assertNoHorizontalOverflow(page);
+});
+
+test("Phone planner defaults to the readable calendar list", async ({ page }) => {
+  const run = fixtureByName["SEM E2E Future Run"];
+
+  await prepareApp(page, {
+    allowPlanner: true,
+    openDiscoveryPanel: false,
+    favorites: [run.event_key]
+  });
+
+  await openPlanner(page);
+  await selectPlannerTab(page, "calendar");
+
+  await expect(page.getByTestId("planner-calendar")).toHaveClass(/season-calendar-view-list/);
+  await assertNoHorizontalOverflow(page);
+});

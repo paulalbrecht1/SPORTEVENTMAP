@@ -102,6 +102,17 @@ const DISCOVERY_DEFAULT_MAP_ZOOM = 6;
 
 const DISCOVERY_DEFAULT_MAP_ZOOM_MOBILE = 5;
 
+const PHONE_VIEWPORT_QUERY =
+  "(max-width: 767px), (max-width: 960px) and (max-height: 500px) and (orientation: landscape)";
+
+function isPhoneViewport() {
+  return Boolean(
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(PHONE_VIEWPORT_QUERY).matches
+  );
+}
+
 function getDiscoveryDefaultMapZoom() {
   if (
     typeof window !== "undefined" &&
@@ -167,7 +178,7 @@ const MARKER_CLUSTER_OPTIONS = {
   maxClusterRadius(zoom) {
     if (zoom >= 12) return 24;
     if (zoom >= 9) return 38;
-    return 52;
+    return isPhoneViewport() ? 64 : 52;
   }
 };
 
@@ -280,11 +291,15 @@ function createEventMarkerPresentation(event) {
 
 // INIT MAP
 function initMap() {
+  const usePhoneMapMode =
+    isPhoneViewport();
+
   map = L.map("map", {
     preferCanvas: true,
-    zoomAnimation: true,
+    zoomAnimation: !usePhoneMapMode,
     markerZoomAnimation: false,
     fadeAnimation: false,
+    inertia: !usePhoneMapMode,
     wheelDebounceTime: 45,
     wheelPxPerZoomLevel: 90
   }).setView(
@@ -334,10 +349,20 @@ function refreshMapLayout(delay = 0) {
     });
   };
 
+  const usePhoneMapMode =
+    isPhoneViewport();
+  const refreshDelay =
+    usePhoneMapMode
+      ? Math.max(delay, 90)
+      : delay;
+
   mapLayoutRefreshTimer = window.setTimeout(() => {
     window.requestAnimationFrame(run);
-    window.setTimeout(run, 220);
-  }, delay);
+
+    if (!usePhoneMapMode) {
+      window.setTimeout(run, 220);
+    }
+  }, refreshDelay);
 }
 
 function setupMapLayoutRefresh() {

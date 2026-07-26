@@ -165,6 +165,8 @@ test("Discovery remains usable across the responsive viewport matrix", async ({ 
       width <= 960 && height <= 500 && width > height;
     const usesDrawer =
       width <= 1023 || isPortraitTablet;
+    const usesFullScreenPhonePanel =
+      width <= 767;
     const openLayout = await page.evaluate(() => {
       const sidebar =
         document.querySelector("#sidebar")?.getBoundingClientRect();
@@ -223,7 +225,7 @@ test("Discovery remains usable across the responsive viewport matrix", async ({ 
 
     expect(openLayout.horizontalOverflow, `${width}x${height} open`).toBeLessThanOrEqual(2);
     expect(
-      isShortLandscape
+      isShortLandscape || usesFullScreenPhonePanel
         ? openLayout.sidebarInViewport
         : openLayout.sidebarInWorkspace,
       `${width}x${height} open ${JSON.stringify(openLayout)}`

@@ -39,6 +39,19 @@ pnpm run test:static
 Weitere Prüfungen und End-to-End-Tests sind in `package.json` sowie unter
 `tests/` dokumentiert.
 
+### Eventdaten-Qualität
+
+```powershell
+pnpm run audit:quality
+```
+
+Der wiederholbare Check bewertet jedes Event als `complete`,
+`review_required` oder `incomplete`. Er prüft Pflichtfelder, Datums- und
+URL-Formate, Geodaten, mögliche Dubletten sowie weitere Qualitätssignale. Die
+vollständige Prüfliste und eine Zusammenfassung werden unter
+`data/imports/review/event-quality-audit.*` erzeugt; die Eventdaten selbst
+werden nicht verändert.
+
 ## Sicherheit
 
 Zugangsdaten, private Importdateien und lokale Konfigurationen dürfen nie in

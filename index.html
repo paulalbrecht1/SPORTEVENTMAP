@@ -2181,62 +2181,30 @@
 
     <div class="admin-dashboard-header">
       <div>
-        <span class="admin-eyebrow">Closed beta operations</span>
+        <span class="admin-eyebrow">Produktsteuerung</span>
         <h2>
-          Admin Dashboard
+          Adminbereich
         </h2>
-        <p>Review submissions, monitor data quality and respond to beta feedback.</p>
+        <p>Verl&auml;ssliche Produktkennzahlen verstehen und Feedback bearbeiten.</p>
       </div>
       <div class="admin-header-actions">
-        <span id="adminLastUpdated">Not refreshed yet</span>
+        <span id="adminLastUpdated">Noch nicht aktualisiert</span>
         <button type="button" id="refreshAdminDashboardBtn">
-          Refresh dashboard
+          Aktualisieren
         </button>
       </div>
     </div>
 
-    <div
-      id="adminSystemStatus"
-      class="admin-system-status"
-      role="status"
-      aria-live="polite"
-    >
-      Checking database setup...
-    </div>
 
-    <div class="admin-tabs">
+
+    <div class="admin-tabs" role="tablist" aria-label="Adminbereiche">
 
       <button
         type="button"
         class="admin-tab active"
-        data-admin-tab="review"
-      >
-        Submissions
-        <span id="adminPendingTabCount" class="admin-tab-count">0</span>
-      </button>
-
-      <button
-        type="button"
-        class="admin-tab"
-        data-admin-tab="quality"
-      >
-        Data Quality
-        <span id="adminQualityTabCount" class="admin-tab-count">0</span>
-      </button>
-
-      <button
-        type="button"
-        class="admin-tab"
-        data-admin-tab="feedback"
-      >
-        Feedback
-        <span id="adminFeedbackTabCount" class="admin-tab-count">0</span>
-      </button>
-
-      <button
-        type="button"
-        class="admin-tab"
         data-admin-tab="analytics"
+        role="tab"
+        aria-selected="true"
       >
         Analytics
       </button>
@@ -2244,34 +2212,20 @@
       <button
         type="button"
         class="admin-tab"
-        data-admin-tab="knowledge"
+        data-admin-tab="feedback"
+        role="tab"
+        aria-selected="false"
       >
-        Knowledge
-        <span id="adminKnowledgeTabCount" class="admin-tab-count">0</span>
-      </button>
-
-      <button
-        type="button"
-        class="admin-tab"
-        data-admin-tab="knowledgeAudit"
-      >
-        Knowledge Audit
-        <span id="adminKnowledgeAuditTabCount" class="admin-tab-count">0</span>
-      </button>
-
-      <button
-        type="button"
-        class="admin-tab"
-        data-admin-tab="imports"
-      >
-        Imports
+        Feedback
+        <span id="adminFeedbackTabCount" class="admin-tab-count">0</span>
       </button>
 
     </div>
 
     <div
-      class="admin-tab-panel active"
+      class="admin-tab-panel"
       id="adminReviewPanel"
+      hidden
     >
 
     <div id="adminStats">
@@ -2434,6 +2388,7 @@
     <div
       class="admin-tab-panel"
       id="adminQualityPanel"
+      hidden
     >
 
     <div class="admin-table-section admin-quality-section">
@@ -2562,6 +2517,7 @@
     <div
       class="admin-tab-panel"
       id="adminKnowledgePanel"
+      hidden
     >
       <div class="admin-table-section admin-knowledge-workspace">
         <div class="admin-section-heading">
@@ -2796,6 +2752,7 @@
     <div
       class="admin-tab-panel"
       id="adminKnowledgeAuditPanel"
+      hidden
     >
       <div class="admin-table-section admin-knowledge-audit-workspace">
         <div class="admin-section-heading">
@@ -2857,6 +2814,7 @@
     <div
       class="admin-tab-panel"
       id="adminImportsPanel"
+      hidden
     >
 
       <div class="admin-import-panel admin-staging-panel">
@@ -2991,94 +2949,94 @@
     </div>
 
     <div
-      class="admin-tab-panel"
+      class="admin-tab-panel active"
       id="adminAnalyticsPanel"
     >
 
       <div class="admin-table-section admin-analytics-workspace">
         <div class="admin-analytics-header">
           <div>
-            <span class="admin-eyebrow">Beta product signals</span>
+             <span class="admin-eyebrow">Entscheidungsrelevante Kennzahlen</span>
             <h3>
               Analytics
             </h3>
-            <p>Understand whether testers discover events, return to the product and use the Season Planner.</p>
+             <p>Zeitraumwerte stammen aus erfassten Produktaktionen. Planner-Best&auml;nde sind die jeweils letzte gemeldete Anzahl.</p>
           </div>
           <div class="admin-analytics-controls">
             <label>
-              Period
+               Zeitraum
               <select id="adminAnalyticsRange">
-                <option value="7">Last 7 days</option>
-                <option value="30" selected>Last 30 days</option>
-                <option value="90">Last 90 days</option>
-                <option value="all">All time</option>
+                 <option value="7">Letzte 7 Tage</option>
+                 <option value="30" selected>Letzte 30 Tage</option>
+                 <option value="90">Letzte 90 Tage</option>
+                 <option value="all">Gesamter Zeitraum</option>
               </select>
             </label>
             <button type="button" id="refreshAdminAnalyticsBtn">
-              Refresh
+               Aktualisieren
             </button>
           </div>
         </div>
 
         <div class="analytics-section-heading">
           <div>
-            <h4>Overview</h4>
-            <p id="analyticsRangeLabel">Last 30 days</p>
+             <h4>Kern-KPIs</h4>
+             <p id="analyticsRangeLabel">Letzte 30 Tage</p>
           </div>
         </div>
 
         <div class="analytics-dashboard-grid analytics-kpi-grid">
           <div class="analytics-card analytics-card-primary">
-            <span>Total Accounts</span>
+             <span>Aktive Besucher</span>
             <strong id="analyticsTotalAccounts">0</strong>
-            <em>Registered profiles</em>
+             <em>Eindeutige erfasste Nutzer oder Besucher im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-            <span>Active Users 7d</span>
+             <span>Event-Detailaufrufe</span>
             <strong id="analyticsActiveUsers7d">0</strong>
-            <em>Unique users or visitors</em>
+             <em>Erfasste &Ouml;ffnungen im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-            <span>Active Users 30d</span>
+             <span>Erreichte Events</span>
             <strong id="analyticsActiveUsers30d">0</strong>
-            <em>Unique users or visitors</em>
+             <em>Eindeutige Events mit Detailaufruf</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-            <span>Returning 7d</span>
+             <span>Planner-Hinzuf&uuml;gungen</span>
             <strong id="analyticsReturningUsers7d">0</strong>
-            <em>2+ sessions or active days</em>
+             <em>Erfasste Hinzuf&uuml;gungen im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-            <span>Returning 30d</span>
+             <span>Zuletzt gemeldete Planner-Events</span>
             <strong id="analyticsReturningUsers30d">0</strong>
-            <em>2+ sessions or active days</em>
+             <em>Letzter erfasster Bestand je Planner</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-            <span>Total Sessions</span>
+             <span>&Oslash; Events pro Planner</span>
             <strong id="analyticsTotalSessions">0</strong>
-            <em>Selected period</em>
+             <em>Durchschnitt der letzten Bestandssignale</em>
           </div>
-          <div class="analytics-card analytics-card-primary">
+          <div class="analytics-card analytics-card-primary" hidden>
             <span>Searches</span>
             <strong id="analyticsSearchesKpi">0</strong>
             <em>Searches performed</em>
           </div>
-          <div class="analytics-card analytics-card-primary">
+          <div class="analytics-card analytics-card-primary" hidden>
             <span>Favorites Added</span>
             <strong id="analyticsFavoritesAddedKpi">0</strong>
             <em>Planning intent</em>
           </div>
-          <div class="analytics-card analytics-card-primary">
+          <div class="analytics-card analytics-card-primary" hidden>
             <span>Planner Users</span>
             <strong id="analyticsPlannerUsersKpi">0</strong>
             <em>Opened or added races</em>
           </div>
-          <div class="analytics-card analytics-card-primary">
+          <div class="analytics-card analytics-card-primary" hidden>
             <span>Planner Adds</span>
             <strong id="analyticsPlannerEventsAddedKpi">0</strong>
             <em>Races added</em>
           </div>
-          <div class="analytics-card analytics-card-primary">
+          <div class="analytics-card analytics-card-primary" hidden>
             <span>Feedback</span>
             <strong id="analyticsFeedbackSubmissionsKpi">0</strong>
             <em>Submitted feedback</em>
@@ -3087,21 +3045,21 @@
 
         <div class="analytics-insight-strip">
           <div>
-            <strong>Retention</strong>
-            <span id="analyticsRetentionInsight">Waiting for returning-user data.</span>
+             <strong>Datenbasis</strong>
+             <span id="analyticsRetentionInsight">Datenquellen werden gepr&uuml;ft.</span>
           </div>
           <div>
-            <strong>Discovery</strong>
-            <span id="analyticsDiscoveryInsight">Waiting for search and event data.</span>
+             <strong>Event-Interesse</strong>
+             <span id="analyticsDiscoveryInsight">Event-Aktionen werden geladen.</span>
           </div>
           <div>
-            <strong>Planning</strong>
-            <span id="analyticsPlanningInsight">Waiting for planner data.</span>
+             <strong>Saisonplanung</strong>
+             <span id="analyticsPlanningInsight">Planner-Bestand wird geladen.</span>
           </div>
         </div>
 
         <div class="analytics-section-grid">
-          <section class="analytics-detail-panel">
+          <section class="analytics-detail-panel" hidden>
             <div class="analytics-panel-heading">
               <div>
                 <h4>Retention & Returning Users</h4>
@@ -3118,7 +3076,7 @@
             <div id="analyticsRetentionTable" class="analytics-table-list"></div>
           </section>
 
-          <section class="analytics-detail-panel">
+          <section class="analytics-detail-panel" hidden>
             <div class="analytics-panel-heading">
               <div>
                 <h4>Search</h4>
@@ -3146,25 +3104,25 @@
           <section class="analytics-detail-panel">
             <div class="analytics-panel-heading">
               <div>
-                <h4>Event Discovery</h4>
-                <p>Which events attract attention and convert into planning intent.</p>
+                 <h4>Event-Interesse</h4>
+                 <p>Detailaufrufe und Planner-Aktionen im gew&auml;hlten Zeitraum.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-              <div><span>Detail opens</span><strong id="analyticsEventDetailOpens">0</strong></div>
-              <div><span>Favorite conversion</span><strong id="analyticsFavoriteConversionRate">0%</strong></div>
+               <div><span>Detailaufrufe</span><strong id="analyticsEventDetailOpens">0</strong></div>
+               <div><span>Planner-Adds / Aufrufe</span><strong id="analyticsFavoriteConversionRate">0%</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                <h5>Most viewed events</h5>
+                 <h5>Meiste Detailaufrufe</h5>
                 <div id="analyticsMostViewedEvents" class="analytics-table-list"></div>
               </div>
               <div>
-                <h5>Most favorited events</h5>
+                 <h5>Meiste Planner-Adds im Zeitraum</h5>
                 <div id="analyticsMostFavoritedEvents" class="analytics-table-list"></div>
               </div>
             </div>
-            <h5>Most clicked official websites</h5>
+             <h5>Meiste Klicks auf offizielle Websites</h5>
             <div id="analyticsMostExternalClicks" class="analytics-table-list"></div>
           </section>
 
@@ -3172,30 +3130,30 @@
             <div class="analytics-panel-heading">
               <div>
                 <h4>Season Planner</h4>
-                <p>Whether testers move from discovery into real season planning.</p>
+                 <p>Zeitraum-Aktionen und der jeweils letzte gemeldete Planner-Bestand werden getrennt ausgewiesen.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-              <div><span>Planner opens</span><strong id="analyticsPlannerOpens">0</strong></div>
-              <div><span>Planner users</span><strong id="analyticsPlannerUsers">0</strong></div>
-              <div><span>Events added</span><strong id="analyticsPlannerEventsAdded">0</strong></div>
-              <div><span>Avg planned/user</span><strong id="analyticsAvgPlannedEvents">0</strong></div>
-              <div><span>Recommendations</span><strong id="analyticsRecommendationClicks">0</strong></div>
-              <div><span>Planner conversion</span><strong id="analyticsPlannerConversionRate">0%</strong></div>
+               <div><span>Planner-Aufrufe</span><strong id="analyticsPlannerOpens">0</strong></div>
+               <div><span>Erfasste Planner</span><strong id="analyticsPlannerUsers">0</strong></div>
+               <div><span>Hinzuf&uuml;gungen im Zeitraum</span><strong id="analyticsPlannerEventsAdded">0</strong></div>
+               <div><span>&Oslash; beim letzten Signal</span><strong id="analyticsAvgPlannedEvents">0</strong></div>
+               <div><span>Empfehlungsklicks</span><strong id="analyticsRecommendationClicks">0</strong></div>
+               <div><span>Planner-Conversion</span><strong id="analyticsPlannerConversionRate">0%</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                <h5>Priority mix</h5>
+                 <h5>Planner-Gr&ouml;&szlig;en (letztes Signal)</h5>
                 <div id="analyticsPriorityMix" class="analytics-table-list"></div>
               </div>
               <div>
-                <h5>Most planned events</h5>
+                 <h5>Meiste Adds im Zeitraum</h5>
                 <div id="analyticsMostPlannedEventsV2" class="analytics-table-list"></div>
               </div>
             </div>
           </section>
 
-          <section class="analytics-detail-panel">
+          <section class="analytics-detail-panel" hidden>
             <div class="analytics-panel-heading">
               <div>
                 <h4>Feedback</h4>
@@ -3238,11 +3196,11 @@
         <div class="admin-feedback-workspace">
           <div class="admin-feedback-heading">
             <div>
-              <h4>Feedback review</h4>
-              <p>Filter beta feedback and update its internal review status.</p>
+               <h4>Feedback bearbeiten</h4>
+               <p>Feedback filtern, priorisieren und den Bearbeitungsstatus pflegen.</p>
             </div>
             <button type="button" id="refreshAdminFeedbackBtn">
-              Refresh
+               Aktualisieren
             </button>
           </div>
 

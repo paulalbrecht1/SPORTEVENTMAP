@@ -59,7 +59,6 @@ pass("HTML ids are unique");
   "adminFeedbackPanel",
   "adminAnalyticsPanel",
   "adminImportsPanel",
-  "adminSystemStatus",
   "pendingEventsList",
   "pendingEventSearch",
   "pendingEventFilter",
@@ -86,6 +85,36 @@ pass("HTML ids are unique");
   );
 });
 pass("required beta views and modals exist");
+const adminTabNames =
+  [...html.matchAll(/data-admin-tab=["']([^"']+)["']/g)]
+    .map(match => match[1]);
+
+assert.deepEqual(
+  adminTabNames,
+  ["analytics", "feedback"],
+  "Admin navigation must expose only Analytics and Feedback"
+);
+
+[
+  "Event-Detailaufrufe",
+  "Planner-Hinzuf&uuml;gungen",
+  "Zuletzt gemeldete Planner-Events",
+  "&Oslash; Events pro Planner"
+].forEach(label => {
+  assert.ok(
+    html.includes(label),
+    `Missing truthful Admin KPI label: ${label}`
+  );
+});
+
+assert.match(
+  css,
+  /body\[data-theme="light"\] #adminModal \.admin-card/,
+  "Admin dashboard needs explicit light-mode contrast rules"
+);
+
+pass("admin is limited to truthful analytics and feedback workflows");
+
 
 assert.match(
   html,
@@ -425,6 +454,28 @@ pass("approved database review status maps into public event cards");
 
 const supabaseSource =
   read("js/supabase.js");
+[
+  /loadAdminTablePages/,
+  /ADMIN_ANALYTICS_ROW_LIMIT\s*=\s*100000/,
+  /getLatestPlannerSnapshots/,
+  /planner_event_added/,
+  /keine geschaetzten Ersatzwerte/
+].forEach(pattern => {
+  assert.match(
+    supabaseSource,
+    pattern,
+    `Truthful analytics implementation missing: ${pattern}`
+  );
+});
+
+assert.match(
+  eventSource,
+  /saved_events:\s*favorites\.length/,
+  "Planner add/remove tracking must report the exact resulting planner size"
+);
+
+pass("analytics uses complete pages and explicit Planner size snapshots");
+
 
 const i18nSource =
   read("js/i18n.js");

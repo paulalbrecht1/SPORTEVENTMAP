@@ -4521,20 +4521,15 @@ const adminTabPanels =
 const adminAnalyticsStatus =
   document.getElementById("adminAnalyticsStatus");
 
-let currentAdminTab = "review";
+let currentAdminTab = "analytics";
 let pendingAdminEvents = [];
 let localQualityRows = [];
 let adminStagingPreviewRows = [];
 let adminRefreshInProgress = false;
 
 const ADMIN_TAB_PANEL_IDS = {
-  review: "adminReviewPanel",
-  quality: "adminQualityPanel",
-  feedback: "adminFeedbackPanel",
   analytics: "adminAnalyticsPanel",
-  knowledge: "adminKnowledgePanel",
-  knowledgeAudit: "adminKnowledgeAuditPanel",
-  imports: "adminImportsPanel"
+  feedback: "adminFeedbackPanel"
 };
 
 
@@ -4560,12 +4555,12 @@ adminBtn.onclick = async () => {
     page: "admin"
   });
 
-  setAdminTab("review");
+  setAdminTab("analytics");
 
-  initWorldTriathlonImportDates();
+  // The streamlined admin area loads only analytics and feedback.
 
   await refreshAdminWorkspace({
-    includeSystemStatus: true,
+    includeSystemStatus: false,
     force: true
   });
 
@@ -4576,7 +4571,7 @@ function setAdminTab(tabName) {
   currentAdminTab =
     ADMIN_TAB_PANEL_IDS[tabName]
       ? tabName
-      : "review";
+      : "analytics";
 
   adminTabs.forEach(tab => {
 
@@ -7181,16 +7176,32 @@ function getAnalyticsRangeConfig() {
   };
 }
 
-async function loadAnalyticsRows(sinceDate = null) {
-  const baseQuery = selectFields => {
+const ADMIN_ANALYTICS_PAGE_SIZE = 1000;
+const ADMIN_ANALYTICS_ROW_LIMIT = 100000;
+
+async function loadAdminTablePages(
+  tableName,
+  selectFields,
+  sinceDate = null
+) {
+  const rows = [];
+  let from = 0;
+  let totalCount = null;
+
+  while (rows.length < ADMIN_ANALYTICS_ROW_LIMIT) {
     let query =
       supabaseClient
-        .from("analytics_events")
-        .select(selectFields)
+        .from(tableName)
+        .select(selectFields, {
+          count: "exact"
+        })
         .order("created_at", {
           ascending: false
         })
-        .limit(10000);
+        .range(
+          from,
+          from + ADMIN_ANALYTICS_PAGE_SIZE - 1
+        );
 
     if (sinceDate) {
       query =
@@ -7200,51 +7211,144 @@ async function loadAnalyticsRows(sinceDate = null) {
         );
     }
 
-    return query;
-  };
+    const {
+      data,
+      error,
+      count
+    } = await query;
 
-  let { data, error } =
-    await baseQuery(
-      "event_name, event_type, anonymous_id, session_id, user_id, event_id, page, source, metadata, created_at"
-    );
+    if (error) {
+      return {
+        rows: null,
+        error,
+        truncated: false
+      };
+    }
 
-  if (
-    error &&
-    (
-      String(error.message || "").toLowerCase().includes("event_type") ||
-      String(error.message || "").toLowerCase().includes("anonymous_id") ||
-      String(error.message || "").toLowerCase().includes("metadata") ||
-      String(error.message || "").toLowerCase().includes("page") ||
-      String(error.message || "").toLowerCase().includes("source")
-    )
-  ) {
-    const fallback =
-      await baseQuery(
-        "event_name, session_id, user_id, event_id, created_at"
-      );
+    if (
+      totalCount === null &&
+      Number.isFinite(count)
+    ) {
+      totalCount = count;
+    }
 
-    data =
-      fallback.data;
-    error =
-      fallback.error;
-  }
+    const pageRows =
+      data || [];
 
-  if (error) {
-    console.warn(
-      "Could not load analytics activity.",
-      error.message
-    );
+    rows.push(...pageRows);
 
-    return {
-      rows: null,
-      error
-    };
+    if (
+      !pageRows.length ||
+      (
+        totalCount !== null &&
+        rows.length >= totalCount
+      )
+    ) {
+      return {
+        rows:
+          totalCount === null
+            ? rows
+            : rows.slice(0, totalCount),
+        error: null,
+        truncated: false
+      };
+    }
+
+    from += pageRows.length;
   }
 
   return {
-    rows: data || [],
-    error: null
+    rows,
+    error: null,
+    truncated:
+      totalCount === null ||
+      rows.length < totalCount
   };
+}
+
+async function loadAnalyticsRows(sinceDate = null) {
+  let result =
+    await loadAdminTablePages(
+      "analytics_events",
+      "event_name, event_type, anonymous_id, session_id, user_id, event_id, page, source, metadata, created_at",
+      sinceDate
+    );
+
+  if (
+    result.error &&
+    (
+      String(result.error.message || "").toLowerCase().includes("event_type") ||
+      String(result.error.message || "").toLowerCase().includes("anonymous_id") ||
+      String(result.error.message || "").toLowerCase().includes("metadata") ||
+      String(result.error.message || "").toLowerCase().includes("page") ||
+      String(result.error.message || "").toLowerCase().includes("source")
+    )
+  ) {
+    result =
+      await loadAdminTablePages(
+        "analytics_events",
+        "event_name, session_id, user_id, event_id, created_at",
+        sinceDate
+      );
+  }
+
+  if (result.error) {
+    console.warn(
+      "Could not load analytics activity.",
+      result.error.message
+    );
+  }
+
+  return result;
+}
+
+function getLatestPlannerSnapshots(rows, identityResolver) {
+  const snapshots =
+    new Map();
+
+  rows
+    .filter(row =>
+      [
+        "season_planner_opened",
+        "planner_event_added",
+        "planner_event_removed"
+      ].includes(getAnalyticsRowType(row))
+    )
+    .sort((first, second) =>
+      Date.parse(second.created_at || "") -
+      Date.parse(first.created_at || "")
+    )
+    .forEach((row, index) => {
+      const metadata =
+        getAnalyticsRowMetadata(row);
+
+      const savedEvents =
+        Number(metadata.saved_events);
+
+      const actor =
+        getAnalyticsActorId(
+          row,
+          index,
+          identityResolver
+        );
+
+      if (
+        !actor ||
+        snapshots.has(actor) ||
+        !Number.isFinite(savedEvents) ||
+        savedEvents < 0
+      ) {
+        return;
+      }
+
+      snapshots.set(actor, {
+        actor,
+        savedEvents,
+        createdAt: row.created_at || null
+      });
+    });
+
+  return [...snapshots.values()];
 }
 
 async function loadAnalyticsFeedbackRows(sinceDate = null) {
@@ -8258,13 +8362,13 @@ async function loadAdminFeedbackManagement() {
 async function loadAdminAnalytics() {
   if (adminAnalyticsStatus) {
     adminAnalyticsStatus.textContent =
-      "Loading analytics...";
+      "Analytics werden geladen...";
   }
 
   setButtonLoading(
     analyticsElements.refresh,
     true,
-    "Refreshing..."
+    "Wird aktualisiert..."
   );
 
   const range =
@@ -8275,95 +8379,37 @@ async function loadAdminAnalytics() {
       range.label;
   }
 
-  const [
-    analyticsResult,
-    registeredUsers,
-    feedbackRows
-  ] = await Promise.all([
-    loadAnalyticsRows(null),
-    getTableCount("profiles"),
-    loadAnalyticsFeedbackRows(range.since)
-  ]);
+  const analyticsResult =
+    await loadAnalyticsRows(null);
+
+  const analyticsAvailable =
+    Array.isArray(analyticsResult.rows);
 
   const allRows =
-    analyticsResult.rows || [];
+    analyticsAvailable
+      ? analyticsResult.rows
+      : [];
+
+  const rangeStart =
+    range.since
+      ? Date.parse(range.since)
+      : null;
 
   const rows =
-    range.since
+    rangeStart
       ? allRows.filter(row => {
           const timestamp =
             Date.parse(row.created_at || "");
 
           return (
             Number.isFinite(timestamp) &&
-            timestamp >= Date.parse(range.since)
+            timestamp >= rangeStart
           );
         })
       : allRows;
 
-  if (!analyticsResult.rows) {
-    Object.values(analyticsElements)
-      .filter(element =>
-        element &&
-        element.tagName &&
-        element.tagName !== "SELECT" &&
-        element.tagName !== "BUTTON"
-      )
-      .forEach(element => {
-        if ("textContent" in element) {
-          element.textContent = "—";
-        }
-      });
-
-    if (adminAnalyticsStatus) {
-      adminAnalyticsStatus.textContent =
-        "Analytics could not be loaded.";
-    }
-
-    setButtonLoading(
-      analyticsElements.refresh,
-      false
-    );
-    return;
-  }
-
-  setAnalyticsNumber(
-    analyticsElements.totalAccounts,
-    registeredUsers
-  );
-
   const identityResolver =
     createAnalyticsIdentityResolver(allRows);
-
-  const rows7d =
-    getAnalyticsRowsSince(allRows, 7);
-
-  const rows30d =
-    getAnalyticsRowsSince(allRows, 30);
-
-  const activeUsers7d =
-    getUniqueAnalyticsActors(
-      rows7d,
-      identityResolver
-    ).size;
-
-  const activeUsers30d =
-    getUniqueAnalyticsActors(
-      rows30d,
-      identityResolver
-    ).size;
-
-  const returningUsers7d =
-    getReturningAnalyticsUsers(
-      rows7d,
-      identityResolver
-    );
-
-  const returningUsers30d =
-    getReturningAnalyticsUsers(
-      rows30d,
-      identityResolver
-    );
 
   const periodUsers =
     getUniqueAnalyticsActors(
@@ -8371,34 +8417,9 @@ async function loadAdminAnalytics() {
       identityResolver
     );
 
-  const periodSessions =
-    getUniqueAnalyticsSessions(rows);
-
-  const unidentifiedLegacySessions =
-    new Set(
-      rows
-        .filter(row =>
-          !identityResolver.hasKnownActor(row)
-        )
-        .map((row, index) =>
-          getAnalyticsRowSessionId(row, index)
-        )
-        .filter(Boolean)
-    ).size;
-
-  const searchRows =
-    rows.filter(row =>
-      getAnalyticsRowType(row) === "search_performed"
-    );
-
   const eventOpenRows =
     rows.filter(row =>
       getAnalyticsRowType(row) === "event_detail_opened"
-    );
-
-  const favoriteRows =
-    rows.filter(row =>
-      getAnalyticsRowType(row) === "favorite_added"
     );
 
   const plannerOpenRows =
@@ -8421,334 +8442,216 @@ async function loadAdminAnalytics() {
       getAnalyticsRowType(row) === "external_event_website_clicked"
     );
 
-  const plannerUsers =
-    getUniqueAnalyticsActors(
-      [
-        ...plannerOpenRows,
-        ...plannerAddRows
-      ],
-      identityResolver
+  const uniqueOpenedEvents =
+    new Set(
+      eventOpenRows
+        .map(row => row.event_id)
+        .filter(Boolean)
     );
+
+  const plannerSnapshots =
+    analyticsAvailable
+      ? getLatestPlannerSnapshots(
+          allRows,
+          identityResolver
+        )
+      : [];
+
+  const reportedPlannerEvents =
+    plannerSnapshots.reduce(
+      (total, snapshot) =>
+        total + snapshot.savedEvents,
+      0
+    );
+
+  const averageReportedPlannerEvents =
+    plannerSnapshots.length
+      ? reportedPlannerEvents /
+        plannerSnapshots.length
+      : 0;
+
+  const plannerSizeCounts =
+    countAnalyticsBy(
+      plannerSnapshots,
+      snapshot => {
+        if (snapshot.savedEvents === 0) {
+          return "0 Events";
+        }
+
+        if (snapshot.savedEvents === 1) {
+          return "1 Event";
+        }
+
+        if (snapshot.savedEvents <= 3) {
+          return "2-3 Events";
+        }
+
+        if (snapshot.savedEvents <= 5) {
+          return "4-5 Events";
+        }
+
+        return "6+ Events";
+      }
+    );
+
+  setAnalyticsNumber(
+    analyticsElements.totalAccounts,
+    analyticsAvailable
+      ? periodUsers.size
+      : null
+  );
 
   setAnalyticsNumber(
     analyticsElements.activeUsers7d,
-    activeUsers7d
+    analyticsAvailable
+      ? eventOpenRows.length
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.activeUsers30d,
-    activeUsers30d
+    analyticsAvailable
+      ? uniqueOpenedEvents.size
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.returningUsers7d,
-    returningUsers7d
+    analyticsAvailable
+      ? plannerAddRows.length
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.returningUsers30d,
-    returningUsers30d
+    analyticsAvailable
+      ? reportedPlannerEvents
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.totalSessions,
-    periodSessions.size
+    analyticsAvailable
+      ? analyticsDecimal(
+          averageReportedPlannerEvents
+        )
+      : null
   );
-  setAnalyticsNumber(
-    analyticsElements.searchesKpi,
-    searchRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.favoritesAddedKpi,
-    favoriteRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerUsersKpi,
-    plannerUsers.size
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerEventsAddedKpi,
-    plannerAddRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.feedbackSubmissionsKpi,
-    feedbackRows.length ||
-      countAnalyticsRows(rows, ["feedback_submitted"])
-  );
-
-  const newUsers =
-    Math.max(
-      0,
-      periodUsers.size -
-      getReturningAnalyticsUsers(
-        rows,
-        identityResolver
-      )
-    );
-
-  if (analyticsElements.newReturningSplit) {
-    analyticsElements.newReturningSplit.textContent =
-      `${newUsers} new / ${getReturningAnalyticsUsers(rows, identityResolver)} returning`;
-  }
-
-  if (analyticsElements.avgSessionsPerUser) {
-    analyticsElements.avgSessionsPerUser.textContent =
-      analyticsDecimal(
-        periodUsers.size
-          ? periodSessions.size / periodUsers.size
-          : 0
-      );
-  }
-
-  const actorVisitCounts = {};
-
-  rows.forEach((row, index) => {
-    const actor =
-      getAnalyticsActorId(
-        row,
-        index,
-        identityResolver
-      );
-
-    if (!actor) {
-      return;
-    }
-
-    if (!actorVisitCounts[actor]) {
-      actorVisitCounts[actor] =
-        new Set();
-    }
-
-    actorVisitCounts[actor].add(
-      getAnalyticsRowSessionId(row, index)
-    );
-  });
-
-  const visitCount =
-    minimum =>
-      Object.values(actorVisitCounts)
-        .filter(set => set.size >= minimum)
-        .length;
-
-  setAnalyticsNumber(
-    analyticsElements.users2Visits,
-    visitCount(2)
-  );
-  setAnalyticsNumber(
-    analyticsElements.users3Visits,
-    visitCount(3)
-  );
-  setAnalyticsNumber(
-    analyticsElements.users5Visits,
-    visitCount(5)
-  );
-
-  renderAnalyticsList(
-    analyticsElements.retentionTable,
-    [
-      ["Active users", periodUsers.size],
-      ["Returning users", getReturningAnalyticsUsers(rows, identityResolver)],
-      ["Total sessions", periodSessions.size],
-      ["Unidentified legacy sessions", unidentifiedLegacySessions],
-      ["Tracked actions", rows.length]
-    ],
-    {
-      empty: "No visitor activity in this period."
-    }
-  );
-
-  const searchTerms =
-    countAnalyticsBy(searchRows, getAnalyticsSearchTerm);
-
-  const zeroResultSearches =
-    searchRows.filter(row =>
-      Number(getAnalyticsRowMetadata(row).results_count) === 0
-    ).length;
-
-  const filterCounts = {};
-
-  rows
-    .filter(row =>
-      ["filter_changed", "sort_changed", "search_performed"]
-        .includes(getAnalyticsRowType(row))
-    )
-    .forEach(row => {
-      getAnalyticsFilterLabels(row)
-        .forEach(label => {
-          filterCounts[label] =
-            (filterCounts[label] || 0) + 1;
-        });
-    });
-
-  const searchSessions =
-    new Set(
-      searchRows.map((row, index) =>
-        getAnalyticsRowSessionId(row, index)
-      )
-    );
-
-  const openSessions =
-    new Set(
-      eventOpenRows.map((row, index) =>
-        getAnalyticsRowSessionId(row, index)
-      )
-    );
-
-  const searchOpenSessions =
-    [...searchSessions]
-      .filter(session =>
-        openSessions.has(session)
-      ).length;
-
-  setAnalyticsNumber(
-    analyticsElements.totalSearches,
-    searchRows.length
-  );
-
-  if (analyticsElements.searchesPerUser) {
-    analyticsElements.searchesPerUser.textContent =
-      analyticsDecimal(
-        periodUsers.size
-          ? searchRows.length / periodUsers.size
-          : 0
-      );
-  }
-
-  setAnalyticsNumber(
-    analyticsElements.zeroResultSearches,
-    zeroResultSearches
-  );
-
-  if (analyticsElements.searchClickRate) {
-    analyticsElements.searchClickRate.textContent =
-      analyticsPercent(
-        searchOpenSessions,
-        searchSessions.size
-      );
-  }
-
-  renderAnalyticsList(
-    analyticsElements.topSearchTerms,
-    searchTerms,
-    {
-      empty: "No search terms tracked yet."
-    }
-  );
-
-  renderAnalyticsList(
-    analyticsElements.mostUsedFilters,
-    filterCounts,
-    {
-      empty: "No filter usage tracked yet."
-    }
-  );
-
-  const openedEventCounts =
-    countAnalyticsBy(
-      eventOpenRows,
-      getAnalyticsEventLabel
-    );
-
-  const favoriteEventCounts =
-    countAnalyticsBy(
-      favoriteRows,
-      getAnalyticsEventLabel
-    );
-
-  const externalEventCounts =
-    countAnalyticsBy(
-      externalRows,
-      getAnalyticsEventLabel
-    );
 
   setAnalyticsNumber(
     analyticsElements.eventDetailOpens,
-    eventOpenRows.length
+    analyticsAvailable
+      ? eventOpenRows.length
+      : null
   );
 
   if (analyticsElements.favoriteConversionRate) {
     analyticsElements.favoriteConversionRate.textContent =
-      analyticsPercent(
-        favoriteRows.length,
-        eventOpenRows.length
-      );
+      analyticsAvailable
+        ? analyticsPercent(
+            plannerAddRows.length,
+            eventOpenRows.length
+          )
+        : "\u2014";
   }
 
   renderAnalyticsList(
     analyticsElements.mostViewedEvents,
-    openedEventCounts,
+    countAnalyticsBy(
+      eventOpenRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No event detail opens yet."
+      empty: "Keine Event-Detailaufrufe in diesem Zeitraum."
     }
   );
 
   renderAnalyticsList(
     analyticsElements.mostFavoritedEvents,
-    favoriteEventCounts,
+    countAnalyticsBy(
+      plannerAddRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No favorites added in this period."
+      empty: "Keine Planner-Hinzufuegungen in diesem Zeitraum."
     }
   );
 
   renderAnalyticsList(
     analyticsElements.mostExternalClicks,
-    externalEventCounts,
+    countAnalyticsBy(
+      externalRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No official website clicks yet."
+      empty: "Keine Klicks auf offizielle Websites in diesem Zeitraum."
     }
   );
 
   setAnalyticsNumber(
     analyticsElements.plannerOpens,
-    plannerOpenRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerUsers,
-    plannerUsers.size
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerEventsAdded,
-    plannerAddRows.length
+    analyticsAvailable
+      ? plannerOpenRows.length
+      : null
   );
 
-  if (analyticsElements.avgPlannedEvents) {
-    analyticsElements.avgPlannedEvents.textContent =
-      analyticsDecimal(
-        plannerUsers.size
-          ? plannerAddRows.length / plannerUsers.size
-          : 0
-      );
-  }
+  setAnalyticsNumber(
+    analyticsElements.plannerUsers,
+    analyticsAvailable
+      ? plannerSnapshots.length
+      : null
+  );
+
+  setAnalyticsNumber(
+    analyticsElements.plannerEventsAdded,
+    analyticsAvailable
+      ? plannerAddRows.length
+      : null
+  );
+
+  setAnalyticsNumber(
+    analyticsElements.avgPlannedEvents,
+    analyticsAvailable
+      ? analyticsDecimal(
+          averageReportedPlannerEvents
+        )
+      : null
+  );
 
   setAnalyticsNumber(
     analyticsElements.recommendationClicks,
-    recommendationRows.length
+    analyticsAvailable
+      ? recommendationRows.length
+      : null
   );
 
-  const plannerOpenUsers =
-    getUniqueAnalyticsActors(
-      plannerOpenRows,
-      identityResolver
-    ).size;
-
   if (analyticsElements.plannerConversionRate) {
+    const plannerOpenUsers =
+      getUniqueAnalyticsActors(
+        plannerOpenRows,
+        identityResolver
+      ).size;
+
+    const plannerAddUsers =
+      getUniqueAnalyticsActors(
+        plannerAddRows,
+        identityResolver
+      ).size;
+
     analyticsElements.plannerConversionRate.textContent =
-      analyticsPercent(
-        getUniqueAnalyticsActors(
-          plannerAddRows,
-          identityResolver
-        ).size,
-        plannerOpenUsers
-      );
+      analyticsAvailable
+        ? analyticsPercent(
+            plannerAddUsers,
+            plannerOpenUsers
+          )
+        : "\u2014";
   }
 
   renderAnalyticsList(
     analyticsElements.priorityMix,
-    countAnalyticsBy(
-      rows.filter(row =>
-        getAnalyticsRowType(row) === "planner_priority_changed"
-      ),
-      row =>
-        getAnalyticsRowMetadata(row).priority || "Unspecified"
-    ),
+    plannerSizeCounts,
     {
-      empty: "No priority changes tracked yet."
+      empty: "Noch keine Planner-Bestaende erfasst."
     }
   );
 
@@ -8759,82 +8662,60 @@ async function loadAdminAnalytics() {
       getAnalyticsEventLabel
     ),
     {
-      empty: "No planner additions yet."
+      empty: "Keine Planner-Hinzufuegungen in diesem Zeitraum."
     }
-  );
-
-  setAnalyticsNumber(
-    analyticsElements.feedbackTotal,
-    feedbackRows.length
-  );
-
-  setAnalyticsNumber(
-    analyticsElements.feedbackNew,
-    feedbackRows.filter(row =>
-      row.status === "new"
-    ).length
-  );
-
-  const ratingCounts =
-    countAnalyticsBy(
-      feedbackRows,
-      row =>
-        row.rating
-          ? `${row.rating}/5`
-          : ""
-    );
-
-  if (analyticsElements.feedbackByRating) {
-    const ratingText =
-      Object.entries(ratingCounts)
-        .sort((first, second) =>
-          Number(second[0][0]) - Number(first[0][0])
-        )
-        .map(([rating, count]) =>
-          `${rating}: ${count}`
-        )
-        .join(" · ");
-
-    analyticsElements.feedbackByRating.textContent =
-      ratingText || "-";
-  }
-
-  renderAnalyticsList(
-    analyticsElements.feedbackByCategory,
-    countAnalyticsBy(
-      feedbackRows,
-      row => row.category || "other"
-    ),
-    {
-      empty: "No feedback categories yet."
-    }
-  );
-
-  renderAnalyticsFeedbackList(
-    analyticsElements.latestFeedback,
-    feedbackRows
   );
 
   if (analyticsElements.retentionInsight) {
     analyticsElements.retentionInsight.textContent =
-      `${returningUsers30d} returning users in the last 30 days.`;
+      analyticsAvailable
+        ? (
+            analyticsResult.truncated
+              ? "Tracking ist auf die juengsten 100.000 Aktionen begrenzt; angezeigte Summen sind Mindestwerte."
+              : "Zeitraum-KPIs stammen vollstaendig aus analytics_events. Planner-Bestaende sind die jeweils letzte gemeldete Anzahl."
+          )
+        : "Tracking ist nicht verfuegbar.";
   }
 
   if (analyticsElements.discoveryInsight) {
     analyticsElements.discoveryInsight.textContent =
-      `${searchRows.length} searches, ${eventOpenRows.length} event detail opens, ${analyticsPercent(searchOpenSessions, searchSessions.size)} search-to-open rate.`;
+      analyticsAvailable
+        ? eventOpenRows.length +
+          " Detailaufrufe fuer " +
+          uniqueOpenedEvents.size +
+          " Events im gewaehlten Zeitraum."
+        : "Event-Tracking konnte nicht geladen werden.";
   }
 
   if (analyticsElements.planningInsight) {
     analyticsElements.planningInsight.textContent =
-      `${plannerUsers.size} planner users and ${plannerAddRows.length} races added to seasons.`;
+      analyticsAvailable
+        ? plannerAddRows.length +
+          " Hinzufuegungen im Zeitraum. Letzter gemeldeter Bestand: " +
+          reportedPlannerEvents +
+          " Events in " +
+          plannerSnapshots.length +
+          " erfassten Plannern."
+        : "Planner-Tracking konnte nicht geladen werden.";
   }
 
   if (adminAnalyticsStatus) {
-    adminAnalyticsStatus.textContent =
-      allRows.length >= 10000
-        ? `${range.label}. Showing the latest 10,000 tracked actions.`
-        : `${range.label}. Analytics are up to date.`;
+    if (!analyticsAvailable) {
+      adminAnalyticsStatus.textContent =
+        "Analytics-Aktionen konnten nicht geladen werden. Es werden keine geschaetzten Ersatzwerte angezeigt.";
+    } else {
+      const limitNote =
+        analyticsResult.truncated
+          ? " Datenlimit erreicht: Werte sind Mindestwerte."
+          : "";
+
+      adminAnalyticsStatus.textContent =
+        range.label +
+        ": " +
+        rows.length +
+        " erfasste Produktaktionen." +
+        limitNote;
+    }
   }
 
   setButtonLoading(

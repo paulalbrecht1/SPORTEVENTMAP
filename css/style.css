@@ -43518,3 +43518,183 @@ html[data-theme="light"] body.platform-route-planner #seasonPlannerModal .season
     0 12px 28px rgba(15, 23, 42, 0.075),
     0 7px 24px rgba(22, 101, 52, 0.055) !important;
 }
+/* Streamlined Admin: analytics and feedback with explicit light-mode contrast */
+#adminModal [hidden] {
+  display: none !important;
+}
+
+#adminModal .analytics-kpi-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+#adminModal .analytics-section-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+#adminModal .analytics-insight-strip > div {
+  min-height: 92px;
+}
+
+body[data-theme="light"] #adminModal {
+  background: rgba(15, 23, 42, 0.42) !important;
+}
+
+body[data-theme="light"] #adminModal .admin-card {
+  border-color: #cbd8d0 !important;
+  background: #f4f7f4 !important;
+  color: #17241c !important;
+  box-shadow: 0 34px 90px rgba(15, 23, 42, 0.2);
+}
+
+body[data-theme="light"] #adminModal .admin-card h2,
+body[data-theme="light"] #adminModal .admin-card h3,
+body[data-theme="light"] #adminModal .admin-card h4,
+body[data-theme="light"] #adminModal .admin-card h5,
+body[data-theme="light"] #adminModal .admin-card strong {
+  color: #17241c !important;
+}
+
+body[data-theme="light"] #adminModal .admin-dashboard-header p,
+body[data-theme="light"] #adminModal .admin-section-heading p,
+body[data-theme="light"] #adminModal .admin-feedback-heading p,
+body[data-theme="light"] #adminModal .admin-analytics-header p,
+body[data-theme="light"] #adminModal .analytics-panel-heading p,
+body[data-theme="light"] #adminModal .admin-section-status,
+body[data-theme="light"] #adminModal .admin-header-actions > span,
+body[data-theme="light"] #adminModal label,
+body[data-theme="light"] #adminModal time {
+  color: #4b6154 !important;
+}
+
+body[data-theme="light"] #adminModal .admin-eyebrow {
+  color: #166534 !important;
+}
+
+body[data-theme="light"] #adminModal .admin-tabs {
+  border: 1px solid #d6e0da !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+}
+
+body[data-theme="light"] #adminModal .admin-tab {
+  color: #52655a !important;
+}
+
+body[data-theme="light"] #adminModal .admin-tab.active,
+body[data-theme="light"] #adminModal .admin-tab:hover,
+body[data-theme="light"] #adminModal .admin-tab:focus-visible {
+  border-color: #86b99a !important;
+  background: #e5f4e9 !important;
+  color: #14532d !important;
+}
+
+body[data-theme="light"] #adminModal .admin-tab.active .admin-tab-count {
+  background: #ccebd5 !important;
+  color: #14532d !important;
+}
+
+body[data-theme="light"] #adminModal .admin-table-section,
+body[data-theme="light"] #adminModal .analytics-card,
+body[data-theme="light"] #adminModal .analytics-detail-panel,
+body[data-theme="light"] #adminModal .analytics-mini-grid > div,
+body[data-theme="light"] #adminModal .analytics-insight-strip > div,
+body[data-theme="light"] #adminModal .admin-feedback-summary > div,
+body[data-theme="light"] #adminModal .admin-feedback-card,
+body[data-theme="light"] #adminModal .admin-empty-state,
+body[data-theme="light"] #adminModal .admin-error-state {
+  border-color: #d7e1da !important;
+  background: #ffffff !important;
+  color: #17241c !important;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.07) !important;
+}
+
+body[data-theme="light"] #adminModal .analytics-card-primary {
+  border-color: #afd4bb !important;
+  background: linear-gradient(145deg, #ffffff, #edf7f0) !important;
+}
+
+body[data-theme="light"] #adminModal .analytics-card-primary::after {
+  border-color: rgba(22, 101, 52, 0.07);
+}
+
+body[data-theme="light"] #adminModal .analytics-card span,
+body[data-theme="light"] #adminModal .analytics-card em,
+body[data-theme="light"] #adminModal .analytics-mini-grid span,
+body[data-theme="light"] #adminModal .analytics-table-row span,
+body[data-theme="light"] #adminModal .analytics-feedback-row span,
+body[data-theme="light"] #adminModal .analytics-insight-strip span,
+body[data-theme="light"] #adminModal .admin-feedback-summary span,
+body[data-theme="light"] #adminModal .admin-feedback-meta span,
+body[data-theme="light"] #adminModal .admin-empty-state span,
+body[data-theme="light"] #adminModal .admin-error-state span {
+  color: #52655a !important;
+}
+
+body[data-theme="light"] #adminModal .analytics-table-row,
+body[data-theme="light"] #adminModal .analytics-feedback-row {
+  border-color: #dce6df !important;
+  background: #f8faf8 !important;
+}
+
+body[data-theme="light"] #adminModal .analytics-table-row strong {
+  color: #166534 !important;
+}
+
+body[data-theme="light"] #adminModal .analytics-table-row em {
+  background: linear-gradient(
+    90deg,
+    #23864a var(--analytics-width, 0%),
+    #dce6df var(--analytics-width, 0%)
+  );
+}
+
+body[data-theme="light"] #adminModal select,
+body[data-theme="light"] #adminModal input,
+body[data-theme="light"] #adminModal textarea {
+  border-color: #bccbc2 !important;
+  background: #ffffff !important;
+  color: #17241c !important;
+}
+
+body[data-theme="light"] #adminModal select:focus,
+body[data-theme="light"] #adminModal input:focus,
+body[data-theme="light"] #adminModal textarea:focus {
+  border-color: #23864a !important;
+  box-shadow: 0 0 0 3px rgba(35, 134, 74, 0.16) !important;
+}
+
+body[data-theme="light"] #adminModal .admin-header-actions button,
+body[data-theme="light"] #adminModal .admin-analytics-controls button,
+body[data-theme="light"] #adminModal .admin-feedback-heading button,
+body[data-theme="light"] #adminModal .admin-feedback-review-controls button {
+  border-color: #207a43 !important;
+  background: #207a43 !important;
+  color: #ffffff !important;
+}
+
+body[data-theme="light"] #adminModal .admin-header-actions button:hover,
+body[data-theme="light"] #adminModal .admin-analytics-controls button:hover,
+body[data-theme="light"] #adminModal .admin-feedback-heading button:hover,
+body[data-theme="light"] #adminModal .admin-feedback-review-controls button:hover {
+  border-color: #14532d !important;
+  background: #14532d !important;
+}
+
+body[data-theme="light"] #adminModal #closeAdminModal {
+  border-color: #c3d0c8 !important;
+  background: #ffffff !important;
+  color: #24382b !important;
+}
+
+body[data-theme="light"] #adminModal #closeAdminModal:hover {
+  border-color: #23864a !important;
+  background: #e5f4e9 !important;
+  color: #14532d !important;
+}
+
+@media (max-width: 860px) {
+  #adminModal .analytics-kpi-grid,
+  #adminModal .analytics-section-grid {
+    grid-template-columns: 1fr;
+  }
+}

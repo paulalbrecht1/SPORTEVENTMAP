@@ -676,3 +676,73 @@ test("Light mode keeps Discovery footer, popup and drawer readable", async ({ pa
   await expect(page.locator("#eventDrawer .drawer-button")).toHaveCSS("position", "static");
   await closeEventDrawer(page);
 });
+
+test("Light mode keeps Analytics and Admin Feedback readable", async ({ page }) => {
+  await page.setViewportSize({
+    width: 1280,
+    height: 900
+  });
+  await prepareApp(page, {
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() => {
+    window.SportEventMapTheme.apply("light", {
+      persist: true
+    });
+    document.getElementById("adminModal").classList.add("open");
+  });
+
+  await expect(page.locator("#adminModal"))
+    .toHaveClass(/open/);
+  await expect(page.locator("#adminModal .admin-card"))
+    .toHaveCSS("background-color", "rgb(244, 247, 244)");
+  await expect(page.locator("#adminModal [data-admin-tab]"))
+    .toHaveCount(2);
+
+  await expectReadable(page, "#adminModal .admin-dashboard-header h2");
+  await expectReadable(page, "#adminModal .admin-dashboard-header p");
+  await expectReadable(page, "#adminModal .admin-tab.active");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-card span");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-card strong");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-card em");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-insight-strip strong");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-insight-strip span");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-detail-panel:not([hidden]) h4");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-detail-panel:not([hidden]) p");
+  await expectReadable(page, "#adminAnalyticsPanel .analytics-mini-grid span");
+
+  await page.evaluate(() => {
+    const analytics = document.getElementById("adminAnalyticsPanel");
+    const feedback = document.getElementById("adminFeedbackPanel");
+    analytics.classList.remove("active");
+    analytics.hidden = true;
+    feedback.classList.add("active");
+    feedback.hidden = false;
+  });
+
+  await expectReadable(page, "#adminFeedbackPanel h4");
+  await expectReadable(page, "#adminFeedbackPanel p");
+  await expectReadable(page, "#adminFeedbackPanel label");
+  await expectReadable(page, "#adminFeedbackPanel select");
+  await expectReadable(page, "#adminFeedbackPanel .admin-feedback-summary span");
+  await expectReadable(page, "#adminFeedbackPanel .admin-feedback-summary strong");
+
+  await page.setViewportSize({
+    width: 390,
+    height: 844
+  });
+  const modalOverflow = await page.locator("#adminModal .admin-card")
+    .evaluate(card => ({
+      left: card.getBoundingClientRect().left,
+      right: card.getBoundingClientRect().right,
+      viewportWidth: document.documentElement.clientWidth,
+      scrollWidth: card.scrollWidth,
+      clientWidth: card.clientWidth
+    }));
+
+  expect(modalOverflow.left).toBeGreaterThanOrEqual(7);
+  expect(modalOverflow.right)
+    .toBeLessThanOrEqual(modalOverflow.viewportWidth - 7);
+  expect(modalOverflow.scrollWidth)
+    .toBeLessThanOrEqual(modalOverflow.clientWidth + 1);
+});

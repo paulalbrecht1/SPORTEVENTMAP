@@ -2475,7 +2475,8 @@ function toggleFavorite(event) {
         : "favorite_removed",
       {
         event_id: key,
-        sport: event.sport || ""
+        sport: event.sport || "",
+        saved_events: favorites.length
       }
     );
 
@@ -2485,7 +2486,8 @@ function toggleFavorite(event) {
         : "season_event_removed",
       {
         event_id: key,
-        sport: event.sport || ""
+        sport: event.sport || "",
+        saved_events: favorites.length
       }
     );
   }

@@ -184,7 +184,7 @@ const publicFixtureInsert =
     }
   );
 
-assert.equal(publicFixtureInsert.response.ok, true);
+assert.equal(publicFixtureInsert.response.ok, true, JSON.stringify(publicFixtureInsert.data));
 publicFixtureEventId = publicFixtureInsert.data[0].id;
 
 const publicFixtureApproval =
@@ -535,6 +535,133 @@ await test(
   }
 );
 
+await test(
+  "11. Anonymous users can read published editions but no operations data",
+  async () => {
+    const edition = await restRequest(
+      `event_editions?select=id,event_id,publication_status&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`
+    );
+    assert.equal(edition.response.ok, true);
+    assert.equal(edition.data.length, 1);
+    assert.equal(edition.data[0].publication_status, "published");
+
+    for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+      const result = await restRequest(`${table}?select=id&limit=1`);
+      assert.equal(
+        result.response.status === 401 || result.response.status === 403,
+        true,
+        `Anonymous access to ${table} was not denied.`
+      );
+    }
+  }
+);
+
+await test(
+  "12. Normal users cannot read or mutate operations data",
+  async () => {
+    for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+      const result = await restRequest(`${table}?select=id&limit=1`, { token: userA.token });
+      assert.equal(
+        result.response.status === 401 || result.response.status === 403 ||
+          (result.response.ok && Array.isArray(result.data) && result.data.length === 0),
+        true,
+        `Normal-user access to ${table} was not blocked.`
+      );
+    }
+
+    const update = await restRequest(
+      `event_editions?event_id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+      {
+        token: userA.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { verification_status: "verified" }
+      }
+    );
+    assert.equal(
+      !update.response.ok || (Array.isArray(update.data) && update.data.length === 0),
+      true,
+      "Normal-user edition update unexpectedly changed a row."
+    );
+  }
+);
+
+await test(
+  "13. Admin can validate, review issues, update editions and read immutable audit history",
+  async () => {
+    const validation = await restRequest("rpc/run_event_validation", {
+      token: admin.token,
+      method: "POST",
+      body: { p_event_id: publicFixtureEventId }
+    });
+    assert.equal(validation.response.ok, true, JSON.stringify(validation.data));
+
+    const editions = await restRequest(
+      `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+      { token: admin.token }
+    );
+    assert.equal(editions.response.ok, true);
+    assert.equal(editions.data.length, 1);
+
+    const editionUpdate = await restRequest(
+      `event_editions?id=eq.${encodeURIComponent(editions.data[0].id)}`,
+      {
+        token: admin.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: {
+          verification_status: "verified",
+          last_verified_at: new Date().toISOString(),
+          needs_review: false
+        }
+      }
+    );
+    assert.equal(editionUpdate.response.ok, true, JSON.stringify(editionUpdate.data));
+    assert.equal(editionUpdate.data.length, 1);
+
+    const issues = await restRequest(
+      `validation_issues?select=id,status,event_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+      { token: admin.token }
+    );
+    assert.equal(issues.response.ok, true);
+    assert.ok(issues.data.length > 0);
+
+    const audit = await restRequest(
+      `event_audit_log?select=id,entity_type,entity_id,field_name&entity_id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+      { token: admin.token }
+    );
+    assert.equal(audit.response.ok, true);
+    assert.ok(audit.data.length > 0);
+
+    const auditMutation = await restRequest(
+      `event_audit_log?id=eq.${encodeURIComponent(audit.data[0].id)}`,
+      {
+        token: admin.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { reason: "must not be mutable from the client" }
+      }
+    );
+    assert.equal(auditMutation.response.ok, false);
+  }
+);
+
+if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  await test(
+    "14. Server-side service role can access operations tables",
+    async () => {
+      for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+        const response = await fetch(`${baseUrl}/rest/v1/${table}?select=id&limit=1`, {
+          headers: {
+            apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+          }
+        });
+        assert.equal(response.ok, true, `${table} service-role request failed with ${response.status}`);
+      }
+    }
+  );
+}
 // Cleanup rows created by the test.
 await restRequest(
   `favorites?event_id=eq.${encodeURIComponent(favoriteEventId)}`,

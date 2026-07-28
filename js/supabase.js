@@ -1,4 +1,4 @@
-﻿const APP_CONFIG =
+const APP_CONFIG =
   window.SPORT_EVENT_MAP_CONFIG || {};
 
 const SUPABASE_URL =
@@ -4512,6 +4512,41 @@ const adminFeedbackElements = {
   refresh: document.getElementById("refreshAdminFeedbackBtn")
 };
 
+const dataOpsElements = {
+  panel: document.getElementById("adminDataOperationsPanel"),
+  status: document.getElementById("dataOperationsStatus"),
+  refresh: document.getElementById("refreshDataOperationsBtn"),
+  validate: document.getElementById("runDataValidationBtn"),
+  eventsList: document.getElementById("dataOpsEventsList"),
+  issuesList: document.getElementById("dataOpsIssuesList"),
+  eventResultCount: document.getElementById("dataOpsEventResultCount"),
+  issueResultCount: document.getElementById("dataOpsIssueResultCount"),
+  country: document.getElementById("dataOpsCountryFilter"),
+  sport: document.getElementById("dataOpsSportFilter"),
+  eventStatus: document.getElementById("dataOpsEventStatusFilter"),
+  verification: document.getElementById("dataOpsVerificationFilter"),
+  severity: document.getElementById("dataOpsSeverityFilter"),
+  priority: document.getElementById("dataOpsPriorityFilter"),
+  lastCheck: document.getElementById("dataOpsLastCheckFilter"),
+  nextCheck: document.getElementById("dataOpsNextCheckFilter"),
+  historyPanel: document.getElementById("dataOpsHistoryPanel"),
+  historyTitle: document.getElementById("dataOpsHistoryTitle"),
+  historyList: document.getElementById("dataOpsHistoryList"),
+  closeHistory: document.getElementById("closeDataOpsHistoryBtn"),
+  kpis: {
+    totalEvents: document.getElementById("dataOpsTotalEvents"),
+    totalEditions: document.getElementById("dataOpsTotalEditions"),
+    verified: document.getElementById("dataOpsVerifiedEvents"),
+    unverified: document.getElementById("dataOpsUnverifiedEvents"),
+    stale: document.getElementById("dataOpsStaleEvents"),
+    review: document.getElementById("dataOpsReviewEvents"),
+    noNextCheck: document.getElementById("dataOpsNoNextCheck"),
+    unreachable: document.getElementById("dataOpsUnreachableSource"),
+    critical: document.getElementById("dataOpsCriticalIssues"),
+    warnings: document.getElementById("dataOpsWarningIssues"),
+    pastWithoutNext: document.getElementById("dataOpsPastWithoutNext")
+  }
+};
 const adminTabs =
   document.querySelectorAll(".admin-tab");
 
@@ -4526,9 +4561,14 @@ let pendingAdminEvents = [];
 let localQualityRows = [];
 let adminStagingPreviewRows = [];
 let adminRefreshInProgress = false;
+let dataOpsEvents = [];
+let dataOpsEditions = [];
+let dataOpsIssues = [];
+let dataOpsSources = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
+  dataOperations: "adminDataOperationsPanel",
   feedback: "adminFeedbackPanel"
 };
 
@@ -4622,6 +4662,11 @@ async function loadAdminTab(tabName, options = {}) {
     return;
   }
 
+  if (tabName === "dataOperations") {
+    await loadDataOperations({ force: options.force });
+    return;
+  }
+
   if (tabName === "feedback") {
     await loadAdminFeedbackManagement();
     return;
@@ -4647,6 +4692,288 @@ async function loadAdminTab(tabName, options = {}) {
   }
 }
 
+function setDataOpsStatus(message, type = "") {
+  if (!dataOpsElements.status) return;
+  dataOpsElements.status.className = `admin-section-status ${type}`.trim();
+  dataOpsElements.status.textContent = message;
+}
+function dataOpsText(key, fallback = "", values = null) {
+  if (values && typeof window.tFormat === "function") {
+    return window.tFormat(key, values, fallback);
+  }
+  return typeof window.t === "function" ? window.t(key, fallback) : fallback;
+}
+
+function formatDataOpsDate(value, includeTime = false) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return escapeAdminHTML(value);
+  return date.toLocaleString([], includeTime
+    ? { dateStyle: "medium", timeStyle: "short" }
+    : { dateStyle: "medium" });
+}
+
+function setDataOpsKpi(name, value) {
+  if (dataOpsElements.kpis[name]) {
+    dataOpsElements.kpis[name].textContent = String(value);
+  }
+}
+
+function populateDataOpsSelect(element, values) {
+  if (!element) return;
+  const selected = element.value;
+  const first = element.options[0]?.outerHTML || '<option value="">All</option>';
+  element.innerHTML = first + [...new Set(values.filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right))
+    .map(value => `<option value="${escapeAdminHTML(value)}">${escapeAdminHTML(value)}</option>`)
+    .join("");
+  element.value = selected;
+}
+
+function getDataOpsEditions(eventId) {
+  return dataOpsEditions
+    .filter(edition => String(edition.event_id) === String(eventId))
+    .sort((left, right) => Number(right.edition_year) - Number(left.edition_year));
+}
+
+function getDataOpsIssues(eventId) {
+  return dataOpsIssues.filter(issue => String(issue.event_id) === String(eventId));
+}
+
+function getDataOpsFilteredRows() {
+  const country = dataOpsElements.country?.value || "";
+  const sport = dataOpsElements.sport?.value || "";
+  const eventStatus = dataOpsElements.eventStatus?.value || "";
+  const verification = dataOpsElements.verification?.value || "";
+  const severity = dataOpsElements.severity?.value || "";
+  const priority = dataOpsElements.priority?.value || "";
+  const lastCheck = dataOpsElements.lastCheck?.value || "";
+  const nextCheck = dataOpsElements.nextCheck?.value || "";
+
+  return dataOpsEvents.filter(event => {
+    const issues = getDataOpsIssues(event.id);
+    if (country && event.country !== country) return false;
+    if (sport && event.sport !== sport) return false;
+    if (eventStatus && event.event_status !== eventStatus) return false;
+    if (verification && event.verification_status !== verification) return false;
+    if (severity && !issues.some(issue => issue.severity === severity)) return false;
+    if (priority && event.review_priority !== priority) return false;
+    if (lastCheck && (!event.last_verified_at || event.last_verified_at.slice(0, 10) < lastCheck)) return false;
+    if (nextCheck && (!event.next_check_at || event.next_check_at.slice(0, 10) > nextCheck)) return false;
+    return true;
+  });
+}
+
+function renderDataOpsEvents(rows) {
+  if (!dataOpsElements.eventsList) return;
+  dataOpsElements.eventResultCount.textContent = `${rows.length} / ${dataOpsEvents.length}`;
+
+  if (!rows.length) {
+    dataOpsElements.eventsList.innerHTML = '<p class="admin-quality-empty">Keine Events für diese Filter.</p>';
+    return;
+  }
+
+  dataOpsElements.eventsList.innerHTML = rows.slice(0, 250).map(event => {
+    const editions = getDataOpsEditions(event.id);
+    const latest = editions[0] || null;
+    const issues = getDataOpsIssues(event.id);
+    const officialUrl = safeAdminUrl(event.official_url || event.event_url || "");
+    const editionUrl = latest?.edition_slug
+      ? `/event/${encodeURIComponent(latest.edition_slug)}/`
+      : "";
+    return `
+      <article class="admin-data-operations-card" data-dataops-event-id="${event.id}">
+        <div class="admin-data-operations-card-heading">
+          <div>
+            <span class="admin-data-operations-status is-${escapeAdminHTML(event.verification_status)}">${escapeAdminHTML(event.verification_status)}</span>
+            <h5>${escapeAdminHTML(event.canonical_name || event.event_name || `Event ${event.id}`)}</h5>
+            <p>${escapeAdminHTML(event.sport || "—")} · ${escapeAdminHTML(event.city || "—")}, ${escapeAdminHTML(event.country || "—")}</p>
+          </div>
+          <strong>${editions.length} ${editions.length === 1 ? "Austragung" : "Austragungen"}</strong>
+        </div>
+        <dl class="admin-data-operations-meta">
+          <div><dt>${dataOpsText("admin.dataOps.lastCheck", "Last check")}</dt><dd>${formatDataOpsDate(event.last_verified_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.nextCheck", "Next check")}</dt><dd>${formatDataOpsDate(event.next_check_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.confidence", "Confidence")}</dt><dd>${Math.round(Number(event.data_confidence || 0) * 100)}%</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.issues", "Issues")}</dt><dd>${issues.length}</dd></div>
+        </dl>
+        <div class="admin-data-operations-editions">
+          ${editions.map(edition => `
+            <div>
+              <span>${edition.edition_year} · ${escapeAdminHTML(edition.edition_status)}</span>
+              <strong>${formatDataOpsDate(edition.start_date)}</strong>
+              ${edition.id === latest?.id ? '<em>aktuell</em>' : ''}
+            </div>
+          `).join("") || '<p>Keine Austragung vorhanden.</p>'}
+        </div>
+        <div class="admin-data-operations-card-actions">
+          ${officialUrl ? `<a href="${officialUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEvent", "Open event")}</a>` : ''}
+          ${editionUrl ? `<a href="${editionUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEdition", "Open edition")}</a>` : ''}
+          <button type="button" data-dataops-action="verify" data-event-id="${event.id}">${dataOpsText("admin.dataOps.manualVerify", "Verify manually")}</button>
+          <button type="button" data-dataops-action="review" data-event-id="${event.id}">${dataOpsText("admin.dataOps.markReview", "Needs review")}</button>
+          <button type="button" data-dataops-action="history" data-entity-type="event" data-entity-id="${event.id}" data-entity-label="${escapeAdminHTML(event.canonical_name || event.event_name)}">${dataOpsText("admin.dataOps.history", "History")}</button>
+        </div>
+        <div class="admin-data-operations-schedule">
+          <label>${dataOpsText("admin.dataOps.nextCheck", "Next check")} <input type="date" data-dataops-next-check value="${escapeAdminHTML((event.next_check_at || "").slice(0, 10))}"></label>
+          <button type="button" data-dataops-action="schedule" data-event-id="${event.id}">${dataOpsText("admin.dataOps.save", "Save")}</button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function renderDataOpsIssues() {
+  if (!dataOpsElements.issuesList) return;
+  const visibleEventIds = new Set(getDataOpsFilteredRows().map(event => String(event.id)));
+  const severity = dataOpsElements.severity?.value || "";
+  const issues = dataOpsIssues.filter(issue =>
+    visibleEventIds.has(String(issue.event_id)) && (!severity || issue.severity === severity)
+  );
+  dataOpsElements.issueResultCount.textContent = `${issues.length} offen`;
+  if (!issues.length) {
+    dataOpsElements.issuesList.innerHTML = '<p class="admin-quality-empty">Keine offenen Validierungsprobleme.</p>';
+    return;
+  }
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  dataOpsElements.issuesList.innerHTML = issues.slice(0, 300).map(issue => {
+    const event = eventById.get(String(issue.event_id));
+    return `
+      <article class="admin-data-operations-issue is-${escapeAdminHTML(issue.severity)}">
+        <div><span>${escapeAdminHTML(issue.severity)} · ${escapeAdminHTML(issue.rule_code)}</span><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${issue.event_id}`)}</strong><p>${escapeAdminHTML(issue.description)}</p></div>
+        <button type="button" data-dataops-action="resolve" data-issue-id="${issue.id}">${dataOpsText("admin.dataOps.resolve", "Mark resolved")}</button>
+      </article>`;
+  }).join("");
+}
+
+function renderDataOperations() {
+  const today = new Date().toISOString().slice(0, 10);
+  const openIssues = dataOpsIssues.filter(issue => issue.status === "open");
+  const pastWithoutNext = dataOpsEvents.filter(event => {
+    const editions = getDataOpsEditions(event.id);
+    return editions.length && editions.every(edition => !edition.start_date || edition.start_date < today);
+  }).length;
+
+  setDataOpsKpi("totalEvents", dataOpsEvents.length);
+  setDataOpsKpi("totalEditions", dataOpsEditions.length);
+  setDataOpsKpi("verified", dataOpsEvents.filter(row => row.verification_status === "verified").length);
+  setDataOpsKpi("unverified", dataOpsEvents.filter(row => row.verification_status === "unverified").length);
+  setDataOpsKpi("stale", dataOpsEvents.filter(row => row.verification_status === "stale").length);
+  setDataOpsKpi("review", dataOpsEvents.filter(row => row.needs_review || row.verification_status === "needs_review").length);
+  setDataOpsKpi("noNextCheck", dataOpsEvents.filter(row => !row.next_check_at).length);
+  setDataOpsKpi("unreachable", dataOpsEvents.filter(row => row.verification_status === "source_unreachable").length);
+  setDataOpsKpi("critical", openIssues.filter(row => row.severity === "critical").length);
+  setDataOpsKpi("warnings", openIssues.filter(row => row.severity === "warning").length);
+  setDataOpsKpi("pastWithoutNext", pastWithoutNext);
+  renderDataOpsEvents(getDataOpsFilteredRows());
+  renderDataOpsIssues();
+}
+
+async function loadDataOperations() {
+  if (!dataOpsElements.panel) return;
+  setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
+  const [eventsResult, editionsResult, issuesResult, sourcesResult] = await Promise.all([
+    loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
+    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_fetched_at,next_fetch_at,created_at")
+  ]);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult].find(result => result.error);
+  if (failed) {
+    setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
+    console.error("Data Operations load failed:", failed.error);
+    return;
+  }
+  dataOpsEvents = eventsResult.rows || [];
+  dataOpsEditions = editionsResult.rows || [];
+  dataOpsIssues = (issuesResult.rows || []).filter(issue => issue.status === "open");
+  dataOpsSources = sourcesResult.rows || [];
+  populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
+  populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
+  renderDataOperations();
+  setDataOpsStatus(`${dataOpsEvents.length} Events, ${dataOpsEditions.length} Austragungen und ${dataOpsIssues.length} offene Probleme geladen.`, "success");
+}
+
+async function runDataOperationsValidation() {
+  setButtonLoading(dataOpsElements.validate, true, dataOpsText("admin.dataOps.validating", "Validating..."));
+  const { error } = await supabaseClient.rpc("run_event_validation");
+  setButtonLoading(dataOpsElements.validate, false);
+  if (error) {
+    setDataOpsStatus(getFriendlyErrorMessage(error, dataOpsText("admin.dataOps.validationFailed", "Validation failed.")), "error");
+    return;
+  }
+  await loadDataOperations();
+}
+
+async function showDataOpsHistory(entityType, entityId, label) {
+  const { data, error } = await supabaseClient
+    .from("event_audit_log")
+    .select("field_name,old_value,new_value,change_source,changed_by_process,reason,source_url,created_at")
+    .eq("entity_type", entityType)
+    .eq("entity_id", String(entityId))
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) {
+    setDataOpsStatus(dataOpsText("admin.dataOps.historyUnavailable", "Change history could not be loaded."), "error");
+    return;
+  }
+  dataOpsElements.historyTitle.textContent = label || `${entityType} ${entityId}`;
+  dataOpsElements.historyList.innerHTML = (data || []).map(row => `
+    <article class="admin-data-operations-history-row">
+      <div><strong>${escapeAdminHTML(row.field_name)}</strong><span>${escapeAdminHTML(row.change_source)} · ${formatDataOpsDate(row.created_at, true)}</span></div>
+      <p>${escapeAdminHTML(row.reason || "Keine Begründung hinterlegt")}</p>
+      <code>${escapeAdminHTML(JSON.stringify(row.old_value))} → ${escapeAdminHTML(JSON.stringify(row.new_value))}</code>
+    </article>`).join("") || '<p class="admin-quality-empty">Noch keine protokollierten Änderungen.</p>';
+  dataOpsElements.historyPanel.hidden = false;
+  dataOpsElements.historyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function handleDataOpsAction(button) {
+  const action = button.dataset.dataopsAction;
+  const eventId = button.dataset.eventId;
+  if (action === "history") {
+    await showDataOpsHistory(button.dataset.entityType, button.dataset.entityId, button.dataset.entityLabel);
+    return;
+  }
+  if (action === "resolve") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("validation_issues").update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", button.dataset.issueId);
+    if (error) setDataOpsStatus(dataOpsText("admin.dataOps.resolveFailed", "The issue could not be resolved."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (!eventId) return;
+  let patch = null;
+  if (action === "verify") patch = { verification_status: "verified", data_confidence: 0.9, needs_review: false, last_verified_at: new Date().toISOString() };
+  if (action === "review") patch = { verification_status: "needs_review", needs_review: true, review_priority: "high" };
+  if (action === "schedule") {
+    const value = button.closest(".admin-data-operations-card")?.querySelector("[data-dataops-next-check]")?.value;
+    if (!value) { setDataOpsStatus(dataOpsText("admin.dataOps.dateRequired", "Choose a date for the next check."), "error"); return; }
+    patch = { next_check_at: `${value}T09:00:00.000Z` };
+  }
+  if (!patch) return;
+  const { error } = await supabaseClient.from("events").update(patch).eq("id", eventId);
+  if (error) setDataOpsStatus(dataOpsText("admin.dataOps.updateFailed", "The event could not be updated. Check the admin role and RLS."), "error"); else await loadDataOperations();
+}
+
+[
+  dataOpsElements.country,
+  dataOpsElements.sport,
+  dataOpsElements.eventStatus,
+  dataOpsElements.verification,
+  dataOpsElements.severity,
+  dataOpsElements.priority,
+  dataOpsElements.lastCheck,
+  dataOpsElements.nextCheck
+].filter(Boolean).forEach(element => element.addEventListener("change", renderDataOperations));
+
+document.addEventListener("app-language-changed", () => {
+  if (dataOpsElements.panel && !dataOpsElements.panel.hidden) renderDataOperations();
+});
+dataOpsElements.refresh?.addEventListener("click", loadDataOperations);
+dataOpsElements.validate?.addEventListener("click", runDataOperationsValidation);
+dataOpsElements.closeHistory?.addEventListener("click", () => { dataOpsElements.historyPanel.hidden = true; });
+dataOpsElements.panel?.addEventListener("click", event => {
+  const button = event.target.closest("[data-dataops-action]");
+  if (button) handleDataOpsAction(button);
+});
 const KNOWLEDGE_CHILD_TABLES = {
   registration: "event_registration",
   course: "event_course",
@@ -5256,7 +5583,7 @@ async function fetchKnowledgeBundle(slug) {
   const [sourcesResult, faqResult] =
     await Promise.all([
       supabaseClient
-        .from("event_sources")
+        .from("event_detail_sources")
         .select("*")
         .eq("event_detail_id", detailId)
         .order("created_at", { ascending: true }),
@@ -5622,7 +5949,7 @@ async function saveSelectedEventKnowledge() {
     }
 
     await replaceKnowledgeRows(
-      "event_sources",
+      "event_detail_sources",
       eventDetailId,
       collectKnowledgeSources()
     );
@@ -5856,7 +6183,7 @@ async function saveKnowledgeReviewSource(eventDetailId, field, proposal) {
 
   const { error } =
     await supabaseClient
-      .from("event_sources")
+      .from("event_detail_sources")
       .insert([sourcePayload]);
 
   if (error) {

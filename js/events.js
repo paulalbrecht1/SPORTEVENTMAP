@@ -1,4 +1,4 @@
-﻿let events = [];
+let events = [];
 
 let favorites =
   JSON.parse(
@@ -191,6 +191,7 @@ function normalizeEvent(rawEvent) {
   };
 
   normalized.event_key =
+    cleanValue(rawEvent.event_key || rawEvent.legacy_event_key) ||
     createEventKey(normalized);
 
   return normalized;
@@ -1687,13 +1688,20 @@ async function loadEvents(callback) {
           typeof supabaseClient !== "undefined" &&
           supabaseClient
         ) {
-          const {
+          let {
             data,
             error
           } = await supabaseClient
-            .from("events")
-            .select("*")
-            .eq("status", "approved");
+            .from("public_event_discovery")
+            .select("*");
+
+          // Compatibility fallback while environments are migrated.
+          if (error && /public_event_discovery/i.test(String(error.message || ""))) {
+            ({ data, error } = await supabaseClient
+              .from("events")
+              .select("*")
+              .eq("status", "approved"));
+          }
 
           if (error) {
             console.error(

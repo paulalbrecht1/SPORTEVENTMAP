@@ -124,7 +124,7 @@ async function main() {
     supabaseGet("event_weather", "?select=*"),
     supabaseGet("event_statistics", "?select=*"),
     supabaseGet("event_editorial", "?select=*"),
-    supabaseGet("event_sources", "?select=*&order=created_at.asc"),
+    supabaseGet("event_detail_sources", "?select=*&order=created_at.asc"),
     supabaseGet("event_faq", "?select=*&order=sort_order.asc")
   ]);
 

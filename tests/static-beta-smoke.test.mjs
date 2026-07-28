@@ -33,6 +33,8 @@ const html =
   read("index.html");
 const css =
   read("css/style.css");
+const dataOpsCss =
+  read("css/data-operations.css");
 
 const ids =
   [...html.matchAll(/\sid=["']([^"']+)["']/g)]
@@ -56,6 +58,10 @@ pass("HTML ids are unique");
   "adminModal",
   "adminReviewPanel",
   "adminQualityPanel",
+  "adminDataOperationsPanel",
+  "runDataValidationBtn",
+  "dataOpsEventsList",
+  "dataOpsIssuesList",
   "adminFeedbackPanel",
   "adminAnalyticsPanel",
   "adminImportsPanel",
@@ -91,8 +97,8 @@ const adminTabNames =
 
 assert.deepEqual(
   adminTabNames,
-  ["analytics", "feedback"],
-  "Admin navigation must expose only Analytics and Feedback"
+  ["analytics", "dataOperations", "feedback"],
+  "Admin navigation must expose Analytics, Data Operations and Feedback"
 );
 
 [
@@ -113,7 +119,8 @@ assert.match(
   "Admin dashboard needs explicit light-mode contrast rules"
 );
 
-pass("admin is limited to truthful analytics and feedback workflows");
+assert.match(dataOpsCss, /admin-data-operations/, "Data Operations needs responsive styles");
+pass("admin exposes truthful analytics, data operations and feedback workflows");
 
 
 assert.match(

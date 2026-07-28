@@ -28,6 +28,7 @@
 
   <!-- DEIN CSS -->
   <link rel="stylesheet" href="css/style.css?v=20260726-mobile-filter-sheet-v115" />
+  <link rel="stylesheet" href="css/data-operations.css?v=20260728-data-operations-v1" />
 </head>
 
 <body>
@@ -2212,6 +2213,16 @@
       <button
         type="button"
         class="admin-tab"
+        data-admin-tab="dataOperations"
+        role="tab"
+        aria-selected="false"
+        data-i18n="admin.dataOperations"
+      >
+        Datenqualität
+      </button>
+      <button
+        type="button"
+        class="admin-tab"
         data-admin-tab="feedback"
         role="tab"
         aria-selected="false"
@@ -2948,6 +2959,59 @@
 
     </div>
 
+    <div class="admin-tab-panel" id="adminDataOperationsPanel" hidden>
+      <div class="admin-table-section admin-data-operations">
+        <div class="admin-data-operations-header">
+          <div>
+            <span class="admin-eyebrow" data-i18n="admin.dataOperationsEyebrow">Event Data Operations</span>
+            <h3 data-i18n="admin.dataOperationsTitle">Datenqualität &amp; Prüfungen</h3>
+            <p data-i18n="admin.dataOperationsCopy">Eventmarken, jährliche Austragungen, Quellen und offene Validierungsprobleme zentral verwalten.</p>
+          </div>
+          <div class="admin-data-operations-actions">
+            <button type="button" id="runDataValidationBtn" data-i18n="admin.runValidation">Validierung ausführen</button>
+            <button type="button" id="refreshDataOperationsBtn" data-i18n="admin.refresh">Aktualisieren</button>
+          </div>
+        </div>
+        <div class="admin-data-operations-kpis" aria-label="Data Operations Kennzahlen">
+          <div><span data-i18n="admin.totalEvents">Events</span><strong id="dataOpsTotalEvents">0</strong></div>
+          <div><span data-i18n="admin.totalEditions">Austragungen</span><strong id="dataOpsTotalEditions">0</strong></div>
+          <div><span data-i18n="admin.verifiedEvents">Verifiziert</span><strong id="dataOpsVerifiedEvents">0</strong></div>
+          <div><span data-i18n="admin.unverifiedEvents">Nicht verifiziert</span><strong id="dataOpsUnverifiedEvents">0</strong></div>
+          <div><span data-i18n="admin.staleEvents">Veraltet</span><strong id="dataOpsStaleEvents">0</strong></div>
+          <div><span data-i18n="admin.reviewEvents">Prüfbedarf</span><strong id="dataOpsReviewEvents">0</strong></div>
+          <div><span data-i18n="admin.noNextCheck">Ohne nächste Prüfung</span><strong id="dataOpsNoNextCheck">0</strong></div>
+          <div><span data-i18n="admin.unreachableSource">Quelle nicht erreichbar</span><strong id="dataOpsUnreachableSource">0</strong></div>
+          <div><span data-i18n="admin.criticalIssues">Kritische Fehler</span><strong id="dataOpsCriticalIssues">0</strong></div>
+          <div><span data-i18n="admin.warningIssues">Warnungen</span><strong id="dataOpsWarningIssues">0</strong></div>
+          <div><span data-i18n="admin.pastWithoutNext">Vergangen ohne Folgeaustragung</span><strong id="dataOpsPastWithoutNext">0</strong></div>
+        </div>
+        <div class="admin-data-operations-filters">
+          <label><span data-i18n="admin.country">Land</span><select id="dataOpsCountryFilter"><option value="" data-i18n="admin.all">Alle</option></select></label>
+          <label><span data-i18n="admin.sport">Sportart</span><select id="dataOpsSportFilter"><option value="" data-i18n="admin.all">Alle</option></select></label>
+          <label><span data-i18n="admin.eventStatus">Eventstatus</span><select id="dataOpsEventStatusFilter"><option value="" data-i18n="admin.all">Alle</option><option value="active">active</option><option value="inactive">inactive</option></select></label>
+          <label><span data-i18n="admin.verificationStatus">Verifizierungsstatus</span><select id="dataOpsVerificationFilter"><option value="" data-i18n="admin.all">Alle</option><option value="verified">verified</option><option value="unverified">unverified</option><option value="stale">stale</option><option value="needs_review">needs_review</option><option value="source_unreachable">source_unreachable</option></select></label>
+          <label><span data-i18n="admin.severity">Schweregrad</span><select id="dataOpsSeverityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="critical">critical</option><option value="error">error</option><option value="warning">warning</option><option value="info">info</option></select></label>
+          <label><span data-i18n="admin.reviewPriority">Prüfpriorität</span><select id="dataOpsPriorityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="high">high</option><option value="medium">medium</option><option value="low">low</option></select></label>
+          <label><span data-i18n="admin.lastCheckFrom">Letzte Prüfung ab</span><input id="dataOpsLastCheckFilter" type="date"></label>
+          <label><span data-i18n="admin.nextCheckUntil">Nächste Prüfung bis</span><input id="dataOpsNextCheckFilter" type="date"></label>
+        </div>
+        <p id="dataOperationsStatus" class="admin-section-status" aria-live="polite"></p>
+        <div class="admin-data-operations-grid">
+          <section>
+            <div class="admin-data-operations-section-heading"><div><h4 data-i18n="admin.eventsAndEditions">Events &amp; Austragungen</h4><p id="dataOpsEventResultCount">0</p></div></div>
+            <div id="dataOpsEventsList" class="admin-data-operations-list" aria-live="polite"></div>
+          </section>
+          <section>
+            <div class="admin-data-operations-section-heading"><div><h4 data-i18n="admin.validationIssues">Validierungsprobleme</h4><p id="dataOpsIssueResultCount">0</p></div></div>
+            <div id="dataOpsIssuesList" class="admin-data-operations-list" aria-live="polite"></div>
+          </section>
+        </div>
+        <section id="dataOpsHistoryPanel" class="admin-data-operations-history" hidden>
+          <div class="admin-data-operations-section-heading"><div><h4 data-i18n="admin.changeHistory">Änderungsverlauf</h4><p id="dataOpsHistoryTitle"></p></div><button type="button" id="closeDataOpsHistoryBtn" data-i18n="admin.close">Schließen</button></div>
+          <div id="dataOpsHistoryList" class="admin-data-operations-list"></div>
+        </section>
+      </div>
+    </div>
     <div
       class="admin-tab-panel active"
       id="adminAnalyticsPanel"

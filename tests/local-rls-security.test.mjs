@@ -213,6 +213,7 @@ try {
         ...process.env,
         SUPABASE_URL: local.API_URL,
         SUPABASE_ANON_KEY: local.ANON_KEY,
+        SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY,
         TEST_USER_A_EMAIL: userA.email,
         TEST_USER_A_PASSWORD: password,
         TEST_USER_B_EMAIL: userB.email,

@@ -4554,6 +4554,71 @@ const dataOpsElements = {
     openAlerts: document.getElementById("dataOpsOpenAlerts")
   }
 };
+function ensureSourceMonitorSection() {
+  if (!document.getElementById("sourceMonitorStyles")) {
+    const styles = document.createElement("link");
+    styles.id = "sourceMonitorStyles";
+    styles.rel = "stylesheet";
+    styles.href = "css/source-monitor.css?v=20260729-source-monitor-v1";
+    document.head.appendChild(styles);
+  }
+  const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
+  if (!operationsRoot || document.getElementById("sourceMonitorSection")) return;
+  const section = document.createElement("section");
+  section.id = "sourceMonitorSection";
+  section.className = "source-monitor-section";
+  section.innerHTML = `
+    <div class="admin-data-operations-section-heading">
+      <div><span class="admin-eyebrow">Source Monitor</span><h4>Technische Quellenpruefung</h4><p>Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</p></div>
+      <p id="sourceMonitorStatus" class="admin-section-status" aria-live="polite"></p>
+    </div>
+    <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen">
+      <div><span>Heute geprueft</span><strong id="sourceMonitorCheckedToday">0</strong></div>
+      <div><span>Unveraendert</span><strong id="sourceMonitorUnchanged">0</strong></div>
+      <div><span>Veraendert</span><strong id="sourceMonitorChanged">0</strong></div>
+      <div><span>Nicht erreichbar</span><strong id="sourceMonitorUnreachable">0</strong></div>
+      <div><span>Fehlgeschlagen</span><strong id="sourceMonitorFailed">0</strong></div>
+      <div><span>Wiederholungen</span><strong id="sourceMonitorRetries">0</strong></div>
+      <div><span>Dead Letter</span><strong id="sourceMonitorDeadLetter">0</strong></div>
+      <div><span>Durchschnitt</span><strong id="sourceMonitorAverageTime">--</strong></div>
+      <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
+      <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
+    </div>
+    <div class="source-monitor-table-wrap">
+      <table class="source-monitor-table">
+        <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
+        <tbody id="sourceMonitorTableBody"></tbody>
+      </table>
+    </div>
+    <section id="sourceMonitorHistory" class="source-monitor-history" hidden>
+      <div class="admin-data-operations-section-heading"><div><h5>Crawl-Historie</h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history">Schliessen</button></div>
+      <div id="sourceMonitorHistoryList" class="admin-data-operations-list"></div>
+    </section>`;
+  operationsRoot.insertBefore(section, dataOpsElements.historyPanel || null);
+}
+
+ensureSourceMonitorSection();
+const sourceMonitorElements = {
+  section: document.getElementById("sourceMonitorSection"),
+  status: document.getElementById("sourceMonitorStatus"),
+  tableBody: document.getElementById("sourceMonitorTableBody"),
+  history: document.getElementById("sourceMonitorHistory"),
+  historyTitle: document.getElementById("sourceMonitorHistoryTitle"),
+  historyList: document.getElementById("sourceMonitorHistoryList"),
+  kpis: {
+    checkedToday: document.getElementById("sourceMonitorCheckedToday"),
+    unchanged: document.getElementById("sourceMonitorUnchanged"),
+    changed: document.getElementById("sourceMonitorChanged"),
+    unreachable: document.getElementById("sourceMonitorUnreachable"),
+    failed: document.getElementById("sourceMonitorFailed"),
+    retries: document.getElementById("sourceMonitorRetries"),
+    deadLetter: document.getElementById("sourceMonitorDeadLetter"),
+    averageTime: document.getElementById("sourceMonitorAverageTime"),
+    overdue: document.getElementById("sourceMonitorOverdue"),
+    noSchedule: document.getElementById("sourceMonitorNoSchedule")
+  }
+};
+
 const adminTabs =
   document.querySelectorAll(".admin-tab");
 
@@ -4575,6 +4640,10 @@ let dataOpsSources = [];
 let dataOpsProposals = [];
 let dataOpsAlerts = [];
 let dataOpsRuns = [];
+
+let sourceMonitorJobs = [];
+let sourceMonitorResults = [];
+let sourceMonitorReviews = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
@@ -4913,21 +4982,164 @@ function renderDataOperations() {
   renderDataOpsIssues();
   renderDataOpsProposals();
   renderDataOpsAlerts();
+  renderSourceMonitor();
+}
+
+function setSourceMonitorStatus(message, type = "") {
+  if (!sourceMonitorElements.status) return;
+  sourceMonitorElements.status.className = `admin-section-status ${type}`.trim();
+  sourceMonitorElements.status.textContent = message;
+}
+
+function setSourceMonitorKpi(name, value) {
+  if (sourceMonitorElements.kpis[name]) sourceMonitorElements.kpis[name].textContent = String(value);
+}
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
+async function loadSourceMonitorRecent(table, columns, limit = 1000) {
+  const { data, error } = await supabaseClient.from(table).select(columns)
+    .order("created_at", { ascending: false }).limit(limit);
+  return { rows: data || [], error };
+}
+
+function sourceMonitorLatestBy(rows, key) {
+  const map = new Map();
+  rows.forEach(row => { if (!map.has(String(row[key]))) map.set(String(row[key]), row); });
+  return map;
+}
+
+function renderSourceMonitor() {
+  if (!sourceMonitorElements.tableBody) return;
+  const nowIso = new Date().toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayResults = sourceMonitorResults.filter(row => String(row.fetched_at || "").slice(0, 10) === today);
+  const timed = todayResults.map(row => Number(row.response_time_ms)).filter(Number.isFinite);
+  setSourceMonitorKpi("checkedToday", todayResults.length);
+  setSourceMonitorKpi("unchanged", todayResults.filter(row => row.change_status === "unchanged").length);
+  setSourceMonitorKpi("changed", todayResults.filter(row => row.change_status === "changed").length);
+  setSourceMonitorKpi("unreachable", todayResults.filter(row => row.change_status === "unreachable").length);
+  setSourceMonitorKpi("failed", todayResults.filter(row => row.processing_status !== "completed").length);
+  setSourceMonitorKpi("retries", sourceMonitorJobs.filter(row => row.status === "retry_scheduled").length);
+  setSourceMonitorKpi("deadLetter", sourceMonitorJobs.filter(row => row.status === "dead_letter").length);
+  setSourceMonitorKpi("averageTime", timed.length ? `${Math.round(timed.reduce((sum, value) => sum + value, 0) / timed.length)} ms` : "--");
+  setSourceMonitorKpi("overdue", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= nowIso).length);
+  setSourceMonitorKpi("noSchedule", dataOpsSources.filter(row => row.is_active && !row.next_fetch_at).length);
+
+  const resultBySource = sourceMonitorLatestBy(sourceMonitorResults, "source_id");
+  const jobBySource = sourceMonitorLatestBy(sourceMonitorJobs, "source_id");
+  const reviewBySource = sourceMonitorLatestBy(sourceMonitorReviews.filter(row => row.status === "open"), "source_id");
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
+
+  sourceMonitorElements.tableBody.innerHTML = dataOpsSources
+    .slice().sort((left, right) => String(left.next_fetch_at || "").localeCompare(String(right.next_fetch_at || "")))
+    .slice(0, 500).map(source => {
+      const event = eventById.get(String(source.event_id));
+      const edition = editionById.get(String(source.edition_id));
+      const result = resultBySource.get(String(source.id));
+      const job = jobBySource.get(String(source.id));
+      const review = reviewBySource.get(String(source.id));
+      const sourceUrl = safeAdminUrl(source.source_url || "");
+      const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : event?.slug ? `/event/${encodeURIComponent(event.slug)}/` : "";
+      return `<tr data-source-id="${source.id}">
+        <td data-label="Event / Austragung"><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${source.event_id}`)}</strong><span>${escapeAdminHTML(edition ? `${edition.edition_year} | ${edition.edition_status}` : "Eventquelle")}</span></td>
+        <td data-label="Quelle"><strong>${escapeAdminHTML(source.source_host || "--")}</strong><span>${escapeAdminHTML(source.source_type || "--")}</span></td>
+        <td data-label="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} Fehler</span></td>
+        <td data-label="Pruefplan"><span>${formatDataOpsDate(source.last_fetched_at, true)}</span><label>Naechster Crawl<input type="datetime-local" data-source-next value="${toDateTimeLocal(source.next_fetch_at)}"></label></td>
+        <td data-label="Review"><strong>${escapeAdminHTML(review?.priority || "--")}</strong><span>${escapeAdminHTML(review?.title || job?.status || "kein offenes Review")}</span></td>
+        <td data-label="Aktionen"><div class="source-monitor-actions">
+          <button type="button" data-source-action="check" data-source-id="${source.id}">Jetzt pruefen</button>
+          <button type="button" data-source-action="schedule" data-source-id="${source.id}">Termin setzen</button>
+          <button type="button" data-source-action="${source.is_active ? "pause" : "activate"}" data-source-id="${source.id}">${source.is_active ? "Pausieren" : "Reaktivieren"}</button>
+          <button type="button" data-source-action="history" data-source-id="${source.id}" data-source-label="${escapeAdminHTML(event?.canonical_name || event?.event_name || source.source_host)}">Historie</button>
+          ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
+          ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event oeffnen</a>` : ""}
+          ${review ? `<button type="button" data-source-action="reviewed" data-task-id="${review.id}">Als geprueft markieren</button>` : ""}
+          <button type="button" data-source-action="reset" data-source-id="${source.id}">Fehler zuruecksetzen</button>
+          ${job?.status === "dead_letter" || job?.status === "failed" ? `<button type="button" data-source-action="retry" data-source-id="${source.id}" data-job-id="${job.id}">Crawl erneut</button>` : ""}
+        </div></td>
+      </tr>`;
+    }).join("") || '<tr><td colspan="6">Keine Quellen vorhanden.</td></tr>';
+}
+
+async function showSourceMonitorHistory(sourceId, label) {
+  setSourceMonitorStatus("Crawl-Historie wird geladen ...");
+  const { data, error } = await supabaseClient.from("source_crawl_results")
+    .select("id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,change_status,processing_status,error_type,error_message,worker_version")
+    .eq("source_id", sourceId).order("fetched_at", { ascending: false }).limit(200);
+  if (error) { setSourceMonitorStatus(getFriendlyErrorMessage(error, "Historie konnte nicht geladen werden."), "error"); return; }
+  sourceMonitorElements.historyTitle.textContent = label || sourceId;
+  sourceMonitorElements.historyList.innerHTML = (data || []).map(row => `<article class="admin-data-operations-history-row">
+    <div><strong>${escapeAdminHTML(row.change_status)} | HTTP ${escapeAdminHTML(row.http_status ?? "--")}</strong><span>${formatDataOpsDate(row.fetched_at, true)} | ${escapeAdminHTML(row.worker_version)}</span></div>
+    <p>${escapeAdminHTML(row.final_url || row.error_message || "Keine Zusatzinformation")}</p>
+    <code>${escapeAdminHTML(JSON.stringify({ redirects: row.redirect_count, duration_ms: row.response_time_ms, content_type: row.content_type, content_length: row.content_length, previous_hash: row.previous_content_hash, hash: row.content_hash, processing: row.processing_status, error: row.error_type }, null, 2))}</code>
+  </article>`).join("") || '<p class="admin-quality-empty">Noch keine Crawl-Ergebnisse.</p>';
+  sourceMonitorElements.history.hidden = false;
+  sourceMonitorElements.history.scrollIntoView({ behavior: "smooth", block: "start" });
+  setSourceMonitorStatus(`${(data || []).length} Historieneintraege geladen.`, "success");
+}
+
+async function runSourceNow(sourceId) {
+  const { data, error } = await supabaseClient.functions.invoke("event-source-check", { body: { source_id: sourceId, batch_size: 1 } });
+  if (error) throw error;
+  return data;
+}
+
+async function handleSourceMonitorAction(button) {
+  const action = button.dataset.sourceAction;
+  if (action === "close-history") { sourceMonitorElements.history.hidden = true; return; }
+  const sourceId = button.dataset.sourceId;
+  if (action === "history") { await showSourceMonitorHistory(sourceId, button.dataset.sourceLabel); return; }
+  setButtonLoading(button, true, "Bitte warten ...");
+  setSourceMonitorStatus("Aktion wird ausgefuehrt ...");
+  try {
+    let error = null;
+    if (action === "check") await runSourceNow(sourceId);
+    if (action === "schedule") {
+      const value = button.closest("tr")?.querySelector("[data-source-next]")?.value;
+      if (!value) throw new Error("Bitte einen naechsten Prueftermin waehlen.");
+      ({ error } = await supabaseClient.from("event_sources").update({ next_fetch_at: new Date(value).toISOString() }).eq("id", sourceId));
+    }
+    if (action === "pause") ({ error } = await supabaseClient.from("event_sources").update({ is_active: false, crawl_status: "inactive" }).eq("id", sourceId));
+    if (action === "activate") ({ error } = await supabaseClient.from("event_sources").update({ is_active: true, crawl_status: "pending", next_fetch_at: new Date().toISOString() }).eq("id", sourceId));
+    if (action === "reset") ({ error } = await supabaseClient.rpc("reset_source_crawl_failures", { p_source_id: sourceId }));
+    if (action === "reviewed") ({ error } = await supabaseClient.rpc("resolve_source_review_task", { p_task_id: button.dataset.taskId, p_status: "resolved", p_notes: "Im Source Monitor geprueft." }));
+    if (action === "retry") {
+      ({ error } = await supabaseClient.rpc("retry_source_crawl_job", { p_job_id: button.dataset.jobId }));
+      if (!error) await runSourceNow(sourceId);
+    }
+    if (error) throw error;
+    await loadDataOperations();
+    setSourceMonitorStatus("Aktion erfolgreich abgeschlossen.", "success");
+  } catch (error) {
+    setSourceMonitorStatus(getFriendlyErrorMessage(error, error.message || "Source-Monitor-Aktion fehlgeschlagen."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
 }
 
 async function loadDataOperations() {
   if (!dataOpsElements.panel) return;
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
-  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult] = await Promise.all([
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
-    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_fetched_at,next_fetch_at,created_at"),
+    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_fetched_at,next_fetch_at,created_at"),
     loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
     loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
-    loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message")
+    loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
+    loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
+    loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,change_status,processing_status,error_type,error_message,worker_version,created_at"),
+    loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at")
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult].find(result => result.error);
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
@@ -4940,6 +5152,9 @@ async function loadDataOperations() {
   dataOpsProposals = (proposalsResult.rows || []).filter(row => row.proposal_status === "pending");
   dataOpsAlerts = (alertsResult.rows || []).filter(row => row.alert_status === "open");
   dataOpsRuns = runsResult.rows || [];
+  sourceMonitorJobs = jobsResult.rows || [];
+  sourceMonitorResults = crawlResultsResult.rows || [];
+  sourceMonitorReviews = reviewsResult.rows || [];
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   renderDataOperations();
@@ -5046,6 +5261,11 @@ dataOpsElements.panel?.addEventListener("click", event => {
   const button = event.target.closest("[data-dataops-action]");
   if (button) handleDataOpsAction(button);
 });
+sourceMonitorElements.section?.addEventListener("click", event => {
+  const button = event.target.closest("[data-source-action]");
+  if (button) handleSourceMonitorAction(button);
+});
+
 const KNOWLEDGE_CHILD_TABLES = {
   registration: "event_registration",
   course: "event_course",

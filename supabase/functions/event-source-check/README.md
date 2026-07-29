@@ -1,15 +1,19 @@
 # Event source check
 
-Server-only source monitor for the Event Data Operations workflow.
+Queue-backed, server-only Source Monitor worker.
 
-- Requires a verified Admin access token or the server-side service-role JWT.
-- Claims at most 20 due sources and at most one URL per host per invocation.
-- Applies per-domain timeout, response-size, pacing and retry policies.
-- Reads and respects `robots.txt`; a denied path is not fetched.
-- Stores hashes and fetch metadata, but never changes event facts directly.
-- A changed content hash creates a pending `event_change_proposals` row for review.
+- Authenticates Supabase Cron with an anon JWT plus one-way verified Cron secret, or accepts a verified Admin/service-role token.
+- Calls the bounded scheduler, then atomically leases at most 20 jobs (default 5).
+- Resolves and validates DNS for every URL and redirect target before fetching.
+- Blocks localhost, private/link-local IPv4 and IPv6, metadata endpoints, internal Supabase hosts, embedded credentials, unsupported protocols and non-standard ports.
+- Applies per-domain Robots, pacing, timeout, response-size, redirect, content-type and HTTP policies.
+- Uses ETag/Last-Modified, handles Retry-After and hashes normalized relevant content.
+- Commits result, source state, retry/dead-letter state and review metadata transactionally.
+- Never writes parsed values or public event facts.
 
-Example server-side invocation:
+Runtime variables are documented in `docs/SOURCE_MONITOR.md`.
+
+Server-side batch invocation:
 
 ```bash
 curl -X POST "$SUPABASE_URL/functions/v1/event-source-check" \
@@ -18,4 +22,10 @@ curl -X POST "$SUPABASE_URL/functions/v1/event-source-check" \
   -d '{"batch_size":5}'
 ```
 
-Do not put the service-role key in browser code.
+Targeted invocation (Admin or server only):
+
+```json
+{"source_id":"00000000-0000-0000-0000-000000000000","batch_size":1}
+```
+
+Do not expose secret/service-role keys in browser code.

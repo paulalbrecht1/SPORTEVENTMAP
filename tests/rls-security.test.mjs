@@ -573,7 +573,10 @@ await test(
       "crawler_domain_policies",
       "event_change_proposals",
       "data_workflow_runs",
-      "data_workflow_alerts"
+      "data_workflow_alerts",
+      "source_crawl_jobs",
+      "source_crawl_results",
+      "source_review_tasks"
     ]) {
       const result = await restRequest(`${table}?select=id&limit=1`);
       assert.equal(
@@ -595,7 +598,10 @@ await test(
       "crawler_domain_policies",
       "event_change_proposals",
       "data_workflow_runs",
-      "data_workflow_alerts"
+      "data_workflow_alerts",
+      "source_crawl_jobs",
+      "source_crawl_results",
+      "source_review_tasks"
     ]) {
       const result = await restRequest(`${table}?select=id&limit=1`, { token: userA.token });
       assert.equal(
@@ -603,6 +609,16 @@ await test(
           (result.response.ok && Array.isArray(result.data) && result.data.length === 0),
         true,
         `Normal-user access to ${table} was not blocked.`
+      );
+    }
+
+    for (const token of [null, userA.token]) {
+      const settings = await restRequest("source_monitor_settings?select=singleton,max_attempts", token ? { token } : {});
+      assert.equal(
+        settings.response.status === 401 || settings.response.status === 403 ||
+          (settings.response.ok && Array.isArray(settings.data) && settings.data.length === 0),
+        true,
+        "Non-admin Source Monitor settings access was not blocked."
       );
     }
 
@@ -764,7 +780,10 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "crawler_domain_policies",
       "event_change_proposals",
       "data_workflow_runs",
-      "data_workflow_alerts"
+      "data_workflow_alerts",
+      "source_crawl_jobs",
+      "source_crawl_results",
+      "source_review_tasks"
     ]) {
         const response = await fetch(`${baseUrl}/rest/v1/${table}?select=id&limit=1`, {
           headers: {
@@ -777,6 +796,169 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
     }
   );
 }
+if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  await test(
+    "16. Source Monitor queue is idempotent, leased server-side and preserves public event facts",
+    async () => {
+      const sources = await serviceRequest(
+        `event_sources?select=id,event_id,edition_id,source_url&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&source_url=like.*${encodeURIComponent(runId)}*`
+      );
+      assert.equal(sources.response.ok, true, JSON.stringify(sources.data));
+      assert.equal(sources.data.length, 1);
+      const source = sources.data[0];
+
+      const publicFactsBefore = await restRequest(
+        `events?select=event_name,date,city,distance,description,event_url&id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+        { token: admin.token }
+      );
+      assert.equal(publicFactsBefore.response.ok, true, JSON.stringify(publicFactsBefore.data));
+
+      const normalSchedule = await restRequest("rpc/schedule_due_source_crawls", {
+        token: userA.token,
+        method: "POST",
+        body: { p_limit: 20 }
+      });
+      assert.equal(normalSchedule.response.ok, false);
+
+      for (let index = 0; index < 2; index += 1) {
+        const scheduled = await serviceRequest("rpc/schedule_due_source_crawls", {
+          method: "POST",
+          body: { p_limit: 20 }
+        });
+        assert.equal(scheduled.response.ok, true, JSON.stringify(scheduled.data));
+      }
+
+      const queued = await serviceRequest(
+        `source_crawl_jobs?select=id,source_id,status,attempt_count&source_id=eq.${encodeURIComponent(source.id)}&status=in.(queued,retry_scheduled,processing)`
+      );
+      assert.equal(queued.response.ok, true, JSON.stringify(queued.data));
+      assert.equal(queued.data.length, 1, "Duplicate active crawl jobs were created.");
+
+      const workerId = `${runId}-source-monitor`;
+      const claimed = await serviceRequest("rpc/claim_source_crawl_jobs", {
+        method: "POST",
+        body: { p_limit: 1, p_worker_id: workerId, p_source_id: source.id }
+      });
+      assert.equal(claimed.response.ok, true, JSON.stringify(claimed.data));
+      assert.equal(claimed.data.length, 1);
+      assert.equal(claimed.data[0].attempt_number, 1);
+
+      const recorded = await serviceRequest("rpc/record_source_crawl_result", {
+        method: "POST",
+        body: {
+          p_job_id: claimed.data[0].job_id,
+          p_worker_id: workerId,
+          p_outcome: "success",
+          p_retriable: false,
+          p_http_status: 200,
+          p_final_url: source.source_url,
+          p_redirect_count: 0,
+          p_response_time_ms: 42,
+          p_content_type: "text/html",
+          p_content_length: 128,
+          p_content_hash: `source-monitor-${runId}`,
+          p_change_status: "first_seen",
+          p_etag: "test-etag",
+          p_last_modified: null,
+          p_error_type: null,
+          p_error_message: null,
+          p_retry_after_seconds: null,
+          p_worker_version: "rls-test",
+          p_normalized_excerpt: null
+        }
+      });
+      assert.equal(recorded.response.ok, true, JSON.stringify(recorded.data));
+      assert.equal(recorded.data.status, "completed");
+
+      const results = await serviceRequest(
+        `source_crawl_results?select=source_id,change_status,processing_status,http_status&job_id=eq.${encodeURIComponent(claimed.data[0].job_id)}`
+      );
+      assert.equal(results.response.ok, true, JSON.stringify(results.data));
+      assert.deepEqual(results.data.map(row => row.change_status), ["first_seen"]);
+      assert.deepEqual(results.data.map(row => row.processing_status), ["completed"]);
+
+      const queuedChange = await serviceRequest("rpc/enqueue_source_crawl", {
+        method: "POST",
+        body: {
+          p_source_id: source.id,
+          p_priority: 1,
+          p_scheduled_at: new Date().toISOString(),
+          p_trigger_source: "test"
+        }
+      });
+      assert.equal(queuedChange.response.ok, true, JSON.stringify(queuedChange.data));
+
+      const changeWorkerId = `${runId}-source-change`;
+      const claimedChange = await serviceRequest("rpc/claim_source_crawl_jobs", {
+        method: "POST",
+        body: { p_limit: 1, p_worker_id: changeWorkerId, p_source_id: source.id }
+      });
+      assert.equal(claimedChange.response.ok, true, JSON.stringify(claimedChange.data));
+      assert.equal(claimedChange.data.length, 1);
+
+      const changed = await serviceRequest("rpc/record_source_crawl_result", {
+        method: "POST",
+        body: {
+          p_job_id: claimedChange.data[0].job_id,
+          p_worker_id: changeWorkerId,
+          p_outcome: "success",
+          p_retriable: false,
+          p_http_status: 200,
+          p_final_url: source.source_url,
+          p_redirect_count: 1,
+          p_response_time_ms: 55,
+          p_content_type: "text/html",
+          p_content_length: 256,
+          p_content_hash: `source-monitor-changed-${runId}`,
+          p_change_status: "changed",
+          p_etag: "test-etag-v2",
+          p_last_modified: null,
+          p_error_type: null,
+          p_error_message: null,
+          p_retry_after_seconds: null,
+          p_worker_version: "rls-test",
+          p_normalized_excerpt: "Changed fixture excerpt"
+        }
+      });
+      assert.equal(changed.response.ok, true, JSON.stringify(changed.data));
+      assert.equal(changed.data.change_status, "changed");
+
+      const reviewTasks = await serviceRequest(
+        `source_review_tasks?select=task_type,status,priority&source_id=eq.${encodeURIComponent(source.id)}&status=eq.open`
+      );
+      assert.equal(reviewTasks.response.ok, true, JSON.stringify(reviewTasks.data));
+      assert.ok(reviewTasks.data.some(row => row.task_type === "content_changed" && row.priority === "high"));
+
+      const sourceAudit = await serviceRequest(
+        `event_audit_log?select=entity_type,entity_id,field_name,change_source&entity_type=eq.source&entity_id=eq.${encodeURIComponent(source.id)}`
+      );
+      assert.equal(sourceAudit.response.ok, true, JSON.stringify(sourceAudit.data));
+      assert.ok(sourceAudit.data.some(row => row.field_name === "content_hash" && row.change_source === "crawler"));
+
+      const changeAlert = await serviceRequest(
+        `data_workflow_alerts?select=alert_code,alert_status&source_id=eq.${encodeURIComponent(source.id)}&alert_code=eq.source_content_changed`
+      );
+      assert.equal(changeAlert.response.ok, true, JSON.stringify(changeAlert.data));
+      assert.equal(changeAlert.data.length, 1);
+
+      const adminJobs = await restRequest(
+        `source_crawl_jobs?select=id,status&source_id=eq.${encodeURIComponent(source.id)}`,
+        { token: admin.token }
+      );
+      assert.equal(adminJobs.response.ok, true, JSON.stringify(adminJobs.data));
+      const adminSettings = await restRequest("source_monitor_settings?select=singleton,max_attempts", { token: admin.token });
+      assert.equal(adminSettings.response.ok, true, JSON.stringify(adminSettings.data));
+      assert.equal(adminSettings.data.length, 1);
+
+      const publicFactsAfter = await restRequest(
+        `events?select=event_name,date,city,distance,description,event_url&id=eq.${encodeURIComponent(publicFixtureEventId)}`,
+        { token: admin.token }
+      );
+      assert.deepEqual(publicFactsAfter.data, publicFactsBefore.data, "Crawler changed public event facts.");
+    }
+  );
+}
+
 // Cleanup rows created by the test.
 await restRequest(
   `favorites?event_id=eq.${encodeURIComponent(favoriteEventId)}`,

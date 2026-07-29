@@ -10,6 +10,7 @@ const catalog = read("supabase/migrations/20260801_catalog_import_transition.sql
 const polygons = read("supabase/migrations/20260802_postgis_country_boundaries.sql");
 const exceptions = read("supabase/migrations/20260803_country_boundary_exceptions.sql");
 const scheduler = read("supabase/migrations/20260805_source_worker_schedule.sql");
+const sourceMonitor = read("supabase/migrations/20260808_source_monitor_queue_worker.sql");
 const worker = read("supabase/functions/event-source-check/index.ts");
 const eventsClient = read("js/events.js");
 const adminClient = read("js/supabase.js");
@@ -40,8 +41,10 @@ assert.ok(scheduler.includes("vault.decrypted_secrets"));
 assert.ok(scheduler.includes("sem-event-source-check"));
 
 assert.ok(worker.includes("robotsAllows"));
-assert.ok(worker.includes("retry_backoff_minutes"));
-assert.ok(worker.includes("event_change_proposals"));
+assert.ok(sourceMonitor.includes("retry_backoff_minutes"));
+assert.ok(sourceMonitor.includes("event_change_proposals"));
+assert.ok(worker.includes("claim_source_crawl_jobs"));
+assert.ok(worker.includes("record_source_crawl_result"));
 assert.ok(worker.includes("verify_event_source_cron_secret"));
 assert.doesNotMatch(worker, /\.from\(["']events["']\)\.update/);
 assert.doesNotMatch(worker, /\.from\(["']event_editions["']\)\.update/);

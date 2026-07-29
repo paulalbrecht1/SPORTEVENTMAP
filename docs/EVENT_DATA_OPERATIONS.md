@@ -4,7 +4,7 @@ Stand: 28. Juli 2026
 
 ## 1. Bestandsaufnahme vor der Änderung
 
-Die öffentliche Discovery-Anwendung ist eine Vanilla-JavaScript-Anwendung. Ihr primärer Eventbestand liegt derzeit in `data/events.csv` (994 Zeilen). `js/events.js` lädt die CSV und ergänzt sie um freigegebene Supabase-Einreichungen. Ein eingebauter CSV-Parser bleibt als Fallback erhalten, falls Papa Parse nicht verfügbar ist.
+Die öffentliche Discovery-Anwendung ist eine Vanilla-JavaScript-Anwendung. Ihr primärer Eventbestand liegt nach dem kontrollierten Vollimport in Supabase. `js/events.js` lädt `public_event_discovery`; `data/events.csv` (994 Zeilen) bleibt ausschließlich ein explizit erzeugter Export- und Ausfall-Fallback.
 
 Die bisherige Supabase-Tabelle `events` enthielt Eventmarke und Austragung gemeinsam: Name, Datum, Ort, Distanz und URL lagen in derselben Zeile. In der verbundenen Produktionsdatenbank waren vor dieser Migration sechs Einreichungen vorhanden; eine war veröffentlicht, fünf waren abgelehnt. Die numerische `events.id` wurde nicht von Favoriten oder Season Planner verwendet.
 
@@ -375,10 +375,13 @@ der Export verweigert kleine/unvollständige Ergebnisse.
 - `sem-event-operations-hourly` läuft stündlich um Minute 17.
 - `sem-country-polygon-validation-hourly` läuft stündlich um Minute 23.
 - `event-source-check` ist als JWT-geschützte Edge Function aktiv (Version 2).
-- `sem-event-source-check` ist für 15-Minuten-Intervalle vorbereitet, aber erst
-  aktiv, nachdem die separat geschützte Vault-Secret-Hinterlegung freigegeben
-  wurde. Der fehlgeschlagene Versuch wurde vollständig zurückgerollt; es liegt
-  kein halbfertiger Secret-/Cron-Zustand vor.
+- `sem-event-source-check` ist aktiv und ruft den Worker alle 15 Minuten mit
+  einem Fünfer-Batch auf. Funktions-URL, öffentlicher JWT und ein rotierbares
+  256-Bit-Cron-Secret liegen ausschließlich in Supabase Vault; außerhalb von
+  Vault wird nur der SHA-256-Digest des Cron-Secrets gespeichert.
+- Ein produktiver Ein-Quellen-Canary endete mit HTTP 200, `not_modified` und
+  ohne Workerfehler. Der `pg_net`-Timeout beträgt 120 Sekunden, damit auch der
+  sequenzielle Fünfer-Batch innerhalb der definierten Request-Limits abschließt.
 
 Quellen werden atomar mit `FOR UPDATE SKIP LOCKED` beansprucht, pro Lauf höchstens
 eine URL je Host. Domainrichtlinien steuern Timeout, Antwortgröße, Mindestpause,
@@ -406,16 +409,15 @@ Fehlende Länderpolygone erzeugen Workflow-Alarme.
 
 Supabase meldet Leaked-Password-Protection weiterhin als deaktiviert. Das Projekt
 liegt im Free-Plan; die Funktion ist laut Supabase nur in Pro und höher verfügbar.
-Sie wurde deshalb nicht kostenpflichtig aktiviert. Nach einem bewusst bestätigten
-Plan-Upgrade ist sie im Auth-Dashboard einzuschalten und mit bestehendem Login,
-Registrierung und Passwortänderung zu testen.
+Sie wurde gemäß Produktentscheidung nicht kostenpflichtig aktiviert. Falls diese
+Entscheidung später geändert wird, ist sie nach dem Plan-Upgrade im Auth-Dashboard
+einzuschalten und mit bestehendem Login, Registrierung und Passwortänderung zu testen.
 
 ### Noch offen vor einem umfangreichen Parser (Stufe 2+)
 
-- Vault-Secret-Hinterlegung und `sem-event-source-check` separat freigeben
 - feldgenaue Parser je Quellentyp entwickeln; leere Hash-Vorschläge bleiben reine
   Prüfhinweise
 - Benachrichtigungskanal für kritische `data_workflow_alerts` anbinden
-- Leaked-Password-Protection nach bestätigtem Pro-Upgrade aktivieren
+- Leaked-Password-Protection bleibt ohne Pro-Upgrade bewusst deaktiviert
 - Nutzungsdaten der neuen Indizes nach realem Betrieb prüfen, nicht unmittelbar
   nach Erstellung wegen erwartbarer `unused_index`-Hinweise

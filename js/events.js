@@ -1673,90 +1673,58 @@ async function loadCsvEvents() {
 }
 
 
-// LOAD CSV
+// Supabase is the source of truth after the controlled catalog import. The
+// versioned CSV remains a read-only export/fallback during rollout or outages.
+const MIN_SUPABASE_CATALOG_ROWS = 900;
+
 async function loadEvents(callback) {
   let loadedEvents = [];
+  let dbEvents = [];
+  let dbReady = false;
 
   try {
-    const csvEvents =
-      await loadCsvEvents();
+    if (typeof supabaseClient !== "undefined" && supabaseClient) {
+      let { data, error } = await supabaseClient
+        .from("public_event_discovery")
+        .select("*");
 
-      let dbEvents = [];
-
-      try {
-        if (
-          typeof supabaseClient !== "undefined" &&
-          supabaseClient
-        ) {
-          let {
-            data,
-            error
-          } = await supabaseClient
-            .from("public_event_discovery")
-            .select("*");
-
-          // Compatibility fallback while environments are migrated.
-          if (error && /public_event_discovery/i.test(String(error.message || ""))) {
-            ({ data, error } = await supabaseClient
-              .from("events")
-              .select("*")
-              .eq("status", "approved"));
-          }
-
-          if (error) {
-            console.error(
-              "Supabase approved events query failed:",
-              error
-            );
-            console.warn(
-              "Approved Supabase events could not be loaded. CSV events remain available."
-            );
-          } else {
-            dbEvents =
-              data || [];
-          }
-        }
-      } catch (error) {
-        console.error(
-          "Supabase approved events request failed:",
-          error
-        );
-        console.warn(
-          "Supabase is unavailable. CSV events remain available."
-        );
+      // Compatibility fallback for environments that have not received the
+      // event-edition view yet. It does not activate source-of-truth mode.
+      if (error && /public_event_discovery/i.test(String(error.message || ""))) {
+        ({ data, error } = await supabaseClient
+          .from("events")
+          .select("*")
+          .eq("status", "approved"));
       }
 
-      console.log(
-        "Loaded approved DB events:",
-        dbEvents
-      );
-
-      events =
-        normalizeEvents([
-          ...csvEvents,
-          ...dbEvents
-        ]);
-
-      migrateLocalPlanningKeys(events);
-
-      loadedEvents =
-        events;
-
-      if (typeof window.updateLandingEventCount === "function") {
-        window.updateLandingEventCount(loadedEvents);
+      if (error) throw error;
+      dbEvents = data || [];
+      dbReady = dbEvents.length >= MIN_SUPABASE_CATALOG_ROWS;
+      if (!dbReady) {
+        console.warn(`Supabase catalog has ${dbEvents.length} rows; keeping the CSV fallback until the controlled import is complete.`);
       }
-
-      processPendingSeasonAdd();
+    }
   } catch (error) {
-    console.error(
-      "CSV event loading failed:",
-      error
-    );
+    // A reachable CSV export is the intentional outage fallback, so this is
+    // operationally noteworthy but not an application error.
+    console.warn("Supabase event catalog request failed; using CSV fallback:", error);
+  }
 
+  try {
+    const sourceEvents = dbReady ? dbEvents : await loadCsvEvents();
+    events = normalizeEvents(sourceEvents);
+    window.eventCatalogSource = dbReady ? "supabase" : "csv-fallback";
+    migrateLocalPlanningKeys(events);
+    loadedEvents = events;
+
+    if (typeof window.updateLandingEventCount === "function") {
+      window.updateLandingEventCount(loadedEvents);
+    }
+    processPendingSeasonAdd();
+  } catch (error) {
+    console.error("Event catalog loading failed:", error);
     events = [];
-    loadedEvents =
-      events;
-
+    loadedEvents = events;
     if (typeof showAppMessage === "function") {
       showAppMessage(
         "Events unavailable",
@@ -1768,13 +1736,9 @@ async function loadEvents(callback) {
   try {
     callback(loadedEvents);
   } catch (error) {
-    console.error(
-      "Event render callback failed:",
-      error
-    );
+    console.error("Event render callback failed:", error);
   }
 }
-
 
 // POPUP
 function createPopup(event) {

@@ -221,8 +221,20 @@ function prepareMigration(rows, options = {}) {
     });
   });
 
+  const events = [...eventMap.values()].map(entry => entry.payload);
+  const slugCounts = events.reduce((counts, event) => {
+    counts.set(event.slug, (counts.get(event.slug) || 0) + 1);
+    return counts;
+  }, new Map());
+
+  events.forEach(event => {
+    if (slugCounts.get(event.slug) > 1) {
+      event.slug = `${event.slug}-${slugPart(event.city || event.canonical_key)}`;
+    }
+  });
+
   return {
-    events: [...eventMap.values()].map(entry => entry.payload),
+    events,
     editions: [...editionMap.values()],
     rejected
   };

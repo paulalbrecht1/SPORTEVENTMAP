@@ -2984,6 +2984,9 @@
           <div><span data-i18n="admin.criticalIssues">Kritische Fehler</span><strong id="dataOpsCriticalIssues">0</strong></div>
           <div><span data-i18n="admin.warningIssues">Warnungen</span><strong id="dataOpsWarningIssues">0</strong></div>
           <div><span data-i18n="admin.pastWithoutNext">Vergangen ohne Folgeaustragung</span><strong id="dataOpsPastWithoutNext">0</strong></div>
+          <div><span>Fällige Quellen</span><strong id="dataOpsDueSources">0</strong></div>
+          <div><span>Offene Vorschläge</span><strong id="dataOpsPendingProposals">0</strong></div>
+          <div><span>Workflow-Alarme</span><strong id="dataOpsOpenAlerts">0</strong></div>
         </div>
         <div class="admin-data-operations-filters">
           <label><span data-i18n="admin.country">Land</span><select id="dataOpsCountryFilter"><option value="" data-i18n="admin.all">Alle</option></select></label>
@@ -3004,6 +3007,16 @@
           <section>
             <div class="admin-data-operations-section-heading"><div><h4 data-i18n="admin.validationIssues">Validierungsprobleme</h4><p id="dataOpsIssueResultCount">0</p></div></div>
             <div id="dataOpsIssuesList" class="admin-data-operations-list" aria-live="polite"></div>
+          </section>
+        </div>
+        <div class="admin-data-operations-grid admin-data-operations-review-grid">
+          <section>
+            <div class="admin-data-operations-section-heading"><div><h4>Automatische Änderungsvorschläge</h4><p id="dataOpsProposalResultCount">0 offen</p></div></div>
+            <div id="dataOpsProposalsList" class="admin-data-operations-list" aria-live="polite"></div>
+          </section>
+          <section>
+            <div class="admin-data-operations-section-heading"><div><h4>Workflow-Monitoring</h4><p id="dataOpsAlertResultCount">0 offen</p></div></div>
+            <div id="dataOpsAlertsList" class="admin-data-operations-list" aria-live="polite"></div>
           </section>
         </div>
         <section id="dataOpsHistoryPanel" class="admin-data-operations-history" hidden>

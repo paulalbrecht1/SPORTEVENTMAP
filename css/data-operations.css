@@ -211,7 +211,9 @@
 #adminModal .admin-data-operations-card-actions a,
 #adminModal .admin-data-operations-card-actions button,
 #adminModal .admin-data-operations-schedule button,
-#adminModal .admin-data-operations-issue button {
+#adminModal .admin-data-operations-issue button,
+#adminModal .admin-data-operations-proposal button,
+#adminModal .admin-data-operations-alert button {
   min-height: 38px;
   padding: 8px 10px;
   border: 1px solid rgba(148, 163, 184, 0.3);
@@ -327,7 +329,9 @@ body[data-theme="light"] #adminModal .admin-data-operations-history-row code {
   #adminModal .admin-data-operations-actions,
   #adminModal .admin-data-operations-card-actions,
   #adminModal .admin-data-operations-schedule,
-  #adminModal .admin-data-operations-issue button {
+  #adminModal .admin-data-operations-issue button,
+#adminModal .admin-data-operations-proposal button,
+#adminModal .admin-data-operations-alert button {
     width: 100%;
   }
 
@@ -339,3 +343,22 @@ body[data-theme="light"] #adminModal .admin-data-operations-history-row code {
     text-align: center;
   }
 }
+
+#adminModal .admin-data-operations-proposal,
+#adminModal .admin-data-operations-alert {
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: 4px solid #38bdf8;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.7);
+}
+#adminModal .admin-data-operations-alert.is-error,
+#adminModal .admin-data-operations-alert.is-critical { border-left-color: #ef4444; }
+#adminModal .admin-data-operations-alert.is-warning { border-left-color: #f59e0b; }
+#adminModal .admin-data-operations-proposal pre {
+  max-width: 100%; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  padding: 8px; border-radius: 8px; background: rgba(2, 6, 23, 0.72); font-size: .7rem;
+}
+#adminModal .admin-data-operations-proposal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+body[data-theme="light"] #adminModal .admin-data-operations-proposal,
+body[data-theme="light"] #adminModal .admin-data-operations-alert { border-color: #d7dee8; background: #fff; color: #172033; }

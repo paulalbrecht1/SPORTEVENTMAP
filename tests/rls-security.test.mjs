@@ -112,6 +112,27 @@ async function restRequest(
   };
 }
 
+async function serviceRequest(path, options = {}) {
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  assert.ok(serviceKey, "Service-role key is required for this request.");
+  const response = await fetch(`${baseUrl}/rest/v1/${path}`, {
+    method: options.method || "GET",
+    headers: {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+      ...(options.prefer ? { Prefer: options.prefer } : {})
+    },
+    body: options.body === undefined ? undefined : JSON.stringify(options.body)
+  });
+  const text = await response.text();
+  let data = null;
+  if (text) {
+    try { data = JSON.parse(text); } catch { data = text; }
+  }
+  return { response, data };
+}
+
 const results = [];
 
 async function test(name, run) {
@@ -545,7 +566,15 @@ await test(
     assert.equal(edition.data.length, 1);
     assert.equal(edition.data[0].publication_status, "published");
 
-    for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+    for (const table of [
+      "event_sources",
+      "validation_issues",
+      "event_audit_log",
+      "crawler_domain_policies",
+      "event_change_proposals",
+      "data_workflow_runs",
+      "data_workflow_alerts"
+    ]) {
       const result = await restRequest(`${table}?select=id&limit=1`);
       assert.equal(
         result.response.status === 401 || result.response.status === 403,
@@ -559,7 +588,15 @@ await test(
 await test(
   "12. Normal users cannot read or mutate operations data",
   async () => {
-    for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+    for (const table of [
+      "event_sources",
+      "validation_issues",
+      "event_audit_log",
+      "crawler_domain_policies",
+      "event_change_proposals",
+      "data_workflow_runs",
+      "data_workflow_alerts"
+    ]) {
       const result = await restRequest(`${table}?select=id&limit=1`, { token: userA.token });
       assert.equal(
         result.response.status === 401 || result.response.status === 403 ||
@@ -648,9 +685,87 @@ await test(
 
 if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   await test(
-    "14. Server-side service role can access operations tables",
+    "14. Automation proposals require admin review and source claims require service role",
     async () => {
-      for (const table of ["event_sources", "validation_issues", "event_audit_log"]) {
+      const editions = await serviceRequest(
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`
+      );
+      assert.equal(editions.response.ok, true, JSON.stringify(editions.data));
+      const editionId = editions.data[0].id;
+
+      const source = await serviceRequest("event_sources", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: publicFixtureEventId,
+          edition_id: editionId,
+          source_type: "official_event_website",
+          source_url: `https://example.com/${runId}`,
+          parser_type: "html",
+          next_fetch_at: "2020-01-01T00:00:00.000Z"
+        }
+      });
+      assert.equal(source.response.ok, true, JSON.stringify(source.data));
+
+      const normalClaim = await restRequest("rpc/claim_event_sources", {
+        token: userA.token,
+        method: "POST",
+        body: { p_limit: 1, p_worker_id: runId }
+      });
+      assert.equal(normalClaim.response.ok, false);
+
+      const claim = await serviceRequest("rpc/claim_event_sources", {
+        method: "POST",
+        body: { p_limit: 20, p_worker_id: runId }
+      });
+      assert.equal(claim.response.ok, true, JSON.stringify(claim.data));
+      assert.ok(claim.data.some(row => row.id === source.data[0].id));
+
+      const proposal = await serviceRequest("event_change_proposals", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: publicFixtureEventId,
+          edition_id: editionId,
+          source_id: source.data[0].id,
+          entity_type: "edition",
+          rule_code: "rls_review_gate",
+          proposal_fingerprint: runId,
+          proposed_changes: { needs_review: true, review_priority: "high" },
+          reason: "RLS integration test"
+        }
+      });
+      assert.equal(proposal.response.ok, true, JSON.stringify(proposal.data));
+
+      const normalApply = await restRequest("rpc/apply_event_change_proposal", {
+        token: userA.token,
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_review_notes: "must fail" }
+      });
+      assert.equal(normalApply.response.ok, false);
+
+      const adminApply = await restRequest("rpc/apply_event_change_proposal", {
+        token: admin.token,
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_review_notes: "approved in test" }
+      });
+      assert.equal(adminApply.response.ok, true, JSON.stringify(adminApply.data));
+      assert.equal(adminApply.data.proposal_status, "approved");
+    }
+  );
+
+  await test(
+    "15. Server-side service role can access operations tables",
+    async () => {
+      for (const table of [
+      "event_sources",
+      "validation_issues",
+      "event_audit_log",
+      "crawler_domain_policies",
+      "event_change_proposals",
+      "data_workflow_runs",
+      "data_workflow_alerts"
+    ]) {
         const response = await fetch(`${baseUrl}/rest/v1/${table}?select=id&limit=1`, {
           headers: {
             apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,

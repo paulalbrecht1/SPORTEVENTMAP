@@ -341,3 +341,81 @@ Verifizierter Zustand unmittelbar danach:
 Der Security Advisor meldet den Validator als absichtlich für `authenticated` ausführbare `SECURITY DEFINER`-Funktion. Die Funktion bricht für alle Nicht-Admins vor Datenzugriff mit `42501` ab; dies ist im Vier-Rollen-RLS-Test abgedeckt. Ein weiterer projektweiter Hinweis betrifft die in Supabase Auth noch deaktivierte Leaked-Password-Protection und ist keine Schemaänderung dieses Arbeitspakets.
 
 Der Performance Advisor meldet für die neuen operativen Fremdschlüssel keine fehlenden Indizes mehr. `unused_index`-Hinweise direkt nach Erstellung sind erwartbar und müssen erst nach realer Nutzung bewertet werden.
+## 13. Produktionsupdate Stufe 2 (29. Juli 2026)
+
+Dieser Abschnitt ersetzt die früheren offenen Punkte zum Vollimport, zu PostGIS,
+Scheduler, Review und Monitoring.
+
+### Produktiver Katalogimport
+
+Der separat freigegebene Import `ba56e423-f4c2-4e6b-8c41-b3ca98641652`
+wurde mit einem 20/20-Canary, fünf Event-Batches und fünf Editions-Batches
+durchgeführt. `private.catalog_import_backups` enthält den vollständigen
+Vorher-Snapshot sowie erwartete Zählwerte. Die Finalisierung verweigert die
+Freigabe bei abweichenden Counts oder doppelten `(event_id, edition_year)`.
+
+Produktiver Abschlusszustand:
+
+- 993 veröffentlichte Eventmarken
+- 994 veröffentlichte Austragungen
+- 994 operative Quellen aus dem Import
+- 0 verwaiste oder doppelte Editionen
+- 0 offene kritische/hart fehlerhafte Importprobleme
+- 35 Favoriten und 46 Season-Planner-Zuordnungen unverändert
+- historische Schreibdublette bleibt mit ihrer ID inaktiv und auditierbar
+
+Der Client liest Supabase zuerst. Nur bei weniger als 900 öffentlichen Zeilen
+(Rollout-Schutz) oder einem Supabase-Ausfall wird `data/events.csv` geladen.
+Die CSV wird nicht mehr parallel gepflegt. Sie wird mit
+`npm run data:export-fallback` explizit aus `public_event_discovery` erzeugt;
+der Export verweigert kleine/unvollständige Ergebnisse.
+
+### Scheduler und Quellen-Worker
+
+- `sem-event-operations-hourly` läuft stündlich um Minute 17.
+- `sem-country-polygon-validation-hourly` läuft stündlich um Minute 23.
+- `event-source-check` ist als JWT-geschützte Edge Function aktiv (Version 2).
+- `sem-event-source-check` ist für 15-Minuten-Intervalle vorbereitet, aber erst
+  aktiv, nachdem die separat geschützte Vault-Secret-Hinterlegung freigegeben
+  wurde. Der fehlgeschlagene Versuch wurde vollständig zurückgerollt; es liegt
+  kein halbfertiger Secret-/Cron-Zustand vor.
+
+Quellen werden atomar mit `FOR UPDATE SKIP LOCKED` beansprucht, pro Lauf höchstens
+eine URL je Host. Domainrichtlinien steuern Timeout, Antwortgröße, Mindestpause,
+Retry-Backoff und `robots.txt`. HTTP 429 berücksichtigt `Retry-After`. Hashänderungen
+ändern niemals Eventdaten direkt, sondern erzeugen einen eindeutigen offenen
+`event_change_proposals`-Datensatz.
+
+### Review und Monitoring
+
+Der geschützte Admin-Tab zeigt zusätzlich fällige Quellen, offene
+Änderungsvorschläge und Workflow-Alarme. Nur Vorschläge mit erlaubten Fachfeldern
+können über `apply_event_change_proposal` übernommen werden. Ablehnung/Schließen
+sowie Alarmauflösung speichern Admin und Zeitpunkt. Crawlerdaten, Vorschläge,
+Runs und Alarme haben keine öffentlichen Leserechte.
+
+### PostGIS
+
+PostGIS prüft Koordinaten gegen 22 Natural-Earth-1:50m-Länderpolygone. Der GiST-
+Index unterstützt räumliche Prüfungen. Kleine Inseln und Territorien, die der
+Kartierungsmaßstab auslässt, sind eng und begründet ergänzt: deutsche Nord-/
+Ostseeinseln, Kanaren und Svalbard. Die globale Toleranz bleibt bei 3 km.
+Fehlende Länderpolygone erzeugen Workflow-Alarme.
+
+### Auth-Status
+
+Supabase meldet Leaked-Password-Protection weiterhin als deaktiviert. Das Projekt
+liegt im Free-Plan; die Funktion ist laut Supabase nur in Pro und höher verfügbar.
+Sie wurde deshalb nicht kostenpflichtig aktiviert. Nach einem bewusst bestätigten
+Plan-Upgrade ist sie im Auth-Dashboard einzuschalten und mit bestehendem Login,
+Registrierung und Passwortänderung zu testen.
+
+### Noch offen vor einem umfangreichen Parser (Stufe 2+)
+
+- Vault-Secret-Hinterlegung und `sem-event-source-check` separat freigeben
+- feldgenaue Parser je Quellentyp entwickeln; leere Hash-Vorschläge bleiben reine
+  Prüfhinweise
+- Benachrichtigungskanal für kritische `data_workflow_alerts` anbinden
+- Leaked-Password-Protection nach bestätigtem Pro-Upgrade aktivieren
+- Nutzungsdaten der neuen Indizes nach realem Betrieb prüfen, nicht unmittelbar
+  nach Erstellung wegen erwartbarer `unused_index`-Hinweise

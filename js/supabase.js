@@ -4521,6 +4521,10 @@ const dataOpsElements = {
   issuesList: document.getElementById("dataOpsIssuesList"),
   eventResultCount: document.getElementById("dataOpsEventResultCount"),
   issueResultCount: document.getElementById("dataOpsIssueResultCount"),
+  proposalsList: document.getElementById("dataOpsProposalsList"),
+  alertsList: document.getElementById("dataOpsAlertsList"),
+  proposalResultCount: document.getElementById("dataOpsProposalResultCount"),
+  alertResultCount: document.getElementById("dataOpsAlertResultCount"),
   country: document.getElementById("dataOpsCountryFilter"),
   sport: document.getElementById("dataOpsSportFilter"),
   eventStatus: document.getElementById("dataOpsEventStatusFilter"),
@@ -4544,7 +4548,10 @@ const dataOpsElements = {
     unreachable: document.getElementById("dataOpsUnreachableSource"),
     critical: document.getElementById("dataOpsCriticalIssues"),
     warnings: document.getElementById("dataOpsWarningIssues"),
-    pastWithoutNext: document.getElementById("dataOpsPastWithoutNext")
+    pastWithoutNext: document.getElementById("dataOpsPastWithoutNext"),
+    dueSources: document.getElementById("dataOpsDueSources"),
+    pendingProposals: document.getElementById("dataOpsPendingProposals"),
+    openAlerts: document.getElementById("dataOpsOpenAlerts")
   }
 };
 const adminTabs =
@@ -4565,6 +4572,9 @@ let dataOpsEvents = [];
 let dataOpsEditions = [];
 let dataOpsIssues = [];
 let dataOpsSources = [];
+let dataOpsProposals = [];
+let dataOpsAlerts = [];
+let dataOpsRuns = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
@@ -4844,6 +4854,39 @@ function renderDataOpsIssues() {
   }).join("");
 }
 
+function renderDataOpsProposals() {
+  if (!dataOpsElements.proposalsList) return;
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  dataOpsElements.proposalResultCount.textContent = `${dataOpsProposals.length} offen`;
+  dataOpsElements.proposalsList.innerHTML = dataOpsProposals.map(proposal => {
+    const event = eventById.get(String(proposal.event_id));
+    const changes = proposal.proposed_changes || {};
+    const hasApplicableChanges = Object.keys(changes).length > 0;
+    return `<article class="admin-data-operations-proposal">
+      <span class="admin-data-operations-status">${escapeAdminHTML(proposal.rule_code)}</span>
+      <strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</strong>
+      <p>${escapeAdminHTML(proposal.reason || "Automatisch erkannte Änderung")}</p>
+      <pre>${escapeAdminHTML(JSON.stringify(hasApplicableChanges ? changes : proposal.observed_values || {}, null, 2))}</pre>
+      <div class="admin-data-operations-proposal-actions">
+        <button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}" ${hasApplicableChanges ? "" : "disabled"}>Prüfen &amp; übernehmen</button>
+        <button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">${hasApplicableChanges ? "Ablehnen" : "Als geprüft schließen"}</button>
+      </div>
+    </article>`;
+  }).join("") || '<p class="admin-quality-empty">Keine offenen Änderungsvorschläge.</p>';
+}
+
+function renderDataOpsAlerts() {
+  if (!dataOpsElements.alertsList) return;
+  dataOpsElements.alertResultCount.textContent = `${dataOpsAlerts.length} offen`;
+  dataOpsElements.alertsList.innerHTML = dataOpsAlerts.map(alert => `
+    <article class="admin-data-operations-alert is-${escapeAdminHTML(alert.severity)}">
+      <span class="admin-data-operations-status">${escapeAdminHTML(alert.severity)} · ${escapeAdminHTML(alert.alert_code)}</span>
+      <strong>${escapeAdminHTML(alert.title)}</strong>
+      <p>${escapeAdminHTML(alert.description)}</p>
+      <p>${formatDataOpsDate(alert.last_detected_at, true)} · ${Number(alert.occurrence_count || 1)}× erkannt</p>
+      <button type="button" data-dataops-action="resolve-alert" data-alert-id="${alert.id}">Alarm schließen</button>
+    </article>`).join("") || '<p class="admin-quality-empty">Keine offenen Workflow-Alarme.</p>';
+}
 function renderDataOperations() {
   const today = new Date().toISOString().slice(0, 10);
   const openIssues = dataOpsIssues.filter(issue => issue.status === "open");
@@ -4863,20 +4906,28 @@ function renderDataOperations() {
   setDataOpsKpi("critical", openIssues.filter(row => row.severity === "critical").length);
   setDataOpsKpi("warnings", openIssues.filter(row => row.severity === "warning").length);
   setDataOpsKpi("pastWithoutNext", pastWithoutNext);
+  setDataOpsKpi("dueSources", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= new Date().toISOString()).length);
+  setDataOpsKpi("pendingProposals", dataOpsProposals.length);
+  setDataOpsKpi("openAlerts", dataOpsAlerts.length);
   renderDataOpsEvents(getDataOpsFilteredRows());
   renderDataOpsIssues();
+  renderDataOpsProposals();
+  renderDataOpsAlerts();
 }
 
 async function loadDataOperations() {
   if (!dataOpsElements.panel) return;
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
-  const [eventsResult, editionsResult, issuesResult, sourcesResult] = await Promise.all([
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
-    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_fetched_at,next_fetch_at,created_at")
+    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_fetched_at,next_fetch_at,created_at"),
+    loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
+    loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
+    loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message")
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult].find(result => result.error);
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
@@ -4886,10 +4937,13 @@ async function loadDataOperations() {
   dataOpsEditions = editionsResult.rows || [];
   dataOpsIssues = (issuesResult.rows || []).filter(issue => issue.status === "open");
   dataOpsSources = sourcesResult.rows || [];
+  dataOpsProposals = (proposalsResult.rows || []).filter(row => row.proposal_status === "pending");
+  dataOpsAlerts = (alertsResult.rows || []).filter(row => row.alert_status === "open");
+  dataOpsRuns = runsResult.rows || [];
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   renderDataOperations();
-  setDataOpsStatus(`${dataOpsEvents.length} Events, ${dataOpsEditions.length} Austragungen und ${dataOpsIssues.length} offene Probleme geladen.`, "success");
+  setDataOpsStatus(`${dataOpsEvents.length} Events, ${dataOpsEditions.length} Austragungen, ${dataOpsProposals.length} Vorschläge und ${dataOpsAlerts.length} Alarme geladen.`, "success");
 }
 
 async function runDataOperationsValidation() {
@@ -4931,6 +4985,24 @@ async function handleDataOpsAction(button) {
   const eventId = button.dataset.eventId;
   if (action === "history") {
     await showDataOpsHistory(button.dataset.entityType, button.dataset.entityId, button.dataset.entityLabel);
+    return;
+  }
+  if (action === "approve-proposal") {
+    const notes = "Im Admin-Dashboard geprüft und freigegeben.";
+    const { error } = await supabaseClient.rpc("apply_event_change_proposal", { p_proposal_id: button.dataset.proposalId, p_review_notes: notes });
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "reject-proposal") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("event_change_proposals").update({ proposal_status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user?.id || null, review_notes: "Im Admin-Dashboard geprüft und nicht übernommen." }).eq("id", button.dataset.proposalId).eq("proposal_status", "pending");
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "resolve-alert") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("data_workflow_alerts").update({ alert_status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", button.dataset.alertId);
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Alarm konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
     return;
   }
   if (action === "resolve") {

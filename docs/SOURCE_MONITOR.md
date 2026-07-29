@@ -185,8 +185,10 @@ Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` 
 Optionale Worker-Konfiguration:
 
 ```text
-SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/2.0 (+https://sporteventmap.de/bot)
-SOURCE_MONITOR_ALLOW_HTTP=true
+SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)
+SOURCE_MONITOR_ALLOW_HTTP=false
+SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
+SOURCE_MONITOR_SMOKE_SECRET=<mindestens 256 Bit>
 ```
 
 Cron benoetigt in Supabase Vault:
@@ -218,7 +220,9 @@ Vor dem Deployment CLI-Befehle immer mit `--help` gegen die installierte Version
 ```bash
 supabase db push
 supabase functions deploy event-source-check --use-api
-supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/2.0 (+https://sporteventmap.de/bot)"
+supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+supabase secrets set SOURCE_MONITOR_ALLOW_HTTP=false SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
+supabase secrets set SOURCE_MONITOR_SMOKE_SECRET="<zufaelliges Secret mit mindestens 256 Bit>"
 ```
 
 Danach:
@@ -243,6 +247,62 @@ curl -X POST "$SUPABASE_URL/functions/v1/event-source-check" \
 ```
 
 Gezielte Admin-Pruefung erfolgt im Dashboard. Alternativ kann ein Admin `enqueue_source_crawl()` aufrufen und danach den Worker starten.
+
+## Produktionshaertung
+
+### DNS-Pinning und TLS
+
+Der Worker verwendet fuer jeden Request und jedes Redirect-Ziel die von
+`Deno.resolveDns` geprueften oeffentlichen A-/AAAA-Adressen. Der
+`pinned-http`-Transport verbindet per `Deno.connect` direkt zu genau einer
+dieser IPs. Bei HTTPS uebernimmt `Deno.startTls` weiterhin den urspruenglichen
+Hostnamen fuer SNI und Zertifikatspruefung. Damit kann der normale Fetch-Resolver
+das Ziel zwischen SSRF-Pruefung und Verbindung nicht austauschen.
+
+`SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true` ist der Produktionsstandard.
+Ist Raw TCP/TLS in der Runtime nicht verfuegbar, wird der Crawl fail-closed
+abgebrochen. Der Transport sendet HTTP/1.1, `Accept-Encoding: identity` und nur
+eine enge Header-Allowlist. Die verwendete IP wird in Crawl-Ergebnis und Quelle
+gespeichert.
+
+### Versionierte Doppel-Hashes
+
+`content_hash` deckt den normalisierten sichtbaren Inhalt ab.
+`semantic_hash` (aktuell `sem-v2`) wird unabhaengig aus Event-JSON-LD und
+Eventsignalen wie Datum, Distanz, Ort, Anmeldung, Preis und Absage gebildet.
+Jede Aenderung bleibt eine Review-Aufgabe, erhaelt aber eine Confidence:
+
+- `high`: Eventsignale haben sich geaendert
+- `low`: breiter Inhalt geaendert, Eventsignale gleich
+- `medium`: Versionswechsel oder nur breiter Hash verfuegbar
+- `exact`/`baseline`: unveraendert beziehungsweise erster Abruf
+
+### Robots und adaptive Domain-Limits
+
+Der Robots-Parser beachtet spezifische User-Agent-Gruppen, Longest-Match fuer
+Allow/Disallow und dezimales `crawl-delay`. Ein temporaer nicht sicher
+abrufbares robots.txt stoppt den Hauptabruf und plant einen Retry; 404/410 gilt
+als fehlende Robots-Datei. Die effektive Domain-Pause ist immer das Maximum aus
+Admin-Basislimit, Robots-`crawl-delay` und adaptivem Limit.
+
+`source_domain_daily_metrics` sammelt nur technische Tagesaggregate.
+Ein 429 verdoppelt die adaptive Pause (maximal 24 Stunden) und respektiert
+`Retry-After`. Nach jeweils 20 erfolgreichen Requests sinkt die adaptive
+Pause schrittweise wieder Richtung Admin-Basiswert.
+
+### Produktions-Smoke-Test
+
+Der Smoke-Modus schreibt weder Queue- noch Eventdaten. Er prueft Remote-Schema,
+Loopback-SSRF-Sperre, DNS-Pinning, TLS, Kontakt-User-Agent sowie Content- und
+Semantic-Hash gegen `https://example.com/`.
+
+```bash
+npm run smoke:source-monitor:production
+```
+
+Erforderlich sind `SUPABASE_URL`, ein Publishable-/Anon-Key und das nur
+serverseitig gesetzte `SOURCE_MONITOR_SMOKE_SECRET`.
+
 
 ## Vorbereitung fuer Stufe 3
 

@@ -576,7 +576,8 @@ await test(
       "data_workflow_alerts",
       "source_crawl_jobs",
       "source_crawl_results",
-      "source_review_tasks"
+      "source_review_tasks",
+      "source_domain_daily_metrics"
     ]) {
       const result = await restRequest(`${table}?select=id&limit=1`);
       assert.equal(
@@ -601,7 +602,8 @@ await test(
       "data_workflow_alerts",
       "source_crawl_jobs",
       "source_crawl_results",
-      "source_review_tasks"
+      "source_review_tasks",
+      "source_domain_daily_metrics"
     ]) {
       const result = await restRequest(`${table}?select=id&limit=1`, { token: userA.token });
       assert.equal(
@@ -716,7 +718,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
           event_id: publicFixtureEventId,
           edition_id: editionId,
           source_type: "official_event_website",
-          source_url: `https://example.com/${runId}`,
+          source_url: `https://${runId}.example.com/event`,
           parser_type: "html",
           next_fetch_at: "2020-01-01T00:00:00.000Z"
         }
@@ -783,7 +785,8 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "data_workflow_alerts",
       "source_crawl_jobs",
       "source_crawl_results",
-      "source_review_tasks"
+      "source_review_tasks",
+      "source_domain_daily_metrics"
     ]) {
         const response = await fetch(`${baseUrl}/rest/v1/${table}?select=id&limit=1`, {
           headers: {
@@ -819,6 +822,20 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         body: { p_limit: 20 }
       });
       assert.equal(normalSchedule.response.ok, false);
+
+      const resetDomainPacing = await serviceRequest(
+        `crawler_domain_policies?source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`,
+        {
+          method: "PATCH",
+          prefer: "return=representation",
+          body: {
+            last_requested_at: "2019-12-31T23:59:00.000Z",
+            next_allowed_at: "2020-01-01T00:00:00.000Z"
+          }
+        }
+      );
+      assert.equal(resetDomainPacing.response.ok, true, JSON.stringify(resetDomainPacing.data));
+      assert.equal(resetDomainPacing.data.length, 1);
 
       for (let index = 0; index < 2; index += 1) {
         const scheduled = await serviceRequest("rpc/schedule_due_source_crawls", {
@@ -869,14 +886,50 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(recorded.response.ok, true, JSON.stringify(recorded.data));
       assert.equal(recorded.data.status, "completed");
+      const firstObservation = await serviceRequest("rpc/record_source_crawl_observation", {
+        method: "POST",
+        body: {
+          p_job_id: claimed.data[0].job_id,
+          p_semantic_hash: `semantic-${runId}`,
+          p_normalization_version: "sem-v2",
+          p_change_confidence: "baseline",
+          p_change_reasons: ["first_seen"],
+          p_http_status: 200,
+          p_response_time_ms: 42,
+          p_content_length: 128,
+          p_pinned_ip: "93.184.216.34",
+          p_error_type: null,
+          p_retry_after_seconds: null,
+          p_user_agent: "SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+        }
+      });
+      assert.equal(firstObservation.response.ok, true, JSON.stringify(firstObservation.data));
+      assert.equal(firstObservation.data.semantic_hash_recorded, true);
+      assert.equal(firstObservation.data.pinned_ip_recorded, true);
 
       const results = await serviceRequest(
-        `source_crawl_results?select=source_id,change_status,processing_status,http_status&job_id=eq.${encodeURIComponent(claimed.data[0].job_id)}`
+        `source_crawl_results?select=source_id,change_status,processing_status,http_status,semantic_hash,normalization_version,change_confidence,pinned_ip&job_id=eq.${encodeURIComponent(claimed.data[0].job_id)}`
       );
       assert.equal(results.response.ok, true, JSON.stringify(results.data));
       assert.deepEqual(results.data.map(row => row.change_status), ["first_seen"]);
       assert.deepEqual(results.data.map(row => row.processing_status), ["completed"]);
 
+      assert.equal(results.data[0].semantic_hash, `semantic-${runId}`);
+      assert.equal(results.data[0].normalization_version, "sem-v2");
+      assert.equal(results.data[0].change_confidence, "baseline");
+      assert.equal(results.data[0].pinned_ip, "93.184.216.34");
+      const releaseForChangedCrawl = await serviceRequest(
+        `crawler_domain_policies?source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`,
+        {
+          method: "PATCH",
+          prefer: "return=representation",
+          body: {
+            last_requested_at: "2019-12-31T23:59:00.000Z",
+            next_allowed_at: "2020-01-01T00:00:00.000Z"
+          }
+        }
+      );
+      assert.equal(releaseForChangedCrawl.response.ok, true, JSON.stringify(releaseForChangedCrawl.data));
       const queuedChange = await serviceRequest("rpc/enqueue_source_crawl", {
         method: "POST",
         body: {
@@ -922,6 +975,144 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(changed.response.ok, true, JSON.stringify(changed.data));
       assert.equal(changed.data.change_status, "changed");
+      const changedObservation = await serviceRequest("rpc/record_source_crawl_observation", {
+        method: "POST",
+        body: {
+          p_job_id: claimedChange.data[0].job_id,
+          p_semantic_hash: `semantic-changed-${runId}`,
+          p_normalization_version: "sem-v2",
+          p_change_confidence: "high",
+          p_change_reasons: ["semantic_event_signals_changed"],
+          p_http_status: 200,
+          p_response_time_ms: 55,
+          p_content_length: 256,
+          p_pinned_ip: "93.184.216.34",
+          p_error_type: null,
+          p_retry_after_seconds: null,
+          p_user_agent: "SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+        }
+      });
+      assert.equal(changedObservation.response.ok, true, JSON.stringify(changedObservation.data));
+      const repeatedObservation = await serviceRequest("rpc/record_source_crawl_observation", {
+        method: "POST",
+        body: {
+          p_job_id: claimedChange.data[0].job_id,
+          p_semantic_hash: `semantic-changed-${runId}`,
+          p_normalization_version: "sem-v2",
+          p_change_confidence: "high",
+          p_change_reasons: ["semantic_event_signals_changed"],
+          p_http_status: 200,
+          p_response_time_ms: 55,
+          p_content_length: 256,
+          p_pinned_ip: "93.184.216.34",
+          p_error_type: null,
+          p_retry_after_seconds: null,
+          p_user_agent: "SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+        }
+      });
+      assert.equal(repeatedObservation.response.ok, true, JSON.stringify(repeatedObservation.data));
+      assert.equal(repeatedObservation.data.idempotent, true);
+
+      const domainMetrics = await serviceRequest(
+        `source_domain_daily_metrics?select=request_count,success_count,changed_signal_count,rate_limited_count&source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`
+      );
+      assert.equal(domainMetrics.response.ok, true, JSON.stringify(domainMetrics.data));
+      assert.equal(domainMetrics.data.length, 1);
+      assert.equal(domainMetrics.data[0].request_count, 2);
+      assert.equal(domainMetrics.data[0].success_count, 2);
+      assert.equal(domainMetrics.data[0].changed_signal_count, 1);
+      const releasedDomain = await serviceRequest(
+        `crawler_domain_policies?source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`,
+        {
+          method: "PATCH",
+          prefer: "return=representation",
+          body: {
+            min_interval_seconds: 5,
+            last_requested_at: null,
+            next_allowed_at: "2020-01-01T00:00:00.000Z"
+          }
+        }
+      );
+      assert.equal(releasedDomain.response.ok, true, JSON.stringify(releasedDomain.data));
+      assert.equal(releasedDomain.data.length, 1, JSON.stringify(releasedDomain.data));
+      const queuedRateLimit = await serviceRequest("rpc/enqueue_source_crawl", {
+        method: "POST",
+        body: {
+          p_source_id: source.id,
+          p_priority: 1,
+          p_scheduled_at: new Date().toISOString(),
+          p_trigger_source: "test"
+        }
+      });
+      assert.equal(queuedRateLimit.response.ok, true, JSON.stringify(queuedRateLimit.data));
+      const rateLimitWorkerId = `${runId}-source-rate-limit`;
+      const claimedRateLimit = await serviceRequest("rpc/claim_source_crawl_jobs", {
+        method: "POST",
+        body: { p_limit: 1, p_worker_id: rateLimitWorkerId, p_source_id: source.id }
+      });
+      assert.equal(claimedRateLimit.response.ok, true, JSON.stringify(claimedRateLimit.data));
+      assert.equal(claimedRateLimit.data.length, 1);
+
+      const rateLimited = await serviceRequest("rpc/record_source_crawl_result", {
+        method: "POST",
+        body: {
+          p_job_id: claimedRateLimit.data[0].job_id,
+          p_worker_id: rateLimitWorkerId,
+          p_outcome: "error",
+          p_retriable: true,
+          p_http_status: 429,
+          p_final_url: source.source_url,
+          p_redirect_count: 0,
+          p_response_time_ms: 61,
+          p_content_type: "text/html",
+          p_content_length: 64,
+          p_content_hash: null,
+          p_change_status: "unreachable",
+          p_etag: null,
+          p_last_modified: null,
+          p_error_type: "http_429",
+          p_error_message: "Rate limited fixture",
+          p_retry_after_seconds: 120,
+          p_worker_version: "rls-test",
+          p_normalized_excerpt: "Rate limited fixture"
+        }
+      });
+      assert.equal(rateLimited.response.ok, true, JSON.stringify(rateLimited.data));
+      assert.equal(rateLimited.data.status, "retry_scheduled");
+
+      const rateLimitObservation = await serviceRequest("rpc/record_source_crawl_observation", {
+        method: "POST",
+        body: {
+          p_job_id: claimedRateLimit.data[0].job_id,
+          p_semantic_hash: null,
+          p_normalization_version: null,
+          p_change_confidence: "technical",
+          p_change_reasons: ["http_429"],
+          p_http_status: 429,
+          p_response_time_ms: 61,
+          p_content_length: 64,
+          p_pinned_ip: "93.184.216.34",
+          p_error_type: "http_429",
+          p_retry_after_seconds: 120,
+          p_user_agent: "SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+        }
+      });
+      assert.equal(rateLimitObservation.response.ok, true, JSON.stringify(rateLimitObservation.data));
+
+      const adaptivePolicy = await serviceRequest(
+        `crawler_domain_policies?select=adaptive_interval_seconds,rate_limit_events,next_allowed_at,last_user_agent&source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`
+      );
+      assert.equal(adaptivePolicy.response.ok, true, JSON.stringify(adaptivePolicy.data));
+      assert.ok(adaptivePolicy.data[0].adaptive_interval_seconds >= 120);
+      assert.equal(adaptivePolicy.data[0].rate_limit_events, 1);
+      assert.match(adaptivePolicy.data[0].last_user_agent, /kontakt@sporteventmap\.com/);
+
+      const metricsAfterRateLimit = await serviceRequest(
+        `source_domain_daily_metrics?select=request_count,rate_limited_count&source_host=eq.${encodeURIComponent(new URL(source.source_url).hostname)}`
+      );
+      assert.equal(metricsAfterRateLimit.response.ok, true, JSON.stringify(metricsAfterRateLimit.data));
+      assert.equal(metricsAfterRateLimit.data[0].request_count, 3);
+      assert.equal(metricsAfterRateLimit.data[0].rate_limited_count, 1);
 
       const reviewTasks = await serviceRequest(
         `source_review_tasks?select=task_type,status,priority&source_id=eq.${encodeURIComponent(source.id)}&status=eq.open`

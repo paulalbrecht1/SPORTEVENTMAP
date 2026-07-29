@@ -6,8 +6,10 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
 const migration = read("supabase/migrations/20260808_source_monitor_queue_worker.sql");
+const hardening = read("supabase/migrations/20260809_source_monitor_production_hardening.sql");
 const worker = read("supabase/functions/event-source-check/index.ts");
 const core = read("supabase/functions/_shared/source-monitor-core.mjs");
+const pinned = read("supabase/functions/_shared/pinned-http.mjs");
 const admin = read("js/supabase.js");
 
 for (const fragment of [
@@ -25,13 +27,25 @@ for (const fragment of [
   "enable row level security"
 ]) assert.ok(migration.includes(fragment), `Migration missing ${fragment}`);
 
-for (const fragment of ["fetchSource", "resolvePublicDns", "record_source_crawl_result", "Promise.all", "SOURCE_MONITOR_USER_AGENT", "SOURCE_MONITOR_ALLOW_HTTP"]) {
+for (const fragment of ["fetchSource", "resolvePublicDns", "record_source_crawl_result", "record_source_crawl_observation", "runProductionSmoke", "pinnedTransport", "SOURCE_MONITOR_USER_AGENT", "SOURCE_MONITOR_ALLOW_HTTP"]) {
   assert.ok(worker.includes(fragment), `Worker missing ${fragment}`);
 }
-for (const fragment of ["ssrf_blocked", "redirect: \"manual\"", "maxResponseBytes", "unsupported_content_type", "normalizeRelevantContent"]) {
+for (const fragment of ["ssrf_blocked", "redirect: \"manual\"", "maxResponseBytes", "unsupported_content_type", "normalizeRelevantContent", "extractSemanticSignals", "NORMALIZATION_VERSION"]) {
   assert.ok(core.includes(fragment), `Core missing ${fragment}`);
 }
 assert.doesNotMatch(worker, /\.from\(["']events["']\)\.update/);
+for (const fragment of ["Deno.connect", "Deno.startTls", "x-source-monitor-pinned-ip", "Accept-Encoding: identity"]) {
+  assert.ok(pinned.includes(fragment), `Pinned transport missing ${fragment}`);
+}
+for (const fragment of [
+  "source_domain_daily_metrics",
+  "record_source_crawl_observation",
+  "enforce_source_domain_pacing",
+  "robots_crawl_delay_seconds",
+  "adaptive_interval_seconds",
+  "last_semantic_hash",
+  "pinned_ip"
+]) assert.ok(hardening.includes(fragment), `Hardening migration missing ${fragment}`);
 assert.doesNotMatch(worker, /\.from\(["']event_editions["']\)\.update/);
 assert.ok(admin.includes("sourceMonitor"), "Admin Source Monitor integration is missing.");
 console.log("Source Monitor queue, worker, safety boundary and admin integration verified.");

@@ -1,14 +1,17 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import {
+  evaluateRobots,
   SourceFetchError,
   fetchSource,
-  robotsAllows
+  validateSourceUrl
 } from "../_shared/source-monitor-core.mjs";
+import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-2.0.0";
+const WORKER_VERSION = "source-monitor-2.1.0";
 const DEFAULT_BATCH_SIZE = 5;
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -43,7 +46,27 @@ function runtimeKeys() {
   };
 }
 
+function configuredUserAgent() {
+  const value = (Deno.env.get("SOURCE_MONITOR_USER_AGENT") || DEFAULT_USER_AGENT).trim();
+  if (!/^(?=.{10,300}$)[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[0-9A-Za-z._-]+\s+\(\+(?:https:\/\/|mailto:)[^)]+\)$/.test(value)) {
+    throw new Error("SOURCE_MONITOR_USER_AGENT must contain product/version and a public HTTPS or mailto contact.");
+  }
+  return value;
+}
+
+function pinnedTransport() {
+  try { return createDenoPinnedFetch(); }
+  catch (error) {
+    if (Deno.env.get("SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT") === "false") return fetch;
+    throw error;
+  }
+}
+
 async function authorize(request: Request, supabaseUrl: string, anonKey: string) {
+  const smokeSecret = Deno.env.get("SOURCE_MONITOR_SMOKE_SECRET") || "";
+  if (smokeSecret && request.headers.get("x-source-monitor-smoke-secret") === smokeSecret) {
+    return { kind: "smoke", userId: null };
+  }
   const authorization = request.headers.get("Authorization") || "";
   const token = authorization.replace(/^Bearer\s+/i, "");
   const payload = parseJwtPayload(token);
@@ -96,7 +119,7 @@ function defaultPolicy() {
     max_redirects: 5,
     robots_cache_hours: 24,
     allowed_content_types: ["text/html", "application/xhtml+xml", "application/json"],
-    allow_http: true
+    allow_http: false
   };
 }
 
@@ -108,7 +131,7 @@ function toFetchPolicy(policy: Record<string, unknown>) {
     maxRedirects: Number(policy.max_redirects || 5),
     allowedContentTypes: Array.isArray(policy.allowed_content_types) ? policy.allowed_content_types : defaultPolicy().allowed_content_types,
     allowHttp: allowHttpOverride == null ? policy.allow_http !== false : allowHttpOverride.toLowerCase() === "true",
-    userAgent: Deno.env.get("SOURCE_MONITOR_USER_AGENT") || `${BOT_NAME}/2.0 (+https://sporteventmap.de/bot)`
+    userAgent: configuredUserAgent()
   };
 }
 
@@ -119,17 +142,19 @@ function isRobotsCacheFresh(claim: Record<string, unknown>, policy: Record<strin
   return Number.isFinite(checked) && Date.now() - checked < ttl;
 }
 
-async function checkRobots(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, policy: Record<string, unknown>, fetchPolicy: Record<string, unknown>, blockedHostnames: string[]) {
-  if (!policy.respect_robots_txt) return;
+async function checkRobots(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, policy: Record<string, unknown>, fetchPolicy: Record<string, unknown>, blockedHostnames: string[], fetchImpl: typeof fetch) {
+  if (!policy.respect_robots_txt) return 0;
   if (isRobotsCacheFresh(claim, policy)) {
     if (claim.robots_allowed === false) {
       throw new SourceFetchError("robots_denied", "robots.txt verbietet den Abruf dieser Quelle.", { retriable: false });
     }
-    return;
+    return Number(policy.robots_crawl_delay_seconds || 0);
   }
 
   const sourceUrl = new URL(String(claim.source_url));
   let allowed = true;
+  let crawlDelaySeconds = 0;
+  let robotsStatus = "allowed";
   try {
     const robots = await fetchSource(`${sourceUrl.origin}/robots.txt`, {
       policy: {
@@ -139,22 +164,44 @@ async function checkRobots(admin: ReturnType<typeof createClient>, claim: Record
         accept: "text/plain,*/*;q=0.1"
       },
       blockedHostnames,
-      resolveDns: resolvePublicDns
+      resolveDns: resolvePublicDns,
+      fetchImpl,
+      requirePinnedTransport: true
     });
-    allowed = robotsAllows(robots.rawText, sourceUrl, BOT_NAME);
+    const decision = evaluateRobots(robots.rawText, sourceUrl, BOT_NAME);
+    allowed = decision.allowed;
+    crawlDelaySeconds = decision.crawlDelaySeconds;
+    robotsStatus = allowed ? "allowed" : "denied";
   } catch (error) {
-    if (!(error instanceof SourceFetchError) || !["http_404", "http_410"].includes(error.code)) {
-      // A missing or temporarily unavailable robots.txt is not a prohibition.
-      allowed = true;
+    if (error instanceof SourceFetchError && ["http_404", "http_410"].includes(error.code)) {
+      robotsStatus = "missing";
+    } else if (error instanceof SourceFetchError && ["http_401", "http_403"].includes(error.code)) {
+      allowed = false;
+      robotsStatus = "denied";
+    } else {
+      throw new SourceFetchError("robots_unavailable", `robots.txt konnte nicht sicher geprueft werden: ${cleanError(error)}`, {
+        retriable: true,
+        retryAfterSeconds: error instanceof SourceFetchError ? error.retryAfterSeconds : null
+      });
     }
   }
-  await admin.from("event_sources").update({
-    robots_checked_at: new Date().toISOString(),
+  const checkedAt = new Date().toISOString();
+  const { error: domainPolicyError } = await admin.from("crawler_domain_policies").update({
+    robots_checked_at: checkedAt,
+    robots_crawl_delay_seconds: crawlDelaySeconds,
+    robots_status: robotsStatus,
+    last_user_agent: String(fetchPolicy.userAgent)
+  }).eq("source_host", claim.source_host);
+  if (domainPolicyError) throw new Error(`Robots domain policy update failed: ${cleanError(domainPolicyError)}`);
+  const { error: sourceRobotsError } = await admin.from("event_sources").update({
+    robots_checked_at: checkedAt,
     robots_allowed: allowed
   }).eq("id", claim.source_id);
+  if (sourceRobotsError) throw new Error(`Robots source update failed: ${cleanError(sourceRobotsError)}`);
   if (!allowed) {
     throw new SourceFetchError("robots_denied", "robots.txt verbietet den Abruf dieser Quelle.", { retriable: false });
   }
+  return crawlDelaySeconds;
 }
 
 async function recordResult(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, payload: Record<string, unknown>) {
@@ -183,23 +230,71 @@ async function recordResult(admin: ReturnType<typeof createClient>, claim: Recor
   return data;
 }
 
-async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[]) {
+function classifyChange(claim: Record<string, unknown>, fetched: Record<string, unknown>, changeStatus: string) {
+  if (changeStatus === "unchanged") return { confidence: "exact", reasons: ["content_hash_equal"] };
+  if (changeStatus === "first_seen") return { confidence: "baseline", reasons: ["first_seen"] };
+  if (claim.previous_normalization_version && claim.previous_normalization_version !== fetched.normalizationVersion) {
+    return { confidence: "medium", reasons: ["normalization_version_changed"] };
+  }
+  if (claim.previous_semantic_hash && claim.previous_semantic_hash === fetched.semanticHash) {
+    return { confidence: "low", reasons: ["content_changed_semantic_signals_equal"] };
+  }
+  if (claim.previous_semantic_hash && fetched.semanticHash) {
+    return { confidence: "high", reasons: ["semantic_event_signals_changed"] };
+  }
+  return { confidence: "medium", reasons: ["content_hash_changed"] };
+}
+
+async function recordObservation(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, payload: Record<string, unknown>, userAgent: string) {
+  const { data, error } = await admin.rpc("record_source_crawl_observation", {
+    p_job_id: claim.job_id,
+    p_semantic_hash: payload.semanticHash ?? null,
+    p_normalization_version: payload.normalizationVersion ?? null,
+    p_change_confidence: payload.changeConfidence ?? null,
+    p_change_reasons: payload.changeReasons ?? [],
+    p_http_status: payload.httpStatus ?? null,
+    p_response_time_ms: payload.responseTimeMs ?? null,
+    p_content_length: payload.contentLength ?? null,
+    p_pinned_ip: payload.pinnedIp ?? null,
+    p_error_type: payload.errorType ?? null,
+    p_retry_after_seconds: payload.retryAfterSeconds ?? null,
+    p_user_agent: userAgent
+  });
+  if (error) throw new Error(`Observation transaction failed: ${cleanError(error)}`);
+  return data;
+}
+
+async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
   const startedAt = Date.now();
+  const { error: domainPolicyEnsureError } = await admin
+    .from("crawler_domain_policies")
+    .upsert({ source_host: claim.source_host }, { onConflict: "source_host", ignoreDuplicates: true });
+  if (domainPolicyEnsureError) throw new Error(`Domain policy ensure failed: ${cleanError(domainPolicyEnsureError)}`);
   const { data: policyRow, error: policyError } = await admin
     .from("crawler_domain_policies")
-    .select("respect_robots_txt,request_timeout_ms,max_response_bytes,max_redirects,robots_cache_hours,allowed_content_types,allow_http")
+    .select("respect_robots_txt,request_timeout_ms,max_response_bytes,max_redirects,robots_cache_hours,allowed_content_types,allow_http,robots_crawl_delay_seconds")
     .eq("source_host", claim.source_host)
     .maybeSingle();
   if (policyError) throw new Error(`Domain policy unavailable: ${cleanError(policyError)}`);
+  const { data: semanticContext, error: semanticContextError } = await admin
+    .from("event_sources")
+    .select("last_semantic_hash,last_normalization_version")
+    .eq("id", claim.source_id)
+    .single();
+  if (semanticContextError) throw new Error(`Semantic source context unavailable: ${cleanError(semanticContextError)}`);
+  claim.previous_semantic_hash = semanticContext.last_semantic_hash;
+  claim.previous_normalization_version = semanticContext.last_normalization_version;
   const policy = { ...defaultPolicy(), ...(policyRow || {}) };
   const fetchPolicy = toFetchPolicy(policy);
 
   try {
-    await checkRobots(admin, claim, policy, fetchPolicy, blockedHostnames);
+    await checkRobots(admin, claim, policy, fetchPolicy, blockedHostnames, fetchImpl);
     const fetched = await fetchSource(String(claim.source_url), {
       policy: fetchPolicy,
       blockedHostnames,
       resolveDns: resolvePublicDns,
+      fetchImpl,
+      requirePinnedTransport: true,
       previousHash: claim.previous_content_hash,
       etag: claim.previous_etag,
       lastModified: claim.previous_last_modified
@@ -207,6 +302,7 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     const changeStatus = fetched.notModified || fetched.contentHash === claim.previous_content_hash
       ? "unchanged"
       : claim.previous_content_hash ? "changed" : "first_seen";
+    const classification = classifyChange(claim, fetched, changeStatus);
     const transaction = await recordResult(admin, claim, workerId, {
       outcome: "success",
       retriable: false,
@@ -214,13 +310,20 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       changeStatus,
       normalizedExcerpt: changeStatus === "changed" ? fetched.normalized.slice(0, 4000) : null
     });
-    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, transaction };
+    const observation = await recordObservation(admin, claim, {
+      ...fetched,
+      semanticHash: fetched.semanticHash || claim.previous_semantic_hash || null,
+      normalizationVersion: fetched.normalizationVersion || claim.previous_normalization_version || null,
+      changeConfidence: classification.confidence,
+      changeReasons: classification.reasons
+    }, String(fetchPolicy.userAgent));
+    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation };
   } catch (error) {
     const failure = error instanceof SourceFetchError
       ? error
       : new SourceFetchError("worker_error", cleanError(error), { retriable: true });
     const metadata = failure.metadata || {};
-    const changeStatus = ["unsupported_content_type", "empty_content", "response_too_large"].includes(failure.code)
+    const changeStatus = ["unsupported_content_type", "unsupported_content_encoding", "empty_content", "response_too_large"].includes(failure.code)
       ? "content_invalid" : "unreachable";
     const transaction = await recordResult(admin, claim, workerId, {
       outcome: "error",
@@ -237,8 +340,78 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       retryAfterSeconds: failure.retryAfterSeconds,
       normalizedExcerpt: failure.message
     });
-    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction };
+    const observation = await recordObservation(admin, claim, {
+      httpStatus: failure.httpStatus ?? metadata.httpStatus ?? null,
+      responseTimeMs: metadata.responseTimeMs ?? Date.now() - startedAt,
+      contentLength: metadata.contentLength ?? null,
+      pinnedIp: metadata.pinnedIp ?? null,
+      errorType: failure.code,
+      retryAfterSeconds: failure.retryAfterSeconds,
+      changeConfidence: "technical",
+      changeReasons: [failure.code]
+    }, String(fetchPolicy.userAgent));
+    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation };
   }
+}
+
+async function runProductionSmoke(admin: ReturnType<typeof createClient>, supabaseUrl: string, fetchImpl: typeof fetch) {
+  const startedAt = Date.now();
+  const { data: settings, error: settingsError } = await admin
+    .from("source_monitor_settings")
+    .select("singleton,worker_batch_size,global_max_processing")
+    .eq("singleton", true)
+    .single();
+  if (settingsError) throw new Error(`Source Monitor schema probe failed: ${cleanError(settingsError)}`);
+
+  let ssrfBlocked = false;
+  try {
+    await validateSourceUrl("http://127.0.0.1/latest/meta-data", {
+      allowHttp: true,
+      blockedHostnames: internalHostnames(supabaseUrl),
+      resolveDns: resolvePublicDns
+    });
+  } catch (error) {
+    ssrfBlocked = error instanceof SourceFetchError && error.code === "ssrf_blocked";
+  }
+  if (!ssrfBlocked) throw new Error("SSRF self-test did not block loopback.");
+
+  const fetched = await fetchSource("https://example.com/", {
+    policy: {
+      requestTimeoutMs: 10000,
+      maxResponseBytes: 250000,
+      maxRedirects: 2,
+      allowedContentTypes: ["text/html"],
+      allowHttp: false,
+      userAgent: configuredUserAgent()
+    },
+    blockedHostnames: internalHostnames(supabaseUrl),
+    resolveDns: resolvePublicDns,
+    fetchImpl,
+    requirePinnedTransport: true
+  });
+  if (!fetched.contentHash || !fetched.semanticHash) throw new Error("Smoke fetch did not produce both hashes.");
+  return {
+    ok: true,
+    worker_version: WORKER_VERSION,
+    checks: {
+      database: Boolean(settings?.singleton),
+      ssrf_loopback_blocked: ssrfBlocked,
+      dns_pinned: Boolean(fetched.pinnedIp),
+      tls_verified: fetched.finalUrl?.startsWith("https://"),
+      content_hash: true,
+      semantic_hash: true,
+      contact_user_agent: configuredUserAgent().includes("kontakt@sporteventmap.com")
+    },
+    target: {
+      http_status: fetched.httpStatus,
+      final_url: fetched.finalUrl,
+      pinned_ip: fetched.pinnedIp,
+      response_time_ms: fetched.responseTimeMs,
+      content_length: fetched.contentLength,
+      normalization_version: fetched.normalizationVersion
+    },
+    duration_ms: Date.now() - startedAt
+  };
 }
 
 Deno.serve(async request => {
@@ -255,6 +428,20 @@ Deno.serve(async request => {
   const sourceId = typeof body.source_id === "string" && body.source_id ? body.source_id : null;
   const workerId = `edge-${crypto.randomUUID()}`;
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  let fetchImpl: typeof fetch;
+  try {
+    fetchImpl = pinnedTransport();
+  } catch (error) {
+    return response({ error: cleanError(error), worker_version: WORKER_VERSION }, 500);
+  }
+
+  if (body.action === "smoke") {
+    if (!["smoke", "service_role", "admin"].includes(authorized.kind)) {
+      return response({ error: "Dedicated smoke, service-role or admin authorization required" }, 403);
+    }
+    try { return response(await runProductionSmoke(admin, supabaseUrl, fetchImpl)); }
+    catch (error) { return response({ ok: false, worker_version: WORKER_VERSION, error: cleanError(error) }, 500); }
+  }
 
   const { data: run, error: runError } = await admin.from("data_workflow_runs").insert({
     job_type: "source_crawl", run_status: "running", trigger_source: authorized.kind,
@@ -280,7 +467,7 @@ Deno.serve(async request => {
 
     const blockedHostnames = internalHostnames(supabaseUrl);
     const results = await Promise.all((claimed || []).map((claim: Record<string, unknown>) =>
-      processClaim(admin, claim, workerId, blockedHostnames)
+      processClaim(admin, claim, workerId, blockedHostnames, fetchImpl)
     ));
     const changed = results.filter(result => result.status === "changed").length;
     const errors = results.filter(result => result.error_type).length;

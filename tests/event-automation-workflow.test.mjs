@@ -40,7 +40,7 @@ assert.ok(exceptions.includes("es_canary_islands"));
 assert.ok(scheduler.includes("vault.decrypted_secrets"));
 assert.ok(scheduler.includes("sem-event-source-check"));
 
-assert.ok(worker.includes("robotsAllows"));
+assert.ok(worker.includes("evaluateRobots"));
 assert.ok(sourceMonitor.includes("retry_backoff_minutes"));
 assert.ok(sourceMonitor.includes("event_change_proposals"));
 assert.ok(worker.includes("claim_source_crawl_jobs"));

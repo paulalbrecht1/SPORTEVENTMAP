@@ -5050,7 +5050,7 @@ function renderSourceMonitor() {
       return `<tr data-source-id="${source.id}">
         <td data-label="Event / Austragung"><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${source.event_id}`)}</strong><span>${escapeAdminHTML(edition ? `${edition.edition_year} | ${edition.edition_status}` : "Eventquelle")}</span></td>
         <td data-label="Quelle"><strong>${escapeAdminHTML(source.source_host || "--")}</strong><span>${escapeAdminHTML(source.source_type || "--")}</span></td>
-        <td data-label="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} Fehler</span></td>
+        <td data-label="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} Fehler</span><span>Confidence ${escapeAdminHTML(result?.change_confidence || "--")} | IP ${escapeAdminHTML(result?.pinned_ip || source.last_pinned_ip || "--")}</span></td>
         <td data-label="Pruefplan"><span>${formatDataOpsDate(source.last_fetched_at, true)}</span><label>Naechster Crawl<input type="datetime-local" data-source-next value="${toDateTimeLocal(source.next_fetch_at)}"></label></td>
         <td data-label="Review"><strong>${escapeAdminHTML(review?.priority || "--")}</strong><span>${escapeAdminHTML(review?.title || job?.status || "kein offenes Review")}</span></td>
         <td data-label="Aktionen"><div class="source-monitor-actions">
@@ -5071,14 +5071,14 @@ function renderSourceMonitor() {
 async function showSourceMonitorHistory(sourceId, label) {
   setSourceMonitorStatus("Crawl-Historie wird geladen ...");
   const { data, error } = await supabaseClient.from("source_crawl_results")
-    .select("id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,change_status,processing_status,error_type,error_message,worker_version")
+    .select("id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version")
     .eq("source_id", sourceId).order("fetched_at", { ascending: false }).limit(200);
   if (error) { setSourceMonitorStatus(getFriendlyErrorMessage(error, "Historie konnte nicht geladen werden."), "error"); return; }
   sourceMonitorElements.historyTitle.textContent = label || sourceId;
   sourceMonitorElements.historyList.innerHTML = (data || []).map(row => `<article class="admin-data-operations-history-row">
     <div><strong>${escapeAdminHTML(row.change_status)} | HTTP ${escapeAdminHTML(row.http_status ?? "--")}</strong><span>${formatDataOpsDate(row.fetched_at, true)} | ${escapeAdminHTML(row.worker_version)}</span></div>
     <p>${escapeAdminHTML(row.final_url || row.error_message || "Keine Zusatzinformation")}</p>
-    <code>${escapeAdminHTML(JSON.stringify({ redirects: row.redirect_count, duration_ms: row.response_time_ms, content_type: row.content_type, content_length: row.content_length, previous_hash: row.previous_content_hash, hash: row.content_hash, processing: row.processing_status, error: row.error_type }, null, 2))}</code>
+    <code>${escapeAdminHTML(JSON.stringify({ redirects: row.redirect_count, duration_ms: row.response_time_ms, content_type: row.content_type, content_length: row.content_length, pinned_ip: row.pinned_ip, normalization: row.normalization_version, confidence: row.change_confidence, reasons: row.change_reasons, previous_hash: row.previous_content_hash, hash: row.content_hash, previous_semantic_hash: row.previous_semantic_hash, semantic_hash: row.semantic_hash, processing: row.processing_status, error: row.error_type }, null, 2))}</code>
   </article>`).join("") || '<p class="admin-quality-empty">Noch keine Crawl-Ergebnisse.</p>';
   sourceMonitorElements.history.hidden = false;
   sourceMonitorElements.history.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -5131,12 +5131,12 @@ async function loadDataOperations() {
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
-    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_fetched_at,next_fetch_at,created_at"),
+    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
     loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
     loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
     loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
-    loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,change_status,processing_status,error_type,error_message,worker_version,created_at"),
+    loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
     loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at")
   ]);
   const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult].find(result => result.error);

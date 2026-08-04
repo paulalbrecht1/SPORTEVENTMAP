@@ -2,6 +2,11 @@
 
 Queue-backed, server-only Source Monitor worker.
 
+Worker `source-monitor-3.2.0` führt nach einem neuen oder geänderten Crawl die
+deterministische Stufe-3-Extraktion aus. Feldwerte werden normalisiert und als
+`event_change_proposals` gespeichert; der Worker schreibt keine extrahierten
+öffentlichen Eventfakten. Details: `docs/SOURCE_MONITOR_EXTRACTION.md`.
+
 - Authenticates Supabase Cron with an anon JWT plus one-way verified Cron secret, or accepts a verified Admin/service-role token.
 - Calls the bounded scheduler, then atomically leases at most 20 jobs (default 5).
 - Resolves and validates DNS for every URL and redirect, then connects directly to the approved IP while retaining hostname-based TLS verification.

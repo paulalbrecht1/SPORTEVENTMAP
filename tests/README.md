@@ -59,3 +59,11 @@ npm run test:rls
 
 The script creates temporary rows prefixed with `[RLS TEST]` and removes them
 when the run completes. Do not use production user passwords.
+
+## Source-Monitor-Extraktion
+
+`npm run test:source-monitor` enthält die reproduzierbare Stufe-3-Suite
+`source-monitor-extraction.test.mjs`. Ihre lokalen HTML-Fixtures liegen unter
+`tests/fixtures/source-extraction/` und decken JSON-LD, Datumssprachen und
+-bereiche, negative Datumskontexte, Status, Adapter, neue Editionen, Duplikate,
+Feldsperren und den transaktionalen Race-Guard ab.

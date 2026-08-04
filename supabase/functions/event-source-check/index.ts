@@ -8,11 +8,12 @@ import {
   validateSourceUrl
 } from "../_shared/source-monitor-core.mjs";
 import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
+import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-3.1.0";
+const WORKER_VERSION = "source-monitor-3.2.0";
 const DEFAULT_BATCH_SIZE = 5;
-const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)";
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -327,6 +328,60 @@ async function recordLifecycleSignals(
   }
   return { editions: editionCount, results: resultCount };
 }
+
+async function recordExtractionSignals(
+  admin: ReturnType<typeof createClient>,
+  claim: Record<string, unknown>,
+  fetched: Record<string, unknown>,
+  crawlResultId: string | null,
+  changeStatus: string
+) {
+  if (!crawlResultId || fetched.notModified || !fetched.rawText || !["changed", "first_seen"].includes(changeStatus)) {
+    return { candidates: 0, proposals: 0, adapters: [] };
+  }
+  const [eventResult, editionsResult, proposalsResult, controlsResult] = await Promise.all([
+    admin.from("events")
+      .select("id,event_name,canonical_name,sport,country,region,city,address,latitude,longitude,event_status,organizer_name,description,image")
+      .eq("id", claim.event_id).single(),
+    admin.from("event_editions")
+      .select("id,event_id,edition_year,start_date,end_date,start_time,registration_url,registration_status,edition_status,price_min,price_max,currency,participant_limit,race_formats")
+      .eq("event_id", claim.event_id).order("edition_year", { ascending: false }),
+    admin.from("event_change_proposals")
+      .select("field_name,normalized_value,proposal_status,reviewed_at,created_at")
+      .eq("event_id", claim.event_id).order("created_at", { ascending: false }).limit(500),
+    admin.from("event_field_controls")
+      .select("edition_id,field_name,is_locked,manual_value,lock_reason,lock_expires_at,source_priority")
+      .eq("event_id", claim.event_id)
+  ]);
+  const contextError = eventResult.error || editionsResult.error || proposalsResult.error || controlsResult.error;
+  if (contextError) throw new Error(`Extraction context failed: ${cleanError(contextError)}`);
+
+  const editions = editionsResult.data || [];
+  const targetEdition = claim.edition_id
+    ? editions.find(edition => String(edition.id) === String(claim.edition_id))
+    : editions.find(edition => String(edition.end_date || edition.start_date || "") >= new Date().toISOString().slice(0, 10)) || editions[0] || null;
+  const extraction = extractEventChanges(String(fetched.rawText), {
+    contentType: String(fetched.contentType || "text/html"),
+    sourceUrl: String(fetched.finalUrl || claim.source_url),
+    event: eventResult.data,
+    edition: targetEdition,
+    editions,
+    previousProposals: proposalsResult.data || [],
+    fieldControls: (controlsResult.data || []).filter(control => !control.edition_id || String(control.edition_id) === String(targetEdition?.id)),
+    source: { source_type: claim.source_type, source_url: claim.source_url }
+  });
+  if (!extraction.proposals.length) {
+    return { candidates: extraction.candidates.length, proposals: 0, adapters: extraction.adapters, diagnostics: extraction.diagnostics };
+  }
+  const { data, error } = await admin.rpc("record_extraction_proposals", {
+    p_source_id: claim.source_id,
+    p_crawl_result_id: crawlResultId,
+    p_proposals: extraction.proposals,
+    p_worker_version: WORKER_VERSION
+  });
+  if (error) throw new Error(`Extraction proposal transaction failed: ${cleanError(error)}`);
+  return { candidates: extraction.candidates.length, proposals: extraction.proposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data };
+}
 async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
   const startedAt = Date.now();
   const { error: domainPolicyEnsureError } = await admin
@@ -380,13 +435,19 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       changeConfidence: classification.confidence,
       changeReasons: classification.reasons
     }, String(fetchPolicy.userAgent));
+    let extraction: Record<string, unknown> = { candidates: 0, proposals: 0, adapters: [], error: null };
+    try {
+      extraction = { ...extraction, ...await recordExtractionSignals(admin, claim, fetched, transaction?.result_id || null, changeStatus) };
+    } catch (error) {
+      extraction.error = cleanError(error);
+    }
     let lifecycle = { editions: 0, results: 0, error: null as string | null };
     try {
       lifecycle = { ...lifecycle, ...await recordLifecycleSignals(admin, claim, fetched, transaction?.result_id || null) };
     } catch (error) {
       lifecycle.error = cleanError(error);
     }
-    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, lifecycle };
+    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, lifecycle };
   } catch (error) {
     const failure = error instanceof SourceFetchError
       ? error

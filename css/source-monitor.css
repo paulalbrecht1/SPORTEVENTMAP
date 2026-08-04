@@ -66,6 +66,28 @@ body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-colo
 #adminModal .admin-secondary-details-body { padding: 4px 14px 16px; border-top: 1px solid rgba(148, 163, 184, .18); }
 #adminModal .source-monitor-section { padding: 0; }
 #adminModal .source-monitor-content { padding-top: 14px; }
+#adminModal .proposal-review-filters { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 8px; margin: 10px 0 14px; }
+#adminModal .proposal-review-filters label { display: grid; gap: 4px; color: var(--text-muted, #aeb8c7); font-size: .67rem; }
+#adminModal .proposal-review-filters select { min-height: 36px; padding: 6px 26px 6px 8px; border: 1px solid rgba(148, 163, 184, .3); border-radius: 8px; background: #0f172a; color: #f8fafc; }
+#adminModal .proposal-review-card { display: grid; gap: 10px; border-left: 4px solid #f59e0b; }
+#adminModal .proposal-review-card.is-critical { border-left-color: #ef4444; background: rgba(127, 29, 29, .16); }
+#adminModal .proposal-review-card.is-high { border-left-color: #f97316; }
+#adminModal .proposal-review-heading { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+#adminModal .proposal-review-heading > div { display: grid; gap: 4px; }
+#adminModal .proposal-review-heading small { color: var(--text-muted, #aeb8c7); }
+#adminModal .proposal-review-heading > b { padding: 6px 8px; border-radius: 999px; background: rgba(16, 185, 129, .16); color: #86efac; font-size: .75rem; }
+#adminModal .proposal-review-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+#adminModal .proposal-review-diff > div { display: grid; gap: 4px; min-width: 0; padding: 9px; border-radius: 8px; background: rgba(15, 23, 42, .55); }
+#adminModal .proposal-review-diff span, #adminModal .proposal-review-meta dt { color: var(--text-muted, #aeb8c7); font-size: .65rem; }
+#adminModal .proposal-review-diff del { color: #fca5a5; overflow-wrap: anywhere; }
+#adminModal .proposal-review-diff strong { color: #86efac; overflow-wrap: anywhere; }
+#adminModal .proposal-review-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0; }
+#adminModal .proposal-review-meta dd { margin: 2px 0 0; overflow-wrap: anywhere; font-size: .71rem; }
+#adminModal .proposal-review-evidence { padding: 8px; border: 1px solid rgba(148, 163, 184, .2); border-radius: 8px; }
+#adminModal .proposal-review-evidence summary { cursor: pointer; font-size: .71rem; }
+#adminModal .proposal-review-evidence p { max-height: 130px; margin: 8px 0 0; overflow: auto; overflow-wrap: anywhere; font-family: ui-monospace, monospace; font-size: .66rem; }
+#adminModal .proposal-review-warnings { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; color: #fde68a; font-size: .68rem; }
+#adminModal .proposal-review-warnings span { padding: 3px 6px; border-radius: 999px; background: rgba(245, 158, 11, .14); }
 
 body[data-theme="light"] #adminModal .admin-review-inbox { border-color: #86cfae; background: linear-gradient(145deg, #f0fdf4, #fff); }
 body[data-theme="light"] #adminModal .admin-review-inbox-toolbar select { border-color: #cbd5e1; background: #fff; color: #172033; }
@@ -75,6 +97,9 @@ body[data-theme="light"] #adminModal .admin-review-diff del { color: #b91c1c; }
 body[data-theme="light"] #adminModal .admin-review-diff strong { color: #166534; }
 body[data-theme="light"] #adminModal .admin-secondary-details { border-color: #d5dce6; background: #f8fafc; }
 body[data-theme="light"] #adminModal .admin-secondary-details-body { border-color: #e2e8f0; }
+body[data-theme="light"] #adminModal .proposal-review-filters select { border-color: #cbd5e1; background: #fff; color: #172033; }
+body[data-theme="light"] #adminModal .proposal-review-diff > div { background: #f8fafc; }
+body[data-theme="light"] #adminModal .proposal-review-heading > b { color: #166534; }
 @media (max-width: 1000px) { #adminModal .source-monitor-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) {
   #adminModal .source-monitor-section { padding: 12px; }
@@ -97,5 +122,7 @@ body[data-theme="light"] #adminModal .admin-secondary-details-body { border-colo
   #adminModal .admin-secondary-details > summary { align-items: flex-start; }
   #adminModal .admin-secondary-details > summary > span:last-of-type { display: none; }
   #adminModal .admin-secondary-details-body { padding: 4px 10px 12px; }
+  #adminModal .proposal-review-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #adminModal .proposal-review-diff, #adminModal .proposal-review-meta { grid-template-columns: minmax(0, 1fr); }
   body[data-theme="light"] #adminModal .source-monitor-table tr { background: #fff; border-color: #ccd5e2; }
 }

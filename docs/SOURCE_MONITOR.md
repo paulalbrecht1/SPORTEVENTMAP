@@ -1,5 +1,7 @@
 # Source Monitor
 
+Die automatische Feldextraktion, Normalisierung, Confidence-Bewertung und Admin-Review aus Stufe 3 ist in [SOURCE_MONITOR_EXTRACTION.md](SOURCE_MONITOR_EXTRACTION.md) dokumentiert.
+
 ## Zweck und Sicherheitsgrenze
 
 Der Source Monitor prueft bestehende offizielle Event- und Registrierungsseiten serverseitig. Er speichert technische Abrufdaten, vergleicht normalisierte Content-Hashes und erzeugt Review-Aufgaben. Er überschreibt keine bestehenden öffentlichen Event-Fakten wie Name, Datum, Ort, Distanz, Beschreibung oder Anmeldelink. Als eng begrenzte Ausnahme darf die Lifecycle-Schicht einen neuen Jahrgang oder offiziellen Ergebnislink nach mehrfacher sicherer Bestätigung veröffentlichen.
@@ -154,7 +156,7 @@ Standardwerte pro Domain:
 - `robots.txt` beachten und 24 Stunden cachen
 - ETag und Last-Modified fuer Conditional Requests nutzen
 - `Retry-After` beachten
-- klarer User-Agent `SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)`
+- klarer User-Agent `SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)`
 
 Die globale Parallelitaet liegt standardmaessig bei 5. Claims enthalten nie zwei laufende Jobs derselben Domain. Robots-Abrufe verwenden ein separates Limit von 250 KB.
 
@@ -187,7 +189,7 @@ Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` 
 Optionale Worker-Konfiguration:
 
 ```text
-SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)
+SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)
 SOURCE_MONITOR_ALLOW_HTTP=false
 SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 SOURCE_MONITOR_SMOKE_SECRET=<mindestens 256 Bit>
@@ -222,7 +224,7 @@ Vor dem Deployment CLI-Befehle immer mit `--help` gegen die installierte Version
 ```bash
 supabase db push
 supabase functions deploy event-source-check --use-api
-supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)"
+supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)"
 supabase secrets set SOURCE_MONITOR_ALLOW_HTTP=false SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 supabase secrets set SOURCE_MONITOR_SMOKE_SECRET="<zufaelliges Secret mit mindestens 256 Bit>"
 ```

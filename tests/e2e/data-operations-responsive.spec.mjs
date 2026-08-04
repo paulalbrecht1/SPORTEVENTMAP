@@ -61,7 +61,7 @@ test("Data Operations stays usable across themes and required viewports", async 
       }, theme);
 
       await expect(page.locator("#adminDataOperationsPanel")).toBeVisible();
-      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(7);
+      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(15);
       await expect(page.locator("#adminDataOperationsPanel input[type=\"date\"]")).toHaveCount(2);
       await expect(page.locator("#runDataValidationBtn")).toBeVisible();
       await expect(page.locator("#editionLifecycleInbox")).toBeVisible();

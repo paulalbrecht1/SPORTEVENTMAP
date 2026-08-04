@@ -612,6 +612,7 @@ await test(
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -638,6 +639,7 @@ await test(
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -808,7 +810,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         body: { p_proposal_id: proposal.data[0].id, p_review_notes: "approved in test" }
       });
       assert.equal(adminApply.response.ok, true, JSON.stringify(adminApply.data));
-      assert.equal(adminApply.data.proposal_status, "approved");
+      assert.equal(adminApply.data.proposal_status, "accepted");
     }
   );
 
@@ -821,6 +823,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",

@@ -4577,6 +4577,14 @@ const dataOpsElements = {
   proposalsList: document.getElementById("dataOpsProposalsList"),
   alertsList: document.getElementById("dataOpsAlertsList"),
   proposalResultCount: document.getElementById("dataOpsProposalResultCount"),
+  proposalStatus: document.getElementById("dataOpsProposalStatusFilter"),
+  proposalType: document.getElementById("dataOpsProposalTypeFilter"),
+  proposalField: document.getElementById("dataOpsProposalFieldFilter"),
+  proposalConfidence: document.getElementById("dataOpsProposalConfidenceFilter"),
+  proposalSource: document.getElementById("dataOpsProposalSourceFilter"),
+  proposalDomain: document.getElementById("dataOpsProposalDomainFilter"),
+  proposalPriority: document.getElementById("dataOpsProposalPriorityFilter"),
+  proposalAge: document.getElementById("dataOpsProposalAgeFilter"),
   alertResultCount: document.getElementById("dataOpsAlertResultCount"),
   country: document.getElementById("dataOpsCountryFilter"),
   sport: document.getElementById("dataOpsSportFilter"),
@@ -4612,7 +4620,7 @@ function ensureDataOpsReviewWorkspace() {
     const styles = document.createElement("link");
     styles.id = "sourceMonitorStyles";
     styles.rel = "stylesheet";
-    styles.href = "css/source-monitor.css?v=20260804-review-inbox-v2";
+    styles.href = "css/source-monitor.css?v=20260815-extraction-v3";
     document.head.appendChild(styles);
   }
   const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
@@ -5044,7 +5052,7 @@ function renderDataOpsIssues() {
   }).join("");
 }
 
-function renderDataOpsProposals() {
+function renderLegacyDataOpsProposals() {
   if (!dataOpsElements.proposalsList) return;
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
   dataOpsElements.proposalResultCount.textContent = `${dataOpsProposals.length} offen`;
@@ -5063,6 +5071,65 @@ function renderDataOpsProposals() {
       </div>
     </article>`;
   }).join("") || '<p class="admin-quality-empty">Keine offenen Änderungsvorschläge.</p>';
+}
+
+function renderDataOpsProposals() {
+  if (!dataOpsElements.proposalsList) return;
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
+  const sourceById = new Map(dataOpsSources.map(source => [String(source.id), source]));
+  const status = dataOpsElements.proposalStatus?.value ?? "pending";
+  const changeType = dataOpsElements.proposalType?.value || "";
+  const field = dataOpsElements.proposalField?.value || "";
+  const confidence = Number(dataOpsElements.proposalConfidence?.value || 0);
+  const sourceType = dataOpsElements.proposalSource?.value || "";
+  const domain = dataOpsElements.proposalDomain?.value || "";
+  const priority = dataOpsElements.proposalPriority?.value || "";
+  const ageDays = Number(dataOpsElements.proposalAge?.value || 0);
+  const country = dataOpsElements.country?.value || "";
+  const sport = dataOpsElements.sport?.value || "";
+  const ageThreshold = ageDays ? Date.now() - ageDays * 86400000 : 0;
+  const visible = dataOpsProposals.filter(proposal => {
+    const source = sourceById.get(String(proposal.source_id));
+    const event = eventById.get(String(proposal.event_id));
+    if (country && event?.country !== country) return false;
+    if (sport && event?.sport !== sport) return false;
+    if (status && proposal.proposal_status !== status) return false;
+    if (changeType && proposal.change_type !== changeType) return false;
+    if (field && proposal.field_name !== field) return false;
+    if (confidence && Number(proposal.confidence || 0) < confidence) return false;
+    if (sourceType && source?.source_type !== sourceType) return false;
+    if (domain && source?.source_host !== domain) return false;
+    if (priority && proposal.priority !== priority) return false;
+    if (ageThreshold && Date.parse(proposal.detected_at || proposal.created_at || 0) < ageThreshold) return false;
+    return true;
+  }).sort((left, right) => {
+    const weight = { critical: 0, high: 1, medium: 2, low: 3 };
+    return (weight[left.priority] ?? 4) - (weight[right.priority] ?? 4) || Number(right.confidence || 0) - Number(left.confidence || 0);
+  });
+  const pendingCount = dataOpsProposals.filter(proposal => proposal.proposal_status === "pending").length;
+  dataOpsElements.proposalResultCount.textContent = `${visible.length} angezeigt · ${pendingCount} offen`;
+  dataOpsElements.proposalsList.innerHTML = visible.map(proposal => {
+    const event = eventById.get(String(proposal.event_id));
+    const edition = editionById.get(String(proposal.edition_id));
+    const source = sourceById.get(String(proposal.source_id));
+    const sourceUrl = safeAdminUrl(proposal.source_url || source?.source_url || "");
+    const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : (event?.slug ? `/event/${encodeURIComponent(event.slug)}/` : "");
+    const isPending = proposal.proposal_status === "pending";
+    const warnings = proposal.validation_warnings || [];
+    return `<article class="admin-data-operations-proposal proposal-review-card is-${escapeAdminHTML(proposal.priority || "medium")}">
+      <div class="proposal-review-heading"><div><span class="admin-data-operations-status is-${escapeAdminHTML(proposal.priority || "medium")}">${escapeAdminHTML(proposal.change_type || proposal.rule_code)}</span><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</strong><small>${escapeAdminHTML(edition?.edition_year || "Event")} · ${escapeAdminHTML(proposal.field_name || "—")}</small></div><b>${(Number(proposal.confidence || 0) * 100).toFixed(1)}%</b></div>
+      <div class="proposal-review-diff"><div><span>Alt</span><del>${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</del></div><div><span>Vorschlag</span><strong>${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value))}</strong></div></div>
+      <dl class="proposal-review-meta"><div><dt>Methode</dt><dd>${escapeAdminHTML(proposal.extraction_method || "—")}</dd></div><div><dt>Quelle</dt><dd>${escapeAdminHTML(source?.source_type || "—")} · ${escapeAdminHTML(source?.source_host || "—")}</dd></div><div><dt>Erkannt</dt><dd>${formatDataOpsDate(proposal.detected_at, true)}</dd></div><div><dt>Status</dt><dd>${escapeAdminHTML(proposal.proposal_status)}</dd></div></dl>
+      ${proposal.source_context ? `<details class="proposal-review-evidence"><summary>Evidenz anzeigen</summary><p>${escapeAdminHTML(proposal.source_context)}</p></details>` : ""}
+      ${warnings.length ? `<div class="proposal-review-warnings"><strong>Validierungswarnungen</strong>${warnings.map(item => `<span>${escapeAdminHTML(item)}</span>`).join("")}</div>` : ""}
+      <div class="admin-data-operations-proposal-actions source-monitor-actions">
+        ${isPending ? `<button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}">Übernehmen</button><button type="button" data-dataops-action="edit-proposal" data-proposal-id="${proposal.id}">Bearbeiten &amp; übernehmen</button><button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">Ablehnen</button><button type="button" data-dataops-action="defer-proposal" data-proposal-id="${proposal.id}">Später prüfen</button><button type="button" data-dataops-action="lock-proposal-field" data-proposal-id="${proposal.id}">Feld sperren</button><button type="button" data-dataops-action="approve-similar" data-proposal-id="${proposal.id}">Ähnliche übernehmen</button>` : ""}
+        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a>` : ""}
+        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event öffnen</a>` : ""}
+      </div>
+    </article>`;
+  }).join("") || '<p class="admin-quality-empty">Keine Änderungsvorschläge für diese Filter.</p>';
 }
 
 function renderDataOpsAlerts() {
@@ -5097,7 +5164,7 @@ function renderDataOperations() {
   setDataOpsKpi("warnings", openIssues.filter(row => row.severity === "warning").length);
   setDataOpsKpi("pastWithoutNext", pastWithoutNext);
   setDataOpsKpi("dueSources", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= new Date().toISOString()).length);
-  setDataOpsKpi("pendingProposals", dataOpsProposals.length);
+  setDataOpsKpi("pendingProposals", dataOpsProposals.filter(row => row.proposal_status === "pending").length);
   setDataOpsKpi("openAlerts", dataOpsAlerts.length);
   renderDataOpsEvents(getDataOpsFilteredRows());
   renderDataOpsIssues();
@@ -5257,7 +5324,7 @@ async function handleEditionLifecycleAction(button) {
       if (item?.item_type === "result") result = await supabaseClient.from("edition_results").update({ publication_status: "archived", result_status: "unavailable", reviewed_at: new Date().toISOString() }).eq("id", item.item_id);
       if (item?.item_type === "proposal") {
         const { data: { user } } = await supabaseClient.auth.getUser();
-        result = await supabaseClient.from("event_change_proposals").update({ proposal_status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user?.id || null, review_notes: "In der Review Inbox abgelehnt." }).eq("id", item.item_id).eq("proposal_status", "pending");
+        result = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: item.item_id, p_action: "rejected", p_review_notes: "In der Review Inbox abgelehnt.", p_rejection_reason: "In der kompakten Review Inbox als nicht maßgeblich abgelehnt." });
       }
       if (result?.error) throw result.error;
       setEditionLifecycleStatus("Ausnahme wurde geschlossen.", "success");
@@ -5418,7 +5485,7 @@ async function loadDataOperations() {
     loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
     loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
-    loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
+    loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,crawl_id,entity_type,rule_code,field_name,old_value,proposed_value,normalized_value,applied_value,proposed_changes,observed_values,confidence,confidence_reasons,change_type,extraction_method,extractor_version,evidence,source_context,validation_warnings,priority,locked_field,reason,source_url,proposal_status,detected_at,reviewed_at,rejection_reason,next_review_at,created_at"),
     loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
     loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
@@ -5438,9 +5505,7 @@ async function loadDataOperations() {
     issue.status === "open" && ["error", "critical"].includes(issue.severity)
   );
   dataOpsSources = sourcesResult.rows || [];
-  dataOpsProposals = (proposalsResult.rows || []).filter(row =>
-    row.proposal_status === "pending" && Object.keys(row.proposed_changes || {}).length > 0
-  );
+  dataOpsProposals = proposalsResult.rows || [];
   dataOpsAlerts = (alertsResult.rows || []).filter(row =>
     row.alert_status === "open" && ["error", "critical"].includes(row.severity)
   );
@@ -5451,6 +5516,10 @@ async function loadDataOperations() {
   editionLifecycleInbox = lifecycleResult.rows || [];
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
+  populateDataOpsSelect(dataOpsElements.proposalType, dataOpsProposals.map(row => row.change_type));
+  populateDataOpsSelect(dataOpsElements.proposalField, dataOpsProposals.map(row => row.field_name));
+  populateDataOpsSelect(dataOpsElements.proposalSource, dataOpsSources.map(row => row.source_type));
+  populateDataOpsSelect(dataOpsElements.proposalDomain, dataOpsSources.map(row => row.source_host));
   renderDataOperations();
   const waitingCount = editionLifecycleInbox.filter(item => item.batch_action === "wait_automation").length;
   const decisionCount = editionLifecycleInbox.length - waitingCount;
@@ -5500,11 +5569,49 @@ async function handleDataOpsAction(button) {
   }
   if (action === "approve-proposal") {
     const notes = "Im Admin-Dashboard geprüft und freigegeben.";
-    const { error } = await supabaseClient.rpc("apply_event_change_proposal", { p_proposal_id: button.dataset.proposalId, p_review_notes: notes });
+    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: button.dataset.proposalId, p_action: "accepted", p_review_notes: notes });
     if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
     return;
   }
-  if (action === "reject-proposal") {
+  const proposal = dataOpsProposals.find(item => String(item.id) === String(button.dataset.proposalId));
+  if (action === "edit-proposal" && proposal) {
+    const entered = window.prompt("Tatsächlich zu übernehmender Wert (Text oder JSON):", formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value));
+    if (entered == null) return;
+    let editedValue;
+    try { editedValue = JSON.parse(entered); } catch { editedValue = entered; }
+    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: "Im Admin-Dashboard bearbeitet und freigegeben.", p_edited_value: editedValue });
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der bearbeitete Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "reject-proposal" && proposal) {
+    const reason = window.prompt("Ablehnungsgrund (wird zur Duplikatunterdrückung gespeichert):", "Quelle oder Wert ist nicht maßgeblich.");
+    if (!reason?.trim()) return;
+    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: proposal.id, p_action: "rejected", p_review_notes: "Im Admin-Dashboard geprüft und nicht übernommen.", p_rejection_reason: reason.trim() });
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "defer-proposal" && proposal) {
+    const nextReview = new Date(Date.now() + 7 * 86400000).toISOString();
+    const { error } = await supabaseClient.from("event_change_proposals").update({ next_review_at: nextReview, review_notes: "Um sieben Tage zurückgestellt." }).eq("id", proposal.id).eq("proposal_status", "pending");
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht zurückgestellt werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "lock-proposal-field" && proposal) {
+    const reason = window.prompt("Begründung für die Feldsperre:", "Manuell durch Admin bestätigt.");
+    if (!reason?.trim()) return;
+    const { error } = await supabaseClient.rpc("set_event_field_control", { p_event_id: proposal.event_id, p_edition_id: proposal.edition_id || null, p_field_name: proposal.field_name, p_manual_value: proposal.old_value, p_reason: reason.trim(), p_is_locked: true, p_source_priority: 1 });
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Das Feld konnte nicht gesperrt werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "approve-similar" && proposal) {
+    const similar = dataOpsProposals.filter(item => item.proposal_status === "pending" && item.field_name === proposal.field_name && JSON.stringify(item.normalized_value) === JSON.stringify(proposal.normalized_value));
+    if (!window.confirm(`${similar.length} ähnliche Vorschläge für „${proposal.field_name}“ kontrolliert übernehmen?`)) return;
+    const results = await Promise.all(similar.map(item => supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: item.id, p_action: "accepted", p_review_notes: "Als ähnlicher Vorschlag gesammelt freigegeben." })));
+    const failed = results.find(result => result.error);
+    if (failed) setDataOpsStatus(getFriendlyErrorMessage(failed.error, "Mindestens ein ähnlicher Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "legacy-reject-proposal") {
     const { data: { user } } = await supabaseClient.auth.getUser();
     const { error } = await supabaseClient.from("event_change_proposals").update({ proposal_status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user?.id || null, review_notes: "Im Admin-Dashboard geprüft und nicht übernommen." }).eq("id", button.dataset.proposalId).eq("proposal_status", "pending");
     if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
@@ -5546,6 +5653,12 @@ async function handleDataOpsAction(button) {
   dataOpsElements.lastCheck,
   dataOpsElements.nextCheck
 ].filter(Boolean).forEach(element => element.addEventListener("change", renderDataOperations));
+
+[
+  dataOpsElements.proposalStatus, dataOpsElements.proposalType, dataOpsElements.proposalField,
+  dataOpsElements.proposalConfidence, dataOpsElements.proposalSource, dataOpsElements.proposalDomain,
+  dataOpsElements.proposalPriority, dataOpsElements.proposalAge
+].filter(Boolean).forEach(element => element.addEventListener("change", renderDataOpsProposals));
 
 document.addEventListener("app-language-changed", () => {
   if (dataOpsElements.panel && !dataOpsElements.panel.hidden) renderDataOperations();

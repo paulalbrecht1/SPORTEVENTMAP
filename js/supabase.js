@@ -4620,7 +4620,7 @@ function ensureDataOpsReviewWorkspace() {
     const styles = document.createElement("link");
     styles.id = "sourceMonitorStyles";
     styles.rel = "stylesheet";
-    styles.href = "css/source-monitor.css?v=20260815-extraction-v3";
+    styles.href = "css/source-monitor.css?v=20260816-stage-four-preparation";
     document.head.appendChild(styles);
   }
   const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
@@ -4714,8 +4714,50 @@ function ensureSourceMonitorSection() {
   operationsRoot.insertBefore(section, dataOpsElements.historyPanel || null);
 }
 
+function ensureStageFourOperationsSection() {
+  const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
+  if (!operationsRoot || document.getElementById("stageFourOperationsCenter")) return;
+  const section = document.createElement("section");
+  section.id = "stageFourOperationsCenter";
+  section.className = "stage-four-center";
+  section.setAttribute("aria-labelledby", "stageFourTitle");
+  section.innerHTML = `
+    <div class="stage-four-heading">
+      <div><span class="admin-eyebrow">Stage 4 · Phase A</span><h4 id="stageFourTitle">Data Operations Center</h4><p>Policy-Simulation, Quellenzuverlässigkeit, Discovery, Dubletten, Geocoding und Länderqualität – ohne automatische Veröffentlichung.</p></div>
+      <div class="stage-four-actions"><button type="button" data-stage-four-action="refresh-metrics">Kennzahlen neu berechnen</button><button type="button" data-stage-four-action="simulate-pending">Offene Vorschläge simulieren</button></div>
+    </div>
+    <div id="stageFourSafetyBanner" class="stage-four-safety" role="status">Stage-4-Konfiguration wird geladen.</div>
+    <p id="stageFourStatus" class="admin-section-status" aria-live="polite"></p>
+    <div class="stage-four-kpis" aria-label="Stage-4-Kennzahlen">
+      <div><span>Simulationen</span><strong id="stageFourDecisionCount">0</strong></div>
+      <div><span>Würde automatisch</span><strong id="stageFourWouldApplyCount">0</strong></div>
+      <div><span>Neue Kandidaten</span><strong id="stageFourDiscoveryCount">0</strong></div>
+      <div><span>Mögliche Dubletten</span><strong id="stageFourDuplicateCount">0</strong></div>
+      <div><span>Geocoding offen</span><strong id="stageFourGeocodingCount">0</strong></div>
+      <div><span>Ø Datenqualität</span><strong id="stageFourQualityScore">–</strong></div>
+    </div>
+    <div class="stage-four-grid">
+      <section><div class="stage-four-section-title"><h5>Policies &amp; Zuverlässigkeit</h5><span id="stageFourReliabilityCount">0 Metriken</span></div><div id="stageFourPoliciesList" class="stage-four-list"></div></section>
+      <section><div class="stage-four-section-title"><h5>Discovery &amp; Dubletten</h5><span id="stageFourDiscoverySummary">0 offen</span></div><div id="stageFourDiscoveryList" class="stage-four-list"></div></section>
+      <section><div class="stage-four-section-title"><h5>Länder &amp; Datenqualität</h5><span>DE → AT → CH</span></div><div id="stageFourCountriesList" class="stage-four-country-grid"></div></section>
+      <section><div class="stage-four-section-title"><h5>Geocoding &amp; Limits</h5><span>Cache + Rate Limits</span></div><div id="stageFourGeocodingList" class="stage-four-list"></div></section>
+    </div>
+    <section class="stage-four-bulk">
+      <div class="stage-four-section-title"><div><h5>Sichere Sammelaktion</h5><p>Erst Vorschau, dann explizite Bestätigung; Phase A simuliert ausschließlich.</p></div><span>max. 100</span></div>
+      <div class="stage-four-bulk-form">
+        <label>Aktion<select id="stageFourBulkAction"><option value="">Bitte wählen</option><option value="confirm_unchanged_sources">Unveränderte Quellen bestätigen</option><option value="accept_safe_registration_changes">Sichere Registrierungsänderungen</option><option value="complete_past_editions">Vergangene Austragungen schließen</option><option value="retry_selected_sources">Quellen erneut prüfen</option><option value="reject_discovery_candidates">Kandidaten ablehnen</option><option value="assign_candidates_to_event">Kandidaten zuordnen</option><option value="reschedule_next_check">Nächste Prüfung verschieben</option></select></label>
+        <label>Datensatztyp<select id="stageFourBulkItemType"><option value="source">Quelle</option><option value="proposal">Vorschlag</option><option value="edition">Austragung</option><option value="discovery_candidate">Eventkandidat</option><option value="event">Event</option></select></label>
+        <label class="stage-four-bulk-ids">IDs, eine pro Zeile<textarea id="stageFourBulkIds" rows="3" placeholder="UUID oder Event-ID"></textarea></label>
+        <button type="button" data-stage-four-action="preview-bulk">Auswirkungen anzeigen</button>
+      </div>
+      <div id="stageFourBulkPreview" class="stage-four-bulk-preview" hidden></div>
+    </section>`;
+  operationsRoot.insertBefore(section, document.getElementById("sourceMonitorSection") || dataOpsElements.historyPanel || null);
+}
+
 ensureDataOpsReviewWorkspace();
 ensureSourceMonitorSection();
+ensureStageFourOperationsSection();
 const sourceMonitorElements = {
   section: document.getElementById("sourceMonitorSection"),
   status: document.getElementById("sourceMonitorStatus"),
@@ -4746,6 +4788,29 @@ const editionLifecycleElements = {
   batch: document.getElementById("editionLifecycleBatch"),
   blocked: document.getElementById("editionLifecycleBlocked")
 };
+const stageFourElements = {
+  section: document.getElementById("stageFourOperationsCenter"),
+  status: document.getElementById("stageFourStatus"),
+  safety: document.getElementById("stageFourSafetyBanner"),
+  policies: document.getElementById("stageFourPoliciesList"),
+  discovery: document.getElementById("stageFourDiscoveryList"),
+  countries: document.getElementById("stageFourCountriesList"),
+  geocoding: document.getElementById("stageFourGeocodingList"),
+  reliabilityCount: document.getElementById("stageFourReliabilityCount"),
+  discoverySummary: document.getElementById("stageFourDiscoverySummary"),
+  bulkAction: document.getElementById("stageFourBulkAction"),
+  bulkItemType: document.getElementById("stageFourBulkItemType"),
+  bulkIds: document.getElementById("stageFourBulkIds"),
+  bulkPreview: document.getElementById("stageFourBulkPreview"),
+  kpis: {
+    decisions: document.getElementById("stageFourDecisionCount"),
+    wouldApply: document.getElementById("stageFourWouldApplyCount"),
+    discovery: document.getElementById("stageFourDiscoveryCount"),
+    duplicates: document.getElementById("stageFourDuplicateCount"),
+    geocoding: document.getElementById("stageFourGeocodingCount"),
+    quality: document.getElementById("stageFourQualityScore")
+  }
+};
 
 const adminTabs =
   document.querySelectorAll(".admin-tab");
@@ -4773,6 +4838,18 @@ let sourceMonitorJobs = [];
 let sourceMonitorResults = [];
 let sourceMonitorReviews = [];
 let editionLifecycleInbox = [];
+let stageFourSettings = null;
+let stageFourPolicies = [];
+let stageFourReliability = [];
+let stageFourDecisions = [];
+let stageFourDiscoverySources = [];
+let stageFourDiscoveryCandidates = [];
+let stageFourDuplicates = [];
+let stageFourGeocodingJobs = [];
+let stageFourCountries = [];
+let stageFourQuality = [];
+let stageFourUsage = [];
+let stageFourBulkOperations = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
@@ -5477,6 +5554,152 @@ async function handleSourceMonitorAction(button) {
   }
 }
 
+function setStageFourStatus(message, type = "") {
+  if (!stageFourElements.status) return;
+  stageFourElements.status.className = `admin-section-status ${type}`.trim();
+  stageFourElements.status.textContent = message;
+}
+
+function setStageFourKpi(key, value) {
+  if (stageFourElements.kpis[key]) stageFourElements.kpis[key].textContent = value;
+}
+
+function renderStageFourOperations() {
+  if (!stageFourElements.section) return;
+  if (!stageFourSettings) {
+    stageFourElements.safety.textContent = "Stage 4 ist noch nicht migriert oder für diesen Admin nicht verfügbar. Stufen 1–3 bleiben uneingeschränkt nutzbar.";
+    stageFourElements.safety.className = "stage-four-safety is-unavailable";
+    return;
+  }
+  const dryRun = stageFourSettings.dry_run !== false;
+  const stopped = stageFourSettings.global_emergency_stop || !stageFourSettings.automation_enabled;
+  stageFourElements.safety.className = `stage-four-safety ${dryRun || stopped ? "is-safe" : "is-live"}`;
+  stageFourElements.safety.innerHTML = `<strong>${dryRun ? "DRY-RUN AKTIV" : "LIVE-MODUS"}</strong><span>Phase ${escapeAdminHTML(stageFourSettings.rollout_phase)} · Automatik ${stageFourSettings.automation_enabled ? "aktiviert" : "deaktiviert"} · Not-Aus ${stageFourSettings.global_emergency_stop ? "aktiv" : "bereit"}</span><small>Limits: ${Number(stageFourSettings.daily_crawl_limit || 0)} Crawls/Tag · ${Number(stageFourSettings.daily_geocoding_limit || 0)} Geocodes/Tag · ${Number(stageFourSettings.maximum_queue_length || 0)} Queue</small>`;
+
+  const openCandidates = stageFourDiscoveryCandidates.filter(row => row.review_status === "pending");
+  const openDuplicates = stageFourDuplicates.filter(row => row.review_status === "pending");
+  const openGeocoding = stageFourGeocodingJobs.filter(row => ["queued", "needs_review", "failed", "rate_limited"].includes(row.job_status));
+  const latestByCountry = new Map();
+  [...stageFourQuality].sort((a, b) => String(b.calculated_at).localeCompare(String(a.calculated_at))).forEach(row => {
+    if (!latestByCountry.has(row.country_code)) latestByCountry.set(row.country_code, row);
+  });
+  const qualityScores = [...latestByCountry.values()].map(row => Number(row.data_quality_score)).filter(Number.isFinite);
+  setStageFourKpi("decisions", stageFourDecisions.length);
+  setStageFourKpi("wouldApply", stageFourDecisions.filter(row => row.recommended_decision === "auto_apply").length);
+  setStageFourKpi("discovery", openCandidates.length);
+  setStageFourKpi("duplicates", openDuplicates.length);
+  setStageFourKpi("geocoding", openGeocoding.length);
+  setStageFourKpi("quality", qualityScores.length ? `${(qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length).toFixed(1)}` : "–");
+
+  stageFourElements.reliabilityCount.textContent = `${stageFourReliability.length} Metriken`;
+  const policiesHtml = stageFourPolicies.sort((a, b) => Number(a.priority) - Number(b.priority)).map(policy => `
+    <article class="stage-four-card"><div><strong>${escapeAdminHTML(policy.name)}</strong><span class="stage-four-decision is-${escapeAdminHTML(policy.decision)}">${escapeAdminHTML(policy.decision)}</span></div><p>${escapeAdminHTML(policy.description)}</p><small>${escapeAdminHTML(policy.policy_code)} · Phase ${escapeAdminHTML(policy.minimum_phase)} · v${Number(policy.policy_version || 1)}</small></article>`).join("");
+  const reliabilityHtml = [...stageFourReliability].sort((a, b) => Number(b.source_reliability_score) - Number(a.source_reliability_score)).slice(0, 8).map(metric => `
+    <article class="stage-four-card stage-four-reliability"><div><strong>${escapeAdminHTML(metric.source_host || metric.source_type || "Quelle")}</strong><b>${(Number(metric.source_reliability_score || 0) * 100).toFixed(1)}%</b></div><p>${escapeAdminHTML(metric.field_name || "alle Felder")} · ${Number(metric.reviewed_count || 0)} Reviews · ${(Number(metric.error_rate || 0) * 100).toFixed(1)}% Fehler</p><small>${escapeAdminHTML(metric.extractor_version || "ohne Extraktorversion")} · ${escapeAdminHTML(metric.country_code || "–")}</small></article>`).join("");
+  stageFourElements.policies.innerHTML = policiesHtml + reliabilityHtml || '<p class="admin-quality-empty">Noch keine Policy- oder Zuverlässigkeitsdaten.</p>';
+
+  stageFourElements.discoverySummary.textContent = `${openCandidates.length} Kandidaten · ${openDuplicates.length} Dubletten`;
+  const eventById = new Map(dataOpsEvents.map(row => [String(row.id), row]));
+  stageFourElements.discovery.innerHTML = openCandidates.slice(0, 12).map(candidate => {
+    const matched = eventById.get(String(candidate.possible_event_id));
+    return `<article class="stage-four-card stage-four-discovery-card"><div><strong>${escapeAdminHTML(candidate.detected_event_name)}</strong><b>${(Number(candidate.confidence || 0) * 100).toFixed(0)}%</b></div><p>${escapeAdminHTML(candidate.possible_start_date || "Datum offen")} · ${escapeAdminHTML(candidate.city || "Ort offen")} · ${escapeAdminHTML(candidate.country_code)} · ${escapeAdminHTML(candidate.sport)}</p><small>${escapeAdminHTML(candidate.match_status)}${matched ? ` · möglicher Treffer: ${escapeAdminHTML(matched.canonical_name || matched.event_name)}` : ""}</small></article>`;
+  }).join("") || '<p class="admin-quality-empty">Keine offenen Discovery-Kandidaten.</p>';
+
+  stageFourElements.countries.innerHTML = stageFourCountries.map(country => `
+    <article class="stage-four-country-card is-${escapeAdminHTML(country.rollout_status)}"><div><strong>${escapeAdminHTML(country.country_code)} · ${escapeAdminHTML(country.country_name)}</strong><span>${escapeAdminHTML(country.rollout_status)}</span></div><b>${country.data_quality_score == null ? "–" : `${Number(country.data_quality_score).toFixed(1)}/100`}</b><dl><div><dt>Events</dt><dd>${Number(country.event_count || 0)}</dd></div><div><dt>Discovery</dt><dd>${Number(country.open_discovery_candidates || 0)}</dd></div><div><dt>Geo-Probleme</dt><dd>${Number(country.open_geocoding_jobs || 0)}</dd></div><div><dt>Kritisch</dt><dd>${Number(country.open_critical_issues || 0)}</dd></div></dl></article>`).join("") || '<p class="admin-quality-empty">Länderstatus noch nicht berechnet.</p>';
+
+  const usageToday = stageFourUsage.filter(row => row.usage_date === new Date().toISOString().slice(0, 10));
+  const geocodesToday = usageToday.reduce((sum, row) => sum + Number(row.geocoding_requests || 0), 0);
+  stageFourElements.geocoding.innerHTML = `<article class="stage-four-card"><div><strong>Tagesbudget</strong><b>${geocodesToday}/${Number(stageFourSettings.daily_geocoding_limit || 0)}</b></div><p>Provider-Aufrufe werden gecacht; deaktivierte Länder und überschrittene Limits werden als rate_limited gespeichert.</p></article>` + openGeocoding.slice(0, 8).map(job => `
+    <article class="stage-four-card"><div><strong>${escapeAdminHTML(job.original_location_text)}</strong><span class="stage-four-decision is-review">${escapeAdminHTML(job.job_status)}</span></div><p>${escapeAdminHTML(job.normalized_address)} · ${escapeAdminHTML(job.country_code)} · ${escapeAdminHTML(job.provider)}</p><small>${escapeAdminHTML((job.validation_warnings || []).join(", ") || job.error_message || "wartet auf Verarbeitung")}</small></article>`).join("");
+}
+
+async function loadStageFourRecent(table, columns, orderColumn, limit = 1000) {
+  const { data, error } = await supabaseClient.from(table).select(columns)
+    .order(orderColumn, { ascending: false }).limit(limit);
+  return { rows: data || [], error };
+}
+
+async function loadStageFourOperations() {
+  if (!stageFourElements.section) return;
+  const results = await Promise.all([
+    loadAdminTablePages("stage_four_settings", "singleton,automation_enabled,dry_run,rollout_phase,maximum_parallel_workers,daily_crawl_limit,daily_geocoding_limit,daily_ai_cost_cents,maximum_queue_length,maximum_candidates_per_source,reliability_minimum_sample,reliability_auto_threshold,global_emergency_stop,change_reason,updated_at"),
+    loadAdminTablePages("automation_policies", "id,policy_code,policy_version,name,description,priority,decision,minimum_phase,field_names,change_types,action_codes,minimum_confidence,minimum_reliability,minimum_reviewed_sample,maximum_error_rate,enabled"),
+    loadAdminTablePages("source_reliability_metrics", "id,source_id,source_host,source_type,extractor_version,adapter_version,field_name,country_code,proposal_count,reviewed_count,acceptance_rate,rejection_rate,error_rate,average_confidence,source_reliability_score,score_reasons,calculated_at"),
+    loadStageFourRecent("automation_decisions", "id,proposal_id,event_id,edition_id,policy_code,action_code,recommended_decision,effective_decision,decision_status,dry_run,confidence,reliability_score,decision_reasons,evaluated_at", "evaluated_at"),
+    loadAdminTablePages("discovery_sources", "id,source_name,source_type,country_code,source_url,discovery_method,adapter_version,is_official,is_active,is_paused,last_discovered_at,next_discovery_at,last_error"),
+    loadStageFourRecent("discovery_candidates", "id,discovery_source_id,detected_event_name,normalized_event_name,possible_start_date,city,region,country_code,sport,distances,official_url,registration_url,confidence,possible_event_id,match_status,geocoding_status,validation_warnings,review_status,detected_at", "detected_at"),
+    loadStageFourRecent("duplicate_candidates", "id,discovery_candidate_id,left_event_id,right_event_id,matched_event_id,duplicate_score,classification,match_factors,review_status,created_at", "created_at"),
+    loadStageFourRecent("geocoding_jobs", "id,event_id,discovery_candidate_id,request_reason,original_location_text,normalized_address,country_code,provider,job_status,latitude,longitude,confidence,validation_warnings,requested_at,error_message", "requested_at"),
+    loadAdminTablePages("stage_four_country_dashboard", "country_code,country_name,rollout_status,discovery_enabled,geocoding_enabled,automation_enabled,quality_target,event_count,active_event_count,data_quality_score,score_factors,open_critical_issues,open_warnings,possible_duplicates,open_discovery_candidates,open_geocoding_jobs"),
+    loadStageFourRecent("data_quality_snapshots", "id,country_code,event_count,active_event_count,data_quality_score,score_factors,open_critical_issues,open_warnings,possible_duplicates,past_without_successor,calculated_at", "calculated_at"),
+    loadStageFourRecent("stage_four_usage_daily", "usage_date,scope_type,scope_key,crawl_requests,discovery_candidates,geocoding_requests,ai_cost_cents,worker_failures,updated_at", "usage_date"),
+    loadStageFourRecent("bulk_operations", "id,action_code,operation_status,dry_run,affected_count,impact_summary,preview_hash,requested_at,confirmed_at,completed_at,error_message", "requested_at")
+  ]);
+  const failed = results.find(result => result.error);
+  if (failed) {
+    stageFourSettings = null;
+    renderStageFourOperations();
+    console.info("Stage-4 preparation schema is not available yet:", failed.error);
+    return;
+  }
+  stageFourSettings = results[0].rows?.[0] || null;
+  [stageFourPolicies, stageFourReliability, stageFourDecisions, stageFourDiscoverySources,
+    stageFourDiscoveryCandidates, stageFourDuplicates, stageFourGeocodingJobs, stageFourCountries,
+    stageFourQuality, stageFourUsage, stageFourBulkOperations] = results.slice(1).map(result => result.rows || []);
+  renderStageFourOperations();
+  setStageFourStatus(`${stageFourDecisions.length} Policy-Entscheidungen · ${stageFourDiscoveryCandidates.length} Discovery-Kandidaten · kein automatischer Publish.`, "success");
+}
+
+async function handleStageFourAction(button) {
+  const action = button.dataset.stageFourAction;
+  setButtonLoading(button, true, "Bitte warten …");
+  try {
+    if (action === "refresh-metrics") {
+      const [reliability, quality, monitoring] = await Promise.all([
+        supabaseClient.rpc("refresh_source_reliability_metrics", { p_window_days: 90 }),
+        supabaseClient.rpc("refresh_data_quality_snapshots"),
+        supabaseClient.rpc("refresh_stage_four_monitoring")
+      ]);
+      if (reliability.error || quality.error || monitoring.error) throw reliability.error || quality.error || monitoring.error;
+      await loadStageFourOperations();
+    }
+    if (action === "simulate-pending") {
+      const proposals = dataOpsProposals.filter(row => row.proposal_status === "pending").slice(0, 50);
+      if (!proposals.length) throw new Error("Keine offenen Vorschläge für die Simulation.");
+      const results = await Promise.all(proposals.map(proposal => supabaseClient.rpc("evaluate_change_proposal_automation", { p_proposal_id: proposal.id, p_persist: true })));
+      const failed = results.find(result => result.error);
+      if (failed) throw failed.error;
+      await loadStageFourOperations();
+    }
+    if (action === "preview-bulk") {
+      const actionCode = stageFourElements.bulkAction.value;
+      const itemType = stageFourElements.bulkItemType.value;
+      const ids = [...new Set(stageFourElements.bulkIds.value.split(/[\n,;]/).map(value => value.trim()).filter(Boolean))];
+      if (!actionCode || !ids.length) throw new Error("Aktion und mindestens eine ID sind erforderlich.");
+      if (ids.length > 100) throw new Error("Maximal 100 Datensätze pro Sammelaktion.");
+      const impact = `${ids.length} ausgewählte Datensätze · ${actionCode} · Phase A simuliert ohne öffentliche Änderung.`;
+      const { data, error } = await supabaseClient.rpc("prepare_stage_four_bulk_operation", { p_action_code: actionCode, p_item_type: itemType, p_item_ids: ids, p_impact_summary: impact });
+      if (error) throw error;
+      stageFourElements.bulkPreview.hidden = false;
+      stageFourElements.bulkPreview.innerHTML = `<strong>Vorschau: ${Number(data.affected_count)} Datensätze</strong><p>${escapeAdminHTML(data.impact_summary)}</p><ul><li>Transaktional</li><li>Explizite Bestätigung erforderlich</li><li>${data.dry_run ? "Nur Simulation" : "Live-Ausführung"}</li><li>Fehler führen zum Rollback</li></ul><button type="button" data-stage-four-action="execute-bulk" data-operation-id="${data.id}" data-preview-hash="${escapeAdminHTML(data.preview_hash)}">Simulation bestätigen</button>`;
+    }
+    if (action === "execute-bulk") {
+      const operation = stageFourBulkOperations.find(row => String(row.id) === String(button.dataset.operationId));
+      const affected = operation?.affected_count || "die angezeigten";
+      if (!window.confirm(`${affected} Datensätze gemäß Vorschau simulieren? Es werden im Dry-Run keine öffentlichen Daten geändert.`)) return;
+      const { error } = await supabaseClient.rpc("execute_stage_four_bulk_operation", { p_operation_id: button.dataset.operationId, p_preview_hash: button.dataset.previewHash });
+      if (error) throw error;
+      stageFourElements.bulkPreview.hidden = true;
+      await loadStageFourOperations();
+    }
+  } catch (error) {
+    setStageFourStatus(getFriendlyErrorMessage(error, error?.message || "Stage-4-Aktion fehlgeschlagen."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
 async function loadDataOperations() {
   if (!dataOpsElements.panel) return;
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
@@ -5521,6 +5744,7 @@ async function loadDataOperations() {
   populateDataOpsSelect(dataOpsElements.proposalSource, dataOpsSources.map(row => row.source_type));
   populateDataOpsSelect(dataOpsElements.proposalDomain, dataOpsSources.map(row => row.source_host));
   renderDataOperations();
+  await loadStageFourOperations();
   const waitingCount = editionLifecycleInbox.filter(item => item.batch_action === "wait_automation").length;
   const decisionCount = editionLifecycleInbox.length - waitingCount;
   setDataOpsStatus(`${decisionCount} Entscheidungen offen · ${waitingCount} warten auf Automatik · ${dataOpsEvents.length} Events im Bestand.`, "success");
@@ -5673,6 +5897,10 @@ dataOpsElements.panel?.addEventListener("click", event => {
 sourceMonitorElements.section?.addEventListener("click", event => {
   const button = event.target.closest("[data-source-action]");
   if (button) handleSourceMonitorAction(button);
+});
+stageFourElements.section?.addEventListener("click", event => {
+  const button = event.target.closest("[data-stage-four-action]");
+  if (button) handleStageFourAction(button);
 });
 editionLifecycleElements.section?.addEventListener("click", event => {
   const button = event.target.closest("[data-lifecycle-action]");

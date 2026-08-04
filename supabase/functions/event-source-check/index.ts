@@ -11,9 +11,9 @@ import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-3.2.0";
+const WORKER_VERSION = "source-monitor-4.0.0-preparation";
 const DEFAULT_BATCH_SIZE = 5;
-const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)";
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.0-preparation (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -380,7 +380,11 @@ async function recordExtractionSignals(
     p_worker_version: WORKER_VERSION
   });
   if (error) throw new Error(`Extraction proposal transaction failed: ${cleanError(error)}`);
-  return { candidates: extraction.candidates.length, proposals: extraction.proposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data };
+  const { data: automation, error: automationError } = await admin.rpc("simulate_stage_four_for_crawl", {
+    p_crawl_result_id: crawlResultId
+  });
+  if (automationError) throw new Error(`Stage-4 simulation failed: ${cleanError(automationError)}`);
+  return { candidates: extraction.candidates.length, proposals: extraction.proposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data, automation };
 }
 async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
   const startedAt = Date.now();
@@ -441,13 +445,23 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     } catch (error) {
       extraction.error = cleanError(error);
     }
+    let technicalAutomation: Record<string, unknown> = { dry_run: true, public_event_changes: 0, error: null };
+    try {
+      if (transaction?.result_id) {
+        const { data, error } = await admin.rpc("record_stage_four_crawl_automation", { p_crawl_result_id: transaction.result_id });
+        if (error) throw error;
+        technicalAutomation = { ...technicalAutomation, ...(data || {}) };
+      }
+    } catch (error) {
+      technicalAutomation.error = cleanError(error);
+    }
     let lifecycle = { editions: 0, results: 0, error: null as string | null };
     try {
       lifecycle = { ...lifecycle, ...await recordLifecycleSignals(admin, claim, fetched, transaction?.result_id || null) };
     } catch (error) {
       lifecycle.error = cleanError(error);
     }
-    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, lifecycle };
+    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, technical_automation: technicalAutomation, lifecycle };
   } catch (error) {
     const failure = error instanceof SourceFetchError
       ? error

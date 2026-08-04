@@ -42,6 +42,7 @@
     "test:data-workflow": "node tests/event-data-workflow.test.mjs",
     "test:event-automation": "node tests/event-automation-workflow.test.mjs",
     "test:source-monitor": "node tests/source-monitor-core.test.mjs && node tests/source-monitor-pinned-http.test.mjs && node tests/source-monitor-workflow.test.mjs && node tests/source-monitor-extraction.test.mjs",
+    "test:stage-four": "node tests/stage-four-preparation.test.mjs",
     "test:edition-lifecycle": "node tests/edition-lifecycle-workflow.test.mjs && node tests/event-detail-toggle.test.mjs",
     "smoke:source-monitor:production": "node tools/source-monitor-production-smoke.mjs",
     "data:migrate:dry": "node tools/migrate-events-to-editions.js",
@@ -51,7 +52,7 @@
     "test:e2e": "node tests/e2e/run-playwright.mjs",
     "test:e2e:headed": "node tests/e2e/run-playwright.mjs --headed",
     "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
-    "test:all": "npm run check && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
+    "test:all": "npm run check && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
     "test:gate": "npm run check && npm run test:static && npm run audit:layout && npm run test:e2e && npm run test:rls:local && npm run audit:anon"
   },
   "devDependencies": {

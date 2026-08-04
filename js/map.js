@@ -779,6 +779,15 @@ function resetMapFilters() {
 
   }
 
+  const countryFilter =
+    document.getElementById("countryFilter");
+
+  if (countryFilter) {
+
+    countryFilter.value = "all";
+
+  }
+
   const sortSelect =
     document.getElementById("sortSelect");
 

@@ -2,6 +2,9 @@
 
 Die automatische Feldextraktion, Normalisierung, Confidence-Bewertung und Admin-Review aus Stufe 3 ist in [SOURCE_MONITOR_EXTRACTION.md](SOURCE_MONITOR_EXTRACTION.md) dokumentiert.
 
+Die sichere Phase-A-Vorbereitung für Policy-Simulation, Reliability, Discovery,
+Geocoding und DACH-Piloten ist in [STAGE_FOUR_PREPARATION.md](STAGE_FOUR_PREPARATION.md) dokumentiert.
+
 ## Zweck und Sicherheitsgrenze
 
 Der Source Monitor prueft bestehende offizielle Event- und Registrierungsseiten serverseitig. Er speichert technische Abrufdaten, vergleicht normalisierte Content-Hashes und erzeugt Review-Aufgaben. Er überschreibt keine bestehenden öffentlichen Event-Fakten wie Name, Datum, Ort, Distanz, Beschreibung oder Anmeldelink. Als eng begrenzte Ausnahme darf die Lifecycle-Schicht einen neuen Jahrgang oder offiziellen Ergebnislink nach mehrfacher sicherer Bestätigung veröffentlichen.

@@ -46,6 +46,17 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
     document.querySelectorAll("[data-testid='event-card']").length === 4
   );
 
+  if (await page.getByTestId("discovery-panel-toggle").getAttribute("aria-expanded") === "false") {
+    await page.getByTestId("discovery-panel-toggle").click();
+  }
+  await page.locator("#countryFilter").selectOption("DE");
+  await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
+  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await page.locator("#countryFilter").selectOption("AT");
+  await expect(page.getByTestId("event-card")).toHaveCount(0);
+  await page.getByTestId("filter-reset").click();
+  await expect(page.locator("#countryFilter")).toHaveValue("all");
+
   await waitForEventList(page);
   await page.getByTestId("filter-sport-triathlon").click();
   await expect(page.locator("#discoveryFilterCount")).toBeVisible();

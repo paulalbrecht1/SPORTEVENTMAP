@@ -67,3 +67,10 @@ when the run completes. Do not use production user passwords.
 `tests/fixtures/source-extraction/` und decken JSON-LD, Datumssprachen und
 -bereiche, negative Datumskontexte, Status, Adapter, neue Editionen, Duplikate,
 Feldsperren und den transaktionalen Race-Guard ab.
+
+## Stufe-4-Vorbereitung
+
+`npm run test:stage-four` prüft Policy-Entscheidungen und Dry-Run, Reliability,
+Discovery, Dubletten, Geocoding, Rate Limits, Deutschland/Österreich/Schweiz,
+Umlaute und mehrsprachige Schweiz, Währungen, Quality Score, Bulk-Vorschau,
+RLS-/Auditmarker und die mobile Data-Operations-Center-Integration.

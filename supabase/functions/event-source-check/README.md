@@ -1,5 +1,10 @@
 # Event source check
 
+> Stage-4 preparation: Worker `source-monitor-4.0.0-preparation` records every
+> technical and field-level policy decision in simulation mode. Global dry-run
+> prevents automatic content changes; discovery, geocoding and country pilots
+> remain paused until an explicit rollout decision.
+
 Queue-backed, server-only Source Monitor worker.
 
 Worker `source-monitor-3.2.0` führt nach einem neuen oder geänderten Crawl die

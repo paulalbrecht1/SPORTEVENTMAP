@@ -14,6 +14,8 @@ function getActiveFilterAnalytics() {
       selectedDistanceFilters.slice(),
     date:
       document.getElementById("dateFilter")?.value || "all",
+    country:
+      document.getElementById("countryFilter")?.value || "all",
     sort:
       document.getElementById("sortSelect")?.value || "date",
     from:
@@ -939,6 +941,32 @@ function parseInputDate(dateStr) {
   return parsedDate;
 }
 
+function normalizeEventCountryCode(country) {
+  const normalized = String(country || "")
+    .trim()
+    .toLocaleLowerCase("de-DE")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+
+  const aliases = {
+    de: "DE",
+    deutschland: "DE",
+    germany: "DE",
+    allemagne: "DE",
+    at: "AT",
+    osterreich: "AT",
+    austria: "AT",
+    autriche: "AT",
+    ch: "CH",
+    schweiz: "CH",
+    switzerland: "CH",
+    suisse: "CH",
+    svizzera: "CH"
+  };
+
+  return aliases[normalized] || String(country || "").trim().toUpperCase();
+}
+
 
 function updateDateRangeState() {
   const dateRangeFilter =
@@ -993,12 +1021,23 @@ function getActiveFilterLabels(resultCount = null) {
   const sort =
     document.getElementById("sortSelect")?.value || "date";
 
+  const country =
+    document.getElementById("countryFilter")?.value || "all";
+
   if (resultCount !== null) {
     labels.push(`${resultCount} found`);
   }
 
   if (searchValue) {
     labels.push(`Search: ${searchValue}`);
+  }
+
+  if (country !== "all") {
+    labels.push(
+      document.querySelector(`#countryFilter option[value="${country}"]`)
+        ?.textContent
+        .trim() || country
+    );
   }
 
   const sportFilters =
@@ -1071,6 +1110,8 @@ function updateDiscoveryFilterCount() {
     document.getElementById("toggleSidebar");
   const dateFilter =
     document.getElementById("dateFilter")?.value || "all";
+  const countryFilter =
+    document.getElementById("countryFilter")?.value || "all";
   const hasCustomDate = Boolean(
     document.getElementById("dateFromFilter")?.value ||
     document.getElementById("dateToFilter")?.value
@@ -1078,6 +1119,7 @@ function updateDiscoveryFilterCount() {
   const activeCount =
     selectedSportFilters.length +
     selectedDistanceFilters.length +
+    Number(countryFilter !== "all") +
     Number(dateFilter !== "all" || hasCustomDate);
 
   if (countBadge) {
@@ -1102,6 +1144,8 @@ function resetAllFilters() {
     document.getElementById("sortSelect");
   const dateFilter =
     document.getElementById("dateFilter");
+  const countryFilter =
+    document.getElementById("countryFilter");
   const dateFromFilter =
     document.getElementById("dateFromFilter");
   const dateToFilter =
@@ -1110,6 +1154,7 @@ function resetAllFilters() {
   if (searchInput) searchInput.value = "";
   if (sortSelect) sortSelect.value = "date";
   if (dateFilter) dateFilter.value = "all";
+  if (countryFilter) countryFilter.value = "all";
   if (dateFromFilter) dateFromFilter.value = "";
   if (dateToFilter) dateToFilter.value = "";
 
@@ -1317,6 +1362,20 @@ function initSearch() {
       event => {
         trackFilterUsed(
           "sort",
+          event.target.value
+        );
+        applyFilters();
+      }
+    );
+
+  // COUNTRY FILTER
+  document
+    .getElementById("countryFilter")
+    ?.addEventListener(
+      "change",
+      event => {
+        trackFilterUsed(
+          "country",
           event.target.value
         );
         applyFilters();
@@ -1627,6 +1686,16 @@ function applyFilters(zoom = false) {
 
     });
 
+
+  // COUNTRY FILTER
+  const countryFilter =
+    document.getElementById("countryFilter")?.value || "all";
+
+  if (countryFilter !== "all") {
+    filtered = filtered.filter(item =>
+      normalizeEventCountryCode(item.data.country) === countryFilter
+    );
+  }
 
   // DATE FILTER
   const dateFilter =

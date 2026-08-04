@@ -613,6 +613,17 @@ await test(
       "crawler_domain_policies",
       "event_change_proposals",
       "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -640,6 +651,17 @@ await test(
       "crawler_domain_policies",
       "event_change_proposals",
       "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -663,6 +685,13 @@ await test(
           (settings.response.ok && Array.isArray(settings.data) && settings.data.length === 0),
         true,
         "Non-admin Source Monitor settings access was not blocked."
+      );
+      const stageFourSettings = await restRequest("stage_four_settings?select=singleton,dry_run,automation_enabled", token ? { token } : {});
+      assert.equal(
+        stageFourSettings.response.status === 401 || stageFourSettings.response.status === 403 ||
+          (stageFourSettings.response.ok && Array.isArray(stageFourSettings.data) && stageFourSettings.data.length === 0),
+        true,
+        "Non-admin Stage-4 settings access was not blocked."
       );
     }
 
@@ -804,6 +833,21 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(normalApply.response.ok, false);
 
+      const normalSimulation = await restRequest("rpc/evaluate_change_proposal_automation", {
+        token: userA.token,
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_persist: true }
+      });
+      assert.equal(normalSimulation.response.ok, false);
+
+      const simulation = await serviceRequest("rpc/evaluate_change_proposal_automation", {
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_persist: true }
+      });
+      assert.equal(simulation.response.ok, true, JSON.stringify(simulation.data));
+      assert.equal(simulation.data.dry_run, true);
+      assert.equal(simulation.data.effective_decision, "block");
+
       const adminApply = await restRequest("rpc/apply_event_change_proposal", {
         token: admin.token,
         method: "POST",
@@ -824,6 +868,17 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "crawler_domain_policies",
       "event_change_proposals",
       "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -839,6 +894,33 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         });
         assert.equal(response.ok, true, `${table} service-role request failed with ${response.status}`);
       }
+      for (const [table, column] of [
+        ["stage_four_settings", "singleton"],
+        ["country_rollouts", "country_code"],
+        ["geocoding_cache", "cache_key"],
+        ["stage_four_usage_daily", "usage_date"],
+        ["bulk_operation_items", "operation_id"]
+      ]) {
+        const response = await fetch(`${baseUrl}/rest/v1/${table}?select=${column}&limit=1`, {
+          headers: {
+            apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+          }
+        });
+        assert.equal(response.ok, true, `${table} service-role request failed with ${response.status}`);
+      }
+      const qualityRefresh = await serviceRequest("rpc/refresh_data_quality_snapshots", {
+        method: "POST",
+        body: {}
+      });
+      assert.equal(qualityRefresh.response.ok, true, JSON.stringify(qualityRefresh.data));
+      assert.equal(Number(qualityRefresh.data), 3);
+      const monitoringRefresh = await serviceRequest("rpc/refresh_stage_four_monitoring", {
+        method: "POST",
+        body: {}
+      });
+      assert.equal(monitoringRefresh.response.ok, true, JSON.stringify(monitoringRefresh.data));
+      assert.equal(typeof monitoringRefresh.data.queue_length, "number");
     }
   );
 }

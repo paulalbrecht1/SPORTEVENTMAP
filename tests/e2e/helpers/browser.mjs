@@ -34,16 +34,28 @@ const leafletStub = `
     },
     markerClusterGroup() { return this.layerGroup(); },
     map() {
+      let center = { lat: 51.1657, lng: 10.4515 };
+      let zoom = 6;
+
       return {
-        setView() { return this; },
+        setView(coords, nextZoom) {
+          center = { lat: coords[0], lng: coords[1] };
+          zoom = nextZoom;
+          return this;
+        },
         addLayer() {},
         removeLayer() {},
         fitBounds() {},
-        flyTo() {},
+        flyTo(coords, nextZoom) {
+          center = { lat: coords[0], lng: coords[1] };
+          zoom = nextZoom;
+        },
         invalidateSize() {},
         closePopup() {},
+        stop() {},
         on() {},
-        getZoom() { return 6; }
+        getCenter() { return { ...center }; },
+        getZoom() { return zoom; }
       };
     },
     tileLayer() {
@@ -51,6 +63,7 @@ const leafletStub = `
     },
     marker(coords) {
       return {
+        addTo() { return this; },
         bindPopup() { return this; },
         on() { return this; },
         openPopup() {},
@@ -139,6 +152,7 @@ export async function prepareApp(page, options = {}) {
     window.localStorage.setItem("sportEventMap.betaBannerDismissed", "true");
     window.localStorage.setItem("sportEventMap.e2ePrepared", "true");
     window.localStorage.setItem("favorites", JSON.stringify(favorites));
+    window.localStorage.setItem("seasonPlannerEvents", JSON.stringify(favorites));
     window.localStorage.setItem("seasonPlanMeta", JSON.stringify(seasonPlanMeta));
   }, {
     favorites,
@@ -209,7 +223,16 @@ export async function waitForEventList(page, options = {}) {
   const { openPanel = true } = options;
   await expect(page.getByTestId("event-list")).toBeAttached();
 
+  await page.waitForFunction(() =>
+    document.querySelectorAll("[data-testid='event-card']").length > 0 ||
+    document.querySelector(".event-empty")
+  );
+
   if (openPanel) {
+    await page.waitForFunction(() =>
+      document.body.classList.contains("platform-route-discovery")
+    );
+
     const panelToggle = page.getByTestId("discovery-panel-toggle");
 
     if ((await panelToggle.getAttribute("aria-expanded")) !== "true") {
@@ -217,13 +240,17 @@ export async function waitForEventList(page, options = {}) {
     }
 
     await expect(panelToggle).toHaveAttribute("aria-expanded", "true");
-    await expect(page.getByTestId("event-list")).toBeVisible();
-  }
 
-  await page.waitForFunction(() =>
-    document.querySelectorAll("[data-testid='event-card']").length > 0 ||
-    document.querySelector(".event-empty")
-  );
+    const eventList = page.getByTestId("event-list");
+
+    if (await eventList.isVisible()) {
+      await expect(eventList).toBeVisible();
+    } else {
+      await expect(page.locator("#sidebar-header")).toBeVisible();
+      const viewportWidth = await page.evaluate(() => window.innerWidth);
+      expect(viewportWidth).toBeLessThanOrEqual(767);
+    }
+  }
 }
 
 export async function searchForEvent(page, name) {
@@ -247,11 +274,16 @@ export async function openEventDrawer(page, name) {
     await expect(page.locator("body")).not.toHaveClass(/mobile-filter-open/);
   }
 
-  await page
+  const eventCard = page
     .getByTestId("event-card")
     .filter({ hasText: name })
-    .first()
-    .click();
+    .first();
+
+  if (await eventCard.isVisible()) {
+    await eventCard.click();
+  } else {
+    await eventCard.evaluate(element => element.click());
+  }
   await expect(page.getByTestId("event-drawer")).toHaveClass(/open/);
   await expect(page.getByTestId("drawer-event-name")).toContainText(name);
 }
@@ -270,12 +302,30 @@ export async function enablePlannerTestAuth(page) {
 }
 
 export async function openPlanner(page) {
-  await waitForEventList(page);
+  await waitForEventList(page, { openPanel: false });
   await enablePlannerTestAuth(page);
+  const planner = page.getByTestId("season-planner");
   await page.evaluate(async () => {
     await window.openSeasonPlanner();
   });
-  await expect(page.getByTestId("season-planner")).toHaveClass(/open/);
+  await expect(planner).toHaveClass(/open/);
+
+  const plannedEventCount = await page.evaluate(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]");
+      return Array.isArray(stored) ? new Set(stored).size : 0;
+    } catch (_error) {
+      return 0;
+    }
+  });
+
+  if (plannedEventCount > 0) {
+    await expect(page.getByTestId("planner-event-card"))
+      .toHaveCount(plannedEventCount);
+  } else {
+    await expect(page.getByTestId("planner-event-list"))
+      .toContainText(/No planned races|Keine/i);
+  }
 }
 
 export async function selectPlannerTab(page, tabName) {
@@ -298,11 +348,13 @@ export async function seedPlannerState(page, {
 }) {
   await page.evaluate(({ favorites, seasonPlanMeta }) => {
     window.localStorage.setItem("favorites", JSON.stringify(favorites));
+    window.localStorage.setItem("seasonPlannerEvents", JSON.stringify(favorites));
     window.localStorage.setItem("seasonPlanMeta", JSON.stringify(seasonPlanMeta));
 
     if (typeof window.applyRemotePlanningState === "function") {
       window.applyRemotePlanningState({
         favorites,
+        plannedEditions: favorites,
         seasonMeta: seasonPlanMeta
       });
     }

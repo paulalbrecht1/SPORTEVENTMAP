@@ -1,0 +1,364 @@
+#adminModal .admin-data-operations {
+  display: grid;
+  gap: 20px;
+}
+
+#adminModal .admin-data-operations-header,
+#adminModal .admin-data-operations-section-heading,
+#adminModal .admin-data-operations-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+#adminModal .admin-data-operations-header h3,
+#adminModal .admin-data-operations-section-heading h4,
+#adminModal .admin-data-operations-card h5 {
+  margin: 0;
+}
+
+#adminModal .admin-data-operations-header p,
+#adminModal .admin-data-operations-section-heading p,
+#adminModal .admin-data-operations-card p {
+  margin: 6px 0 0;
+  color: var(--text-muted, #aeb8c7);
+}
+
+#adminModal .admin-data-operations-actions,
+#adminModal .admin-data-operations-card-actions,
+#adminModal .admin-data-operations-schedule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+#adminModal .admin-data-operations-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+#adminModal .admin-data-operations-kpis > div {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.58);
+}
+
+#adminModal .admin-data-operations-kpis span,
+#adminModal .admin-data-operations-kpis strong {
+  display: block;
+}
+
+#adminModal .admin-data-operations-kpis span {
+  min-height: 2.4em;
+  color: var(--text-muted, #aeb8c7);
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+#adminModal .admin-data-operations-kpis strong {
+  margin-top: 6px;
+  font-size: 1.45rem;
+}
+
+#adminModal .admin-data-operations-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.4);
+}
+
+#adminModal .admin-data-operations-filters label,
+#adminModal .admin-data-operations-schedule label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-muted, #aeb8c7);
+  font-size: 0.78rem;
+}
+
+#adminModal .admin-data-operations-filters select,
+#adminModal .admin-data-operations-filters input,
+#adminModal .admin-data-operations-schedule input {
+  width: 100%;
+  min-height: 42px;
+  padding: 8px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 10px;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+#adminModal .admin-data-operations-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 16px;
+  align-items: start;
+}
+
+#adminModal .admin-data-operations-grid > section,
+#adminModal .admin-data-operations-history {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.38);
+}
+
+#adminModal .admin-data-operations-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+  max-height: min(62vh, 720px);
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+#adminModal .admin-data-operations-card,
+#adminModal .admin-data-operations-issue,
+#adminModal .admin-data-operations-history-row {
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.7);
+}
+
+#adminModal .admin-data-operations-card-heading > strong {
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+#adminModal .admin-data-operations-status {
+  display: inline-flex;
+  margin-bottom: 6px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+#adminModal .admin-data-operations-status.is-verified {
+  background: rgba(34, 197, 94, 0.16);
+  color: #86efac;
+}
+
+#adminModal .admin-data-operations-status.is-stale,
+#adminModal .admin-data-operations-status.is-needs_review,
+#adminModal .admin-data-operations-status.is-source_unreachable {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
+}
+
+#adminModal .admin-data-operations-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+#adminModal .admin-data-operations-meta div {
+  min-width: 0;
+}
+
+#adminModal .admin-data-operations-meta dt,
+#adminModal .admin-data-operations-meta dd {
+  margin: 0;
+}
+
+#adminModal .admin-data-operations-meta dt {
+  color: var(--text-muted, #aeb8c7);
+  font-size: 0.68rem;
+}
+
+#adminModal .admin-data-operations-meta dd {
+  margin-top: 3px;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+
+#adminModal .admin-data-operations-editions {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+#adminModal .admin-data-operations-editions > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(15, 23, 42, 0.52);
+  font-size: 0.76rem;
+}
+
+#adminModal .admin-data-operations-editions em {
+  color: #86efac;
+  font-style: normal;
+}
+
+#adminModal .admin-data-operations-card-actions a,
+#adminModal .admin-data-operations-card-actions button,
+#adminModal .admin-data-operations-schedule button,
+#adminModal .admin-data-operations-issue button,
+#adminModal .admin-data-operations-proposal button,
+#adminModal .admin-data-operations-alert button {
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 9px;
+  color: #e2e8f0;
+  font-size: 0.74rem;
+  text-decoration: none;
+}
+
+#adminModal .admin-data-operations-schedule {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+#adminModal .admin-data-operations-schedule label {
+  flex: 1 1 210px;
+}
+
+#adminModal .admin-data-operations-issue {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-left: 4px solid #64748b;
+}
+
+#adminModal .admin-data-operations-issue.is-warning {
+  border-left-color: #f59e0b;
+}
+
+#adminModal .admin-data-operations-issue.is-error,
+#adminModal .admin-data-operations-issue.is-critical {
+  border-left-color: #ef4444;
+}
+
+#adminModal .admin-data-operations-issue span,
+#adminModal .admin-data-operations-history-row span {
+  display: block;
+  color: var(--text-muted, #aeb8c7);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+}
+
+#adminModal .admin-data-operations-history[hidden] {
+  display: none;
+}
+
+#adminModal .admin-data-operations-history-row code {
+  display: block;
+  max-width: 100%;
+  padding: 8px;
+  overflow: auto;
+  border-radius: 8px;
+  background: rgba(2, 6, 23, 0.72);
+  color: #cbd5e1;
+  font-size: 0.7rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+body[data-theme="light"] #adminModal .admin-data-operations-kpis > div,
+body[data-theme="light"] #adminModal .admin-data-operations-filters,
+body[data-theme="light"] #adminModal .admin-data-operations-grid > section,
+body[data-theme="light"] #adminModal .admin-data-operations-history,
+body[data-theme="light"] #adminModal .admin-data-operations-card,
+body[data-theme="light"] #adminModal .admin-data-operations-issue,
+body[data-theme="light"] #adminModal .admin-data-operations-history-row {
+  border-color: #d7dee8;
+  background: #ffffff;
+  color: #172033;
+}
+
+body[data-theme="light"] #adminModal .admin-data-operations-filters select,
+body[data-theme="light"] #adminModal .admin-data-operations-filters input,
+body[data-theme="light"] #adminModal .admin-data-operations-schedule input,
+body[data-theme="light"] #adminModal .admin-data-operations-editions > div {
+  border-color: #ccd5e2;
+  background: #f5f7fa;
+  color: #172033;
+}
+
+body[data-theme="light"] #adminModal .admin-data-operations-history-row code {
+  background: #eef2f7;
+  color: #243047;
+}
+
+@media (max-width: 1000px) {
+  #adminModal .admin-data-operations-kpis,
+  #adminModal .admin-data-operations-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #adminModal .admin-data-operations-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 620px) {
+  #adminModal .admin-data-operations-header,
+  #adminModal .admin-data-operations-section-heading,
+  #adminModal .admin-data-operations-card-heading,
+  #adminModal .admin-data-operations-issue {
+    flex-direction: column;
+  }
+
+  #adminModal .admin-data-operations-kpis,
+  #adminModal .admin-data-operations-filters,
+  #adminModal .admin-data-operations-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #adminModal .admin-data-operations-actions,
+  #adminModal .admin-data-operations-card-actions,
+  #adminModal .admin-data-operations-schedule,
+  #adminModal .admin-data-operations-issue button,
+#adminModal .admin-data-operations-proposal button,
+#adminModal .admin-data-operations-alert button {
+    width: 100%;
+  }
+
+  #adminModal .admin-data-operations-actions button,
+  #adminModal .admin-data-operations-card-actions a,
+  #adminModal .admin-data-operations-card-actions button,
+  #adminModal .admin-data-operations-schedule button {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}
+
+#adminModal .admin-data-operations-proposal,
+#adminModal .admin-data-operations-alert {
+  padding: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-left: 4px solid #38bdf8;
+  border-radius: 12px;
+  background: rgba(30, 41, 59, 0.7);
+}
+#adminModal .admin-data-operations-alert.is-error,
+#adminModal .admin-data-operations-alert.is-critical { border-left-color: #ef4444; }
+#adminModal .admin-data-operations-alert.is-warning { border-left-color: #f59e0b; }
+#adminModal .admin-data-operations-proposal pre {
+  max-width: 100%; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere;
+  padding: 8px; border-radius: 8px; background: rgba(2, 6, 23, 0.72); font-size: .7rem;
+}
+#adminModal .admin-data-operations-proposal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+body[data-theme="light"] #adminModal .admin-data-operations-proposal,
+body[data-theme="light"] #adminModal .admin-data-operations-alert { border-color: #d7dee8; background: #fff; color: #172033; }

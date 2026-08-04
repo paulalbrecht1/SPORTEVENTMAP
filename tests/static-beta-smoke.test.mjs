@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import eventMarkerTypes from "../js/event-marker-types.js";
 import eventTableUtils from "../tools/event-table-utils.js";
 
 const {
@@ -30,6 +31,10 @@ function pass(message) {
 
 const html =
   read("index.html");
+const css =
+  read("css/style.css");
+const dataOpsCss =
+  read("css/data-operations.css");
 
 const ids =
   [...html.matchAll(/\sid=["']([^"']+)["']/g)]
@@ -53,10 +58,13 @@ pass("HTML ids are unique");
   "adminModal",
   "adminReviewPanel",
   "adminQualityPanel",
+  "adminDataOperationsPanel",
+  "runDataValidationBtn",
+  "dataOpsEventsList",
+  "dataOpsIssuesList",
   "adminFeedbackPanel",
   "adminAnalyticsPanel",
   "adminImportsPanel",
-  "adminSystemStatus",
   "pendingEventsList",
   "pendingEventSearch",
   "pendingEventFilter",
@@ -83,12 +91,147 @@ pass("HTML ids are unique");
   );
 });
 pass("required beta views and modals exist");
+const adminTabNames =
+  [...html.matchAll(/data-admin-tab=["']([^"']+)["']/g)]
+    .map(match => match[1]);
+
+assert.deepEqual(
+  adminTabNames,
+  ["analytics", "dataOperations", "feedback"],
+  "Admin navigation must expose Analytics, Data Operations and Feedback"
+);
+
+[
+  "Event-Detailaufrufe",
+  "Planner-Hinzuf&uuml;gungen",
+  "Zuletzt gemeldete Planner-Events",
+  "&Oslash; Events pro Planner"
+].forEach(label => {
+  assert.ok(
+    html.includes(label),
+    `Missing truthful Admin KPI label: ${label}`
+  );
+});
+
+assert.match(
+  css,
+  /body\[data-theme="light"\] #adminModal \.admin-card/,
+  "Admin dashboard needs explicit light-mode contrast rules"
+);
+
+assert.match(dataOpsCss, /admin-data-operations/, "Data Operations needs responsive styles");
+pass("admin exposes truthful analytics, data operations and feedback workflows");
+
+
+assert.match(
+  html,
+  /<nav class="sem-desktop-nav"[^>]*>[\s\S]*?<a class="active" href="#\/home"[^>]*>Home<\/a>/i,
+  "Home landing navigation must expose an active Home pill"
+);
+assert.match(
+  css,
+  /\.sem-desktop-nav a\s*\{[\s\S]*?border-radius:\s*999px;[\s\S]*?background:/i,
+  "Home landing navigation links must render as pills"
+);
+assert.match(
+  css,
+  /\.platform-nav a\s*\{[\s\S]*?border:\s*1px solid rgba\(148, 163, 184, 0\.24\);[\s\S]*?border-radius:\s*999px;[\s\S]*?background:/i,
+  "Platform navigation links must render as visible pills"
+);
+pass("Home and platform navigation labels render as pills");
+
+assert.match(
+  css,
+  /\.app-language-select\s*\{[\s\S]*?appearance:\s*none;[\s\S]*?background:[\s\S]*?data:image\/svg\+xml/i,
+  "Language controls must use the polished custom pill treatment"
+);
+assert.match(
+  css,
+  /\.app-language-select:focus-visible\s*\{[\s\S]*?box-shadow:[\s\S]*?rgba\(34, 197, 94, 0\.16\)/i,
+  "Language controls must expose a visible keyboard focus state"
+);
+pass("language controls use a polished custom appearance");
+
+const themeSource =
+  read("js/theme.js");
+const detailPageSource =
+  read("js/event-detail.js");
+
+[
+  "sportEventMapTheme",
+  "document.documentElement.dataset.theme",
+  'querySelectorAll("[data-theme-toggle]")',
+  '".sem-header-actions"',
+  '"#authArea"',
+  '".event-detail-header"',
+  '".legal-page-content"'
+].forEach(fragment => {
+  assert.ok(
+    themeSource.includes(fragment),
+    `Global theme system is missing: ${fragment}`
+  );
+});
+
+[
+  'html[data-theme="light"]',
+  ".global-theme-toggle",
+  ".sem-home",
+  "#topbar",
+  "#seasonPlannerModal",
+  ".event-detail-page"
+].forEach(fragment => {
+  assert.ok(
+    css.includes(fragment),
+    `Global theme CSS coverage is missing: ${fragment}`
+  );
+});
+
+[
+  "imprint.html",
+  "privacy.html",
+  "legal.html",
+  "contact.html"
+].forEach(page => {
+  assert.match(
+    read(page),
+    /js\/theme.js/,
+    `Theme script missing from ${page}`
+  );
+});
+
+assert.match(detailPageSource, /theme.js/);
+assert.match(detailPageSource, /ensureControls/);
+pass("global light and dark themes cover application, detail and legal views");
+
+[
+  "Discovery professional visual system",
+  "body.platform-route-discovery:not(.landing-open) .platform-nav a",
+  "body.platform-route-discovery:not(.landing-open) .event-card",
+  "body.platform-route-discovery:not(.landing-open) #sidebar-header",
+  "body.platform-route-discovery:not(.landing-open) #topbar-search input",
+  '.filter-chip[data-filter="Ultramarathon"]'
+].forEach(fragment => {
+  assert.ok(
+    css.includes(fragment),
+    `Professional Discovery styling is missing: ${fragment}`
+  );
+});
+pass("Discovery uses the professional Home-aligned visual system");
+
+assert.doesNotMatch(
+  html,
+  /href=["']#\/community["']/i,
+  "Deferred Community must not appear in primary beta navigation"
+);
+pass("beta navigation stays focused on event discovery and season planning");
 
 const requiredScripts = [
+  "js/theme.js",
   "js/config.js",
   "js/i18n.js",
   "js/supabase.js",
   "js/events.js",
+  "js/event-marker-types.js",
   "js/map.js",
   "js/search.js",
   "js/app.js"
@@ -110,11 +253,33 @@ requiredScripts.forEach(script => {
 });
 pass("application scripts load in the required order");
 
+const publishPackageSource =
+  read("tools/create-publish-package.js");
+
+const publishEntriesSource =
+  publishPackageSource.match(
+    /const COPY_ENTRIES = \[([\s\S]*?)\n\];/
+  )?.[1] || "";
+
+[
+  "js/theme.js",
+  "js/event-marker-types.js",
+  "js/event-detail.js",
+  "js/event-detail-supabase.js"
+].forEach(script => {
+  assert.ok(
+    publishEntriesSource.includes(`"${script}"`),
+    `Publish package is missing runtime dependency ${script}`
+  );
+});
+pass("publish package includes all shared and detail-page runtime scripts");
+
 const frontendSource =
   [
     "js/config.js",
     "js/supabase.js",
     "js/events.js",
+    "js/event-marker-types.js",
     "js/map.js",
     "js/search.js",
     "js/app.js"
@@ -168,8 +333,29 @@ events.forEach((event, index) => {
 });
 pass(`${events.length} event rows pass schema validation`);
 
-const css =
-  read("css/style.css");
+const expectedMarkerTypeBySport = {
+  Running: "running",
+  "Trail Running": "running",
+  Ultramarathon: "ultra",
+  Triathlon: "triathlon"
+};
+const markerTypeMismatches =
+  events
+    .map(event => ({
+      event_name: event.event_name,
+      sport: event.sport,
+      distance: event.distance,
+      expected: expectedMarkerTypeBySport[event.sport],
+      actual: eventMarkerTypes.getEventMarkerType(event)
+    }))
+    .filter(event => !event.expected || event.actual !== event.expected);
+
+assert.deepEqual(
+  markerTypeMismatches,
+  [],
+  "Event marker colors do not match the reviewed sport categories"
+);
+pass("all event rows match the red, green and blue marker categories");
 
 assert.match(
   css,
@@ -220,6 +406,26 @@ assert.match(
 );
 pass("closed-beta migration covers all protected tables");
 
+const gateHardeningMigration =
+  read("supabase/migrations/20260725_closed_beta_gate_hardening.sql");
+
+[
+  /drop function if exists public\.handle_new_user\(\)/i,
+  /drop function if exists public\.set_updated_at\(\)/i,
+  /drop policy if exists events_admin_read_all on public\.events/i,
+  /create policy "Authenticated can read accessible events"/i,
+  /create policy "Authenticated can update accessible profiles"/i,
+  /drop index if exists public\.analytics_events_event_name_idx/i,
+  /create policy sem_authenticated_read_accessible/i
+].forEach(pattern => {
+  assert.match(
+    gateHardeningMigration,
+    pattern,
+    `Closed-beta gate hardening is missing: ${pattern}`
+  );
+});
+pass("closed-beta gate migration removes production drift and policy overlap");
+
 const adminWorkflowMigration =
   read("supabase/migrations/20260609_admin_workflow.sql");
 
@@ -255,6 +461,28 @@ pass("approved database review status maps into public event cards");
 
 const supabaseSource =
   read("js/supabase.js");
+[
+  /loadAdminTablePages/,
+  /ADMIN_ANALYTICS_ROW_LIMIT\s*=\s*100000/,
+  /getLatestPlannerSnapshots/,
+  /planner_event_added/,
+  /keine geschaetzten Ersatzwerte/
+].forEach(pattern => {
+  assert.match(
+    supabaseSource,
+    pattern,
+    `Truthful analytics implementation missing: ${pattern}`
+  );
+});
+
+assert.match(
+  eventSource,
+  /saved_events:\s*favorites\.length/,
+  "Planner add/remove tracking must report the exact resulting planner size"
+);
+
+pass("analytics uses complete pages and explicit Planner size snapshots");
+
 
 const i18nSource =
   read("js/i18n.js");

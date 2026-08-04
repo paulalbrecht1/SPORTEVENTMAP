@@ -44,15 +44,17 @@ test("Planner event, priority, target time, note and just-for-fun survive reload
   await expect(page.getByTestId("planner-event-card")).toContainText(run.event_name);
   await expect(page.getByTestId("planner-event-edit-card")).toContainText(run.event_name);
 
+  await page.getByTestId("planner-event-edit-button").click();
   await page.getByTestId("planner-priority-select").selectOption("A");
   await expect(page.getByTestId("planner-priority-select")).toHaveValue("A");
 
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await page.getByTestId("planner-goal-type-target_time").click();
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await page.getByTestId("planner-time-goals-target-time-minutes").fill("45");
   await page.getByTestId("planner-time-goals-target-time-minutes").dispatchEvent("change");
 
-  await ensurePlannerSectionOpen(page, "planner-section-personal-notes");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await page.getByTestId("planner-field-personal-note").fill("E2E race note survives reload");
   await page.getByTestId("planner-field-personal-note").blur();
 
@@ -61,23 +63,24 @@ test("Planner event, priority, target time, note and just-for-fun survive reload
   await selectPlannerTab(page, "events");
 
   await expect(page.getByTestId("planner-event-edit-card")).toContainText(run.event_name);
+  await page.getByTestId("planner-event-edit-button").click();
   await expect(page.getByTestId("planner-priority-select")).toHaveValue("A");
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await expect(page.getByTestId("planner-time-goals-target-time-minutes")).toHaveValue("45");
 
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await page.getByTestId("planner-time-goals-target-time-minutes").fill("");
   await page.getByTestId("planner-time-goals-target-time-minutes").dispatchEvent("change");
 
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await page.getByTestId("planner-goal-type-fun").click();
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await expect(page.getByTestId("planner-goal-type-fun")).toHaveAttribute("aria-pressed", "true");
 
   await page.reload();
   await openPlanner(page);
   await selectPlannerTab(page, "events");
-  await ensurePlannerSectionOpen(page, "planner-section-ziel-and-race-strategy");
+  await ensurePlannerSectionOpen(page, "planner-section-goal-and-race-strategy");
   await expect(page.getByTestId("planner-goal-type-fun")).toHaveAttribute("aria-pressed", "true");
 });
 

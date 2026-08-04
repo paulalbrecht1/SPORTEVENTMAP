@@ -1,11 +1,11 @@
 severity;event_name;event_id;city;country;current_date;issues;reason;recommended_action
 info;Bielefelder Triathlon;bielefelder-triathlon-bielefeld-28-06-2026;Bielefeld;Germany;28.06.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-clean;Sörmlands 100 Trail Run;sormlands-100-trail-run-bjornlunda-11-09-2026;Björnlunda;Sweden;11.09.2026;;;No date action required.
+info;Sörmlands 100 Trail Run;sormlands-100-trail-run-bjornlunda-11-09-2026;Björnlunda;Sweden;11.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;IRONMAN Hamburg European Championship;ironman-hamburg-european-championship-hamburg-07-06-2026;Hamburg;Germany;07.06.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;IRONMAN Frankfurt;ironman-frankfurt-frankfurt-28-06-2026;Frankfurt;Germany;28.06.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;IRONMAN 70.3 Duisburg;ironman-70-3-duisburg-duisburg-16-08-2026;Duisburg;Germany;16.08.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-info;IRONMAN 70.3 Leipzig;ironman-70-3-leipzig-leipzig-23-08-2026;Leipzig;Germany;23.08.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-info;IRONMAN 70.3 Erkner;ironman-70-3-erkner-erkner-13-09-2026;Erkner;Germany;13.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+clean;IRONMAN 70.3 Leipzig;ironman-70-3-leipzig-leipzig-23-08-2026;Leipzig;Germany;23.08.2026;;;No date action required.
+clean;IRONMAN 70.3 Erkner;ironman-70-3-erkner-erkner-13-09-2026;Erkner;Germany;13.09.2026;;;No date action required.
 info;IRONMAN Kaernten-Klagenfurt Austria;ironman-kaernten-klagenfurt-austria-klagenfurt-14-06-2026;Klagenfurt;Austria;14.06.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 clean;IRONMAN 70.3 European Championship Elsinore;ironman-70-3-european-championship-elsinore-elsinore-27-06-2027;Elsinore;Denmark;27.06.2027;;;No date action required.
 info;IRONMAN 70.3 Westfriesland;ironman-70-3-westfriesland-hoorn-21-06-2026;Hoorn;Netherlands;21.06.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
@@ -15,9 +15,9 @@ info;IRONMAN 70.3 Luxembourg;ironman-70-3-luxembourg-moselle-12-07-2026;Moselle;
 info;IRONMAN Vitoria-Gasteiz;ironman-vitoria-gasteiz-vitoria-gasteiz-12-07-2026;Vitoria-Gasteiz;Spain;12.07.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;IRONMAN 70.3 Vitoria-Gasteiz;ironman-70-3-vitoria-gasteiz-vitoria-gasteiz-12-07-2026;Vitoria-Gasteiz;Spain;12.07.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Generali Köln Marathon;generali-koln-marathon-koln-04-10-2026;Köln;Germany;04.10.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-info;Köln Triathlon;koln-triathlon-koln-06-09-2026;Köln;Germany;06.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+clean;Köln Triathlon;koln-triathlon-koln-06-09-2026;Köln;Germany;06.09.2026;;;No date action required.
 info;Haspa Marathon Hamburg;haspa-marathon-hamburg-hamburg-25-04-2027;Hamburg;Germany;25.04.2027;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-clean;BMW Berlin Marathon;bmw-berlin-marathon-berlin-27-09-2026;Berlin;Germany;27.09.2026;;;No date action required.
+info;BMW Berlin Marathon;bmw-berlin-marathon-berlin-27-09-2026;Berlin;Germany;27.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Mainova Frankfurt Marathon;mainova-frankfurt-marathon-frankfurt-am-main-25-10-2026;Frankfurt am Main;Germany;25.10.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Thüringen Ultra;thuringen-ultra-frottstadt-04-07-2026;Fröttstädt;Germany;04.07.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Münster Marathon;munster-marathon-munster-13-09-2026;Münster;Germany;13.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
@@ -407,7 +407,7 @@ info;adidas Stockholm Marathon;adidas-stockholm-marathon-stockholm-29-05-2027;St
 info;EDP Porto Marathon;edp-porto-marathon-porto-08-11-2026;Porto;Portugal;08.11.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;EDP Lisbon Marathon;edp-lisbon-marathon-lisbon-10-10-2026;Lisbon;Portugal;10.10.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Valencia Half Marathon Trinidad Alfonso Zurich;valencia-half-marathon-trinidad-alfonso-zurich-valencia-25-10-2026;Valencia;Spain;25.10.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
-info;Generali Berlin Half Marathon;generali-berlin-half-marathon-berlin-04-04-2027;Berlin;Germany;04.04.2027;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+clean;Generali Berlin Half Marathon;generali-berlin-half-marathon-berlin-04-04-2027;Berlin;Germany;04.04.2027;;;No date action required.
 info;HOKA UTMB Mont-Blanc;hoka-utmb-mont-blanc-chamonix-mont-blanc-24-08-2026;Chamonix-Mont-Blanc;France;24.08.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;IRONMAN Copenhagen;ironman-copenhagen-copenhagen-16-08-2026;Copenhagen;Denmark;16.08.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Challenge Almere-Amsterdam;challenge-almere-amsterdam-almere-12-09-2026;Almere;Netherlands;12.09.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
@@ -479,7 +479,7 @@ info;(L)auf zur Venus;l-auf-zur-venus-bremen-13-09-2026;Bremen;Germany;13.09.202
 info;Lahnparklauf;lahnparklauf-wetzlar-30-08-2026;Wetzlar;Germany;30.08.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;Lipperland Marathon;lipperland-marathon-dorentrup-21-11-2026;Dörentrup;Germany;21.11.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;Ludwigshafener Stadtlauf;ludwigshafener-stadtlauf-ludwigshafen-am-rhein-27-06-2026;Ludwigshafen am Rhein;Germany;27.06.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
-clean;Stadtwerke Lübeck Marathon;stadtwerke-lubeck-marathon-lubeck-18-10-2026;Lübeck;Germany;18.10.2026;;;No date action required.
+info;Stadtwerke Lübeck Marathon;stadtwerke-lubeck-marathon-lubeck-18-10-2026;Lübeck;Germany;18.10.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 info;Marburger Nacht-Marathon;marburger-nacht-marathon-marburg-03-07-2026;Marburg;Germany;03.07.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;100 Meilen Berlin — Mauerweglauf;100-meilen-berlin-mauerweglauf-berlin-15-08-2026;Berlin;Germany;15.08.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;Miltenberger Landkreis-Lauftag;miltenberger-landkreis-lauftag-elsenfeld-13-09-2026;Elsenfeld;Germany;13.09.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
@@ -986,10 +986,10 @@ info;Duinger Berglauf - Duingen;duinger-berglauf-duingen-duingen-19-09-2026;Duin
 info;Heidener Teufelslauf;heidener-teufelslauf-heiden-19-09-2026;Heiden;Germany;19.09.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;Baaber Heidelauf;baaber-heidelauf-baabe-19-09-2026;Baabe;Germany;19.09.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
 info;Dresden Frauenlauf;dresden-frauenlauf-dresden-19-09-2026;Dresden;Germany;19.09.2026;next_check_missing;Next check is not filled.;Fill Next check during the next source verification.
-clean;Hermannslauf Bielefeld;hermannslauf-bielefeld-detmold-24-04-2027;Detmold;Germany;24.04.2027;;;No date action required.
-clean;NN Marathon Rotterdam;nn-marathon-rotterdam-rotterdam-12-04-2026;Rotterdam;Netherlands;12.04.2026;;;No date action required.
-clean;Schneider Electric Marathon de Paris;schneider-electric-marathon-de-paris-paris-12-04-2026;Paris;France;12.04.2026;;;No date action required.
-clean;Vodafone Prague Marathon;vodafone-prague-marathon-prague-03-05-2026;Prague;Czech Republic;03.05.2026;;;No date action required.
+clean;Hermannslauf Bielefeld;hermannslauf-bielefeld-detmold-25-04-2027;Detmold;Germany;25.04.2027;;;No date action required.
+info;NN Marathon Rotterdam;nn-marathon-rotterdam-rotterdam-12-04-2026;Rotterdam;Netherlands;12.04.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+info;Schneider Electric Marathon de Paris;schneider-electric-marathon-de-paris-paris-12-04-2026;Paris;France;12.04.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+info;Vodafone Prague Marathon;vodafone-prague-marathon-prague-03-05-2026;Prague;Czech Republic;03.05.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
 clean;Mozart 100 by UTMB;mozart-100-by-utmb-salzburg-05-06-2027;Salzburg;Austria;05.06.2027;;;No date action required.
-clean;Transvulcania;transvulcania-fuencaliente-de-la-palma-08-05-2027;Fuencaliente de La Palma;Spain;08.05.2027;;;No date action required.
-clean;Paderborner Osterlauf;paderborner-osterlauf-paderborn-04-04-2026;Paderborn;Germany;04.04.2026;;;No date action required.
+info;Transvulcania;transvulcania-fuencaliente-de-la-palma-08-05-2027;Fuencaliente de La Palma;Spain;08.05.2027;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.
+info;Paderborner Osterlauf;paderborner-osterlauf-paderborn-04-04-2026;Paderborn;Germany;04.04.2026;next_check_overdue;Next check date is already in the past.;Run source verification and move next_check forward.

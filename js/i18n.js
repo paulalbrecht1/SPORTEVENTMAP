@@ -15,7 +15,10 @@ const I18N = {
     "landing.subheadline": "Find races. Save favorites. Plan your season.",
     "landing.copy": "Discover running, trail, ultra and triathlon events across Europe. Plan A-, B- and C-races with countdowns, training blocks and realistic recovery windows.",
     "landing.discover": "Explore Events",
-    "landing.plan": "Plan Your Season",
+    "landing.plan": "Open Season Planner",
+    "landing.openPlanner": "Open Season Planner",
+    "landing.openProfile": "Open profile",
+    "landing.logIn": "Log in",
     "landing.search": "Search by event, city, sport, distance or month...",
     "landing.searchButton": "Search",
     "landing.popular": "Popular searches:",
@@ -104,11 +107,88 @@ const I18N = {
     "app.search": "Find your next race...",
     "footer.imprint": "Legal notice",
     "footer.privacy": "Privacy",
-    "footer.legal": "Legal",
+    "footer.legal": "Terms",
     "footer.contact": "Contact",
     "footer.landingPage": "Landing page",
     "footer.feedback": "Feedback",
     "footer.publicBeta": "Public beta - event data may change.",
+    "legal.back": "Back to Sport Event Map",
+    "legal.footerLabel": "Legal links",
+    "legal.countryGermany": "Germany",
+    "legal.email": "Email:",
+    "imprint.metaTitle": "Legal notice - Sport Event Map",
+    "imprint.title": "Legal notice",
+    "imprint.providerHeading": "Information pursuant to Section 5 DDG",
+    "imprint.responsibleHeading": "Responsible for content pursuant to Section 18 (2) MStV",
+    "imprint.contentHeading": "Liability for content",
+    "imprint.contentCopy": "The content of this website has been created with the greatest possible care. However, no guarantee is given for the accuracy, completeness or timeliness of the information provided.",
+    "imprint.linksHeading": "Liability for links",
+    "imprint.linksCopy": "This website contains links to external third-party websites. We have no influence over their content. The respective operators are solely responsible for the content of linked pages.",
+    "imprint.copyrightHeading": "Copyright",
+    "imprint.copyrightCopy": "The content and works created by the operator of this website are subject to German copyright law.",
+    "privacy.metaTitle": "Privacy policy - Sport Event Map",
+    "privacy.metaDescription": "Privacy policy for Sport Event Map and its event search, account, favorites and Season Planner features.",
+    "privacy.title": "Privacy policy",
+    "privacy.controllerHeading": "1. Controller",
+    "privacy.generalHeading": "2. General information",
+    "privacy.generalCopy": "Protecting personal data is important. Personal data is processed confidentially and in accordance with applicable data protection laws.",
+    "privacy.hostingHeading": "3. Hosting and Cloudflare",
+    "privacy.hostingCopy": "This website is provided using Cloudflare services. Cloudflare may process technical access data such as IP addresses, browser information, pages accessed, the date and time of access and other technical information in order to provide the website securely and reliably.",
+    "privacy.analyticsHeading": "4. Cloudflare Analytics",
+    "privacy.analyticsCopy": "Where Cloudflare Analytics or comparable technical analytics are used, this is done to analyze the technical use and stability of the website. Marketing tracking services such as Google Analytics, Meta Pixel or Hotjar are not used.",
+    "privacy.supabaseHeading": "5. Supabase",
+    "privacy.supabaseIntro": "Supabase is used to provide user accounts, authentication, database features, favorites, the Season Planner, event submissions and feedback features.",
+    "privacy.supabaseListIntro": "In particular, the following data may be processed:",
+    "privacy.supabaseEmail": "Email address",
+    "privacy.supabaseAccount": "User account data",
+    "privacy.supabaseFavorites": "Saved favorites",
+    "privacy.supabasePlanner": "Season Planner data",
+    "privacy.supabaseEvents": "Submitted events",
+    "privacy.supabaseFeedback": "Feedback messages",
+    "privacy.supabaseTechnical": "Technical access data",
+    "privacy.supabasePurpose": "The data is processed to provide the platform's features.",
+    "privacy.accountsHeading": "6. Registration and user accounts",
+    "privacy.accountsCopy": "Users can create an account. The required data is used to provide login, profile and user-specific features.",
+    "privacy.favoritesHeading": "7. Favorites and Season Planner",
+    "privacy.favoritesCopy": "When users save favorites or use the Season Planner, this information is stored so that the features can be provided for the respective user.",
+    "privacy.submissionsHeading": "8. Event submissions",
+    "privacy.submissionsCopy": "Users can submit events. The submitted information is used to review, manage and potentially publish the event.",
+    "privacy.feedbackHeading": "9. Feedback",
+    "privacy.feedbackCopy": "Users can submit feedback about the platform. The submitted data is used to improve the platform and resolve errors.",
+    "privacy.logsHeading": "10. Server log files",
+    "privacy.logsCopy": "When the website is visited, technical information may be processed automatically, including browser type, operating system, date and time of access, IP address and pages accessed. This data is used to provide and secure the website and to analyze errors.",
+    "privacy.storageHeading": "11. Cookies and local storage",
+    "privacy.storageCopy": "The website may use technically necessary cookies or local storage to provide features such as login, language settings, appearance mode, favorites or other user-specific settings.",
+    "privacy.retentionHeading": "12. Retention period",
+    "privacy.retentionCopy": "Personal data is stored only for as long as necessary to provide the respective features or for as long as statutory retention obligations apply.",
+    "privacy.rightsHeading": "13. Rights of data subjects",
+    "privacy.rightsIntro": "Under applicable data protection laws, data subjects have the following rights in particular:",
+    "privacy.rightAccess": "Access",
+    "privacy.rightCorrection": "Rectification",
+    "privacy.rightDeletion": "Erasure",
+    "privacy.rightRestriction": "Restriction of processing",
+    "privacy.rightPortability": "Data portability",
+    "privacy.rightObjection": "Objection",
+    "privacy.contactHeading": "14. Contact",
+    "privacy.contactCopy": "For privacy-related questions:",
+    "privacy.changesHeading": "15. Changes to this privacy policy",
+    "privacy.changesCopy": "This privacy policy may be updated if technical or legal changes make this necessary.",
+    "terms.metaTitle": "Terms of use - Sport Event Map",
+    "terms.metaDescription": "Terms of use and legal information for the Sport Event Map beta.",
+    "terms.title": "Terms of use",
+    "terms.useHeading": "1. Use of the platform",
+    "terms.useCopy": "Sport Event Map helps users find and save endurance sports events and plan their season. The platform is in beta and is being continuously developed.",
+    "terms.eventsHeading": "2. Event data",
+    "terms.eventsCopy": "Event data is maintained with care. However, dates, distances, registration status, venues and links may change at short notice. Users should always check the official organizer website before registering, planning travel or participating.",
+    "terms.linksHeading": "3. External links",
+    "terms.linksCopy": "The platform links to external organizer websites. The respective operators are solely responsible for their content, availability, privacy practices and registration processes.",
+    "terms.accountsHeading": "4. User accounts and content",
+    "terms.accountsCopy": "Users are responsible for the accuracy of the information they submit. Submitted events may be reviewed, edited, rejected or removed before publication.",
+    "terms.availabilityHeading": "5. Availability",
+    "terms.availabilityCopy": "There is no entitlement to uninterrupted availability of the platform or individual features. Features may be changed, expanded or removed during the beta.",
+    "terms.contactHeading": "6. Contact",
+    "terms.contactBefore": "Questions about these terms can be sent by email to",
+    "terms.contactAfter": ".",
     "platform.eventWiki.kicker": "Event Wiki",
     "platform.eventWiki.title": "Event guides built for race decisions.",
     "platform.eventWiki.copy": "Event Wiki is the knowledge area for verified detail information on endurance events, from course profile and cut-off times to race guide links, registration details and planning notes.",
@@ -216,6 +296,10 @@ const I18N = {
     "map.standard": "Standard",
     "map.light": "Light",
     "map.outdoor": "Outdoor",
+    "map.legend": "Event types",
+    "map.legendRunning": "Running",
+    "map.legendUltra": "Ultra",
+    "map.legendTriathlon": "Triathlon",
     "drawer.placeholder": "Select an event to view details.",
 
     "event.addTitle": "Add Event",
@@ -441,6 +525,64 @@ const I18N = {
     "admin.checkingDatabase": "Checking database setup...",
     "admin.submissions": "Submissions",
     "admin.dataQuality": "Data Quality",
+    "admin.dataOperations": "Data Operations",
+    "admin.dataOperationsEyebrow": "Event Data Operations",
+    "admin.dataOperationsTitle": "Data quality and reviews",
+    "admin.dataOperationsCopy": "Manage durable events, yearly editions, sources and validation issues in one place.",
+    "admin.runValidation": "Run validation",
+    "admin.totalEvents": "Events",
+    "admin.totalEditions": "Editions",
+    "admin.verifiedEvents": "Verified",
+    "admin.unverifiedEvents": "Unverified",
+    "admin.staleEvents": "Stale",
+    "admin.reviewEvents": "Needs review",
+    "admin.noNextCheck": "No next check",
+    "admin.unreachableSource": "Source unreachable",
+    "admin.criticalIssues": "Critical issues",
+    "admin.warningIssues": "Warnings",
+    "admin.pastWithoutNext": "Past without next edition",
+    "admin.country": "Country",
+    "admin.sport": "Sport",
+    "admin.eventStatus": "Event status",
+    "admin.verificationStatus": "Verification status",
+    "admin.severity": "Severity",
+    "admin.reviewPriority": "Review priority",
+    "admin.lastCheckFrom": "Last check from",
+    "admin.nextCheckUntil": "Next check until",
+    "admin.all": "All",
+    "admin.eventsAndEditions": "Events and editions",
+    "admin.validationIssues": "Validation issues",
+    "admin.changeHistory": "Change history",
+    "admin.close": "Close",
+    "admin.dataOps.emptyEvents": "No events match these filters.",
+    "admin.dataOps.loading": "Loading Data Operations...",
+    "admin.dataOps.schemaUnavailable": "Data Operations schema unavailable. Check the migration and admin RLS.",
+    "admin.dataOps.loaded": "{events} events, {editions} editions and {issues} open issues loaded.",
+    "admin.dataOps.occurrence": "edition",
+    "admin.dataOps.occurrences": "editions",
+    "admin.dataOps.current": "current",
+    "admin.dataOps.noEdition": "No edition available.",
+    "admin.dataOps.openEvent": "Open event",
+    "admin.dataOps.openEdition": "Open edition",
+    "admin.dataOps.manualVerify": "Verify manually",
+    "admin.dataOps.markReview": "Needs review",
+    "admin.dataOps.history": "History",
+    "admin.dataOps.lastCheck": "Last check",
+    "admin.dataOps.nextCheck": "Next check",
+    "admin.dataOps.confidence": "Confidence",
+    "admin.dataOps.issues": "Issues",
+    "admin.dataOps.save": "Save",
+    "admin.dataOps.openCount": "{count} open",
+    "admin.dataOps.noOpenIssues": "No open validation issues.",
+    "admin.dataOps.resolve": "Mark resolved",
+    "admin.dataOps.validating": "Validating...",
+    "admin.dataOps.validationFailed": "Validation failed.",
+    "admin.dataOps.historyUnavailable": "Change history could not be loaded.",
+    "admin.dataOps.noReason": "No reason recorded",
+    "admin.dataOps.noHistory": "No changes recorded yet.",
+    "admin.dataOps.resolveFailed": "The issue could not be resolved.",
+    "admin.dataOps.dateRequired": "Choose a date for the next check.",
+    "admin.dataOps.updateFailed": "The event could not be updated. Check the admin role and RLS.",
     "admin.feedback": "Feedback",
     "admin.analytics": "Analytics",
     "admin.imports": "Imports",
@@ -551,7 +693,10 @@ const I18N = {
     "landing.subheadline": "Rennen finden. Favoriten speichern. Saison planen.",
     "landing.copy": "Finde Lauf-, Trail-, Ultra- und Triathlon-Events in Europa. Plane A-, B- und C-Rennen mit Countdowns, Trainingsblöcken und realistischen Erholungsfenstern.",
     "landing.discover": "Events entdecken",
-    "landing.plan": "Saison planen",
+    "landing.plan": "Saisonplaner öffnen",
+    "landing.openPlanner": "Saisonplaner öffnen",
+    "landing.openProfile": "Profil öffnen",
+    "landing.logIn": "Anmelden",
     "landing.search": "Suche nach Event, Ort, Sportart, Distanz oder Monat...",
     "landing.searchButton": "Suchen",
     "landing.popular": "Beliebte Suchen:",
@@ -640,11 +785,88 @@ const I18N = {
     "app.search": "Finde dein nächstes Rennen...",
     "footer.imprint": "Impressum",
     "footer.privacy": "Datenschutz",
-    "footer.legal": "Rechtliches",
+    "footer.legal": "Nutzungsbedingungen",
     "footer.contact": "Kontakt",
     "footer.landingPage": "Startseite",
     "footer.feedback": "Feedback",
     "footer.publicBeta": "Öffentliche Beta - Eventdaten können sich ändern.",
+    "legal.back": "Zurück zur Sport Event Map",
+    "legal.footerLabel": "Rechtliche Links",
+    "legal.countryGermany": "Deutschland",
+    "legal.email": "E-Mail:",
+    "imprint.metaTitle": "Impressum - Sport Event Map",
+    "imprint.title": "Impressum",
+    "imprint.providerHeading": "Angaben gemäß § 5 DDG",
+    "imprint.responsibleHeading": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
+    "imprint.contentHeading": "Haftung für Inhalte",
+    "imprint.contentCopy": "Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der bereitgestellten Inhalte wird jedoch keine Gewähr übernommen.",
+    "imprint.linksHeading": "Haftung für Links",
+    "imprint.linksCopy": "Diese Website enthält Links zu externen Websites Dritter. Auf deren Inhalte besteht kein Einfluss. Für die Inhalte der verlinkten Seiten sind ausschließlich deren Betreiber verantwortlich.",
+    "imprint.copyrightHeading": "Urheberrecht",
+    "imprint.copyrightCopy": "Die durch den Betreiber erstellten Inhalte und Werke auf dieser Website unterliegen dem deutschen Urheberrecht.",
+    "privacy.metaTitle": "Datenschutzerklärung - Sport Event Map",
+    "privacy.metaDescription": "Datenschutzerklärung für die Sport Event Map und ihre Eventsuche, Benutzerkonten, Favoriten und Season-Planner-Funktionen.",
+    "privacy.title": "Datenschutzerklärung",
+    "privacy.controllerHeading": "1. Verantwortlicher",
+    "privacy.generalHeading": "2. Allgemeine Hinweise",
+    "privacy.generalCopy": "Der Schutz personenbezogener Daten ist wichtig. Personenbezogene Daten werden vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften verarbeitet.",
+    "privacy.hostingHeading": "3. Hosting und Cloudflare",
+    "privacy.hostingCopy": "Diese Website wird über Dienste von Cloudflare bereitgestellt. Cloudflare kann technische Zugriffsdaten wie IP-Adresse, Browserinformationen, aufgerufene Seiten, Datum und Uhrzeit des Zugriffs sowie weitere technische Informationen verarbeiten, um die Website sicher und zuverlässig bereitzustellen.",
+    "privacy.analyticsHeading": "4. Cloudflare Analytics",
+    "privacy.analyticsCopy": "Soweit Cloudflare Analytics oder vergleichbare technische Auswertungen genutzt werden, erfolgt dies zur Analyse der technischen Nutzung und Stabilität der Website. Es werden keine Marketing-Tracking-Dienste wie Google Analytics, Meta Pixel oder Hotjar verwendet.",
+    "privacy.supabaseHeading": "5. Supabase",
+    "privacy.supabaseIntro": "Für die Bereitstellung von Benutzerkonten, Authentifizierung, Datenbankfunktionen, Favoriten, Season Planner, Event-Einreichungen und Feedback-Funktionen wird Supabase genutzt.",
+    "privacy.supabaseListIntro": "Dabei können insbesondere folgende Daten verarbeitet werden:",
+    "privacy.supabaseEmail": "E-Mail-Adresse",
+    "privacy.supabaseAccount": "Benutzerkonto-Daten",
+    "privacy.supabaseFavorites": "Gespeicherte Favoriten",
+    "privacy.supabasePlanner": "Season-Planner-Daten",
+    "privacy.supabaseEvents": "Eingereichte Events",
+    "privacy.supabaseFeedback": "Feedback-Nachrichten",
+    "privacy.supabaseTechnical": "Technische Zugriffsdaten",
+    "privacy.supabasePurpose": "Die Verarbeitung erfolgt zur Bereitstellung der Funktionen der Plattform.",
+    "privacy.accountsHeading": "6. Registrierung und Benutzerkonten",
+    "privacy.accountsCopy": "Nutzer können ein Benutzerkonto erstellen. Die dafür erforderlichen Daten werden verwendet, um Login, Profilfunktionen und nutzerbezogene Funktionen bereitzustellen.",
+    "privacy.favoritesHeading": "7. Favoriten und Season Planner",
+    "privacy.favoritesCopy": "Wenn Nutzer Favoriten speichern oder den Season Planner verwenden, werden diese Angaben gespeichert, damit die Funktionen nutzerbezogen bereitgestellt werden können.",
+    "privacy.submissionsHeading": "8. Event-Einreichungen",
+    "privacy.submissionsCopy": "Nutzer können Events einreichen. Die übermittelten Informationen werden zur Prüfung, Verwaltung und möglichen Veröffentlichung der Veranstaltung verwendet.",
+    "privacy.feedbackHeading": "9. Feedback",
+    "privacy.feedbackCopy": "Nutzer können Feedback zur Plattform übermitteln. Die übermittelten Daten werden verwendet, um die Plattform zu verbessern und Fehler zu beheben.",
+    "privacy.logsHeading": "10. Server-Logfiles",
+    "privacy.logsCopy": "Beim Besuch der Website können automatisch technische Informationen verarbeitet werden, darunter Browsertyp, Betriebssystem, Datum und Uhrzeit des Zugriffs, IP-Adresse und aufgerufene Seiten. Diese Daten dienen der technischen Bereitstellung, Sicherheit und Fehleranalyse.",
+    "privacy.storageHeading": "11. Cookies und Local Storage",
+    "privacy.storageCopy": "Die Website kann technisch notwendige Cookies oder Local Storage verwenden, um Funktionen wie Login, Spracheinstellungen, Darstellungsmodus, Favoriten oder andere nutzerbezogene Einstellungen bereitzustellen.",
+    "privacy.retentionHeading": "12. Speicherdauer",
+    "privacy.retentionCopy": "Personenbezogene Daten werden nur so lange gespeichert, wie dies für die Bereitstellung der jeweiligen Funktionen erforderlich ist oder gesetzliche Aufbewahrungspflichten bestehen.",
+    "privacy.rightsHeading": "13. Rechte betroffener Personen",
+    "privacy.rightsIntro": "Betroffene Personen haben nach den geltenden Datenschutzgesetzen insbesondere folgende Rechte:",
+    "privacy.rightAccess": "Auskunft",
+    "privacy.rightCorrection": "Berichtigung",
+    "privacy.rightDeletion": "Löschung",
+    "privacy.rightRestriction": "Einschränkung der Verarbeitung",
+    "privacy.rightPortability": "Datenübertragbarkeit",
+    "privacy.rightObjection": "Widerspruch",
+    "privacy.contactHeading": "14. Kontakt",
+    "privacy.contactCopy": "Bei Fragen zum Datenschutz:",
+    "privacy.changesHeading": "15. Änderungen dieser Datenschutzerklärung",
+    "privacy.changesCopy": "Diese Datenschutzerklärung kann angepasst werden, wenn technische oder rechtliche Änderungen dies erforderlich machen.",
+    "terms.metaTitle": "Nutzungsbedingungen - Sport Event Map",
+    "terms.metaDescription": "Nutzungsbedingungen und rechtliche Hinweise für die Sport Event Map Beta.",
+    "terms.title": "Nutzungsbedingungen",
+    "terms.useHeading": "1. Nutzung der Plattform",
+    "terms.useCopy": "Sport Event Map unterstützt Nutzer dabei, Ausdauersportveranstaltungen zu finden, zu speichern und die eigene Saison zu planen. Die Plattform befindet sich in der Beta und wird laufend weiterentwickelt.",
+    "terms.eventsHeading": "2. Eventdaten",
+    "terms.eventsCopy": "Eventdaten werden mit Sorgfalt gepflegt. Termine, Distanzen, Anmeldestatus, Austragungsorte und Links können sich jedoch kurzfristig ändern. Vor Anmeldung, Reiseplanung oder Teilnahme sollten Nutzer immer die offizielle Veranstalterseite prüfen.",
+    "terms.linksHeading": "3. Externe Links",
+    "terms.linksCopy": "Die Plattform verweist auf externe Veranstalter-Websites. Für deren Inhalte, Verfügbarkeit, Datenschutz und Anmeldeprozesse sind ausschließlich die jeweiligen Betreiber verantwortlich.",
+    "terms.accountsHeading": "4. Benutzerkonten und Inhalte",
+    "terms.accountsCopy": "Nutzer sind selbst für die Richtigkeit der von ihnen eingereichten Informationen verantwortlich. Eingereichte Events können vor Veröffentlichung geprüft, bearbeitet, abgelehnt oder entfernt werden.",
+    "terms.availabilityHeading": "5. Verfügbarkeit",
+    "terms.availabilityCopy": "Es besteht kein Anspruch auf ständige Verfügbarkeit der Plattform oder einzelner Funktionen. Funktionen können während der Beta angepasst, erweitert oder entfernt werden.",
+    "terms.contactHeading": "6. Kontakt",
+    "terms.contactBefore": "Fragen zu diesen Bedingungen können per E-Mail an",
+    "terms.contactAfter": "gesendet werden.",
     "platform.eventWiki.kicker": "Event-Wiki",
     "platform.eventWiki.title": "Event-Guides für bessere Rennentscheidungen.",
     "platform.eventWiki.copy": "Das Event-Wiki wird der Wissensbereich für verifizierte Detailinformationen zu Ausdauerevents: Streckenprofil, Cut-off-Zeiten, Race-Guide-Links, Anmeldung, Preise und Planungshinweise.",
@@ -752,6 +974,10 @@ const I18N = {
     "map.standard": "Standard",
     "map.light": "Hell",
     "map.outdoor": "Outdoor",
+    "map.legend": "Eventarten",
+    "map.legendRunning": "Laufevent",
+    "map.legendUltra": "Ultra",
+    "map.legendTriathlon": "Triathlon",
     "drawer.placeholder": "Wähle ein Event aus, um die Details zu sehen.",
 
     "event.addTitle": "Event hinzufügen",
@@ -977,6 +1203,64 @@ const I18N = {
     "admin.checkingDatabase": "Datenbank-Einrichtung wird geprüft...",
     "admin.submissions": "Einreichungen",
     "admin.dataQuality": "Datenqualität",
+    "admin.dataOperations": "Datenqualität",
+    "admin.dataOperationsEyebrow": "Event Data Operations",
+    "admin.dataOperationsTitle": "Datenqualität und Prüfungen",
+    "admin.dataOperationsCopy": "Eventmarken, jährliche Austragungen, Quellen und Validierungsprobleme zentral verwalten.",
+    "admin.runValidation": "Validierung ausführen",
+    "admin.totalEvents": "Events",
+    "admin.totalEditions": "Austragungen",
+    "admin.verifiedEvents": "Verifiziert",
+    "admin.unverifiedEvents": "Nicht verifiziert",
+    "admin.staleEvents": "Veraltet",
+    "admin.reviewEvents": "Prüfbedarf",
+    "admin.noNextCheck": "Ohne nächste Prüfung",
+    "admin.unreachableSource": "Quelle nicht erreichbar",
+    "admin.criticalIssues": "Kritische Fehler",
+    "admin.warningIssues": "Warnungen",
+    "admin.pastWithoutNext": "Vergangen ohne Folgeaustragung",
+    "admin.country": "Land",
+    "admin.sport": "Sportart",
+    "admin.eventStatus": "Eventstatus",
+    "admin.verificationStatus": "Verifizierungsstatus",
+    "admin.severity": "Schweregrad",
+    "admin.reviewPriority": "Prüfpriorität",
+    "admin.lastCheckFrom": "Letzte Prüfung ab",
+    "admin.nextCheckUntil": "Nächste Prüfung bis",
+    "admin.all": "Alle",
+    "admin.eventsAndEditions": "Events und Austragungen",
+    "admin.validationIssues": "Validierungsprobleme",
+    "admin.changeHistory": "Änderungsverlauf",
+    "admin.close": "Schließen",
+    "admin.dataOps.emptyEvents": "Keine Events für diese Filter.",
+    "admin.dataOps.loading": "Data Operations werden geladen...",
+    "admin.dataOps.schemaUnavailable": "Data-Operations-Schema nicht erreichbar. Migration und Admin-RLS prüfen.",
+    "admin.dataOps.loaded": "{events} Events, {editions} Austragungen und {issues} offene Probleme geladen.",
+    "admin.dataOps.occurrence": "Austragung",
+    "admin.dataOps.occurrences": "Austragungen",
+    "admin.dataOps.current": "aktuell",
+    "admin.dataOps.noEdition": "Keine Austragung vorhanden.",
+    "admin.dataOps.openEvent": "Event öffnen",
+    "admin.dataOps.openEdition": "Edition öffnen",
+    "admin.dataOps.manualVerify": "Manuell verifizieren",
+    "admin.dataOps.markReview": "Muss geprüft werden",
+    "admin.dataOps.history": "Verlauf",
+    "admin.dataOps.lastCheck": "Letzte Prüfung",
+    "admin.dataOps.nextCheck": "Nächste Prüfung",
+    "admin.dataOps.confidence": "Confidence",
+    "admin.dataOps.issues": "Probleme",
+    "admin.dataOps.save": "Speichern",
+    "admin.dataOps.openCount": "{count} offen",
+    "admin.dataOps.noOpenIssues": "Keine offenen Validierungsprobleme.",
+    "admin.dataOps.resolve": "Als gelöst markieren",
+    "admin.dataOps.validating": "Validiere...",
+    "admin.dataOps.validationFailed": "Validierung fehlgeschlagen.",
+    "admin.dataOps.historyUnavailable": "Änderungsverlauf konnte nicht geladen werden.",
+    "admin.dataOps.noReason": "Keine Begründung hinterlegt",
+    "admin.dataOps.noHistory": "Noch keine protokollierten Änderungen.",
+    "admin.dataOps.resolveFailed": "Problem konnte nicht gelöst werden.",
+    "admin.dataOps.dateRequired": "Bitte ein Datum für die nächste Prüfung wählen.",
+    "admin.dataOps.updateFailed": "Event konnte nicht aktualisiert werden. Admin-Rolle und RLS prüfen.",
     "admin.feedback": "Feedback",
     "admin.analytics": "Analytics",
     "admin.imports": "Importe",
@@ -1100,6 +1384,35 @@ function translateTemplate(key, values = {}, fallback = "") {
 function setText(selector, key) {
   document.querySelectorAll(selector).forEach(element => {
     element.textContent = translate(key, element.textContent);
+  });
+}
+
+function applyDataLanguageBindings() {
+  document.querySelectorAll("[data-i18n]").forEach(element => {
+    element.textContent = translate(
+      element.dataset.i18n,
+      element.textContent
+    );
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach(element => {
+    element.setAttribute(
+      "aria-label",
+      translate(
+        element.dataset.i18nAriaLabel,
+        element.getAttribute("aria-label") || ""
+      )
+    );
+  });
+
+  document.querySelectorAll("[data-i18n-content]").forEach(element => {
+    element.setAttribute(
+      "content",
+      translate(
+        element.dataset.i18nContent,
+        element.getAttribute("content") || ""
+      )
+    );
   });
 }
 
@@ -1340,6 +1653,10 @@ const TEXT_BINDINGS = [
   ["#mapStyleSelect option[value='standard']", "map.standard"],
   ["#mapStyleSelect option[value='light']", "map.light"],
   ["#mapStyleSelect option[value='outdoor']", "map.outdoor"],
+  ["#eventMapLegendTitle", "map.legend"],
+  ["#eventMapLegendRunning", "map.legendRunning"],
+  ["#eventMapLegendUltra", "map.legendUltra"],
+  ["#eventMapLegendTriathlon", "map.legendTriathlon"],
   [".drawer-placeholder", "drawer.placeholder"],
 
   ["#eventModal h2", "event.addTitle"],
@@ -1586,9 +1903,243 @@ const CONTROL_LABEL_BINDINGS = [
   ["#adminAnalyticsRange", "analytics.period"]
 ];
 
+const SEM_HOME_TEXT_TRANSLATIONS = {
+  "Home": "Start",
+  "Discovery": "Entdecken",
+  "Season Planner": "Saisonplaner",
+  "Event Wiki": "Event-Wiki",
+  "Login": "Anmelden",
+  "Explore Events": "Events entdecken",
+  "Navigation": "Navigation",
+  "Sport events. One season.": "Sportevents. Eine Saison.",
+  "Find your next race.": "Finde dein nächstes Rennen.",
+  "Build your entire season.": "Plane deine gesamte Saison.",
+  "Discover running, trail, ultra and triathlon events across Germany and Europe. Compare races, save your favorites and turn them into a realistic season plan.": "Entdecke Lauf-, Trail-, Ultra- und Triathlon-Events in Deutschland und Europa. Vergleiche Rennen, speichere Favoriten und erstelle daraus einen realistischen Saisonplan.",
+  "Open Season Planner": "Saisonplaner öffnen",
+  "No spreadsheets. No scattered race tabs. Everything in one place.": "Keine Tabellen. Keine verstreuten Renntabs. Alles an einem Ort.",
+  "Find your next race...": "Finde dein nächstes Rennen...",
+  "Running": "Laufen",
+  "Registration open": "Anmeldung offen",
+  "Next race": "Nächstes Rennen",
+  "days": "Tage",
+  "Loading": "Lädt",
+  "events and growing": "Events und es werden mehr",
+  "Germany & Europe": "Deutschland & Europa",
+  "Running · Trail · Ultra · Triathlon": "Laufen · Trail · Ultra · Triathlon",
+  "Structured event information": "Strukturierte Eventinformationen",
+  "One connected workflow": "Ein durchgängiger Ablauf",
+  "From race discovery to race day": "Von der Eventsuche bis zum Renntag",
+  "Sport Event Map connects event discovery, detailed race information and personal season planning in one workflow.": "Sport Event Map verbindet Eventsuche, detaillierte Renninformationen und persönliche Saisonplanung in einem Ablauf.",
+  "Discover": "Entdecken",
+  "Search events by sport, location, date, distance and registration status.": "Suche Events nach Sportart, Ort, Datum, Distanz und Anmeldestatus.",
+  "Compare and save": "Vergleichen und speichern",
+  "Open structured event information, compare options and save the races that matter to you.": "Öffne strukturierte Eventinformationen, vergleiche Optionen und speichere die Rennen, die dir wichtig sind.",
+  "Plan your season": "Saison planen",
+  "Turn saved events into a realistic season with priorities, countdowns and training blocks.": "Erstelle aus gespeicherten Events eine realistische Saison mit Prioritäten, Countdowns und Trainingsblöcken.",
+  "Built around your race calendar": "Rund um deinen Rennkalender entwickelt",
+  "Everything you need to plan your racing season": "Alles, was du für deine Rennsaison brauchst",
+  "Interactive event map": "Interaktive Eventkarte",
+  "Explore events geographically and keep the map, results and event details synchronized.": "Entdecke Events geografisch und halte Karte, Ergebnisse und Eventdetails synchron.",
+  "Explore Discovery": "Discovery öffnen",
+  "Powerful event filters": "Leistungsstarke Eventfilter",
+  "Filter by sport, distance, date, location and registration status without losing your search context.": "Filtere nach Sportart, Distanz, Datum, Ort und Anmeldestatus, ohne deinen Suchkontext zu verlieren.",
+  "Filter events": "Events filtern",
+  "Structured event details": "Strukturierte Eventdetails",
+  "Find course information, cut-offs, registration details, race-day information and official sources.": "Finde Streckeninformationen, Cut-offs, Anmeldedetails, Renntag-Informationen und offizielle Quellen.",
+  "Open Event Wiki": "Event-Wiki öffnen",
+  "Favorites and shortlists": "Favoriten und Auswahllisten",
+  "Save interesting events and build a shortlist before committing to your season.": "Speichere interessante Events und erstelle eine Auswahlliste, bevor du deine Saison festlegst.",
+  "Find favorites": "Favoriten finden",
+  "Personal season planner": "Persönlicher Saisonplaner",
+  "Organize A-, B- and C-races, add goals and keep your race calendar realistic.": "Ordne A-, B- und C-Rennen, ergänze Ziele und halte deinen Rennkalender realistisch.",
+  "Open planner": "Planer öffnen",
+  "Countdown and preparation": "Countdown und Vorbereitung",
+  "See what race is next and track the information that matters before race day.": "Sieh, welches Rennen als Nächstes ansteht, und behalte die wichtigen Informationen bis zum Renntag im Blick.",
+  "Start planning": "Planung starten",
+  "Event discovery": "Eventsuche",
+  "Explore events without losing context": "Events entdecken, ohne den Überblick zu verlieren",
+  "Search, filter and open event details while the map and event list remain synchronized.": "Suche, filtere und öffne Eventdetails, während Karte und Eventliste synchron bleiben.",
+  "Explore the map": "Karte entdecken",
+  "Event Discovery": "Eventsuche",
+  "Search events, cities and distances": "Events, Orte und Distanzen suchen",
+  "Germany": "Deutschland",
+  "matching events": "passende Events",
+  "Season planner": "Saisonplaner",
+  "Build a season you can actually execute": "Plane eine Saison, die du wirklich umsetzen kannst",
+  "Prioritize your races, avoid crowded race periods and keep every important event in one personal overview.": "Priorisiere deine Rennen, vermeide überfüllte Rennphasen und behalte alle wichtigen Events in einer persönlichen Übersicht.",
+  "Countdown to the next race": "Countdown bis zum nächsten Rennen",
+  "A/B/C race priorities": "A-/B-/C-Rennprioritäten",
+  "Calendar and season overview": "Kalender- und Saisonübersicht",
+  "Goals, notes and race results": "Ziele, Notizen und Rennergebnisse",
+  "My 2026 season": "Meine Saison 2026",
+  "Priority A": "Priorität A",
+  "planned races": "geplante Rennen",
+  "key races": "Schlüsselrennen",
+  "weeks": "Wochen",
+  "May · Build race": "Mai · Aufbaurennen",
+  "July · Tune-up race": "Juli · Vorbereitungsrennen",
+  "Made for the start line": "Für die Startlinie gemacht",
+  "Built for endurance athletes": "Für Ausdauersportler entwickelt",
+  "Choose your discipline and see the event information that supports better race decisions.": "Wähle deine Disziplin und finde die Eventinformationen, die bessere Rennentscheidungen unterstützen.",
+  "Trail Running": "Trailrunning",
+  "Ultra Running": "Ultralauf",
+  "Find road races from local 5K events to major city marathons.": "Finde Straßenläufe vom lokalen 5-km-Rennen bis zum großen Stadtmarathon.",
+  "Compare terrain, elevation, distance and event location.": "Vergleiche Gelände, Höhenmeter, Distanz und Veranstaltungsort.",
+  "Keep cut-offs, course details and preparation requirements organized.": "Behalte Cut-offs, Streckendetails und Anforderungen an die Vorbereitung übersichtlich.",
+  "Plan race distances, priorities and your complete multi-sport season.": "Plane Renndistanzen, Prioritäten und deine komplette Multisport-Saison.",
+  "Ready when you are": "Bereit, wenn du es bist",
+  "Your next season starts with the right event.": "Deine nächste Saison beginnt mit dem richtigen Event.",
+  "Explore the event database, save the races that inspire you and build a season that fits your goals.": "Entdecke die Eventdatenbank, speichere Rennen, die dich inspirieren, und plane eine Saison, die zu deinen Zielen passt.",
+  "Find Events": "Events finden",
+  "Build My Season": "Meine Saison planen",
+  "Discover the right event. Build a better season.": "Finde das richtige Event. Plane eine bessere Saison.",
+  "Submit an event": "Event einreichen",
+  "Imprint": "Impressum",
+  "Privacy": "Datenschutz",
+  "Terms": "Nutzungsbedingungen",
+  "Contact": "Kontakt",
+  "Public beta · Event data is reviewed continuously.": "Öffentliche Beta · Eventdaten werden fortlaufend geprüft."
+};
+
+const SEM_HOME_REVERSE_TRANSLATIONS = Object.fromEntries(
+  Object.entries(SEM_HOME_TEXT_TRANSLATIONS).map(([english, german]) => [german, english])
+);
+
+const SEM_HOME_TEXT_KEYS = new WeakMap();
+
+const SEM_HOME_ATTRIBUTE_TRANSLATIONS = [
+  [
+    "#landingPage",
+    "aria-label",
+    "Sport Event Map landing page",
+    "Sport Event Map Startseite"
+  ],
+  [
+    ".sem-header .sem-brand",
+    "aria-label",
+    "Sport Event Map home",
+    "Sport Event Map Startseite"
+  ],
+  [
+    ".sem-desktop-nav",
+    "aria-label",
+    "Primary navigation",
+    "Hauptnavigation"
+  ],
+  [
+    "#landingMenuBtn",
+    "aria-label",
+    "Open navigation",
+    "Navigation öffnen"
+  ],
+  [
+    "#landingMenuCloseBtn",
+    "aria-label",
+    "Close navigation",
+    "Navigation schließen"
+  ],
+  [
+    "#landingMobileMenu",
+    "aria-label",
+    "Mobile navigation",
+    "Mobile Navigation"
+  ],
+  [
+    ".sem-trust",
+    "aria-label",
+    "Platform status",
+    "Plattformstatus"
+  ],
+  [
+    ".sem-hero-product",
+    "aria-label",
+    "Product preview showing the event map and season planner",
+    "Produktvorschau mit Eventkarte und Saisonplaner"
+  ],
+  [
+    ".sem-discovery-product",
+    "aria-label",
+    "Discovery interface preview",
+    "Vorschau der Eventsuche"
+  ],
+  [
+    ".sem-planner-product",
+    "aria-label",
+    "Season planner interface preview",
+    "Vorschau des Saisonplaners"
+  ],
+  [
+    ".sem-sport-tabs",
+    "aria-label",
+    "Endurance sports",
+    "Ausdauersportarten"
+  ],
+  [
+    ".sem-footer nav:first-of-type",
+    "aria-label",
+    "Footer navigation",
+    "Footer-Navigation"
+  ],
+  [
+    ".sem-footer nav:last-of-type",
+    "aria-label",
+    "Legal links",
+    "Rechtliche Links"
+  ]
+];
+
+function applySemHomeLanguage(language = getAppLanguage()) {
+  const root = document.querySelector(".sem-home");
+
+  if (!root) {
+    return;
+  }
+
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node = walker.nextNode();
+
+  while (node) {
+    const sourceText = node.textContent;
+    const visibleText = sourceText.trim();
+    let englishText = SEM_HOME_TEXT_KEYS.get(node);
+
+    if (!englishText) {
+      if (Object.hasOwn(SEM_HOME_TEXT_TRANSLATIONS, visibleText)) {
+        englishText = visibleText;
+      } else {
+        englishText = SEM_HOME_REVERSE_TRANSLATIONS[visibleText];
+      }
+
+      if (englishText) {
+        SEM_HOME_TEXT_KEYS.set(node, englishText);
+      }
+    }
+
+    if (englishText) {
+      const leadingWhitespace = sourceText.match(/^\s*/)?.[0] || "";
+      const trailingWhitespace = sourceText.match(/\s*$/)?.[0] || "";
+      const translatedText = language === "de"
+        ? SEM_HOME_TEXT_TRANSLATIONS[englishText]
+        : englishText;
+
+      node.textContent = leadingWhitespace + translatedText + trailingWhitespace;
+    }
+
+    node = walker.nextNode();
+  }
+
+  SEM_HOME_ATTRIBUTE_TRANSLATIONS.forEach(([selector, attribute, english, german]) => {
+    document.querySelectorAll(selector).forEach(element => {
+      element.setAttribute(attribute, language === "de" ? german : english);
+    });
+  });
+}
+
 function applyStaticLanguage() {
   const language = getAppLanguage();
   document.documentElement.lang = language;
+  applySemHomeLanguage(language);
+  applyDataLanguageBindings();
 
   TEXT_BINDINGS.forEach(([selector, key]) =>
     setText(selector, key)

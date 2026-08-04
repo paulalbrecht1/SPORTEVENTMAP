@@ -1064,6 +1064,37 @@ function updateActiveFilterSummary(resultCount) {
       .join("");
 }
 
+function updateDiscoveryFilterCount() {
+  const countBadge =
+    document.getElementById("discoveryFilterCount");
+  const panelToggle =
+    document.getElementById("toggleSidebar");
+  const dateFilter =
+    document.getElementById("dateFilter")?.value || "all";
+  const hasCustomDate = Boolean(
+    document.getElementById("dateFromFilter")?.value ||
+    document.getElementById("dateToFilter")?.value
+  );
+  const activeCount =
+    selectedSportFilters.length +
+    selectedDistanceFilters.length +
+    Number(dateFilter !== "all" || hasCustomDate);
+
+  if (countBadge) {
+    countBadge.textContent = String(activeCount);
+    countBadge.hidden = activeCount === 0;
+  }
+
+  if (panelToggle) {
+    panelToggle.dataset.activeFilterCount =
+      String(activeCount);
+  }
+
+  if (typeof window.updateSidebarToggleState === "function") {
+    window.updateSidebarToggleState();
+  }
+}
+
 function resetAllFilters() {
   const searchInput =
     document.getElementById("searchInput");
@@ -1489,12 +1520,24 @@ function initSearch() {
     document.body.classList.remove(
       "mobile-filter-open"
     );
+
+    if (typeof window.setSidebarExpanded === "function") {
+      window.setSidebarExpanded(false);
+    } else {
+      document.getElementById("sidebar")?.classList.add("closed");
+    }
   };
 
   if (mobileFilterBtn) {
     mobileFilterBtn.addEventListener(
       "click",
       () => {
+        if (typeof window.setSidebarExpanded === "function") {
+          window.setSidebarExpanded(true);
+        } else {
+          document.getElementById("sidebar")?.classList.remove("closed");
+        }
+
         document.body.classList.add(
           "mobile-filter-open"
         );
@@ -1763,6 +1806,7 @@ if (sort === "date") {
 
   // UPDATE LIST
   updateActiveFilterSummary(filtered.length);
+  updateDiscoveryFilterCount();
 
   if (typeof renderEventList === "function") {
     renderEventList(

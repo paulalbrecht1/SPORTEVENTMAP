@@ -93,6 +93,8 @@ let allMarkers = [];
 
 let searchInitialized = false;
 
+let discoveryMapViewBeforeEvent = null;
+
 const DISCOVERY_DEFAULT_MAP_CENTER = [
   51.1657,
   10.4515
@@ -101,6 +103,17 @@ const DISCOVERY_DEFAULT_MAP_CENTER = [
 const DISCOVERY_DEFAULT_MAP_ZOOM = 6;
 
 const DISCOVERY_DEFAULT_MAP_ZOOM_MOBILE = 5;
+
+const PHONE_VIEWPORT_QUERY =
+  "(max-width: 767px), (max-width: 960px) and (max-height: 500px) and (orientation: landscape)";
+
+function isPhoneViewport() {
+  return Boolean(
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(PHONE_VIEWPORT_QUERY).matches
+  );
+}
 
 function getDiscoveryDefaultMapZoom() {
   if (
@@ -114,6 +127,65 @@ function getDiscoveryDefaultMapZoom() {
   return DISCOVERY_DEFAULT_MAP_ZOOM;
 }
 
+function rememberDiscoveryMapViewBeforeEvent() {
+  if (
+    discoveryMapViewBeforeEvent ||
+    typeof map === "undefined" ||
+    !map ||
+    typeof map.getCenter !== "function" ||
+    typeof map.getZoom !== "function"
+  ) {
+    return false;
+  }
+
+  const center = map.getCenter();
+  const zoom = map.getZoom();
+
+  if (
+    !center ||
+    !Number.isFinite(center.lat) ||
+    !Number.isFinite(center.lng) ||
+    !Number.isFinite(zoom)
+  ) {
+    return false;
+  }
+
+  discoveryMapViewBeforeEvent = {
+    center: [center.lat, center.lng],
+    zoom
+  };
+
+  return true;
+}
+
+function restoreDiscoveryMapViewBeforeEvent() {
+  if (
+    !discoveryMapViewBeforeEvent ||
+    typeof map === "undefined" ||
+    !map ||
+    typeof map.setView !== "function"
+  ) {
+    return false;
+  }
+
+  const savedView = discoveryMapViewBeforeEvent;
+  discoveryMapViewBeforeEvent = null;
+
+  if (typeof map.stop === "function") {
+    map.stop();
+  }
+
+  if (typeof map.closePopup === "function") {
+    map.closePopup();
+  }
+
+  map.setView(savedView.center, savedView.zoom, {
+    animate: false
+  });
+
+  return true;
+}
+
 function resetDiscoveryMapView(options = {}) {
   if (
     typeof map === "undefined" ||
@@ -121,6 +193,8 @@ function resetDiscoveryMapView(options = {}) {
   ) {
     return;
   }
+
+  discoveryMapViewBeforeEvent = null;
 
   const zoom =
     Number.isFinite(options.zoom)
@@ -167,7 +241,7 @@ const MARKER_CLUSTER_OPTIONS = {
   maxClusterRadius(zoom) {
     if (zoom >= 12) return 24;
     if (zoom >= 9) return 38;
-    return 52;
+    return isPhoneViewport() ? 64 : 52;
   }
 };
 
@@ -201,6 +275,8 @@ let markerLayer = createMarkerLayer();
 
 let baseLayer;
 let mapLayoutRefreshTimer;
+let mapLayoutObserver;
+let mapLayoutRefreshInitialized = false;
 let eventsRefreshToken = 0;
 let deferMarkerLayerUpdates = false;
 
@@ -234,27 +310,59 @@ const MAP_STYLES = {
   }
 };
 
-// CUSTOM RED MARKER
-const redIcon = L.icon({
-  iconUrl:
-    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+// SPORT-SPECIFIC EVENT MARKERS
+const EVENT_MARKER_TYPES = {
+  running: {
+    title: "Running event"
+  },
+  ultra: {
+    title: "Ultra event"
+  },
+  triathlon: {
+    title: "Triathlon event"
+  }
+};
 
-  shadowUrl:
-    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+function getEventMarkerType(event) {
+  return window.SportEventMapMarkerTypes
+    .getEventMarkerType(event);
+}
 
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
-});
+function renderEventMarkerPin(type) {
+  return `<span class="event-map-pin event-map-pin--${type}" data-event-marker-type="${type}" aria-hidden="true"></span>`;
+}
+
+function createEventMarkerPresentation(event) {
+  const type =
+    getEventMarkerType(event);
+  const meta =
+    EVENT_MARKER_TYPES[type];
+
+  return {
+    type,
+    title: meta.title,
+    icon: L.divIcon({
+      className: `custom-marker custom-marker--${type}`,
+      html:
+        renderEventMarkerPin(type),
+      iconSize: [38, 46],
+      iconAnchor: [19, 44],
+      popupAnchor: [0, -40]
+    })
+  };
+}
 
 // INIT MAP
 function initMap() {
+  const usePhoneMapMode =
+    isPhoneViewport();
+
   map = L.map("map", {
     preferCanvas: true,
-    zoomAnimation: true,
+    zoomAnimation: !usePhoneMapMode,
     markerZoomAnimation: false,
     fadeAnimation: false,
+    inertia: !usePhoneMapMode,
     wheelDebounceTime: 45,
     wheelPxPerZoomLevel: 90
   }).setView(
@@ -304,13 +412,30 @@ function refreshMapLayout(delay = 0) {
     });
   };
 
+  const usePhoneMapMode =
+    isPhoneViewport();
+  const refreshDelay =
+    usePhoneMapMode
+      ? Math.max(delay, 90)
+      : delay;
+
   mapLayoutRefreshTimer = window.setTimeout(() => {
     window.requestAnimationFrame(run);
-    window.setTimeout(run, 220);
-  }, delay);
+
+    if (!usePhoneMapMode) {
+      window.setTimeout(run, 220);
+    }
+  }, refreshDelay);
 }
 
 function setupMapLayoutRefresh() {
+  if (mapLayoutRefreshInitialized) {
+    refreshMapLayout(80);
+    return;
+  }
+
+  mapLayoutRefreshInitialized = true;
+
   const mapElement =
     document.getElementById("map");
 
@@ -318,17 +443,22 @@ function setupMapLayoutRefresh() {
     mapElement &&
     typeof ResizeObserver !== "undefined"
   ) {
-    const observer =
+    mapLayoutObserver =
       new ResizeObserver(() => {
         refreshMapLayout(40);
       });
 
-    observer.observe(mapElement);
+    mapLayoutObserver.observe(mapElement);
   }
 
   window.addEventListener(
     "resize",
     () => refreshMapLayout(80)
+  );
+
+  window.addEventListener(
+    "orientationchange",
+    () => refreshMapLayout(120)
   );
 
   document.addEventListener(
@@ -503,7 +633,16 @@ function addMarker(event) {
     return;
   }
 
-  const marker = L.marker([lat, lng], { icon: redIcon });
+  const markerPresentation =
+    createEventMarkerPresentation(event);
+  const marker = L.marker([lat, lng], {
+    icon: markerPresentation.icon,
+    title:
+      `${event.event_name || markerPresentation.title} · ${markerPresentation.title}`,
+    alt:
+      `${event.event_name || markerPresentation.title} · ${markerPresentation.title}`,
+    riseOnHover: true
+  });
 
   marker.bindPopup(createPopup(event));
 
@@ -591,6 +730,8 @@ function focusEvent(event) {
     Number.isNaN(lat) ||
     Number.isNaN(lng)
   ) return;
+
+  rememberDiscoveryMapViewBeforeEvent();
 
   map.flyTo([lat, lng], Math.max(map.getZoom(), 14), {
     duration: 1.5
@@ -794,6 +935,12 @@ window.setMapStyle = setMapStyle;
 
 window.resetDiscoveryMapView =
   resetDiscoveryMapView;
+
+window.rememberDiscoveryMapViewBeforeEvent =
+  rememberDiscoveryMapViewBeforeEvent;
+
+window.restoreDiscoveryMapViewBeforeEvent =
+  restoreDiscoveryMapViewBeforeEvent;
 
 window.setVisibleMapMarkers =
   setVisibleMapMarkers;

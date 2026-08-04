@@ -1,4 +1,4 @@
-﻿const APP_CONFIG =
+const APP_CONFIG =
   window.SPORT_EVENT_MAP_CONFIG || {};
 
 const SUPABASE_URL =
@@ -2875,12 +2875,12 @@ async function loadRemotePlanningState(user) {
     const favoritesPromise =
       supabaseClient
         .from("favorites")
-        .select("event_id")
+        .select("event_id,event_ref")
         .eq("user_id", user.id);
     let seasonPromise =
       supabaseClient
         .from("season_planner_events")
-        .select("event_id, priority, planned_distance, planner_details")
+        .select("event_id, edition_id, priority, planned_distance, planner_details")
         .eq("user_id", user.id);
 
     let [
@@ -2918,7 +2918,17 @@ async function loadRemotePlanningState(user) {
 
     const remoteFavorites =
       (favoritesResult.data || [])
-        .map(row => row.event_id)
+        .map(row => {
+          if (!row.event_ref || typeof events === "undefined" || !Array.isArray(events)) {
+            return row.event_id;
+          }
+          const currentEdition = events.find(item =>
+            String(item.event_id || "") === String(row.event_ref)
+          );
+          return currentEdition && typeof getEventKey === "function"
+            ? getEventKey(currentEdition)
+            : row.event_id;
+        })
         .filter(Boolean);
 
     const remoteSeasonMeta =
@@ -2935,8 +2945,14 @@ async function loadRemotePlanningState(user) {
           return result;
         }, {});
 
+    const remotePlannedEditions =
+      (seasonResult.data || [])
+        .map(row => row.event_id)
+        .filter(Boolean);
+
     const planningState = {
       favorites: remoteFavorites,
+      plannedEditions: remotePlannedEditions,
       seasonMeta: remoteSeasonMeta
     };
 
@@ -2977,73 +2993,41 @@ async function syncFavoriteToSupabase(event, isFavoriteNow) {
       return;
     }
 
+    const eventRef = Number(event?.event_id) || null;
+    const favoriteId = eventRef ? `event:${eventRef}` : eventId;
+
     if (isFavoriteNow) {
-      const [
-        favoriteResult,
-        seasonResult
-      ] = await Promise.all([
-        supabaseClient
+      const favoriteResult = await supabaseClient
           .from("favorites")
           .upsert(
             {
               user_id: user.id,
-              event_id: eventId
+              event_id: favoriteId,
+              event_ref: eventRef
             },
             {
               onConflict: "user_id,event_id",
               ignoreDuplicates: true
             }
-          ),
-        supabaseClient
-          .from("season_planner_events")
-          .upsert(
-            {
-              user_id: user.id,
-              event_id: eventId
-            },
-            {
-              onConflict: "user_id,event_id",
-              ignoreDuplicates: true
-            }
-          )
-      ]);
+          );
 
-      if (
-        favoriteResult.error ||
-        seasonResult.error
-      ) {
-        throw (
-          favoriteResult.error ||
-          seasonResult.error
-        );
+      if (favoriteResult.error) {
+        throw favoriteResult.error;
       }
       return;
     }
 
-    const [
-      favoriteResult,
-      seasonResult
-    ] = await Promise.all([
-      supabaseClient
+    let favoriteDelete = supabaseClient
         .from("favorites")
         .delete()
-        .eq("user_id", user.id)
-        .eq("event_id", eventId),
-      supabaseClient
-        .from("season_planner_events")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("event_id", eventId)
-    ]);
+        .eq("user_id", user.id);
+    favoriteDelete = eventRef
+      ? favoriteDelete.eq("event_ref", eventRef)
+      : favoriteDelete.eq("event_id", favoriteId);
+    const favoriteResult = await favoriteDelete;
 
-    if (
-      favoriteResult.error ||
-      seasonResult.error
-    ) {
-      throw (
-        favoriteResult.error ||
-        seasonResult.error
-      );
+    if (favoriteResult.error) {
+      throw favoriteResult.error;
     }
   } catch (error) {
     console.warn(
@@ -3053,6 +3037,63 @@ async function syncFavoriteToSupabase(event, isFavoriteNow) {
     showAppMessage(
       "Sync delayed",
       "The change is saved on this device, but cloud sync is currently unavailable."
+    );
+  }
+}
+
+async function syncSeasonEditionToSupabase(event, isPlannedNow) {
+  try {
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const eventId =
+      typeof getEventKey === "function"
+        ? getEventKey(event)
+        : String(event?.event_key || "");
+
+    if (!eventId) {
+      return;
+    }
+
+    let result;
+    if (isPlannedNow) {
+      result = await supabaseClient
+        .from("season_planner_events")
+        .upsert(
+          {
+            user_id: user.id,
+            event_id: eventId,
+            edition_id: event?.edition_id || null
+          },
+          {
+            onConflict: "user_id,event_id",
+            ignoreDuplicates: true
+          }
+        );
+    } else {
+      result = await supabaseClient
+        .from("season_planner_events")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("event_id", eventId);
+    }
+
+    if (result.error) {
+      throw result.error;
+    }
+  } catch (error) {
+    console.warn(
+      "Season edition cloud sync failed:",
+      error
+    );
+    showAppMessage(
+      "Sync delayed",
+      "The Season Planner change is saved on this device, but cloud sync is currently unavailable."
     );
   }
 }
@@ -3095,6 +3136,15 @@ async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
     ) {
       payload.planner_details =
         patch.planner_details || {};
+    }
+
+    if (typeof events !== "undefined" && Array.isArray(events)) {
+      const edition = events.find(item =>
+        typeof getEventKey === "function" && getEventKey(item) === eventId
+      );
+      if (edition?.edition_id) {
+        payload.edition_id = edition.edition_id;
+      }
     }
 
     let { error } =
@@ -3141,6 +3191,9 @@ async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
 
 window.syncFavoriteToSupabase =
   syncFavoriteToSupabase;
+
+window.syncSeasonEditionToSupabase =
+  syncSeasonEditionToSupabase;
 
 window.syncSeasonPlanMetaToSupabase =
   syncSeasonPlanMetaToSupabase;
@@ -4512,6 +4565,139 @@ const adminFeedbackElements = {
   refresh: document.getElementById("refreshAdminFeedbackBtn")
 };
 
+const dataOpsElements = {
+  panel: document.getElementById("adminDataOperationsPanel"),
+  status: document.getElementById("dataOperationsStatus"),
+  refresh: document.getElementById("refreshDataOperationsBtn"),
+  validate: document.getElementById("runDataValidationBtn"),
+  eventsList: document.getElementById("dataOpsEventsList"),
+  issuesList: document.getElementById("dataOpsIssuesList"),
+  eventResultCount: document.getElementById("dataOpsEventResultCount"),
+  issueResultCount: document.getElementById("dataOpsIssueResultCount"),
+  proposalsList: document.getElementById("dataOpsProposalsList"),
+  alertsList: document.getElementById("dataOpsAlertsList"),
+  proposalResultCount: document.getElementById("dataOpsProposalResultCount"),
+  alertResultCount: document.getElementById("dataOpsAlertResultCount"),
+  country: document.getElementById("dataOpsCountryFilter"),
+  sport: document.getElementById("dataOpsSportFilter"),
+  eventStatus: document.getElementById("dataOpsEventStatusFilter"),
+  verification: document.getElementById("dataOpsVerificationFilter"),
+  severity: document.getElementById("dataOpsSeverityFilter"),
+  priority: document.getElementById("dataOpsPriorityFilter"),
+  lastCheck: document.getElementById("dataOpsLastCheckFilter"),
+  nextCheck: document.getElementById("dataOpsNextCheckFilter"),
+  historyPanel: document.getElementById("dataOpsHistoryPanel"),
+  historyTitle: document.getElementById("dataOpsHistoryTitle"),
+  historyList: document.getElementById("dataOpsHistoryList"),
+  closeHistory: document.getElementById("closeDataOpsHistoryBtn"),
+  kpis: {
+    totalEvents: document.getElementById("dataOpsTotalEvents"),
+    totalEditions: document.getElementById("dataOpsTotalEditions"),
+    verified: document.getElementById("dataOpsVerifiedEvents"),
+    unverified: document.getElementById("dataOpsUnverifiedEvents"),
+    stale: document.getElementById("dataOpsStaleEvents"),
+    review: document.getElementById("dataOpsReviewEvents"),
+    noNextCheck: document.getElementById("dataOpsNoNextCheck"),
+    unreachable: document.getElementById("dataOpsUnreachableSource"),
+    critical: document.getElementById("dataOpsCriticalIssues"),
+    warnings: document.getElementById("dataOpsWarningIssues"),
+    pastWithoutNext: document.getElementById("dataOpsPastWithoutNext"),
+    dueSources: document.getElementById("dataOpsDueSources"),
+    pendingProposals: document.getElementById("dataOpsPendingProposals"),
+    openAlerts: document.getElementById("dataOpsOpenAlerts")
+  }
+};
+function ensureSourceMonitorSection() {
+  if (!document.getElementById("sourceMonitorStyles")) {
+    const styles = document.createElement("link");
+    styles.id = "sourceMonitorStyles";
+    styles.rel = "stylesheet";
+    styles.href = "css/source-monitor.css?v=20260729-source-monitor-v1";
+    document.head.appendChild(styles);
+  }
+  const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
+  if (!operationsRoot || document.getElementById("sourceMonitorSection")) return;
+  const section = document.createElement("section");
+  section.id = "sourceMonitorSection";
+  section.className = "source-monitor-section";
+  section.innerHTML = `
+    <div class="admin-data-operations-section-heading">
+      <div><span class="admin-eyebrow">Source Monitor</span><h4>Technische Quellenpruefung</h4><p>Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</p></div>
+      <p id="sourceMonitorStatus" class="admin-section-status" aria-live="polite"></p>
+    </div>
+    <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen">
+      <div><span>Heute geprueft</span><strong id="sourceMonitorCheckedToday">0</strong></div>
+      <div><span>Unveraendert</span><strong id="sourceMonitorUnchanged">0</strong></div>
+      <div><span>Veraendert</span><strong id="sourceMonitorChanged">0</strong></div>
+      <div><span>Nicht erreichbar</span><strong id="sourceMonitorUnreachable">0</strong></div>
+      <div><span>Fehlgeschlagen</span><strong id="sourceMonitorFailed">0</strong></div>
+      <div><span>Wiederholungen</span><strong id="sourceMonitorRetries">0</strong></div>
+      <div><span>Dead Letter</span><strong id="sourceMonitorDeadLetter">0</strong></div>
+      <div><span>Durchschnitt</span><strong id="sourceMonitorAverageTime">--</strong></div>
+      <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
+      <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
+    </div>
+    <section id="editionLifecycleInbox" class="edition-lifecycle-inbox" aria-labelledby="editionLifecycleTitle">
+      <div class="admin-data-operations-section-heading">
+        <div><span class="admin-eyebrow">Edition Lifecycle</span><h5 id="editionLifecycleTitle">Nur Ausnahmen bearbeiten</h5><p>Vergangene Austragungen werden automatisch archiviert. Hier erscheinen nur neue Jahrgaenge, Ergebnisse und echte Fehler.</p></div>
+        <p id="editionLifecycleStatus" class="admin-section-status" aria-live="polite"></p>
+      </div>
+      <div class="edition-lifecycle-kpis">
+        <div><span>Ausnahmen</span><strong id="editionLifecycleTotal">0</strong></div>
+        <div><span>Neue Jahrgaenge</span><strong id="editionLifecycleSuccessors">0</strong></div>
+        <div><span>Ergebnisse</span><strong id="editionLifecycleResults">0</strong></div>
+        <div><span>Kritisch</span><strong id="editionLifecycleCritical">0</strong></div>
+      </div>
+      <div class="edition-lifecycle-toolbar">
+        <button type="button" data-lifecycle-action="select-all">Alle freigabefaehigen waehlen</button>
+        <button type="button" data-lifecycle-action="approve-selected">Auswahl freigeben</button>
+      </div>
+      <div id="editionLifecycleList" class="edition-lifecycle-list"></div>
+    </section>
+    <div class="source-monitor-table-wrap">
+      <table class="source-monitor-table">
+        <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
+        <tbody id="sourceMonitorTableBody"></tbody>
+      </table>
+    </div>
+    <section id="sourceMonitorHistory" class="source-monitor-history" hidden>
+      <div class="admin-data-operations-section-heading"><div><h5>Crawl-Historie</h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history">Schliessen</button></div>
+      <div id="sourceMonitorHistoryList" class="admin-data-operations-list"></div>
+    </section>`;
+  operationsRoot.insertBefore(section, dataOpsElements.historyPanel || null);
+}
+
+ensureSourceMonitorSection();
+const sourceMonitorElements = {
+  section: document.getElementById("sourceMonitorSection"),
+  status: document.getElementById("sourceMonitorStatus"),
+  tableBody: document.getElementById("sourceMonitorTableBody"),
+  history: document.getElementById("sourceMonitorHistory"),
+  historyTitle: document.getElementById("sourceMonitorHistoryTitle"),
+  historyList: document.getElementById("sourceMonitorHistoryList"),
+  kpis: {
+    checkedToday: document.getElementById("sourceMonitorCheckedToday"),
+    unchanged: document.getElementById("sourceMonitorUnchanged"),
+    changed: document.getElementById("sourceMonitorChanged"),
+    unreachable: document.getElementById("sourceMonitorUnreachable"),
+    failed: document.getElementById("sourceMonitorFailed"),
+    retries: document.getElementById("sourceMonitorRetries"),
+    deadLetter: document.getElementById("sourceMonitorDeadLetter"),
+    averageTime: document.getElementById("sourceMonitorAverageTime"),
+    overdue: document.getElementById("sourceMonitorOverdue"),
+    noSchedule: document.getElementById("sourceMonitorNoSchedule")
+  }
+};
+const editionLifecycleElements = {
+  section: document.getElementById("editionLifecycleInbox"),
+  status: document.getElementById("editionLifecycleStatus"),
+  list: document.getElementById("editionLifecycleList"),
+  total: document.getElementById("editionLifecycleTotal"),
+  successors: document.getElementById("editionLifecycleSuccessors"),
+  results: document.getElementById("editionLifecycleResults"),
+  critical: document.getElementById("editionLifecycleCritical")
+};
+
 const adminTabs =
   document.querySelectorAll(".admin-tab");
 
@@ -4521,20 +4707,28 @@ const adminTabPanels =
 const adminAnalyticsStatus =
   document.getElementById("adminAnalyticsStatus");
 
-let currentAdminTab = "review";
+let currentAdminTab = "analytics";
 let pendingAdminEvents = [];
 let localQualityRows = [];
 let adminStagingPreviewRows = [];
 let adminRefreshInProgress = false;
+let dataOpsEvents = [];
+let dataOpsEditions = [];
+let dataOpsIssues = [];
+let dataOpsSources = [];
+let dataOpsProposals = [];
+let dataOpsAlerts = [];
+let dataOpsRuns = [];
+
+let sourceMonitorJobs = [];
+let sourceMonitorResults = [];
+let sourceMonitorReviews = [];
+let editionLifecycleInbox = [];
 
 const ADMIN_TAB_PANEL_IDS = {
-  review: "adminReviewPanel",
-  quality: "adminQualityPanel",
-  feedback: "adminFeedbackPanel",
   analytics: "adminAnalyticsPanel",
-  knowledge: "adminKnowledgePanel",
-  knowledgeAudit: "adminKnowledgeAuditPanel",
-  imports: "adminImportsPanel"
+  dataOperations: "adminDataOperationsPanel",
+  feedback: "adminFeedbackPanel"
 };
 
 
@@ -4560,12 +4754,12 @@ adminBtn.onclick = async () => {
     page: "admin"
   });
 
-  setAdminTab("review");
+  setAdminTab("analytics");
 
-  initWorldTriathlonImportDates();
+  // The streamlined admin area loads only analytics and feedback.
 
   await refreshAdminWorkspace({
-    includeSystemStatus: true,
+    includeSystemStatus: false,
     force: true
   });
 
@@ -4576,7 +4770,7 @@ function setAdminTab(tabName) {
   currentAdminTab =
     ADMIN_TAB_PANEL_IDS[tabName]
       ? tabName
-      : "review";
+      : "analytics";
 
   adminTabs.forEach(tab => {
 
@@ -4627,6 +4821,11 @@ async function loadAdminTab(tabName, options = {}) {
     return;
   }
 
+  if (tabName === "dataOperations") {
+    await loadDataOperations({ force: options.force });
+    return;
+  }
+
   if (tabName === "feedback") {
     await loadAdminFeedbackManagement();
     return;
@@ -4651,6 +4850,603 @@ async function loadAdminTab(tabName, options = {}) {
     initWorldTriathlonImportDates();
   }
 }
+
+function setDataOpsStatus(message, type = "") {
+  if (!dataOpsElements.status) return;
+  dataOpsElements.status.className = `admin-section-status ${type}`.trim();
+  dataOpsElements.status.textContent = message;
+}
+function dataOpsText(key, fallback = "", values = null) {
+  if (values && typeof window.tFormat === "function") {
+    return window.tFormat(key, values, fallback);
+  }
+  return typeof window.t === "function" ? window.t(key, fallback) : fallback;
+}
+
+function formatDataOpsDate(value, includeTime = false) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return escapeAdminHTML(value);
+  return date.toLocaleString([], includeTime
+    ? { dateStyle: "medium", timeStyle: "short" }
+    : { dateStyle: "medium" });
+}
+
+function setDataOpsKpi(name, value) {
+  if (dataOpsElements.kpis[name]) {
+    dataOpsElements.kpis[name].textContent = String(value);
+  }
+}
+
+function populateDataOpsSelect(element, values) {
+  if (!element) return;
+  const selected = element.value;
+  const first = element.options[0]?.outerHTML || '<option value="">All</option>';
+  element.innerHTML = first + [...new Set(values.filter(Boolean))]
+    .sort((left, right) => left.localeCompare(right))
+    .map(value => `<option value="${escapeAdminHTML(value)}">${escapeAdminHTML(value)}</option>`)
+    .join("");
+  element.value = selected;
+}
+
+function getDataOpsEditions(eventId) {
+  return dataOpsEditions
+    .filter(edition => String(edition.event_id) === String(eventId))
+    .sort((left, right) => Number(right.edition_year) - Number(left.edition_year));
+}
+
+function getDataOpsIssues(eventId) {
+  return dataOpsIssues.filter(issue => String(issue.event_id) === String(eventId));
+}
+
+function getDataOpsFilteredRows() {
+  const country = dataOpsElements.country?.value || "";
+  const sport = dataOpsElements.sport?.value || "";
+  const eventStatus = dataOpsElements.eventStatus?.value || "";
+  const verification = dataOpsElements.verification?.value || "";
+  const severity = dataOpsElements.severity?.value || "";
+  const priority = dataOpsElements.priority?.value || "";
+  const lastCheck = dataOpsElements.lastCheck?.value || "";
+  const nextCheck = dataOpsElements.nextCheck?.value || "";
+
+  return dataOpsEvents.filter(event => {
+    const issues = getDataOpsIssues(event.id);
+    if (country && event.country !== country) return false;
+    if (sport && event.sport !== sport) return false;
+    if (eventStatus && event.event_status !== eventStatus) return false;
+    if (verification && event.verification_status !== verification) return false;
+    if (severity && !issues.some(issue => issue.severity === severity)) return false;
+    if (priority && event.review_priority !== priority) return false;
+    if (lastCheck && (!event.last_verified_at || event.last_verified_at.slice(0, 10) < lastCheck)) return false;
+    if (nextCheck && (!event.next_check_at || event.next_check_at.slice(0, 10) > nextCheck)) return false;
+    return true;
+  });
+}
+
+function renderDataOpsEvents(rows) {
+  if (!dataOpsElements.eventsList) return;
+  dataOpsElements.eventResultCount.textContent = `${rows.length} / ${dataOpsEvents.length}`;
+
+  if (!rows.length) {
+    dataOpsElements.eventsList.innerHTML = '<p class="admin-quality-empty">Keine Events für diese Filter.</p>';
+    return;
+  }
+
+  dataOpsElements.eventsList.innerHTML = rows.slice(0, 250).map(event => {
+    const editions = getDataOpsEditions(event.id);
+    const latest = editions[0] || null;
+    const issues = getDataOpsIssues(event.id);
+    const officialUrl = safeAdminUrl(event.official_url || event.event_url || "");
+    const editionUrl = latest?.edition_slug
+      ? `/event/${encodeURIComponent(latest.edition_slug)}/`
+      : "";
+    return `
+      <article class="admin-data-operations-card" data-dataops-event-id="${event.id}">
+        <div class="admin-data-operations-card-heading">
+          <div>
+            <span class="admin-data-operations-status is-${escapeAdminHTML(event.verification_status)}">${escapeAdminHTML(event.verification_status)}</span>
+            <h5>${escapeAdminHTML(event.canonical_name || event.event_name || `Event ${event.id}`)}</h5>
+            <p>${escapeAdminHTML(event.sport || "—")} · ${escapeAdminHTML(event.city || "—")}, ${escapeAdminHTML(event.country || "—")}</p>
+          </div>
+          <strong>${editions.length} ${editions.length === 1 ? "Austragung" : "Austragungen"}</strong>
+        </div>
+        <dl class="admin-data-operations-meta">
+          <div><dt>${dataOpsText("admin.dataOps.lastCheck", "Last check")}</dt><dd>${formatDataOpsDate(event.last_verified_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.nextCheck", "Next check")}</dt><dd>${formatDataOpsDate(event.next_check_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.confidence", "Confidence")}</dt><dd>${Math.round(Number(event.data_confidence || 0) * 100)}%</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.issues", "Issues")}</dt><dd>${issues.length}</dd></div>
+        </dl>
+        <div class="admin-data-operations-editions">
+          ${editions.map(edition => `
+            <div>
+              <span>${edition.edition_year} · ${escapeAdminHTML(edition.edition_status)}</span>
+              <strong>${formatDataOpsDate(edition.start_date)}</strong>
+              ${edition.id === latest?.id ? '<em>aktuell</em>' : ''}
+            </div>
+          `).join("") || '<p>Keine Austragung vorhanden.</p>'}
+        </div>
+        <div class="admin-data-operations-card-actions">
+          ${officialUrl ? `<a href="${officialUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEvent", "Open event")}</a>` : ''}
+          ${editionUrl ? `<a href="${editionUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEdition", "Open edition")}</a>` : ''}
+          <button type="button" data-dataops-action="verify" data-event-id="${event.id}">${dataOpsText("admin.dataOps.manualVerify", "Verify manually")}</button>
+          <button type="button" data-dataops-action="review" data-event-id="${event.id}">${dataOpsText("admin.dataOps.markReview", "Needs review")}</button>
+          <button type="button" data-dataops-action="history" data-entity-type="event" data-entity-id="${event.id}" data-entity-label="${escapeAdminHTML(event.canonical_name || event.event_name)}">${dataOpsText("admin.dataOps.history", "History")}</button>
+        </div>
+        <div class="admin-data-operations-schedule">
+          <label>${dataOpsText("admin.dataOps.nextCheck", "Next check")} <input type="date" data-dataops-next-check value="${escapeAdminHTML((event.next_check_at || "").slice(0, 10))}"></label>
+          <button type="button" data-dataops-action="schedule" data-event-id="${event.id}">${dataOpsText("admin.dataOps.save", "Save")}</button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function renderDataOpsIssues() {
+  if (!dataOpsElements.issuesList) return;
+  const visibleEventIds = new Set(getDataOpsFilteredRows().map(event => String(event.id)));
+  const severity = dataOpsElements.severity?.value || "";
+  const issues = dataOpsIssues.filter(issue =>
+    visibleEventIds.has(String(issue.event_id)) && (!severity || issue.severity === severity)
+  );
+  dataOpsElements.issueResultCount.textContent = `${issues.length} offen`;
+  if (!issues.length) {
+    dataOpsElements.issuesList.innerHTML = '<p class="admin-quality-empty">Keine offenen Validierungsprobleme.</p>';
+    return;
+  }
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  dataOpsElements.issuesList.innerHTML = issues.slice(0, 300).map(issue => {
+    const event = eventById.get(String(issue.event_id));
+    return `
+      <article class="admin-data-operations-issue is-${escapeAdminHTML(issue.severity)}">
+        <div><span>${escapeAdminHTML(issue.severity)} · ${escapeAdminHTML(issue.rule_code)}</span><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${issue.event_id}`)}</strong><p>${escapeAdminHTML(issue.description)}</p></div>
+        <button type="button" data-dataops-action="resolve" data-issue-id="${issue.id}">${dataOpsText("admin.dataOps.resolve", "Mark resolved")}</button>
+      </article>`;
+  }).join("");
+}
+
+function renderDataOpsProposals() {
+  if (!dataOpsElements.proposalsList) return;
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  dataOpsElements.proposalResultCount.textContent = `${dataOpsProposals.length} offen`;
+  dataOpsElements.proposalsList.innerHTML = dataOpsProposals.map(proposal => {
+    const event = eventById.get(String(proposal.event_id));
+    const changes = proposal.proposed_changes || {};
+    const hasApplicableChanges = Object.keys(changes).length > 0;
+    return `<article class="admin-data-operations-proposal">
+      <span class="admin-data-operations-status">${escapeAdminHTML(proposal.rule_code)}</span>
+      <strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</strong>
+      <p>${escapeAdminHTML(proposal.reason || "Automatisch erkannte Änderung")}</p>
+      <pre>${escapeAdminHTML(JSON.stringify(hasApplicableChanges ? changes : proposal.observed_values || {}, null, 2))}</pre>
+      <div class="admin-data-operations-proposal-actions">
+        <button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}" ${hasApplicableChanges ? "" : "disabled"}>Prüfen &amp; übernehmen</button>
+        <button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">${hasApplicableChanges ? "Ablehnen" : "Als geprüft schließen"}</button>
+      </div>
+    </article>`;
+  }).join("") || '<p class="admin-quality-empty">Keine offenen Änderungsvorschläge.</p>';
+}
+
+function renderDataOpsAlerts() {
+  if (!dataOpsElements.alertsList) return;
+  dataOpsElements.alertResultCount.textContent = `${dataOpsAlerts.length} offen`;
+  dataOpsElements.alertsList.innerHTML = dataOpsAlerts.map(alert => `
+    <article class="admin-data-operations-alert is-${escapeAdminHTML(alert.severity)}">
+      <span class="admin-data-operations-status">${escapeAdminHTML(alert.severity)} · ${escapeAdminHTML(alert.alert_code)}</span>
+      <strong>${escapeAdminHTML(alert.title)}</strong>
+      <p>${escapeAdminHTML(alert.description)}</p>
+      <p>${formatDataOpsDate(alert.last_detected_at, true)} · ${Number(alert.occurrence_count || 1)}× erkannt</p>
+      <button type="button" data-dataops-action="resolve-alert" data-alert-id="${alert.id}">Alarm schließen</button>
+    </article>`).join("") || '<p class="admin-quality-empty">Keine offenen Workflow-Alarme.</p>';
+}
+function renderDataOperations() {
+  const today = new Date().toISOString().slice(0, 10);
+  const openIssues = dataOpsIssues.filter(issue => issue.status === "open");
+  const pastWithoutNext = dataOpsEvents.filter(event => {
+    const editions = getDataOpsEditions(event.id);
+    return editions.length && editions.every(edition => !edition.start_date || edition.start_date < today);
+  }).length;
+
+  setDataOpsKpi("totalEvents", dataOpsEvents.length);
+  setDataOpsKpi("totalEditions", dataOpsEditions.length);
+  setDataOpsKpi("verified", dataOpsEvents.filter(row => row.verification_status === "verified").length);
+  setDataOpsKpi("unverified", dataOpsEvents.filter(row => row.verification_status === "unverified").length);
+  setDataOpsKpi("stale", dataOpsEvents.filter(row => row.verification_status === "stale").length);
+  setDataOpsKpi("review", dataOpsEvents.filter(row => row.needs_review || row.verification_status === "needs_review").length);
+  setDataOpsKpi("noNextCheck", dataOpsEvents.filter(row => !row.next_check_at).length);
+  setDataOpsKpi("unreachable", dataOpsEvents.filter(row => row.verification_status === "source_unreachable").length);
+  setDataOpsKpi("critical", openIssues.filter(row => row.severity === "critical").length);
+  setDataOpsKpi("warnings", openIssues.filter(row => row.severity === "warning").length);
+  setDataOpsKpi("pastWithoutNext", pastWithoutNext);
+  setDataOpsKpi("dueSources", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= new Date().toISOString()).length);
+  setDataOpsKpi("pendingProposals", dataOpsProposals.length);
+  setDataOpsKpi("openAlerts", dataOpsAlerts.length);
+  renderDataOpsEvents(getDataOpsFilteredRows());
+  renderDataOpsIssues();
+  renderDataOpsProposals();
+  renderDataOpsAlerts();
+  renderSourceMonitor();
+}
+
+function setSourceMonitorStatus(message, type = "") {
+  if (!sourceMonitorElements.status) return;
+  sourceMonitorElements.status.className = `admin-section-status ${type}`.trim();
+  sourceMonitorElements.status.textContent = message;
+}
+
+function setSourceMonitorKpi(name, value) {
+  if (sourceMonitorElements.kpis[name]) sourceMonitorElements.kpis[name].textContent = String(value);
+}
+
+function setEditionLifecycleStatus(message, type = "") {
+  if (!editionLifecycleElements.status) return;
+  editionLifecycleElements.status.className = `admin-section-status ${type}`.trim();
+  editionLifecycleElements.status.textContent = message;
+}
+
+function renderEditionLifecycleInbox() {
+  if (!editionLifecycleElements.list) return;
+  const rows = editionLifecycleInbox.slice().sort((left, right) => {
+    const weights = { critical: 0, high: 1, medium: 2 };
+    return (weights[left.priority] ?? 3) - (weights[right.priority] ?? 3) ||
+      String(left.created_at || "").localeCompare(String(right.created_at || ""));
+  });
+  editionLifecycleElements.total.textContent = String(rows.length);
+  editionLifecycleElements.successors.textContent = String(rows.filter(row => row.item_type === "new_edition").length);
+  editionLifecycleElements.results.textContent = String(rows.filter(row => row.item_type === "result").length);
+  editionLifecycleElements.critical.textContent = String(rows.filter(row => row.priority === "critical").length);
+
+  if (!rows.length) {
+    editionLifecycleElements.list.innerHTML = '<p class="admin-quality-empty">Keine manuelle Ausnahme offen. Der Lifecycle laeuft automatisch.</p>';
+    return;
+  }
+
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
+  editionLifecycleElements.list.innerHTML = rows.slice(0, 300).map(row => {
+    const event = eventById.get(String(row.event_id));
+    const edition = editionById.get(String(row.edition_id));
+    const canApprove = ["approve_successor", "approve_result"].includes(row.batch_action);
+    const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : "";
+    const sourceUrl = safeAdminUrl(row.metadata?.source_url || row.metadata?.url || "");
+    return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
+      ${canApprove ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
+      <div><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(row.priority)}</span><h6>${escapeAdminHTML(row.title)}</h6><p>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)} · ${escapeAdminHTML(row.description)}</p></div>
+      <dl><div><dt>Typ</dt><dd>${escapeAdminHTML(row.item_type)}</dd></div><div><dt>Status</dt><dd>${escapeAdminHTML(row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${Math.round(Number(row.confidence) * 100)}%`}</dd></div><div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
+      <div class="source-monitor-actions">
+        ${canApprove ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
+        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
+        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Austragung oeffnen</a>` : ""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+async function approveEditionLifecycleItems(items) {
+  const successorIds = items.filter(item => item.item_type === "new_edition").map(item => item.item_id);
+  const resultIds = items.filter(item => item.item_type === "result").map(item => item.item_id);
+  const responses = [];
+  if (successorIds.length) responses.push(await supabaseClient.rpc("approve_edition_succession_candidates", { p_candidate_ids: successorIds, p_limit: successorIds.length }));
+  if (resultIds.length) responses.push(await supabaseClient.rpc("approve_edition_result_candidates", { p_result_ids: resultIds, p_limit: resultIds.length }));
+  const failed = responses.find(result => result.error);
+  if (failed) throw failed.error;
+  return responses.reduce((count, result) => count + Number(result.data?.approved_count || 0), 0);
+}
+
+async function handleEditionLifecycleAction(button) {
+  const action = button.dataset.lifecycleAction;
+  if (action === "select-all") {
+    editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]").forEach(input => { input.checked = true; });
+    setEditionLifecycleStatus("Alle freigabefaehigen Ausnahmen wurden ausgewaehlt.", "success");
+    return;
+  }
+  let items = [];
+  if (action === "approve-selected") {
+    const selected = new Set([...editionLifecycleElements.list.querySelectorAll("[data-lifecycle-select]:checked")].map(input => input.value));
+    items = editionLifecycleInbox.filter(item => selected.has(String(item.item_id)));
+    if (!items.length) { setEditionLifecycleStatus("Bitte mindestens eine Ausnahme auswaehlen.", "error"); return; }
+  } else {
+    items = editionLifecycleInbox.filter(item => String(item.item_id) === String(button.dataset.itemId));
+  }
+
+  setButtonLoading(button, true, action === "reject" ? "Ablehnen ..." : "Freigeben ...");
+  try {
+    if (action === "reject") {
+      const item = items[0];
+      let result;
+      if (item?.item_type === "new_edition") result = await supabaseClient.from("edition_succession_candidates").update({ candidate_status: "rejected", reviewed_at: new Date().toISOString(), review_notes: "In der Exception-Inbox abgelehnt." }).eq("id", item.item_id);
+      if (item?.item_type === "result") result = await supabaseClient.from("edition_results").update({ publication_status: "archived", result_status: "unavailable", reviewed_at: new Date().toISOString() }).eq("id", item.item_id);
+      if (result?.error) throw result.error;
+      setEditionLifecycleStatus("Ausnahme wurde geschlossen.", "success");
+    } else {
+      const approvedCount = await approveEditionLifecycleItems(items);
+      setEditionLifecycleStatus(`${approvedCount} Eintraege wurden kontrolliert veroeffentlicht.`, "success");
+    }
+    await loadDataOperations();
+  } catch (error) {
+    setEditionLifecycleStatus(getFriendlyErrorMessage(error, "Lifecycle-Aktion fehlgeschlagen."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+function toDateTimeLocal(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
+async function loadSourceMonitorRecent(table, columns, limit = 1000) {
+  const { data, error } = await supabaseClient.from(table).select(columns)
+    .order("created_at", { ascending: false }).limit(limit);
+  return { rows: data || [], error };
+}
+
+function sourceMonitorLatestBy(rows, key) {
+  const map = new Map();
+  rows.forEach(row => { if (!map.has(String(row[key]))) map.set(String(row[key]), row); });
+  return map;
+}
+
+function renderSourceMonitor() {
+  if (!sourceMonitorElements.tableBody) return;
+  renderEditionLifecycleInbox();
+  const nowIso = new Date().toISOString();
+  const today = nowIso.slice(0, 10);
+  const todayResults = sourceMonitorResults.filter(row => String(row.fetched_at || "").slice(0, 10) === today);
+  const timed = todayResults.map(row => Number(row.response_time_ms)).filter(Number.isFinite);
+  setSourceMonitorKpi("checkedToday", todayResults.length);
+  setSourceMonitorKpi("unchanged", todayResults.filter(row => row.change_status === "unchanged").length);
+  setSourceMonitorKpi("changed", todayResults.filter(row => row.change_status === "changed").length);
+  setSourceMonitorKpi("unreachable", todayResults.filter(row => row.change_status === "unreachable").length);
+  setSourceMonitorKpi("failed", todayResults.filter(row => row.processing_status !== "completed").length);
+  setSourceMonitorKpi("retries", sourceMonitorJobs.filter(row => row.status === "retry_scheduled").length);
+  setSourceMonitorKpi("deadLetter", sourceMonitorJobs.filter(row => row.status === "dead_letter").length);
+  setSourceMonitorKpi("averageTime", timed.length ? `${Math.round(timed.reduce((sum, value) => sum + value, 0) / timed.length)} ms` : "--");
+  setSourceMonitorKpi("overdue", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= nowIso).length);
+  setSourceMonitorKpi("noSchedule", dataOpsSources.filter(row => row.is_active && !row.next_fetch_at).length);
+
+  const resultBySource = sourceMonitorLatestBy(sourceMonitorResults, "source_id");
+  const jobBySource = sourceMonitorLatestBy(sourceMonitorJobs, "source_id");
+  const reviewBySource = sourceMonitorLatestBy(sourceMonitorReviews.filter(row => row.status === "open"), "source_id");
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
+
+  sourceMonitorElements.tableBody.innerHTML = dataOpsSources
+    .slice().sort((left, right) => String(left.next_fetch_at || "").localeCompare(String(right.next_fetch_at || "")))
+    .slice(0, 500).map(source => {
+      const event = eventById.get(String(source.event_id));
+      const edition = editionById.get(String(source.edition_id));
+      const result = resultBySource.get(String(source.id));
+      const job = jobBySource.get(String(source.id));
+      const review = reviewBySource.get(String(source.id));
+      const sourceUrl = safeAdminUrl(source.source_url || "");
+      const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : event?.slug ? `/event/${encodeURIComponent(event.slug)}/` : "";
+      return `<tr data-source-id="${source.id}">
+        <td data-label="Event / Austragung"><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${source.event_id}`)}</strong><span>${escapeAdminHTML(edition ? `${edition.edition_year} | ${edition.edition_status}` : "Eventquelle")}</span></td>
+        <td data-label="Quelle"><strong>${escapeAdminHTML(source.source_host || "--")}</strong><span>${escapeAdminHTML(source.source_type || "--")}</span></td>
+        <td data-label="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} Fehler</span><span>Confidence ${escapeAdminHTML(result?.change_confidence || "--")} | IP ${escapeAdminHTML(result?.pinned_ip || source.last_pinned_ip || "--")}</span></td>
+        <td data-label="Pruefplan"><span>${formatDataOpsDate(source.last_fetched_at, true)}</span><label>Naechster Crawl<input type="datetime-local" data-source-next value="${toDateTimeLocal(source.next_fetch_at)}"></label></td>
+        <td data-label="Review"><strong>${escapeAdminHTML(review?.priority || "--")}</strong><span>${escapeAdminHTML(review?.title || job?.status || "kein offenes Review")}</span></td>
+        <td data-label="Aktionen"><div class="source-monitor-actions">
+          <button type="button" data-source-action="check" data-source-id="${source.id}">Jetzt pruefen</button>
+          <button type="button" data-source-action="schedule" data-source-id="${source.id}">Termin setzen</button>
+          <button type="button" data-source-action="${source.is_active ? "pause" : "activate"}" data-source-id="${source.id}">${source.is_active ? "Pausieren" : "Reaktivieren"}</button>
+          <button type="button" data-source-action="history" data-source-id="${source.id}" data-source-label="${escapeAdminHTML(event?.canonical_name || event?.event_name || source.source_host)}">Historie</button>
+          ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
+          ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event oeffnen</a>` : ""}
+          ${review ? `<button type="button" data-source-action="reviewed" data-task-id="${review.id}">Als geprueft markieren</button>` : ""}
+          <button type="button" data-source-action="reset" data-source-id="${source.id}">Fehler zuruecksetzen</button>
+          ${job?.status === "dead_letter" || job?.status === "failed" ? `<button type="button" data-source-action="retry" data-source-id="${source.id}" data-job-id="${job.id}">Crawl erneut</button>` : ""}
+        </div></td>
+      </tr>`;
+    }).join("") || '<tr><td colspan="6">Keine Quellen vorhanden.</td></tr>';
+}
+
+async function showSourceMonitorHistory(sourceId, label) {
+  setSourceMonitorStatus("Crawl-Historie wird geladen ...");
+  const { data, error } = await supabaseClient.from("source_crawl_results")
+    .select("id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version")
+    .eq("source_id", sourceId).order("fetched_at", { ascending: false }).limit(200);
+  if (error) { setSourceMonitorStatus(getFriendlyErrorMessage(error, "Historie konnte nicht geladen werden."), "error"); return; }
+  sourceMonitorElements.historyTitle.textContent = label || sourceId;
+  sourceMonitorElements.historyList.innerHTML = (data || []).map(row => `<article class="admin-data-operations-history-row">
+    <div><strong>${escapeAdminHTML(row.change_status)} | HTTP ${escapeAdminHTML(row.http_status ?? "--")}</strong><span>${formatDataOpsDate(row.fetched_at, true)} | ${escapeAdminHTML(row.worker_version)}</span></div>
+    <p>${escapeAdminHTML(row.final_url || row.error_message || "Keine Zusatzinformation")}</p>
+    <code>${escapeAdminHTML(JSON.stringify({ redirects: row.redirect_count, duration_ms: row.response_time_ms, content_type: row.content_type, content_length: row.content_length, pinned_ip: row.pinned_ip, normalization: row.normalization_version, confidence: row.change_confidence, reasons: row.change_reasons, previous_hash: row.previous_content_hash, hash: row.content_hash, previous_semantic_hash: row.previous_semantic_hash, semantic_hash: row.semantic_hash, processing: row.processing_status, error: row.error_type }, null, 2))}</code>
+  </article>`).join("") || '<p class="admin-quality-empty">Noch keine Crawl-Ergebnisse.</p>';
+  sourceMonitorElements.history.hidden = false;
+  sourceMonitorElements.history.scrollIntoView({ behavior: "smooth", block: "start" });
+  setSourceMonitorStatus(`${(data || []).length} Historieneintraege geladen.`, "success");
+}
+
+async function runSourceNow(sourceId) {
+  const { data, error } = await supabaseClient.functions.invoke("event-source-check", { body: { source_id: sourceId, batch_size: 1 } });
+  if (error) throw error;
+  return data;
+}
+
+async function handleSourceMonitorAction(button) {
+  const action = button.dataset.sourceAction;
+  if (action === "close-history") { sourceMonitorElements.history.hidden = true; return; }
+  const sourceId = button.dataset.sourceId;
+  if (action === "history") { await showSourceMonitorHistory(sourceId, button.dataset.sourceLabel); return; }
+  setButtonLoading(button, true, "Bitte warten ...");
+  setSourceMonitorStatus("Aktion wird ausgefuehrt ...");
+  try {
+    let error = null;
+    if (action === "check") await runSourceNow(sourceId);
+    if (action === "schedule") {
+      const value = button.closest("tr")?.querySelector("[data-source-next]")?.value;
+      if (!value) throw new Error("Bitte einen naechsten Prueftermin waehlen.");
+      ({ error } = await supabaseClient.from("event_sources").update({ next_fetch_at: new Date(value).toISOString() }).eq("id", sourceId));
+    }
+    if (action === "pause") ({ error } = await supabaseClient.from("event_sources").update({ is_active: false, crawl_status: "inactive" }).eq("id", sourceId));
+    if (action === "activate") ({ error } = await supabaseClient.from("event_sources").update({ is_active: true, crawl_status: "pending", next_fetch_at: new Date().toISOString() }).eq("id", sourceId));
+    if (action === "reset") ({ error } = await supabaseClient.rpc("reset_source_crawl_failures", { p_source_id: sourceId }));
+    if (action === "reviewed") ({ error } = await supabaseClient.rpc("resolve_source_review_task", { p_task_id: button.dataset.taskId, p_status: "resolved", p_notes: "Im Source Monitor geprueft." }));
+    if (action === "retry") {
+      ({ error } = await supabaseClient.rpc("retry_source_crawl_job", { p_job_id: button.dataset.jobId }));
+      if (!error) await runSourceNow(sourceId);
+    }
+    if (error) throw error;
+    await loadDataOperations();
+    setSourceMonitorStatus("Aktion erfolgreich abgeschlossen.", "success");
+  } catch (error) {
+    setSourceMonitorStatus(getFriendlyErrorMessage(error, error.message || "Source-Monitor-Aktion fehlgeschlagen."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+async function loadDataOperations() {
+  if (!dataOpsElements.panel) return;
+  setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult] = await Promise.all([
+    loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
+    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
+    loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
+    loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
+    loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
+    loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
+    loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
+    loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at"),
+    loadSourceMonitorRecent("admin_exception_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata")
+  ]);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult].find(result => result.error);
+  if (failed) {
+    setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
+    console.error("Data Operations load failed:", failed.error);
+    return;
+  }
+  dataOpsEvents = eventsResult.rows || [];
+  dataOpsEditions = editionsResult.rows || [];
+  dataOpsIssues = (issuesResult.rows || []).filter(issue =>
+    issue.status === "open" && ["error", "critical"].includes(issue.severity)
+  );
+  dataOpsSources = sourcesResult.rows || [];
+  dataOpsProposals = (proposalsResult.rows || []).filter(row => row.proposal_status === "pending");
+  dataOpsAlerts = (alertsResult.rows || []).filter(row => row.alert_status === "open");
+  dataOpsRuns = runsResult.rows || [];
+  sourceMonitorJobs = jobsResult.rows || [];
+  sourceMonitorResults = crawlResultsResult.rows || [];
+  sourceMonitorReviews = reviewsResult.rows || [];
+  editionLifecycleInbox = lifecycleResult.rows || [];
+  populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
+  populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
+  renderDataOperations();
+  setDataOpsStatus(`${dataOpsEvents.length} Events, ${dataOpsEditions.length} Austragungen, ${dataOpsProposals.length} Vorschläge und ${dataOpsAlerts.length} Alarme geladen.`, "success");
+}
+
+async function runDataOperationsValidation() {
+  setButtonLoading(dataOpsElements.validate, true, dataOpsText("admin.dataOps.validating", "Validating..."));
+  const { error } = await supabaseClient.rpc("run_event_validation");
+  setButtonLoading(dataOpsElements.validate, false);
+  if (error) {
+    setDataOpsStatus(getFriendlyErrorMessage(error, dataOpsText("admin.dataOps.validationFailed", "Validation failed.")), "error");
+    return;
+  }
+  await loadDataOperations();
+}
+
+async function showDataOpsHistory(entityType, entityId, label) {
+  const { data, error } = await supabaseClient
+    .from("event_audit_log")
+    .select("field_name,old_value,new_value,change_source,changed_by_process,reason,source_url,created_at")
+    .eq("entity_type", entityType)
+    .eq("entity_id", String(entityId))
+    .order("created_at", { ascending: false })
+    .limit(200);
+  if (error) {
+    setDataOpsStatus(dataOpsText("admin.dataOps.historyUnavailable", "Change history could not be loaded."), "error");
+    return;
+  }
+  dataOpsElements.historyTitle.textContent = label || `${entityType} ${entityId}`;
+  dataOpsElements.historyList.innerHTML = (data || []).map(row => `
+    <article class="admin-data-operations-history-row">
+      <div><strong>${escapeAdminHTML(row.field_name)}</strong><span>${escapeAdminHTML(row.change_source)} · ${formatDataOpsDate(row.created_at, true)}</span></div>
+      <p>${escapeAdminHTML(row.reason || "Keine Begründung hinterlegt")}</p>
+      <code>${escapeAdminHTML(JSON.stringify(row.old_value))} → ${escapeAdminHTML(JSON.stringify(row.new_value))}</code>
+    </article>`).join("") || '<p class="admin-quality-empty">Noch keine protokollierten Änderungen.</p>';
+  dataOpsElements.historyPanel.hidden = false;
+  dataOpsElements.historyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function handleDataOpsAction(button) {
+  const action = button.dataset.dataopsAction;
+  const eventId = button.dataset.eventId;
+  if (action === "history") {
+    await showDataOpsHistory(button.dataset.entityType, button.dataset.entityId, button.dataset.entityLabel);
+    return;
+  }
+  if (action === "approve-proposal") {
+    const notes = "Im Admin-Dashboard geprüft und freigegeben.";
+    const { error } = await supabaseClient.rpc("apply_event_change_proposal", { p_proposal_id: button.dataset.proposalId, p_review_notes: notes });
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "reject-proposal") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("event_change_proposals").update({ proposal_status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user?.id || null, review_notes: "Im Admin-Dashboard geprüft und nicht übernommen." }).eq("id", button.dataset.proposalId).eq("proposal_status", "pending");
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "resolve-alert") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("data_workflow_alerts").update({ alert_status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", button.dataset.alertId);
+    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Alarm konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (action === "resolve") {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    const { error } = await supabaseClient.from("validation_issues").update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", button.dataset.issueId);
+    if (error) setDataOpsStatus(dataOpsText("admin.dataOps.resolveFailed", "The issue could not be resolved."), "error"); else await loadDataOperations();
+    return;
+  }
+  if (!eventId) return;
+  let patch = null;
+  if (action === "verify") patch = { verification_status: "verified", data_confidence: 0.9, needs_review: false, last_verified_at: new Date().toISOString() };
+  if (action === "review") patch = { verification_status: "needs_review", needs_review: true, review_priority: "high" };
+  if (action === "schedule") {
+    const value = button.closest(".admin-data-operations-card")?.querySelector("[data-dataops-next-check]")?.value;
+    if (!value) { setDataOpsStatus(dataOpsText("admin.dataOps.dateRequired", "Choose a date for the next check."), "error"); return; }
+    patch = { next_check_at: `${value}T09:00:00.000Z` };
+  }
+  if (!patch) return;
+  const { error } = await supabaseClient.from("events").update(patch).eq("id", eventId);
+  if (error) setDataOpsStatus(dataOpsText("admin.dataOps.updateFailed", "The event could not be updated. Check the admin role and RLS."), "error"); else await loadDataOperations();
+}
+
+[
+  dataOpsElements.country,
+  dataOpsElements.sport,
+  dataOpsElements.eventStatus,
+  dataOpsElements.verification,
+  dataOpsElements.severity,
+  dataOpsElements.priority,
+  dataOpsElements.lastCheck,
+  dataOpsElements.nextCheck
+].filter(Boolean).forEach(element => element.addEventListener("change", renderDataOperations));
+
+document.addEventListener("app-language-changed", () => {
+  if (dataOpsElements.panel && !dataOpsElements.panel.hidden) renderDataOperations();
+});
+dataOpsElements.refresh?.addEventListener("click", loadDataOperations);
+dataOpsElements.validate?.addEventListener("click", runDataOperationsValidation);
+dataOpsElements.closeHistory?.addEventListener("click", () => { dataOpsElements.historyPanel.hidden = true; });
+dataOpsElements.panel?.addEventListener("click", event => {
+  const button = event.target.closest("[data-dataops-action]");
+  if (button) handleDataOpsAction(button);
+});
+sourceMonitorElements.section?.addEventListener("click", event => {
+  const lifecycleButton = event.target.closest("[data-lifecycle-action]");
+  if (lifecycleButton) {
+    handleEditionLifecycleAction(lifecycleButton);
+    return;
+  }
+  const button = event.target.closest("[data-source-action]");
+  if (button) handleSourceMonitorAction(button);
+});
 
 const KNOWLEDGE_CHILD_TABLES = {
   registration: "event_registration",
@@ -5261,7 +6057,7 @@ async function fetchKnowledgeBundle(slug) {
   const [sourcesResult, faqResult] =
     await Promise.all([
       supabaseClient
-        .from("event_sources")
+        .from("event_detail_sources")
         .select("*")
         .eq("event_detail_id", detailId)
         .order("created_at", { ascending: true }),
@@ -5627,7 +6423,7 @@ async function saveSelectedEventKnowledge() {
     }
 
     await replaceKnowledgeRows(
-      "event_sources",
+      "event_detail_sources",
       eventDetailId,
       collectKnowledgeSources()
     );
@@ -5861,7 +6657,7 @@ async function saveKnowledgeReviewSource(eventDetailId, field, proposal) {
 
   const { error } =
     await supabaseClient
-      .from("event_sources")
+      .from("event_detail_sources")
       .insert([sourcePayload]);
 
   if (error) {
@@ -7181,16 +7977,32 @@ function getAnalyticsRangeConfig() {
   };
 }
 
-async function loadAnalyticsRows(sinceDate = null) {
-  const baseQuery = selectFields => {
+const ADMIN_ANALYTICS_PAGE_SIZE = 1000;
+const ADMIN_ANALYTICS_ROW_LIMIT = 100000;
+
+async function loadAdminTablePages(
+  tableName,
+  selectFields,
+  sinceDate = null
+) {
+  const rows = [];
+  let from = 0;
+  let totalCount = null;
+
+  while (rows.length < ADMIN_ANALYTICS_ROW_LIMIT) {
     let query =
       supabaseClient
-        .from("analytics_events")
-        .select(selectFields)
+        .from(tableName)
+        .select(selectFields, {
+          count: "exact"
+        })
         .order("created_at", {
           ascending: false
         })
-        .limit(10000);
+        .range(
+          from,
+          from + ADMIN_ANALYTICS_PAGE_SIZE - 1
+        );
 
     if (sinceDate) {
       query =
@@ -7200,51 +8012,144 @@ async function loadAnalyticsRows(sinceDate = null) {
         );
     }
 
-    return query;
-  };
+    const {
+      data,
+      error,
+      count
+    } = await query;
 
-  let { data, error } =
-    await baseQuery(
-      "event_name, event_type, anonymous_id, session_id, user_id, event_id, page, source, metadata, created_at"
-    );
+    if (error) {
+      return {
+        rows: null,
+        error,
+        truncated: false
+      };
+    }
 
-  if (
-    error &&
-    (
-      String(error.message || "").toLowerCase().includes("event_type") ||
-      String(error.message || "").toLowerCase().includes("anonymous_id") ||
-      String(error.message || "").toLowerCase().includes("metadata") ||
-      String(error.message || "").toLowerCase().includes("page") ||
-      String(error.message || "").toLowerCase().includes("source")
-    )
-  ) {
-    const fallback =
-      await baseQuery(
-        "event_name, session_id, user_id, event_id, created_at"
-      );
+    if (
+      totalCount === null &&
+      Number.isFinite(count)
+    ) {
+      totalCount = count;
+    }
 
-    data =
-      fallback.data;
-    error =
-      fallback.error;
-  }
+    const pageRows =
+      data || [];
 
-  if (error) {
-    console.warn(
-      "Could not load analytics activity.",
-      error.message
-    );
+    rows.push(...pageRows);
 
-    return {
-      rows: null,
-      error
-    };
+    if (
+      !pageRows.length ||
+      (
+        totalCount !== null &&
+        rows.length >= totalCount
+      )
+    ) {
+      return {
+        rows:
+          totalCount === null
+            ? rows
+            : rows.slice(0, totalCount),
+        error: null,
+        truncated: false
+      };
+    }
+
+    from += pageRows.length;
   }
 
   return {
-    rows: data || [],
-    error: null
+    rows,
+    error: null,
+    truncated:
+      totalCount === null ||
+      rows.length < totalCount
   };
+}
+
+async function loadAnalyticsRows(sinceDate = null) {
+  let result =
+    await loadAdminTablePages(
+      "analytics_events",
+      "event_name, event_type, anonymous_id, session_id, user_id, event_id, page, source, metadata, created_at",
+      sinceDate
+    );
+
+  if (
+    result.error &&
+    (
+      String(result.error.message || "").toLowerCase().includes("event_type") ||
+      String(result.error.message || "").toLowerCase().includes("anonymous_id") ||
+      String(result.error.message || "").toLowerCase().includes("metadata") ||
+      String(result.error.message || "").toLowerCase().includes("page") ||
+      String(result.error.message || "").toLowerCase().includes("source")
+    )
+  ) {
+    result =
+      await loadAdminTablePages(
+        "analytics_events",
+        "event_name, session_id, user_id, event_id, created_at",
+        sinceDate
+      );
+  }
+
+  if (result.error) {
+    console.warn(
+      "Could not load analytics activity.",
+      result.error.message
+    );
+  }
+
+  return result;
+}
+
+function getLatestPlannerSnapshots(rows, identityResolver) {
+  const snapshots =
+    new Map();
+
+  rows
+    .filter(row =>
+      [
+        "season_planner_opened",
+        "planner_event_added",
+        "planner_event_removed"
+      ].includes(getAnalyticsRowType(row))
+    )
+    .sort((first, second) =>
+      Date.parse(second.created_at || "") -
+      Date.parse(first.created_at || "")
+    )
+    .forEach((row, index) => {
+      const metadata =
+        getAnalyticsRowMetadata(row);
+
+      const savedEvents =
+        Number(metadata.saved_events);
+
+      const actor =
+        getAnalyticsActorId(
+          row,
+          index,
+          identityResolver
+        );
+
+      if (
+        !actor ||
+        snapshots.has(actor) ||
+        !Number.isFinite(savedEvents) ||
+        savedEvents < 0
+      ) {
+        return;
+      }
+
+      snapshots.set(actor, {
+        actor,
+        savedEvents,
+        createdAt: row.created_at || null
+      });
+    });
+
+  return [...snapshots.values()];
 }
 
 async function loadAnalyticsFeedbackRows(sinceDate = null) {
@@ -8258,13 +9163,13 @@ async function loadAdminFeedbackManagement() {
 async function loadAdminAnalytics() {
   if (adminAnalyticsStatus) {
     adminAnalyticsStatus.textContent =
-      "Loading analytics...";
+      "Analytics werden geladen...";
   }
 
   setButtonLoading(
     analyticsElements.refresh,
     true,
-    "Refreshing..."
+    "Wird aktualisiert..."
   );
 
   const range =
@@ -8275,95 +9180,37 @@ async function loadAdminAnalytics() {
       range.label;
   }
 
-  const [
-    analyticsResult,
-    registeredUsers,
-    feedbackRows
-  ] = await Promise.all([
-    loadAnalyticsRows(null),
-    getTableCount("profiles"),
-    loadAnalyticsFeedbackRows(range.since)
-  ]);
+  const analyticsResult =
+    await loadAnalyticsRows(null);
+
+  const analyticsAvailable =
+    Array.isArray(analyticsResult.rows);
 
   const allRows =
-    analyticsResult.rows || [];
+    analyticsAvailable
+      ? analyticsResult.rows
+      : [];
+
+  const rangeStart =
+    range.since
+      ? Date.parse(range.since)
+      : null;
 
   const rows =
-    range.since
+    rangeStart
       ? allRows.filter(row => {
           const timestamp =
             Date.parse(row.created_at || "");
 
           return (
             Number.isFinite(timestamp) &&
-            timestamp >= Date.parse(range.since)
+            timestamp >= rangeStart
           );
         })
       : allRows;
 
-  if (!analyticsResult.rows) {
-    Object.values(analyticsElements)
-      .filter(element =>
-        element &&
-        element.tagName &&
-        element.tagName !== "SELECT" &&
-        element.tagName !== "BUTTON"
-      )
-      .forEach(element => {
-        if ("textContent" in element) {
-          element.textContent = "—";
-        }
-      });
-
-    if (adminAnalyticsStatus) {
-      adminAnalyticsStatus.textContent =
-        "Analytics could not be loaded.";
-    }
-
-    setButtonLoading(
-      analyticsElements.refresh,
-      false
-    );
-    return;
-  }
-
-  setAnalyticsNumber(
-    analyticsElements.totalAccounts,
-    registeredUsers
-  );
-
   const identityResolver =
     createAnalyticsIdentityResolver(allRows);
-
-  const rows7d =
-    getAnalyticsRowsSince(allRows, 7);
-
-  const rows30d =
-    getAnalyticsRowsSince(allRows, 30);
-
-  const activeUsers7d =
-    getUniqueAnalyticsActors(
-      rows7d,
-      identityResolver
-    ).size;
-
-  const activeUsers30d =
-    getUniqueAnalyticsActors(
-      rows30d,
-      identityResolver
-    ).size;
-
-  const returningUsers7d =
-    getReturningAnalyticsUsers(
-      rows7d,
-      identityResolver
-    );
-
-  const returningUsers30d =
-    getReturningAnalyticsUsers(
-      rows30d,
-      identityResolver
-    );
 
   const periodUsers =
     getUniqueAnalyticsActors(
@@ -8371,34 +9218,9 @@ async function loadAdminAnalytics() {
       identityResolver
     );
 
-  const periodSessions =
-    getUniqueAnalyticsSessions(rows);
-
-  const unidentifiedLegacySessions =
-    new Set(
-      rows
-        .filter(row =>
-          !identityResolver.hasKnownActor(row)
-        )
-        .map((row, index) =>
-          getAnalyticsRowSessionId(row, index)
-        )
-        .filter(Boolean)
-    ).size;
-
-  const searchRows =
-    rows.filter(row =>
-      getAnalyticsRowType(row) === "search_performed"
-    );
-
   const eventOpenRows =
     rows.filter(row =>
       getAnalyticsRowType(row) === "event_detail_opened"
-    );
-
-  const favoriteRows =
-    rows.filter(row =>
-      getAnalyticsRowType(row) === "favorite_added"
     );
 
   const plannerOpenRows =
@@ -8421,334 +9243,216 @@ async function loadAdminAnalytics() {
       getAnalyticsRowType(row) === "external_event_website_clicked"
     );
 
-  const plannerUsers =
-    getUniqueAnalyticsActors(
-      [
-        ...plannerOpenRows,
-        ...plannerAddRows
-      ],
-      identityResolver
+  const uniqueOpenedEvents =
+    new Set(
+      eventOpenRows
+        .map(row => row.event_id)
+        .filter(Boolean)
     );
+
+  const plannerSnapshots =
+    analyticsAvailable
+      ? getLatestPlannerSnapshots(
+          allRows,
+          identityResolver
+        )
+      : [];
+
+  const reportedPlannerEvents =
+    plannerSnapshots.reduce(
+      (total, snapshot) =>
+        total + snapshot.savedEvents,
+      0
+    );
+
+  const averageReportedPlannerEvents =
+    plannerSnapshots.length
+      ? reportedPlannerEvents /
+        plannerSnapshots.length
+      : 0;
+
+  const plannerSizeCounts =
+    countAnalyticsBy(
+      plannerSnapshots,
+      snapshot => {
+        if (snapshot.savedEvents === 0) {
+          return "0 Events";
+        }
+
+        if (snapshot.savedEvents === 1) {
+          return "1 Event";
+        }
+
+        if (snapshot.savedEvents <= 3) {
+          return "2-3 Events";
+        }
+
+        if (snapshot.savedEvents <= 5) {
+          return "4-5 Events";
+        }
+
+        return "6+ Events";
+      }
+    );
+
+  setAnalyticsNumber(
+    analyticsElements.totalAccounts,
+    analyticsAvailable
+      ? periodUsers.size
+      : null
+  );
 
   setAnalyticsNumber(
     analyticsElements.activeUsers7d,
-    activeUsers7d
+    analyticsAvailable
+      ? eventOpenRows.length
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.activeUsers30d,
-    activeUsers30d
+    analyticsAvailable
+      ? uniqueOpenedEvents.size
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.returningUsers7d,
-    returningUsers7d
+    analyticsAvailable
+      ? plannerAddRows.length
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.returningUsers30d,
-    returningUsers30d
+    analyticsAvailable
+      ? reportedPlannerEvents
+      : null
   );
+
   setAnalyticsNumber(
     analyticsElements.totalSessions,
-    periodSessions.size
+    analyticsAvailable
+      ? analyticsDecimal(
+          averageReportedPlannerEvents
+        )
+      : null
   );
-  setAnalyticsNumber(
-    analyticsElements.searchesKpi,
-    searchRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.favoritesAddedKpi,
-    favoriteRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerUsersKpi,
-    plannerUsers.size
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerEventsAddedKpi,
-    plannerAddRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.feedbackSubmissionsKpi,
-    feedbackRows.length ||
-      countAnalyticsRows(rows, ["feedback_submitted"])
-  );
-
-  const newUsers =
-    Math.max(
-      0,
-      periodUsers.size -
-      getReturningAnalyticsUsers(
-        rows,
-        identityResolver
-      )
-    );
-
-  if (analyticsElements.newReturningSplit) {
-    analyticsElements.newReturningSplit.textContent =
-      `${newUsers} new / ${getReturningAnalyticsUsers(rows, identityResolver)} returning`;
-  }
-
-  if (analyticsElements.avgSessionsPerUser) {
-    analyticsElements.avgSessionsPerUser.textContent =
-      analyticsDecimal(
-        periodUsers.size
-          ? periodSessions.size / periodUsers.size
-          : 0
-      );
-  }
-
-  const actorVisitCounts = {};
-
-  rows.forEach((row, index) => {
-    const actor =
-      getAnalyticsActorId(
-        row,
-        index,
-        identityResolver
-      );
-
-    if (!actor) {
-      return;
-    }
-
-    if (!actorVisitCounts[actor]) {
-      actorVisitCounts[actor] =
-        new Set();
-    }
-
-    actorVisitCounts[actor].add(
-      getAnalyticsRowSessionId(row, index)
-    );
-  });
-
-  const visitCount =
-    minimum =>
-      Object.values(actorVisitCounts)
-        .filter(set => set.size >= minimum)
-        .length;
-
-  setAnalyticsNumber(
-    analyticsElements.users2Visits,
-    visitCount(2)
-  );
-  setAnalyticsNumber(
-    analyticsElements.users3Visits,
-    visitCount(3)
-  );
-  setAnalyticsNumber(
-    analyticsElements.users5Visits,
-    visitCount(5)
-  );
-
-  renderAnalyticsList(
-    analyticsElements.retentionTable,
-    [
-      ["Active users", periodUsers.size],
-      ["Returning users", getReturningAnalyticsUsers(rows, identityResolver)],
-      ["Total sessions", periodSessions.size],
-      ["Unidentified legacy sessions", unidentifiedLegacySessions],
-      ["Tracked actions", rows.length]
-    ],
-    {
-      empty: "No visitor activity in this period."
-    }
-  );
-
-  const searchTerms =
-    countAnalyticsBy(searchRows, getAnalyticsSearchTerm);
-
-  const zeroResultSearches =
-    searchRows.filter(row =>
-      Number(getAnalyticsRowMetadata(row).results_count) === 0
-    ).length;
-
-  const filterCounts = {};
-
-  rows
-    .filter(row =>
-      ["filter_changed", "sort_changed", "search_performed"]
-        .includes(getAnalyticsRowType(row))
-    )
-    .forEach(row => {
-      getAnalyticsFilterLabels(row)
-        .forEach(label => {
-          filterCounts[label] =
-            (filterCounts[label] || 0) + 1;
-        });
-    });
-
-  const searchSessions =
-    new Set(
-      searchRows.map((row, index) =>
-        getAnalyticsRowSessionId(row, index)
-      )
-    );
-
-  const openSessions =
-    new Set(
-      eventOpenRows.map((row, index) =>
-        getAnalyticsRowSessionId(row, index)
-      )
-    );
-
-  const searchOpenSessions =
-    [...searchSessions]
-      .filter(session =>
-        openSessions.has(session)
-      ).length;
-
-  setAnalyticsNumber(
-    analyticsElements.totalSearches,
-    searchRows.length
-  );
-
-  if (analyticsElements.searchesPerUser) {
-    analyticsElements.searchesPerUser.textContent =
-      analyticsDecimal(
-        periodUsers.size
-          ? searchRows.length / periodUsers.size
-          : 0
-      );
-  }
-
-  setAnalyticsNumber(
-    analyticsElements.zeroResultSearches,
-    zeroResultSearches
-  );
-
-  if (analyticsElements.searchClickRate) {
-    analyticsElements.searchClickRate.textContent =
-      analyticsPercent(
-        searchOpenSessions,
-        searchSessions.size
-      );
-  }
-
-  renderAnalyticsList(
-    analyticsElements.topSearchTerms,
-    searchTerms,
-    {
-      empty: "No search terms tracked yet."
-    }
-  );
-
-  renderAnalyticsList(
-    analyticsElements.mostUsedFilters,
-    filterCounts,
-    {
-      empty: "No filter usage tracked yet."
-    }
-  );
-
-  const openedEventCounts =
-    countAnalyticsBy(
-      eventOpenRows,
-      getAnalyticsEventLabel
-    );
-
-  const favoriteEventCounts =
-    countAnalyticsBy(
-      favoriteRows,
-      getAnalyticsEventLabel
-    );
-
-  const externalEventCounts =
-    countAnalyticsBy(
-      externalRows,
-      getAnalyticsEventLabel
-    );
 
   setAnalyticsNumber(
     analyticsElements.eventDetailOpens,
-    eventOpenRows.length
+    analyticsAvailable
+      ? eventOpenRows.length
+      : null
   );
 
   if (analyticsElements.favoriteConversionRate) {
     analyticsElements.favoriteConversionRate.textContent =
-      analyticsPercent(
-        favoriteRows.length,
-        eventOpenRows.length
-      );
+      analyticsAvailable
+        ? analyticsPercent(
+            plannerAddRows.length,
+            eventOpenRows.length
+          )
+        : "\u2014";
   }
 
   renderAnalyticsList(
     analyticsElements.mostViewedEvents,
-    openedEventCounts,
+    countAnalyticsBy(
+      eventOpenRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No event detail opens yet."
+      empty: "Keine Event-Detailaufrufe in diesem Zeitraum."
     }
   );
 
   renderAnalyticsList(
     analyticsElements.mostFavoritedEvents,
-    favoriteEventCounts,
+    countAnalyticsBy(
+      plannerAddRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No favorites added in this period."
+      empty: "Keine Planner-Hinzufuegungen in diesem Zeitraum."
     }
   );
 
   renderAnalyticsList(
     analyticsElements.mostExternalClicks,
-    externalEventCounts,
+    countAnalyticsBy(
+      externalRows,
+      getAnalyticsEventLabel
+    ),
     {
-      empty: "No official website clicks yet."
+      empty: "Keine Klicks auf offizielle Websites in diesem Zeitraum."
     }
   );
 
   setAnalyticsNumber(
     analyticsElements.plannerOpens,
-    plannerOpenRows.length
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerUsers,
-    plannerUsers.size
-  );
-  setAnalyticsNumber(
-    analyticsElements.plannerEventsAdded,
-    plannerAddRows.length
+    analyticsAvailable
+      ? plannerOpenRows.length
+      : null
   );
 
-  if (analyticsElements.avgPlannedEvents) {
-    analyticsElements.avgPlannedEvents.textContent =
-      analyticsDecimal(
-        plannerUsers.size
-          ? plannerAddRows.length / plannerUsers.size
-          : 0
-      );
-  }
+  setAnalyticsNumber(
+    analyticsElements.plannerUsers,
+    analyticsAvailable
+      ? plannerSnapshots.length
+      : null
+  );
+
+  setAnalyticsNumber(
+    analyticsElements.plannerEventsAdded,
+    analyticsAvailable
+      ? plannerAddRows.length
+      : null
+  );
+
+  setAnalyticsNumber(
+    analyticsElements.avgPlannedEvents,
+    analyticsAvailable
+      ? analyticsDecimal(
+          averageReportedPlannerEvents
+        )
+      : null
+  );
 
   setAnalyticsNumber(
     analyticsElements.recommendationClicks,
-    recommendationRows.length
+    analyticsAvailable
+      ? recommendationRows.length
+      : null
   );
 
-  const plannerOpenUsers =
-    getUniqueAnalyticsActors(
-      plannerOpenRows,
-      identityResolver
-    ).size;
-
   if (analyticsElements.plannerConversionRate) {
+    const plannerOpenUsers =
+      getUniqueAnalyticsActors(
+        plannerOpenRows,
+        identityResolver
+      ).size;
+
+    const plannerAddUsers =
+      getUniqueAnalyticsActors(
+        plannerAddRows,
+        identityResolver
+      ).size;
+
     analyticsElements.plannerConversionRate.textContent =
-      analyticsPercent(
-        getUniqueAnalyticsActors(
-          plannerAddRows,
-          identityResolver
-        ).size,
-        plannerOpenUsers
-      );
+      analyticsAvailable
+        ? analyticsPercent(
+            plannerAddUsers,
+            plannerOpenUsers
+          )
+        : "\u2014";
   }
 
   renderAnalyticsList(
     analyticsElements.priorityMix,
-    countAnalyticsBy(
-      rows.filter(row =>
-        getAnalyticsRowType(row) === "planner_priority_changed"
-      ),
-      row =>
-        getAnalyticsRowMetadata(row).priority || "Unspecified"
-    ),
+    plannerSizeCounts,
     {
-      empty: "No priority changes tracked yet."
+      empty: "Noch keine Planner-Bestaende erfasst."
     }
   );
 
@@ -8759,82 +9463,60 @@ async function loadAdminAnalytics() {
       getAnalyticsEventLabel
     ),
     {
-      empty: "No planner additions yet."
+      empty: "Keine Planner-Hinzufuegungen in diesem Zeitraum."
     }
-  );
-
-  setAnalyticsNumber(
-    analyticsElements.feedbackTotal,
-    feedbackRows.length
-  );
-
-  setAnalyticsNumber(
-    analyticsElements.feedbackNew,
-    feedbackRows.filter(row =>
-      row.status === "new"
-    ).length
-  );
-
-  const ratingCounts =
-    countAnalyticsBy(
-      feedbackRows,
-      row =>
-        row.rating
-          ? `${row.rating}/5`
-          : ""
-    );
-
-  if (analyticsElements.feedbackByRating) {
-    const ratingText =
-      Object.entries(ratingCounts)
-        .sort((first, second) =>
-          Number(second[0][0]) - Number(first[0][0])
-        )
-        .map(([rating, count]) =>
-          `${rating}: ${count}`
-        )
-        .join(" · ");
-
-    analyticsElements.feedbackByRating.textContent =
-      ratingText || "-";
-  }
-
-  renderAnalyticsList(
-    analyticsElements.feedbackByCategory,
-    countAnalyticsBy(
-      feedbackRows,
-      row => row.category || "other"
-    ),
-    {
-      empty: "No feedback categories yet."
-    }
-  );
-
-  renderAnalyticsFeedbackList(
-    analyticsElements.latestFeedback,
-    feedbackRows
   );
 
   if (analyticsElements.retentionInsight) {
     analyticsElements.retentionInsight.textContent =
-      `${returningUsers30d} returning users in the last 30 days.`;
+      analyticsAvailable
+        ? (
+            analyticsResult.truncated
+              ? "Tracking ist auf die juengsten 100.000 Aktionen begrenzt; angezeigte Summen sind Mindestwerte."
+              : "Zeitraum-KPIs stammen vollstaendig aus analytics_events. Planner-Bestaende sind die jeweils letzte gemeldete Anzahl."
+          )
+        : "Tracking ist nicht verfuegbar.";
   }
 
   if (analyticsElements.discoveryInsight) {
     analyticsElements.discoveryInsight.textContent =
-      `${searchRows.length} searches, ${eventOpenRows.length} event detail opens, ${analyticsPercent(searchOpenSessions, searchSessions.size)} search-to-open rate.`;
+      analyticsAvailable
+        ? eventOpenRows.length +
+          " Detailaufrufe fuer " +
+          uniqueOpenedEvents.size +
+          " Events im gewaehlten Zeitraum."
+        : "Event-Tracking konnte nicht geladen werden.";
   }
 
   if (analyticsElements.planningInsight) {
     analyticsElements.planningInsight.textContent =
-      `${plannerUsers.size} planner users and ${plannerAddRows.length} races added to seasons.`;
+      analyticsAvailable
+        ? plannerAddRows.length +
+          " Hinzufuegungen im Zeitraum. Letzter gemeldeter Bestand: " +
+          reportedPlannerEvents +
+          " Events in " +
+          plannerSnapshots.length +
+          " erfassten Plannern."
+        : "Planner-Tracking konnte nicht geladen werden.";
   }
 
   if (adminAnalyticsStatus) {
-    adminAnalyticsStatus.textContent =
-      allRows.length >= 10000
-        ? `${range.label}. Showing the latest 10,000 tracked actions.`
-        : `${range.label}. Analytics are up to date.`;
+    if (!analyticsAvailable) {
+      adminAnalyticsStatus.textContent =
+        "Analytics-Aktionen konnten nicht geladen werden. Es werden keine geschaetzten Ersatzwerte angezeigt.";
+    } else {
+      const limitNote =
+        analyticsResult.truncated
+          ? " Datenlimit erreicht: Werte sind Mindestwerte."
+          : "";
+
+      adminAnalyticsStatus.textContent =
+        range.label +
+        ": " +
+        rows.length +
+        " erfasste Produktaktionen." +
+        limitNote;
+    }
   }
 
   setButtonLoading(
@@ -9106,10 +9788,10 @@ function getPossibleDuplicateKeys(rows) {
 
         if (similar) {
           duplicates.add(
-            createEventKey(group[firstIndex])
+            createAdminEventKey(group[firstIndex])
           );
           duplicates.add(
-            createEventKey(group[secondIndex])
+            createAdminEventKey(group[secondIndex])
           );
         }
       }
@@ -9175,7 +9857,7 @@ function getQualityReviewIssue(event, duplicateKeys) {
 
   if (
     duplicateKeys.has(
-      createEventKey(event)
+      createAdminEventKey(event)
     )
   ) {
     return {
@@ -9365,7 +10047,7 @@ function isDateInPast(value) {
   return date < today;
 }
 
-function createEventKey(event) {
+function createAdminEventKey(event) {
   return [
     normalizeQualityReviewName(event.event_name),
     String(event.date || "").trim(),
@@ -9443,7 +10125,7 @@ function formatAdminDateForCsv(date = new Date()) {
 
 function getQualityDecisionForEvent(event) {
   return getAdminQualityReviewDecisions()[
-    createEventKey(event)
+    createAdminEventKey(event)
   ] || null;
 }
 
@@ -9589,7 +10271,7 @@ function getQualityUpdatePayload(action, options = {}) {
 
 async function persistQualityReviewDecision(event, action, options = {}) {
   const eventKey =
-    createEventKey(event);
+    createAdminEventKey(event);
 
   const payload =
     getQualityUpdatePayload(
@@ -9705,7 +10387,7 @@ async function persistQualityReviewDecision(event, action, options = {}) {
 
   localQualityRows =
     localQualityRows.map(row =>
-      createEventKey(row) === eventKey
+      createAdminEventKey(row) === eventKey
         ? applyQualityDecisionToEvent({
             ...row,
             date:
@@ -9877,7 +10559,7 @@ function getDuplicateGroups(rows) {
 
     group.forEach(event => {
       const key =
-        createEventKey(event);
+        createAdminEventKey(event);
 
       if (
         decisions[key]?.decision === "not_duplicate" ||
@@ -9888,7 +10570,7 @@ function getDuplicateGroups(rows) {
 
       const others =
         group.filter(candidate =>
-          createEventKey(candidate) !== key
+          createAdminEventKey(candidate) !== key
         );
 
       if (others.length) {
@@ -10079,7 +10761,7 @@ function getQualityReviewIssues(event, duplicateMap) {
 
   const duplicateCandidates =
     duplicateMap.get(
-      createEventKey(event)
+      createAdminEventKey(event)
     );
 
   if (duplicateCandidates?.length) {
@@ -10153,7 +10835,7 @@ function getQualityAnalysisRows(rows) {
         getQualityScore(issues),
       duplicateCandidates:
         duplicateMap.get(
-          createEventKey(reviewedEvent)
+          createAdminEventKey(reviewedEvent)
         ) || []
     };
   });
@@ -10474,7 +11156,7 @@ function renderQualityPriorityQueue(rows) {
             issues[0];
 
           const eventKey =
-            createEventKey(event);
+            createAdminEventKey(event);
 
           return `
             <article class="admin-quality-priority-item ${score >= 85 ? "is-low-risk" : score >= 65 ? "is-medium-risk" : "is-high-risk"}" data-quality-event-key="${escapeAdminHTML(eventKey)}">
@@ -10708,8 +11390,8 @@ function findQualityEventByKey(key) {
   }
 
   return localQualityRows.find(row =>
-    createEventKey(row) === key ||
-    createEventKey(
+    createAdminEventKey(row) === key ||
+    createAdminEventKey(
       applyQualityDecisionToEvent(row)
     ) === key
   ) || null;

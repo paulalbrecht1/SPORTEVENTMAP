@@ -1,8 +1,4 @@
 Sport Event Map - Cloudflare beta release
-Version: 20260630-event-knowledge-v65
+Version: 20260804-edition-lifecycle-v78
 Built for upload: use the complete dist folder contents
-Includes: index.html, about.html, contact.html, legal.html, imprint.html, privacy.html, sitemap.xml, robots.txt, favicon/app icons, SVG brand icon, 50 priority event detail pages, css, js, data/events.csv
-
-
-
-
+Includes: 520 active Discovery editions, 994 public archive/detail pages, Edition Lifecycle and succession review, Source Monitor 3.0, separate favorites and Season Planner editions, admin operations styles, sitemap, legal pages, icons, CSS, JavaScript and 25 aligned Supabase migrations

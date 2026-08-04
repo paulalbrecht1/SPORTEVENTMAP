@@ -1,0 +1,8 @@
+# Supabase CLI runtime state
+.branches
+.temp
+
+# Machine-local environment overrides
+.env.keys
+.env.local
+.env.*.local

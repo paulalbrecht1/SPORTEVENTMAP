@@ -41,13 +41,23 @@ function updateSidebarToggleState() {
     isExpanded
       ? "Events & Filter schließen"
       : "Events & Filter öffnen";
+  const activeFilterCount =
+    Number(toggleBtn.dataset.activeFilterCount || 0);
+  const accessibleLabel =
+    activeFilterCount > 0
+      ? `${actionLabel}, ${activeFilterCount} aktive Filter`
+      : actionLabel;
 
   toggleBtn.setAttribute(
     "aria-expanded",
     String(isExpanded)
   );
-  toggleBtn.setAttribute("aria-label", actionLabel);
-  toggleBtn.title = actionLabel;
+  toggleBtn.setAttribute("aria-label", accessibleLabel);
+  toggleBtn.title = accessibleLabel;
+  sidebar.setAttribute(
+    "aria-hidden",
+    String(!isExpanded)
+  );
 }
 
 function syncSidebarState() {
@@ -60,8 +70,22 @@ function syncSidebarState() {
     sidebar.classList.contains("closed")
   );
 
+  document.body.classList.toggle(
+    "discovery-panel-open",
+    !sidebar.classList.contains("closed")
+  );
+
   updateSidebarToggleState();
 }
+
+window.updateSidebarToggleState =
+  updateSidebarToggleState;
+
+// Keep every filter trigger on the same state transition. The legacy mobile
+// trigger lives in search.js, which is loaded before this file, so expose the
+// canonical controller once the platform shell is ready.
+window.setSidebarExpanded =
+  setSidebarExpanded;
 
 function setSidebarExpanded(expanded, options = {}) {
   if (!sidebar) {
@@ -201,6 +225,22 @@ function openWelcomeModal() {
   }
 }
 
+function setLandingBackgroundInert(isInert) {
+  document
+    .querySelectorAll(
+      "#topbar, #platformMobileOverlay, #platformMobileMenu, #app, #eventDrawer, #floatingActions, #discoveryFooter, [data-platform-page]"
+    )
+    .forEach(element => {
+      element.toggleAttribute("inert", isInert);
+
+      if (isInert) {
+        element.setAttribute("aria-hidden", "true");
+      } else {
+        element.removeAttribute("aria-hidden");
+      }
+    });
+}
+
 function showLandingPage(options = {}) {
   if (
     !options.keepHash &&
@@ -216,6 +256,7 @@ function showLandingPage(options = {}) {
   document.body.classList.remove("landing-revealing-app");
   document.body.classList.remove("landing-exiting");
   document.body.classList.add("landing-open");
+  setLandingBackgroundInert(true);
 
   if (typeof trackEvent === "function") {
     trackEvent("landing_viewed", {
@@ -258,6 +299,7 @@ function hideLandingPage(afterHide, options = {}) {
   setTimeout(() => {
     document.body.classList.remove("landing-open");
     document.body.classList.remove("landing-exiting");
+    setLandingBackgroundInert(false);
 
     if (typeof refreshMapLayout === "function") {
       refreshMapLayout();
@@ -455,12 +497,20 @@ function showPlatformPage(route) {
     });
 }
 
-function resetDiscoveryMapAfterLayout(delay = 220) {
+function resetDiscoveryMapAfterLayout(delay = 220, options = {}) {
   if (typeof refreshMapLayout === "function") {
     refreshMapLayout(delay);
   }
 
   window.setTimeout(() => {
+    if (
+      options.restoreEventView &&
+      typeof restoreDiscoveryMapViewBeforeEvent === "function" &&
+      restoreDiscoveryMapViewBeforeEvent()
+    ) {
+      return;
+    }
+
     if (typeof resetDiscoveryMapView === "function") {
       resetDiscoveryMapView();
     }
@@ -581,6 +631,22 @@ function showPlatformRoute(routeInfo, options = {}) {
       ? "events"
       : route;
 
+  if (route !== "discovery") {
+    document.body.classList.remove("mobile-filter-open");
+
+    if (sidebar && !sidebar.classList.contains("closed")) {
+      setSidebarExpanded(false, {
+        refresh: false
+      });
+    }
+  }
+  if (
+    route !== "planner" &&
+    typeof closeSeasonPlanner === "function"
+  ) {
+    closeSeasonPlanner();
+  }
+
   closePlatformMobileMenu();
   setPlatformActiveRoute(route);
 
@@ -615,23 +681,27 @@ function showPlatformRoute(routeInfo, options = {}) {
       closeEventDrawerOnly();
     }
 
-    resetDiscoveryMapAfterLayout(180);
+    resetDiscoveryMapAfterLayout(180, {
+      restoreEventView: Boolean(options.restoreEventView)
+    });
 
     return;
   }
 
   if (route === "planner") {
     closeEventDrawerOnly();
-    setPlatformRouteClasses("discovery");
-    showPlatformPage("");
+    setPlatformRouteClasses("planner");
+    showPlatformPage("planner");
 
     if (typeof openSeasonPlanner === "function") {
       openSeasonPlanner();
     }
 
-    if (typeof refreshMapLayout === "function") {
-      refreshMapLayout(180);
-    }
+    document.querySelector(".platform-pages")?.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto"
+    });
 
     return;
   }
@@ -713,9 +783,35 @@ function initPlatformShell() {
     document.getElementById("platformMobileMenu");
   const overlay =
     document.getElementById("platformMobileOverlay");
+  const mobileActionButtons =
+    menu?.querySelectorAll("[data-platform-mobile-action]") || [];
+
+  const syncPlatformMobileActions = () => {
+    mobileActionButtons.forEach(button => {
+      const target =
+        document.getElementById(
+          button.dataset.platformMobileAction
+        );
+      const isAvailable = Boolean(
+        target &&
+        !target.hidden &&
+        target.getAttribute("aria-hidden") !== "true" &&
+        target.style.display !== "none"
+      );
+
+      button.hidden = !isAvailable;
+
+      if (isAvailable) {
+        button.textContent =
+          target.textContent.trim();
+      }
+    });
+  };
 
   if (menuButton && menu && overlay) {
     menuButton.addEventListener("click", () => {
+      syncPlatformMobileActions();
+
       const isOpen =
         menu.classList.toggle("open");
 
@@ -735,6 +831,18 @@ function initPlatformShell() {
   if (overlay) {
     overlay.addEventListener("click", closePlatformMobileMenu);
   }
+
+  mobileActionButtons.forEach(button => {
+    button.addEventListener("click", () => {
+      const target =
+        document.getElementById(
+          button.dataset.platformMobileAction
+        );
+
+      closePlatformMobileMenu();
+      target?.click();
+    });
+  });
 
   document
     .querySelectorAll("[data-platform-route]")
@@ -869,7 +977,10 @@ window.preparePlatformDiscoveryForEvent = function preparePlatformDiscoveryForEv
 
 window.closePlatformEventRoute = function closePlatformEventRoute() {
   if (window.location.hash.startsWith("#/event/")) {
-    navigateToPlatformRoute("discovery");
+    navigateToPlatformRoute("discovery", {
+      replace: true,
+      restoreEventView: true
+    });
   }
 };
 
@@ -910,66 +1021,47 @@ function applyLandingSearch(query) {
 }
 
 const LANDING_THEME_KEY =
-  "sportEventMap.landingTheme";
-
-const landingSystemThemeQuery =
-  window.matchMedia
-    ? window.matchMedia("(prefers-color-scheme: dark)")
-    : null;
+  "sportEventMapTheme";
 
 function getLandingThemePreference() {
-  return (
-    localStorage.getItem(LANDING_THEME_KEY) ||
-    "system"
-  );
+  return window.SportEventMapTheme
+    ? window.SportEventMapTheme.getPreference()
+    : "system";
 }
 
 function applyLandingTheme(theme = getLandingThemePreference()) {
-  const normalizedTheme =
-    ["system", "dark", "light"].includes(theme)
-      ? theme
-      : "system";
+  if (window.SportEventMapTheme) {
+    return window.SportEventMapTheme.apply(theme);
+  }
 
-  const resolvedTheme =
-    normalizedTheme === "system"
-      ? landingSystemThemeQuery?.matches
-        ? "dark"
-        : "light"
-      : normalizedTheme;
+  return theme;
+}
 
-  document.body.classList.toggle(
-    "landing-theme-dark",
-    resolvedTheme === "dark"
-  );
+function updateLandingEventCount(eventList) {
+  const sourceEvents =
+    Array.isArray(eventList)
+      ? eventList
+      : typeof events !== "undefined" && Array.isArray(events)
+        ? events
+        : null;
 
-  document.body.classList.toggle(
-    "landing-theme-light",
-    resolvedTheme === "light"
-  );
+  if (!sourceEvents) {
+    return;
+  }
 
-  document.body.dataset.landingTheme =
-    normalizedTheme;
-
-  document.body.dataset.landingResolvedTheme =
-    resolvedTheme;
+  const formattedCount =
+    new Intl.NumberFormat("en-US")
+      .format(sourceEvents.length);
 
   document
-    .querySelectorAll("[data-landing-theme]")
-    .forEach(button => {
-      button.classList.toggle(
-        "active",
-        button.dataset.landingTheme === normalizedTheme
-      );
+    .querySelectorAll("[data-landing-event-count]")
+    .forEach(element => {
+      element.textContent = formattedCount;
     });
 }
 
-if (landingSystemThemeQuery) {
-  landingSystemThemeQuery.addEventListener("change", () => {
-    if (getLandingThemePreference() === "system") {
-      applyLandingTheme("system");
-    }
-  });
-}
+window.updateLandingEventCount =
+  updateLandingEventCount;
 
 function initLandingPage() {
   const landingPage =
@@ -1041,12 +1133,261 @@ function initLandingPage() {
     document.getElementById("landingSearchBtn");
 
   const landingAddEventBtn =
-    document.getElementById("landingAddEventBtn");
+    document.getElementById("homeAddEventBtn");
 
   const landingThemeButtons =
     document.querySelectorAll("[data-landing-theme]");
 
+  const landingMenuButton =
+    document.getElementById("landingMenuBtn");
+
+  const landingMenuCloseButton =
+    document.getElementById("landingMenuCloseBtn");
+
+  const landingMenu =
+    document.getElementById("landingMobileMenu");
+
+  const landingMenuOverlay =
+    document.getElementById("landingMenuOverlay");
+
+  const landingAuthButtons =
+    [
+      document.getElementById("landingAuthBtn"),
+      document.getElementById("landingMobileAuthBtn")
+    ].filter(Boolean);
+
   applyLandingTheme();
+
+  const translateLandingLabel = (key, fallback) =>
+    typeof window.t === "function"
+      ? window.t(key, fallback)
+      : fallback;
+
+  const syncLandingCtas = () => {
+    if (discoverBtn) {
+      discoverBtn.textContent = translateLandingLabel(
+        "landing.discover",
+        "Explore Events"
+      );
+    }
+
+    if (seasonBtn) {
+      seasonBtn.textContent = translateLandingLabel(
+        "landing.openPlanner",
+        "Open Season Planner"
+      );
+    }
+  };
+
+  syncLandingCtas();
+
+  document.addEventListener(
+    "app-language-changed",
+    syncLandingCtas
+  );
+
+  updateLandingEventCount();
+
+  let landingMenuReturnFocus = null;
+
+  const closeLandingMenu = () => {
+    if (!landingMenu || !landingMenuButton) {
+      return;
+    }
+
+    landingMenu.classList.remove("open");
+    landingMenuOverlay?.classList.remove("open");
+    landingPage.classList.remove("menu-open");
+    document.body.classList.remove("sem-menu-open");
+    landingMenu.setAttribute("aria-hidden", "true");
+    landingMenuButton.setAttribute("aria-expanded", "false");
+
+    if (landingMenuReturnFocus instanceof HTMLElement) {
+      landingMenuReturnFocus.focus();
+      landingMenuReturnFocus = null;
+    }
+  };
+
+  const openLandingMenu = () => {
+    if (!landingMenu || !landingMenuButton) {
+      return;
+    }
+
+    landingMenuReturnFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : landingMenuButton;
+
+    landingMenu.classList.add("open");
+    landingMenuOverlay?.classList.add("open");
+    landingPage.classList.add("menu-open");
+    document.body.classList.add("sem-menu-open");
+    landingMenu.setAttribute("aria-hidden", "false");
+    landingMenuButton.setAttribute("aria-expanded", "true");
+
+    window.setTimeout(() => {
+      landingMenu
+        .querySelector("a, button")
+        ?.focus();
+    }, 0);
+  };
+
+  landingMenuButton?.addEventListener("click", () => {
+    if (landingMenu?.classList.contains("open")) {
+      closeLandingMenu();
+    } else {
+      openLandingMenu();
+    }
+  });
+
+  landingMenuCloseButton
+    ?.addEventListener("click", closeLandingMenu);
+
+  landingMenuOverlay
+    ?.addEventListener("click", closeLandingMenu);
+
+  landingMenu
+    ?.querySelectorAll("a")
+    .forEach(link => {
+      link.addEventListener("click", closeLandingMenu);
+    });
+
+  document.addEventListener("keydown", event => {
+    if (
+      event.key === "Escape" &&
+      landingMenu?.classList.contains("open")
+    ) {
+      closeLandingMenu();
+    }
+  });
+
+  const loginButton =
+    document.getElementById("loginBtn");
+
+  const profileButton =
+    document.getElementById("profileBtn");
+
+  const isProfileAvailable = () =>
+    Boolean(
+      profileButton &&
+      profileButton.style.display !== "none"
+    );
+
+  const syncLandingAuthButtons = () => {
+    const profileAvailable = isProfileAvailable();
+    const label = profileAvailable
+      ? translateLandingLabel("nav.profile", "Profile")
+      : translateLandingLabel("nav.login", "Login");
+    const ariaLabel = profileAvailable
+      ? translateLandingLabel("landing.openProfile", "Open profile")
+      : translateLandingLabel("landing.logIn", "Log in");
+
+    landingAuthButtons.forEach(button => {
+      button.textContent = label;
+      button.setAttribute("aria-label", ariaLabel);
+    });
+  };
+
+  const activateLandingAuth = () => {
+    closeLandingMenu();
+
+    if (isProfileAvailable()) {
+      profileButton?.click();
+    } else {
+      loginButton?.click();
+    }
+  };
+
+  landingAuthButtons.forEach(button => {
+    button.addEventListener("click", activateLandingAuth);
+  });
+
+  document.addEventListener(
+    "app-language-changed",
+    syncLandingAuthButtons
+  );
+
+  [loginButton, profileButton]
+    .filter(Boolean)
+    .forEach(button => {
+      new MutationObserver(syncLandingAuthButtons)
+        .observe(button, {
+          attributes: true,
+          attributeFilter: ["style", "hidden", "aria-hidden"]
+        });
+    });
+
+  syncLandingAuthButtons();
+
+  const sportTabs =
+    [...document.querySelectorAll("[data-sport-tab]")];
+
+  const sportPanels =
+    [...document.querySelectorAll("[data-sport-panel]")];
+
+  const activateSportTab = tab => {
+    const sport =
+      tab.dataset.sportTab;
+
+    sportTabs.forEach(button => {
+      const isActive =
+        button === tab;
+
+      button.setAttribute(
+        "aria-selected",
+        isActive ? "true" : "false"
+      );
+      button.tabIndex =
+        isActive ? 0 : -1;
+    });
+
+    sportPanels.forEach(panel => {
+      panel.hidden =
+        panel.dataset.sportPanel !== sport;
+    });
+  };
+
+  sportTabs.forEach((tab, index) => {
+    tab.addEventListener("click", () => {
+      activateSportTab(tab);
+    });
+
+    tab.addEventListener("keydown", event => {
+      if (!["ArrowLeft", "ArrowRight"].includes(event.key)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const direction =
+        event.key === "ArrowRight" ? 1 : -1;
+
+      const nextTab =
+        sportTabs[
+          (index + direction + sportTabs.length) % sportTabs.length
+        ];
+
+      activateSportTab(nextTab);
+      nextTab.focus();
+    });
+  });
+
+  landingPage
+    .querySelectorAll("[data-landing-route]")
+    .forEach(link => {
+      link.addEventListener("click", event => {
+        const route =
+          link.dataset.landingRoute;
+
+        if (!route) {
+          return;
+        }
+
+        event.preventDefault();
+        closeLandingMenu();
+        navigateToPlatformRoute(route);
+      });
+    });
 
   if (brandHomeLink) {
     brandHomeLink.addEventListener("click", goToAppHome);
@@ -1194,6 +1535,33 @@ if (toggleBtn && sidebar) {
     );
   });
 }
+
+const closeDiscoveryPanelBtn =
+  document.getElementById("closeDiscoveryPanelBtn");
+
+function closeDiscoveryPanelAndRestoreFocus() {
+  setSidebarExpanded(false);
+
+  window.requestAnimationFrame(() => {
+    toggleBtn?.focus({ preventScroll: true });
+  });
+}
+
+closeDiscoveryPanelBtn?.addEventListener(
+  "click",
+  closeDiscoveryPanelAndRestoreFocus
+);
+
+document.addEventListener("keydown", event => {
+  if (
+    event.key === "Escape" &&
+    sidebar &&
+    !sidebar.classList.contains("closed") &&
+    document.body.classList.contains("platform-route-discovery")
+  ) {
+    closeDiscoveryPanelAndRestoreFocus();
+  }
+});
 
 
 // FAVORITES VIEW

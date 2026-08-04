@@ -1,9 +1,21 @@
-﻿let events = [];
+let events = [];
 
 let favorites =
   JSON.parse(
     localStorage.getItem("favorites")
   ) || [];
+
+const storedSeasonPlannerEvents =
+  localStorage.getItem("seasonPlannerEvents");
+let plannedEditions = storedSeasonPlannerEvents
+  ? JSON.parse(storedSeasonPlannerEvents)
+  : [...favorites];
+if (!storedSeasonPlannerEvents) {
+  localStorage.setItem(
+    "seasonPlannerEvents",
+    JSON.stringify(plannedEditions)
+  );
+}
 
 let csvEventsPromise = null;
 let seasonTimeInputSaveTimer = null;
@@ -63,11 +75,63 @@ function createEventKey(event) {
   return [
     event.event_name,
     event.date,
+    event.city,
+    event.country
+  ]
+    .map(cleanValue)
+    .join("|")
+    .toLowerCase();
+}
+
+
+function createLegacyEventKey(event) {
+  return [
+    event.event_name,
+    event.date,
     event.city
   ]
     .map(cleanValue)
     .join("|")
     .toLowerCase();
+}
+
+
+function createLegacyAdminEventKey(event) {
+  const normalizedName =
+    cleanValue(event.event_name)
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(
+        /\b(generali|bmw|datev|mainova|tcs|nn|adac|sparkasse)\b/g,
+        " "
+      )
+      .replace(
+        /\b(5k|10k|half|halbmarathon|marathon|kilometer|km)\b/g,
+        " "
+      )
+      .replace(/[^a-z0-9]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+  return [
+    normalizedName,
+    cleanValue(event.date),
+    cleanValue(event.city).toLowerCase(),
+    cleanValue(event.country).toLowerCase()
+  ].join("|");
+}
+
+
+function getEventKeyAliases(event) {
+  return [
+    getEventKey(event),
+    createLegacyEventKey(event),
+    createLegacyAdminEventKey(event),
+    event.event_name
+  ].filter((alias, index, aliases) =>
+    alias && aliases.indexOf(alias) === index
+  );
 }
 
 
@@ -139,6 +203,7 @@ function normalizeEvent(rawEvent) {
   };
 
   normalized.event_key =
+    cleanValue(rawEvent.event_key || rawEvent.legacy_event_key) ||
     createEventKey(normalized);
 
   return normalized;
@@ -178,13 +243,17 @@ function getEventKey(event) {
 
 
 function isFavorite(event) {
-  const key =
-    getEventKey(event);
+  const aliases =
+    getEventKeyAliases(event);
 
-  return (
-    favorites.includes(key) ||
-    favorites.includes(event.event_name)
+  return aliases.some(alias =>
+    favorites.includes(alias)
   );
+}
+
+function isPlannedEdition(event) {
+  const aliases = getEventKeyAliases(event);
+  return aliases.some(alias => plannedEditions.includes(alias));
 }
 
 
@@ -193,6 +262,73 @@ function saveFavorites() {
     "favorites",
     JSON.stringify(favorites)
   );
+}
+
+function savePlannedEditions() {
+  localStorage.setItem(
+    "seasonPlannerEvents",
+    JSON.stringify(plannedEditions)
+  );
+}
+
+
+function migrateLocalPlanningKeys(eventList) {
+  const storedMeta =
+    getSeasonPlanMeta();
+  const migratedFavorites =
+    new Set();
+  let favoritesChanged = false;
+  let metaChanged = false;
+
+  eventList.forEach(event => {
+    const canonicalKey =
+      getEventKey(event);
+    const aliases =
+      getEventKeyAliases(event);
+
+    if (aliases.some(alias => favorites.includes(alias))) {
+      migratedFavorites.add(canonicalKey);
+
+      if (!favorites.includes(canonicalKey)) {
+        favoritesChanged = true;
+      }
+    }
+
+    const legacyMetaKey = aliases.find(alias =>
+      alias !== canonicalKey && storedMeta[alias]
+    );
+
+    if (legacyMetaKey) {
+      storedMeta[canonicalKey] = {
+        ...storedMeta[legacyMetaKey],
+        ...(storedMeta[canonicalKey] || {})
+      };
+      delete storedMeta[legacyMetaKey];
+      metaChanged = true;
+    }
+  });
+
+  favorites.forEach(favorite => {
+    const matched = eventList.some(event =>
+      getEventKeyAliases(event).includes(favorite)
+    );
+
+    if (!matched) {
+      migratedFavorites.add(favorite);
+    }
+  });
+
+  if (
+    favoritesChanged ||
+    migratedFavorites.size !== favorites.length
+  ) {
+    favorites = [...migratedFavorites];
+    saveFavorites();
+  }
+
+  if (metaChanged) {
+    saveSeasonPlanMeta(storedMeta);
+  }
 }
 
 function applyRemotePlanningState(state = {}) {
@@ -279,7 +415,13 @@ function applyRemotePlanningState(state = {}) {
       ? [...new Set(state.favorites)]
       : [];
 
+  plannedEditions =
+    Array.isArray(state.plannedEditions)
+      ? [...new Set(state.plannedEditions)]
+      : [];
+
   saveFavorites();
+  savePlannedEditions();
 
   localStorage.setItem(
     "seasonPlanMeta",
@@ -564,7 +706,7 @@ async function addEventToSeasonPlanner(event, options = {}) {
     return false;
   }
 
-  if (isFavorite(event)) {
+  if (isPlannedEdition(event)) {
     if (typeof showToast === "function") {
       showToast(
         "Already in Season Planner",
@@ -576,7 +718,7 @@ async function addEventToSeasonPlanner(event, options = {}) {
     return true;
   }
 
-  toggleFavorite(event);
+  toggleSeasonPlan(event);
 
   if (typeof showToast === "function") {
     showToast(
@@ -1561,77 +1703,58 @@ async function loadCsvEvents() {
 }
 
 
-// LOAD CSV
+// Supabase is the source of truth after the controlled catalog import. The
+// versioned CSV remains a read-only export/fallback during rollout or outages.
+const MIN_SUPABASE_CATALOG_ROWS = 1;
+
 async function loadEvents(callback) {
   let loadedEvents = [];
+  let dbEvents = [];
+  let dbReady = false;
 
   try {
-    const csvEvents =
-      await loadCsvEvents();
+    if (typeof supabaseClient !== "undefined" && supabaseClient) {
+      let { data, error } = await supabaseClient
+        .from("public_event_discovery")
+        .select("*");
 
-      let dbEvents = [];
-
-      try {
-        if (
-          typeof supabaseClient !== "undefined" &&
-          supabaseClient
-        ) {
-          const {
-            data,
-            error
-          } = await supabaseClient
-            .from("events")
-            .select("*")
-            .eq("status", "approved");
-
-          if (error) {
-            console.error(
-              "Supabase approved events query failed:",
-              error
-            );
-            console.warn(
-              "Approved Supabase events could not be loaded. CSV events remain available."
-            );
-          } else {
-            dbEvents =
-              data || [];
-          }
-        }
-      } catch (error) {
-        console.error(
-          "Supabase approved events request failed:",
-          error
-        );
-        console.warn(
-          "Supabase is unavailable. CSV events remain available."
-        );
+      // Compatibility fallback for environments that have not received the
+      // event-edition view yet. It does not activate source-of-truth mode.
+      if (error && /public_event_discovery/i.test(String(error.message || ""))) {
+        ({ data, error } = await supabaseClient
+          .from("events")
+          .select("*")
+          .eq("status", "approved"));
       }
 
-      console.log(
-        "Loaded approved DB events:",
-        dbEvents
-      );
-
-      events =
-        normalizeEvents([
-          ...csvEvents,
-          ...dbEvents
-        ]);
-
-      loadedEvents =
-        events;
-
-      processPendingSeasonAdd();
+      if (error) throw error;
+      dbEvents = data || [];
+      dbReady = dbEvents.length >= MIN_SUPABASE_CATALOG_ROWS;
+      if (!dbReady) {
+        console.warn(`Supabase catalog has ${dbEvents.length} rows; keeping the CSV fallback until the controlled import is complete.`);
+      }
+    }
   } catch (error) {
-    console.error(
-      "CSV event loading failed:",
-      error
-    );
+    // A reachable CSV export is the intentional outage fallback, so this is
+    // operationally noteworthy but not an application error.
+    console.warn("Supabase event catalog request failed; using CSV fallback:", error);
+  }
 
+  try {
+    const sourceEvents = dbReady ? dbEvents : await loadCsvEvents();
+    events = normalizeEvents(sourceEvents);
+    window.eventCatalogSource = dbReady ? "supabase" : "csv-fallback";
+    migrateLocalPlanningKeys(events);
+    loadedEvents = events;
+
+    if (typeof window.updateLandingEventCount === "function") {
+      window.updateLandingEventCount(loadedEvents);
+    }
+    processPendingSeasonAdd();
+  } catch (error) {
+    console.error("Event catalog loading failed:", error);
     events = [];
-    loadedEvents =
-      events;
-
+    loadedEvents = events;
     if (typeof showAppMessage === "function") {
       showAppMessage(
         "Events unavailable",
@@ -1643,13 +1766,9 @@ async function loadEvents(callback) {
   try {
     callback(loadedEvents);
   } catch (error) {
-    console.error(
-      "Event render callback failed:",
-      error
-    );
+    console.error("Event render callback failed:", error);
   }
 }
-
 
 // POPUP
 function createPopup(event) {
@@ -1984,6 +2103,10 @@ function highlightCard(eventKey) {
 // DRAWER
 function openDrawer(event) {
 
+  if (typeof window.rememberDiscoveryMapViewBeforeEvent === "function") {
+    window.rememberDiscoveryMapViewBeforeEvent();
+  }
+
   const trackedKey =
     getEventKey(event);
 
@@ -2075,12 +2198,12 @@ function openDrawer(event) {
 
     <div class="drawer-action-row">
       <button
-        class="drawer-season-btn ${isFavorite(event) ? "active" : ""}"
+        class="drawer-season-btn ${isPlannedEdition(event) ? "active" : ""}"
         type="button"
         data-event-key="${escapeHTML(getEventKey(event))}"
         data-testid="drawer-add-to-planner"
       >
-        ${isFavorite(event) ? "Saved in Season" : "Add to Season"}
+        ${isPlannedEdition(event) ? "Saved in Season" : "Add to Season"}
       </button>
 
       <button
@@ -2234,7 +2357,7 @@ function openDrawer(event) {
           });
 
         const active =
-          added && isFavorite(event);
+          added && isPlannedEdition(event);
 
         drawerSeasonBtn.classList.toggle(
           "active",
@@ -2327,34 +2450,26 @@ function toggleFavorite(event) {
 
   const key =
     getEventKey(event);
+  const aliases =
+    new Set(getEventKeyAliases(event));
 
   const wasFavorite =
-    favorites.includes(key) ||
-    favorites.includes(event.event_name);
+    favorites.some(favorite =>
+      aliases.has(favorite)
+    );
 
   favorites =
     favorites.filter(
       favorite =>
-        favorite !== event.event_name
+        !aliases.has(favorite)
     );
 
-  if (favorites.includes(key)) {
-
-    favorites =
-      favorites.filter(
-        favorite => favorite !== key
-      );
-
-  }
-
-  else {
-
+  if (!wasFavorite) {
     favorites.push(key);
-
   }
 
   const isNowFavorite =
-    favorites.includes(key);
+    !wasFavorite;
 
   if (
     typeof trackEvent === "function" &&
@@ -2366,19 +2481,11 @@ function toggleFavorite(event) {
         : "favorite_removed",
       {
         event_id: key,
-        sport: event.sport || ""
+        sport: event.sport || "",
+        saved_events: favorites.length
       }
     );
 
-    trackEvent(
-      isNowFavorite
-        ? "season_event_added"
-        : "season_event_removed",
-      {
-        event_id: key,
-        sport: event.sport || ""
-      }
-    );
   }
 
   if (
@@ -2456,6 +2563,38 @@ function toggleFavorite(event) {
 
 }
 
+function toggleSeasonPlan(event) {
+  const key = getEventKey(event);
+  const aliases = new Set(getEventKeyAliases(event));
+  const wasPlanned = plannedEditions.some(item => aliases.has(item));
+
+  plannedEditions = plannedEditions.filter(item => !aliases.has(item));
+  if (!wasPlanned) {
+    plannedEditions.push(key);
+  }
+
+  const isNowPlanned = !wasPlanned;
+  savePlannedEditions();
+
+  if (typeof window.syncSeasonEditionToSupabase === "function") {
+    window.syncSeasonEditionToSupabase(event, isNowPlanned);
+  }
+  if (typeof trackEvent === "function") {
+    trackEvent(isNowPlanned ? "season_event_added" : "season_event_removed", {
+      event_id: key,
+      sport: event.sport || "",
+      saved_events: plannedEditions.length
+    });
+  }
+
+  updateFavoriteButtons(event);
+  const seasonPlanner = document.getElementById("seasonPlannerModal");
+  if (seasonPlanner?.classList.contains("open") && typeof renderSeasonPlanner === "function") {
+    renderSeasonPlanner();
+  }
+  return isNowPlanned;
+}
+
 function updateFavoriteButtons(event) {
   const key =
     getEventKey(event);
@@ -2513,9 +2652,10 @@ function updateFavoriteButtons(event) {
         return;
       }
 
-      button.classList.toggle("active", active);
+      const planned = isPlannedEdition(event);
+      button.classList.toggle("active", planned);
       button.textContent =
-        active
+        planned
           ? "Saved in Season"
           : "Add to Season";
     });
@@ -2524,8 +2664,18 @@ function updateFavoriteButtons(event) {
 
 let seasonCountdownTimer = null;
 let selectedSeasonEventKey = "";
+let seasonEditingEventKey = "";
+let seasonMobileEventDetailOpen = false;
+let seasonEventsListScrollTop = 0;
 
 function getSeasonPlannerScrollContainer() {
+  const plannerModal =
+    document.getElementById("seasonPlannerModal");
+
+  if (plannerModal?.classList.contains("season-planner-page-mode")) {
+    return document.querySelector(".platform-pages");
+  }
+
   return document.querySelector(
     "#seasonPlannerModal .season-planner-card"
   );
@@ -2625,6 +2775,59 @@ function writeSelectedSeasonEventKey(eventKey) {
   } catch (_error) {
     // The selection is purely UI state; storage errors should not block planning.
   }
+}
+
+function usesSeasonListDetailNavigation() {
+  return Boolean(
+    window.matchMedia?.(
+      "(max-width: 900px), (max-width: 1024px) and (orientation: portrait)"
+    ).matches
+  );
+}
+
+function syncSeasonMobileEventView() {
+  const panel =
+    document.getElementById("seasonEventsPanel");
+  const backButton =
+    document.getElementById("seasonEventsBackButton");
+  const showDetail =
+    usesSeasonListDetailNavigation() &&
+    seasonMobileEventDetailOpen &&
+    Boolean(readSelectedSeasonEventKey());
+
+  panel?.classList.toggle(
+    "season-mobile-detail-open",
+    showDetail
+  );
+
+  if (backButton) {
+    backButton.hidden = !showDetail;
+    backButton.setAttribute(
+      "aria-hidden",
+      showDetail ? "false" : "true"
+    );
+  }
+}
+
+function closeSeasonMobileEventDetail({ restoreList = true } = {}) {
+  seasonMobileEventDetailOpen = false;
+  seasonEditingEventKey = "";
+  syncSeasonMobileEventView();
+
+  if (!restoreList) {
+    return;
+  }
+
+  window.requestAnimationFrame(() => {
+    const listPanel =
+      document.querySelector(
+        "#seasonEventsPanel .season-events-list-panel"
+      );
+
+    if (listPanel) {
+      listPanel.scrollTop = seasonEventsListScrollTop;
+    }
+  });
 }
 
 function getSelectedSeasonEventKey(favoriteEvents = []) {
@@ -4730,6 +4933,13 @@ function bindSeasonDetailPanelState() {
         "true";
 
       panel.addEventListener("toggle", () => {
+        panel
+          .querySelector(":scope > summary")
+          ?.setAttribute(
+            "aria-expanded",
+            panel.open ? "true" : "false"
+          );
+
         if (panel.open) {
           seasonOpenDetailPanels.add(panelKey);
         } else {
@@ -5359,21 +5569,28 @@ function renderSeasonDetailPanel({
   const shouldOpen =
     open ||
     (panelKey && seasonOpenDetailPanels.has(panelKey));
+  const panelId =
+    `${testId}-${cleanValue(panelKey || title)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "panel"}`;
+  const bodyId = `${panelId}-content`;
 
   return `
     <details
+      id="${escapeHTML(panelId)}"
       class="season-detail-panel ${tone ? `season-detail-panel-${escapeHTML(tone)}` : ""}"
       data-testid="${escapeHTML(testId)}"
       ${panelKey ? `data-season-detail-panel="${escapeHTML(panelKey)}"` : ""}
       ${shouldOpen ? "open" : ""}
     >
-      <summary>
+      <summary aria-expanded="${shouldOpen ? "true" : "false"}" aria-controls="${escapeHTML(bodyId)}">
         <span>
           <strong>${escapeHTML(title)}</strong>
           <em>${escapeHTML(summary)}</em>
         </span>
       </summary>
-      <div class="season-detail-panel-body">
+      <div id="${escapeHTML(bodyId)}" class="season-detail-panel-body">
         ${body}
       </div>
     </details>
@@ -7642,7 +7859,7 @@ function getFavoriteEventsForSeason() {
   }
 
   return events
-    .filter(event => isFavorite(event))
+    .filter(event => isPlannedEdition(event))
     .sort((first, second) => {
       const firstDate =
         parseSeasonDate(first.date);
@@ -8010,7 +8227,20 @@ function getUpcomingSeasonEvents(favoriteEvents) {
 }
 
 function getSeasonCalendarView() {
-  return localStorage.getItem("seasonCalendarView") === "list"
+  const storedView =
+    localStorage.getItem("seasonCalendarView");
+
+  if (storedView === "list" || storedView === "month") {
+    return storedView;
+  }
+
+  const usePhoneLayout =
+    typeof window.matchMedia === "function" &&
+    window.matchMedia(
+      "(max-width: 767px), (max-width: 960px) and (max-height: 500px) and (orientation: landscape)"
+    ).matches;
+
+  return usePhoneLayout
     ? "list"
     : "month";
 }
@@ -8292,16 +8522,21 @@ function renderSeasonEventList(
     };
   const sortByDateDesc = (first, second) =>
     sortByDateAsc(second, first);
+  const upcomingEvents =
+    favoriteEvents
+      .filter(event => !isSeasonEventPast(event))
+      .sort(sortByDateAsc);
+  const nextRaceKey =
+    upcomingEvents[0]
+      ? getEventKey(upcomingEvents[0])
+      : "";
   const groupedEvents = [
     {
       title: "Upcoming",
-      events:
-        favoriteEvents
-          .filter(event => !isSeasonEventPast(event))
-          .sort(sortByDateAsc)
+      events: upcomingEvents
     },
     {
-      title: "Past Events",
+      title: "Completed",
       events:
         favoriteEvents
           .filter(event => {
@@ -8335,58 +8570,66 @@ function renderSeasonEventList(
       getEventKey(event);
     const priority =
       getSeasonPriority(event);
-    const raceLoad =
-      getSeasonRaceLoad(event);
     const details =
       getSeasonPlannerDetailsForEvent(event);
-    const prepSummary =
-      getSeasonPreparationSummary(
-        event,
-        details
-      );
-    const daysUntil =
-      getSeasonDaysUntil(event);
     const isPast =
       isSeasonEventPast(event);
+    const daysUntil =
+      getSeasonDaysUntil(event);
     const timingLabel =
-      getSeasonTimingLabel(event);
+      daysUntil === null
+        ? "Kein Datum"
+        : daysUntil === 0
+          ? "Heute"
+          : daysUntil > 0
+            ? `${daysUntil} Tage`
+            : `Vor ${Math.abs(daysUntil)} Tagen`;
     const postStatus =
       isPast
         ? getSeasonPostRaceStatus(details)
         : "";
     const result =
       details.result || {};
-    const pastMetaItems =
-      [
-        result.finish_time,
-        result.finish_status ? getSeasonFinishStatusLabel(result.finish_status) : "",
-        result.personal_rating ? `${result.personal_rating} / 5` : "",
-        !hasSeasonResult(result) ? "Ergebnis ausstehend" : ""
-      ].filter(Boolean);
+    const taskSummary =
+      getSeasonWorkspaceTaskSummary(event, details);
+    const isNextRace =
+      !isPast && eventKey === nextRaceKey;
+    const compactDate =
+      cleanValue(event.date || "--");
+    const place =
+      [event.city, event.country]
+        .map(cleanValue)
+        .filter(Boolean)
+        .join(", ") || "Ort offen";
+    const resultStatus =
+      result.finish_status
+        ? getSeasonFinishStatusLabel(result.finish_status)
+        : postStatus;
 
     return `
       <button
         type="button"
-        class="season-event-selector ${eventKey === selectedKey ? "active" : ""} ${!isPast && isCloseRaceEvent(event, closeWarnings) ? "has-warning" : ""} ${isPast ? "is-past-event" : ""} ${details.post_race?.archived ? "is-archived-event" : ""}"
+        class="season-event-selector ${eventKey === selectedKey ? "active" : ""} ${!isPast && isCloseRaceEvent(event, closeWarnings) ? "has-warning" : ""} ${isPast ? "is-past-event" : ""} ${isNextRace ? "is-next-race" : ""} ${details.post_race?.archived ? "is-archived-event" : ""}"
         data-season-edit="${escapeHTML(eventKey)}"
         data-testid="planner-event-card"
         aria-pressed="${eventKey === selectedKey ? "true" : "false"}"
       >
-        <span class="season-event-selector-date">${escapeHTML(event.date || "--")}</span>
+        <span class="season-event-selector-date">${escapeHTML(compactDate)}</span>
         <span class="season-event-selector-main">
+          ${isNextRace ? `<small>Next Race</small>` : ""}
           <strong>${escapeHTML(event.event_name)}</strong>
-          <em>${escapeHTML(event.city)}, ${escapeHTML(event.country)} · ${escapeHTML(getEventFormatLabel(event))}</em>
+          <em>${escapeHTML(place)} · ${escapeHTML(getEventFormatLabel(event))}</em>
         </span>
         <span class="season-event-selector-meta">
           <b class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">${escapeHTML(getSeasonPriorityLabel(priority))}</b>
           ${isPast ? `
             <b class="season-post-status-badge season-post-status-${postStatus.toLowerCase().replace(/[^a-z0-9]+/g, "-")}">${escapeHTML(postStatus)}</b>
-            ${pastMetaItems.slice(0, 2).map(item => `<b>${escapeHTML(item)}</b>`).join("")}
+            ${result.finish_time ? `<b>${escapeHTML(result.finish_time)}</b>` : ""}
+            ${resultStatus && resultStatus !== postStatus ? `<b>${escapeHTML(resultStatus)}</b>` : ""}
           ` : `
-            <b class="season-load-badge season-load-${raceLoad.level.toLowerCase().replace(/\s+/g, "-")}">${escapeHTML(getSeasonPlanningLoadLabel(raceLoad.level))}</b>
-            <b>${escapeHTML(prepSummary.percent)}%</b>
+            <b>${escapeHTML(timingLabel)}</b>
+            ${taskSummary.open.length ? `<b>${escapeHTML(taskSummary.open.length)} ${taskSummary.open.length === 1 ? "Aufgabe" : "Aufgaben"} offen</b>` : `<b>Planung bereit</b>`}
           `}
-          <b>${escapeHTML(daysUntil === null ? "No date" : timingLabel)}</b>
         </span>
       </button>
     `;
@@ -8404,6 +8647,526 @@ function renderSeasonEventList(
   `;
 }
 
+function getSeasonWorkspaceTaskSummary(event, details = {}) {
+  if (isSeasonEventPast(event)) {
+    const result = details.result || {};
+    const finishStatus = cleanValue(result.finish_status);
+    const tasks = [
+      {
+        key: "result",
+        label: "Ergebnis eingetragen",
+        done: hasSeasonResult(result)
+      },
+      {
+        key: "finish_status",
+        label: "Finish Status gesetzt",
+        done: Boolean(finishStatus)
+      },
+      {
+        key: "rating",
+        label: "Persönliche Bewertung ergänzt",
+        done: Boolean(cleanValue(result.personal_rating))
+      },
+      {
+        key: "reflection",
+        label: "Rennreview abgeschlossen",
+        done: hasSeasonReflection(result)
+      }
+    ];
+    const done = tasks.filter(task => task.done);
+    const open = tasks.filter(task => !task.done);
+
+    return {
+      tasks,
+      done,
+      open,
+      total: tasks.length
+    };
+  }
+
+  const goals = details.goals || {};
+  const logistics = details.logistics || {};
+  const daysUntil = getSeasonDaysUntil(event);
+  const priority = getSeasonPriority(event);
+  const goalStatus = getSeasonAreaStatus(
+    details,
+    "goals.goal_status",
+    Boolean(cleanValue(goals.goal_type))
+  );
+  const bibStatus = getSeasonAreaStatus(
+    details,
+    "logistics.bib_status",
+    Boolean(cleanValue(logistics.bib_number))
+  );
+  const tasks = [
+    {
+      key: "date",
+      label: "Eventdatum vorhanden",
+      done: Boolean(parseSeasonDate(event.date))
+    },
+    {
+      key: "distance",
+      label: "Distanz festgelegt",
+      done: Boolean(cleanValue(getSeasonDisplayDistance(event)))
+    },
+    {
+      key: "priority",
+      label: "Priorität festgelegt",
+      done: ["A", "B", "C", "Training"].includes(priority)
+    },
+    {
+      key: "registration",
+      label: "Anmeldung abgeschlossen",
+      done: Boolean(logistics.registration_confirmed)
+    },
+    {
+      key: "goal",
+      label: "Rennziel gewählt",
+      done:
+        goalStatus === "not_needed" ||
+        Boolean(cleanValue(goals.goal_type))
+    }
+  ];
+
+  if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 42) {
+    tasks.push({
+      key: "bib",
+      label: "Race Guide und Startunterlagen geprüft",
+      done:
+        bibStatus === "done" ||
+        bibStatus === "not_needed"
+    });
+  }
+
+  const relevant = tasks.filter(task => !task.notNeeded);
+  const done = relevant.filter(task => task.done);
+  const open = relevant.filter(task => !task.done);
+
+  return {
+    tasks,
+    done,
+    open,
+    total: relevant.length
+  };
+}
+
+function getSeasonWorkspaceNextAction(event, details = {}) {
+  const goals = details.goals || {};
+  const logistics = details.logistics || {};
+  const equipment = details.equipment || {};
+  const nutrition = details.nutrition || {};
+  const result = details.result || {};
+  const eventKey = getEventKey(event);
+  const isPast = isSeasonEventPast(event);
+  const daysUntil = getSeasonDaysUntil(event);
+
+  if (isPast) {
+    if (!hasSeasonResult(result)) {
+      return {
+        title: "Ergebnis eintragen",
+        description: "Halte Finish Status, offizielle Zeit und Platzierung für deinen Saisonrückblick fest.",
+        label: "Ergebnis eintragen",
+        panelKey: `result-review:${eventKey}`,
+        action: "result"
+      };
+    }
+
+    if (!hasSeasonReflection(result)) {
+      return {
+        title: "Rennen kurz reflektieren",
+        description: "Notiere, was gut lief und was du beim nächsten Rennen anders machen möchtest.",
+        label: "Review ergänzen",
+        panelKey: `result-review:${eventKey}`,
+        action: "result"
+      };
+    }
+
+    return {
+      title: "Keine offenen Schritte",
+      description: "Ergebnis und Rennreview sind vollständig dokumentiert.",
+      label: "",
+      panelKey: "",
+      action: ""
+    };
+  }
+
+  if (!["A", "B", "C", "Training"].includes(getSeasonPriority(event))) {
+    return {
+      title: "Eventpriorität festlegen",
+      description: "Ordne das Rennen als A-, B-, C- oder Trainingsrennen ein.",
+      label: "Event bearbeiten",
+      action: "edit"
+    };
+  }
+
+  if (!logistics.registration_confirmed) {
+    return {
+      title: "Anmeldung abschließen",
+      description: "Prüfe den Meldestatus, bevor du weitere Reise- oder Rennplanung festlegst.",
+      label: "Anmeldung prüfen",
+      panelKey: `preparation:${eventKey}`,
+      action: "panel"
+    };
+  }
+
+  if (!cleanValue(goals.goal_type)) {
+    return {
+      title: "Persönliches Rennziel festlegen",
+      description: "Lege fest, ob du auf Zeit, als Training oder einfach zum Spaß startest.",
+      label: "Ziel festlegen",
+      panelKey: `goal-strategy:${eventKey}`,
+      action: "panel"
+    };
+  }
+
+  const bibStatus = normalizeSeasonAreaStatus(logistics.bib_status);
+  if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 42 && bibStatus === "open") {
+    return {
+      title: "Race Guide und Startunterlagen prüfen",
+      description: "Kontrolliere Ausgabe, Pflichtunterlagen und wichtige Zeiten für den Renntag.",
+      label: "Vorbereitung öffnen",
+      panelKey: `preparation:${eventKey}`,
+      action: "panel"
+    };
+  }
+
+  if (
+    daysUntil !== null &&
+    daysUntil >= 0 &&
+    daysUntil <= 42 &&
+    normalizeSeasonAreaStatus(equipment.status) === "open"
+  ) {
+    return {
+      title: "Ausrüstung planen",
+      description: "Prüfe die automatisch vorgeschlagene Packliste für dieses Event.",
+      label: "Equipment öffnen",
+      panelKey: `equipment-nutrition:${eventKey}`,
+      action: "panel"
+    };
+  }
+
+  if (
+    daysUntil !== null &&
+    daysUntil >= 0 &&
+    daysUntil <= 42 &&
+    normalizeSeasonAreaStatus(nutrition.status) === "open"
+  ) {
+    return {
+      title: "Verpflegungsstrategie erstellen",
+      description: "Lege fest, ob und wie du dich während des Rennens verpflegen möchtest.",
+      label: "Verpflegung planen",
+      panelKey: `equipment-nutrition:${eventKey}`,
+      action: "panel"
+    };
+  }
+
+  return {
+    title: "Planung vollständig",
+    description: "Alle aktuell wichtigen Punkte für dieses Rennen sind geklärt.",
+    label: "",
+    panelKey: "",
+    action: ""
+  };
+}
+
+function getSeasonWorkspaceNotice(event) {
+  if (isSeasonEventPast(event)) {
+    return "Vergangene Planungsdaten bleiben in den Bereichen weiterhin erreichbar.";
+  }
+
+  const eventKey = getEventKey(event);
+  const warning = getCloseRaceWarnings(
+    getUpcomingSeasonEvents(getFavoriteEventsForSeason())
+  ).find(item =>
+    getEventKey(item.previous) === eventKey ||
+    getEventKey(item.current) === eventKey
+  );
+
+  if (!warning) {
+    return "";
+  }
+
+  const bothARaces =
+    getSeasonPriority(warning.previous) === "A" &&
+    getSeasonPriority(warning.current) === "A";
+  const prefix = bothARaces
+    ? "Zwei A-Races liegen nah beieinander. "
+    : "Kurzer Rennabstand: ";
+
+  return `${prefix}Zwischen ${warning.previous.event_name} und ${warning.current.event_name} liegen ${warning.daysBetween} Tage.`;
+}
+
+function renderSeasonEventEditPanel(event, eventKey) {
+  const distanceOptions = getSeasonDistanceOptions(event);
+  const plannedDistance = getSeasonPlannedDistance(event);
+  const priority = getSeasonPriority(event);
+  const removeTitle = seasonPlannerText(
+    "season.removeFromSeason",
+    "Event aus dem Season Planner entfernen"
+  );
+
+  return `
+    <div class="season-workspace-edit-panel" data-testid="planner-event-edit-form">
+      <div class="season-workspace-edit-fields">
+        <label class="season-distance-control">
+          <span>${escapeHTML(seasonPlannerText("season.plannedDistance", "Distanz"))}</span>
+          <select data-season-distance="${escapeHTML(eventKey)}" data-testid="planner-distance-select">
+            <option value="">${escapeHTML(seasonPlannerText("season.eventDefault", "Eventangabe verwenden"))}</option>
+            ${distanceOptions.map(distance => `
+              <option value="${escapeHTML(distance)}" ${plannedDistance === distance ? "selected" : ""}>${escapeHTML(distance)}</option>
+            `).join("")}
+          </select>
+        </label>
+        <label class="season-priority-control">
+          <span>${escapeHTML(seasonPlannerText("season.racePriority", "Priorität"))}</span>
+          <select data-season-priority="${escapeHTML(eventKey)}" data-testid="planner-priority-select">
+            ${["A", "B", "C", "Training", "Maybe"].map(value => `
+              <option value="${value}" ${priority === value ? "selected" : ""}>${escapeHTML(getSeasonPriorityLabel(value))}</option>
+            `).join("")}
+          </select>
+        </label>
+      </div>
+      <div class="season-workspace-edit-actions">
+        <span>Änderungen werden automatisch gespeichert.</span>
+        <button type="button" class="season-edit-done" data-season-edit-done="${escapeHTML(eventKey)}">Fertig</button>
+        <button
+          type="button"
+          class="season-priority-remove-event season-priority-remove-icon"
+          data-season-remove="${escapeHTML(eventKey)}"
+          data-testid="planner-remove-event"
+          aria-label="${escapeHTML(removeTitle)}: ${escapeHTML(event.event_name)}"
+          title="${escapeHTML(removeTitle)}"
+        >
+          <svg class="season-trash-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+            <path d="M9 3h6l1 2h4v2H4V5h4l1-2Z"></path>
+            <path d="M6 9h12l-1 11H7L6 9Zm4 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function renderSeasonRaceWorkspace(event, eventKey) {
+  const details = getSeasonPlannerDetailsForEvent(event);
+  const goals = details.goals || {};
+  const logistics = details.logistics || {};
+  const equipment = details.equipment || {};
+  const nutrition = details.nutrition || {};
+  const result = details.result || {};
+  const summary = getSeasonResultSummaryItems(event, goals, result);
+  const taskSummary = getSeasonWorkspaceTaskSummary(event, details);
+  const nextAction = getSeasonWorkspaceNextAction(event, details);
+  const isPast = isSeasonEventPast(event);
+  const hasResult = hasSeasonResult(result);
+  const distanceKm = summary.distanceKm;
+  const distanceLabel = Number.isFinite(distanceKm)
+    ? `${distanceKm.toFixed(distanceKm % 1 ? 2 : 0)} km`
+    : "";
+  const resultMetricLabel = summary.sportType === "cycling"
+    ? "Avg speed"
+    : summary.sportType === "swimming"
+      ? "Pace / 100 m"
+      : "Pace";
+  const targetMetricValue = summary.sportType === "triathlon"
+    ? ""
+    : summary.targetMetric.value;
+  const finishMetricValue = summary.sportType === "triathlon"
+    ? ""
+    : summary.finishMetric.value;
+  const priority = getSeasonPriority(event);
+  const trainingPhase = isPast ? "Completed" : getSeasonTrainingPhase(event);
+  const timingLabel = isPast
+    ? getSeasonPostRaceStatus(details)
+    : getSeasonTimingLabel(event);
+  const place = [event.city, event.country]
+    .map(cleanValue)
+    .filter(Boolean)
+    .join(", ") || "Ort offen";
+  const goalSummary = [
+    goals.goal_type ? getSeasonGoalTypeLabel(goals.goal_type) : "Noch kein Zieltyp gewählt",
+    goals.target_time ? `Zielzeit ${goals.target_time}` : "",
+    cleanValue(goals.race_strategy) ? "Strategie notiert" : ""
+  ].filter(Boolean).join(" · ");
+  const preparationSummary = [
+    logistics.registration_confirmed ? "Angemeldet" : "Anmeldung offen",
+    normalizeSeasonAreaStatus(logistics.bib_status) === "done" ? "Startunterlagen geklärt" : ""
+  ].filter(Boolean).join(" · ");
+  const travelStatus = normalizeSeasonAreaStatus(logistics.travel_status, logistics.travel_booked ? "done" : "open");
+  const accommodationStatus = normalizeSeasonAreaStatus(logistics.accommodation_status, logistics.accommodation_booked ? "done" : "open");
+  const travelSummary = [
+    travelStatus === "not_needed" ? "Keine Reise nötig" : travelStatus === "done" ? "Anreise geklärt" : "Anreise offen",
+    accommodationStatus === "not_needed" ? "Keine Unterkunft nötig" : accommodationStatus === "done" ? "Unterkunft geklärt" : "Unterkunft offen"
+  ].join(" · ");
+  const equipmentStatus = normalizeSeasonAreaStatus(equipment.status);
+  const nutritionStatus = normalizeSeasonAreaStatus(nutrition.status);
+  const equipmentSummary = [
+    equipmentStatus === "not_needed" ? "Ausrüstung nicht benötigt" : equipmentStatus === "done" || equipmentStatus === "planned" ? "Ausrüstung geplant" : "Ausrüstung offen",
+    nutritionStatus === "not_needed" || cleanValue(nutrition.type) === "not_needed" ? "Verpflegung nicht benötigt" : nutritionStatus === "done" || nutritionStatus === "planned" ? "Verpflegung geplant" : "Verpflegung offen"
+  ].join(" · ");
+  const resultSummary = hasResult
+    ? [
+        result.finish_status ? getSeasonFinishStatusLabel(result.finish_status) : "",
+        result.finish_time ? `Finish ${result.finish_time}` : "",
+        result.age_group_place ? `AK ${result.age_group_place}` : ""
+      ].filter(Boolean).join(" · ")
+    : isPast
+      ? "Ergebnis noch nicht eingetragen"
+      : "Nach dem Rennen verfügbar";
+  const notice = getSeasonWorkspaceNotice(event);
+  const editOpen = seasonEditingEventKey === eventKey;
+  const resultPanelMarkup = renderSeasonDetailPanel({
+    title: "Result & Review",
+    summary: resultSummary,
+    open: isPast && (!hasResult || !hasSeasonReflection(result)),
+    tone: isPast ? "" : "is-future-result",
+    panelKey: `result-review:${eventKey}`,
+    body: `
+      ${renderSeasonResultPanel({
+        event,
+        eventKey,
+        result,
+        summary,
+        distanceLabel,
+        finishMetricValue,
+        goalDelta: summary.goalDelta,
+        hasResult
+      })}
+      ${isPast ? renderSeasonArchiveAction(eventKey, details.post_race || {}) : ""}
+    `
+  });
+
+  return `
+    <div class="season-race-workspace ${isPast ? "is-past-race" : ""}">
+      <header class="season-workspace-header">
+        <div class="season-workspace-heading">
+          <span>${escapeHTML(event.date || "Datum offen")}</span>
+          <h3>${escapeHTML(event.event_name)}</h3>
+          <p>${escapeHTML(place)} · ${escapeHTML(event.sport || getSeasonSportLabel(summary.sportType))} · ${escapeHTML(getSeasonDisplayDistance(event) || "Distanz offen")}</p>
+          <div class="season-workspace-badges">
+            <b class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">${escapeHTML(getSeasonPriorityLabel(priority))}</b>
+            <b>${escapeHTML(timingLabel)}</b>
+            <b>${escapeHTML(trainingPhase)}</b>
+            <b>${logistics.registration_confirmed ? "Angemeldet" : "Anmeldung offen"}</b>
+          </div>
+        </div>
+        <button
+          type="button"
+          class="season-event-edit-button"
+          data-season-toggle-edit="${escapeHTML(eventKey)}"
+          data-testid="planner-event-edit-button"
+          aria-expanded="${editOpen ? "true" : "false"}"
+        >
+          ${editOpen ? "Bearbeitung schließen" : "Event bearbeiten"}
+        </button>
+      </header>
+
+      ${editOpen ? renderSeasonEventEditPanel(event, eventKey) : ""}
+
+      <section class="season-next-action-card ${nextAction.action ? "has-action" : "is-complete"}" data-testid="planner-next-action">
+        <span>Nächster Schritt</span>
+        <div>
+          <strong>${escapeHTML(nextAction.title)}</strong>
+          <p>${escapeHTML(nextAction.description)}</p>
+        </div>
+        ${nextAction.label ? `
+          <button
+            type="button"
+            data-season-next-action="${escapeHTML(nextAction.action)}"
+            data-season-next-panel="${escapeHTML(nextAction.panelKey || "")}"
+            data-season-next-event="${escapeHTML(eventKey)}"
+          >${escapeHTML(nextAction.label)}</button>
+        ` : ""}
+      </section>
+
+      <section class="season-task-progress" aria-label="Planungsstand">
+        <div>
+          <strong>${escapeHTML(taskSummary.done.length)} von ${escapeHTML(taskSummary.total)} wichtigen Punkten erledigt</strong>
+          <span>${taskSummary.open.length ? `${taskSummary.open.length} ${taskSummary.open.length === 1 ? "Punkt ist" : "Punkte sind"} noch offen.` : "Alle aktuell relevanten Punkte sind geklärt."}</span>
+        </div>
+        <div class="season-task-list">
+          ${taskSummary.tasks.map(task => `
+            <span class="${task.done ? "is-done" : "is-open"}"><b aria-hidden="true">${task.done ? "✓" : "○"}</b>${escapeHTML(task.label)}</span>
+          `).join("")}
+        </div>
+      </section>
+
+      ${notice ? `<p class="season-workspace-notice">${escapeHTML(notice)}</p>` : ""}
+
+      <div class="season-workspace-accordions">
+        ${isPast ? resultPanelMarkup : ""}
+        ${renderSeasonDetailPanel({
+          title: "Goal & Race Strategy",
+          summary: goalSummary,
+          open: !isPast && !goals.goal_type,
+          panelKey: `goal-strategy:${eventKey}`,
+          body: `
+            <div class="season-status-strip">
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: "Ziel", value: goals.goal_status, doneLabel: "Geklärt" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: "Race Strategy", value: goals.strategy_status, doneLabel: "Geplant" })}
+            </div>
+            ${renderSeasonGoalTypeControl(eventKey, goals)}
+            ${renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetricLabel)}
+            <div class="season-detail-fields">
+              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.race_strategy", labelKey: "", fallback: "Pacing und Renntaktik", value: goals.race_strategy, placeholder: "Intensität, Pacing, Schlüsselstellen..." })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "personal_note", labelKey: "season.personalNote", fallback: "Persönliche Notiz", value: details.personal_note, placeholder: "Was möchtest du dir für dieses Rennen merken?", legacyNote: true })}
+            </div>
+          `
+        })}
+        ${renderSeasonDetailPanel({
+          title: "Preparation",
+          summary: preparationSummary,
+          open: !isPast && !logistics.registration_confirmed,
+          panelKey: `preparation:${eventKey}`,
+          body: `
+            <div class="season-detail-checks season-detail-checks-compact">
+              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: "Anmeldung abgeschlossen", checked: logistics.registration_confirmed })}
+            </div>
+            <div class="season-detail-fields">
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: "Race Guide & Startunterlagen", value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: "Geprüft" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "preparation.medical_status", label: "Medizinische Bescheinigung", value: details.preparation?.medical_status || "not_needed", doneLabel: "Vorhanden" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "preparation.course_status", label: "Streckenkenntnis", value: details.preparation?.course_status || "open", doneLabel: "Geprüft" })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: "Startnummer", value: logistics.bib_number, placeholder: "Optional" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "preparation.note", labelKey: "", fallback: "Weitere Vorbereitung", value: details.preparation?.note, placeholder: "Race Guide, Pflichtausrüstung, eigene Punkte..." })}
+            </div>
+          `
+        })}
+        ${renderSeasonDetailPanel({
+          title: "Travel & Logistics",
+          summary: travelSummary,
+          panelKey: `travel-logistics:${eventKey}`,
+          body: `
+            <div class="season-detail-fields">
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: "Anreise", value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: "Geklärt" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: "Unterkunft", value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: "Gebucht" })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.start_location", labelKey: "", fallback: "Startort", value: logistics.start_location, placeholder: "Ort oder Adresse" })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.parking", labelKey: "", fallback: "Parken / Transfer", value: logistics.parking, placeholder: "Optional" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: "Logistiknotiz", value: logistics.travel_note, placeholder: "Anreise, Ausgabe, Begleitpersonen, wichtige Uhrzeiten..." })}
+            </div>
+          `
+        })}
+        ${renderSeasonDetailPanel({
+          title: "Equipment & Nutrition",
+          summary: equipmentSummary,
+          tone: "equipment",
+          panelKey: `equipment-nutrition:${eventKey}`,
+          body: `
+            <section class="season-workspace-subsection">
+              <h4>Equipment</h4>
+              ${renderSeasonEquipmentChecklist(event, eventKey, equipment)}
+            </section>
+            <section class="season-workspace-subsection">
+              <h4>Verpflegung</h4>
+              ${renderSeasonNutritionPlanner(eventKey, nutrition)}
+            </section>
+          `
+        })}
+        ${!isPast ? resultPanelMarkup : ""}
+      </div>
+    </div>
+  `;
+}
+
 function renderSeasonEditableEvent(event) {
   if (!event) {
     return `
@@ -8414,124 +9177,12 @@ function renderSeasonEditableEvent(event) {
     `;
   }
 
-  const distanceOptions =
-    getSeasonDistanceOptions(event);
-  const plannedDistance =
-    getSeasonPlannedDistance(event);
-  const raceLoad =
-    getSeasonRaceLoad(event);
   const eventKey =
     getEventKey(event);
-  const priority =
-    getSeasonPriority(event);
-  const details =
-    getSeasonPlannerDetailsForEvent(event);
-  const dashboardSummary =
-    getSeasonResultSummaryItems(
-      event,
-      details.goals || {},
-      details.result || {}
-    );
-  const plannerResult =
-    details.result || {};
-  const plannerGoals =
-    details.goals || {};
-  const plannerLogistics =
-    details.logistics || {};
-  const isPast =
-    isSeasonEventPast(event);
-  const postRaceStatus =
-    isPast
-      ? getSeasonPostRaceStatus(details)
-      : "";
-  const compactStatusItems =
-    isPast
-      ? [
-          postRaceStatus,
-          plannerResult.finish_time ? `Finish ${plannerResult.finish_time}` : "",
-          plannerResult.personal_rating ? `${plannerResult.personal_rating} / 5` : "",
-          getSeasonTimingLabel(event)
-        ].filter(Boolean)
-      : [
-          plannerGoals.target_time ? `Ziel ${plannerGoals.target_time}` : "",
-          plannerResult.finish_time ? `Finish ${plannerResult.finish_time}` : "",
-          dashboardSummary.goalDelta,
-          plannerLogistics.registration_confirmed ? "Angemeldet" : "",
-          plannerLogistics.travel_booked ? "Reise gebucht" : ""
-        ].filter(Boolean);
-  const removeTitle =
-    typeof window.t === "function"
-      ? window.t("season.removeFromSeason", "Remove from Season")
-      : "Remove from Season";
 
   return `
-    <article class="season-priority-row season-event-editor-card" data-testid="planner-event-edit-card">
-      <div class="season-priority-race">
-        <span class="season-event-date">${escapeHTML(event.date)}</span>
-        <span class="season-event-main">
-          <strong>${escapeHTML(event.event_name)}</strong>
-          <em>${escapeHTML(event.city)}, ${escapeHTML(event.country)} · ${escapeHTML(event.sport || "Event")} · ${escapeHTML(getSeasonDisplayDistance(event))}</em>
-        </span>
-        <div class="season-race-chip-row">
-          <span class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">
-            ${escapeHTML(getSeasonPriorityLabel(priority))}
-          </span>
-          <span class="season-load-badge season-load-${raceLoad.level.toLowerCase().replace(/\s+/g, "-")}">
-            ${escapeHTML(getSeasonPlanningLoadLabel(raceLoad.level))}
-          </span>
-          ${compactStatusItems.map(item => `
-            <span class="season-race-chip">${escapeHTML(item)}</span>
-          `).join("")}
-        </div>
-      </div>
-      <div class="season-priority-controls">
-        <label class="season-distance-control">
-          <span>${escapeHTML(seasonPlannerText("season.plannedDistance", "Planned distance"))}</span>
-          <select data-season-distance="${escapeHTML(eventKey)}" data-testid="planner-distance-select">
-            <option value="">${escapeHTML(seasonPlannerText("season.eventDefault", "Event default"))}</option>
-            ${distanceOptions.map(distance => `
-              <option
-                value="${escapeHTML(distance)}"
-                ${plannedDistance === distance ? "selected" : ""}
-              >
-                ${escapeHTML(distance)}
-              </option>
-            `).join("")}
-          </select>
-        </label>
-        <label class="season-priority-control">
-          <span>${escapeHTML(seasonPlannerText("season.racePriority", "Race priority"))}</span>
-          <select data-season-priority="${escapeHTML(eventKey)}" data-testid="planner-priority-select">
-            ${["A", "B", "C", "Training", "Maybe"].map(priorityValue => `
-              <option
-                value="${priorityValue}"
-                ${getSeasonPriority(event) === priorityValue ? "selected" : ""}
-              >
-                ${getSeasonPriorityLabel(priorityValue)}
-              </option>
-            `).join("")}
-          </select>
-        </label>
-        <button
-          type="button"
-          class="season-priority-remove-event season-priority-remove-icon"
-          data-season-remove="${escapeHTML(eventKey)}"
-          data-testid="planner-remove-event"
-          aria-label="${escapeHTML(removeTitle)}: ${escapeHTML(event.event_name)}"
-          title="${escapeHTML(removeTitle)}"
-        >
-          <svg
-            class="season-trash-icon"
-            aria-hidden="true"
-            viewBox="0 0 24 24"
-            focusable="false"
-          >
-            <path d="M9 3h6l1 2h4v2H4V5h4l1-2Z"></path>
-            <path d="M6 9h12l-1 11H7L6 9Zm4 2v7h2v-7h-2Zm4 0v7h2v-7h-2Z"></path>
-          </svg>
-        </button>
-      </div>
-      ${renderSeasonPlannerDetails(event, eventKey)}
+    <article class="season-event-editor-card" data-testid="planner-event-edit-card">
+      ${renderSeasonRaceWorkspace(event, eventKey)}
     </article>
   `;
 }
@@ -8792,6 +9443,9 @@ function renderSeasonPlanner() {
         renderSeasonEventList([], "", []);
     }
 
+    seasonMobileEventDetailOpen = false;
+    syncSeasonMobileEventView();
+
     if (overviewARaces) {
       overviewARaces.innerHTML =
         `<p>No A races selected yet.</p>`;
@@ -8889,6 +9543,8 @@ function renderSeasonPlanner() {
     priorityList.innerHTML =
       renderSeasonEditableEvent(selectedEvent);
   }
+
+  syncSeasonMobileEventView();
 
   const seasonCalendarView =
     getSeasonCalendarView();
@@ -9599,11 +10255,115 @@ function renderSeasonPlanner() {
     .querySelectorAll("[data-season-edit]")
     .forEach(button => {
       button.addEventListener("click", () => {
+        if (usesSeasonListDetailNavigation()) {
+          const listPanel =
+            button.closest(".season-events-list-panel");
+
+          seasonEventsListScrollTop =
+            listPanel?.scrollTop || 0;
+          seasonMobileEventDetailOpen = true;
+
+          if (!history.state?.seasonPlannerDetail) {
+            history.pushState(
+              {
+                ...(history.state || {}),
+                seasonPlannerDetail: true
+              },
+              "",
+              window.location.href
+            );
+          }
+        }
+
         writeSelectedSeasonEventKey(
           button.dataset.seasonEdit
         );
 
         renderSeasonPlannerPreservingView("events");
+
+        if (usesSeasonListDetailNavigation()) {
+          window.requestAnimationFrame(() => {
+            const scrollContainer =
+              getSeasonPlannerScrollContainer();
+
+            if (scrollContainer) {
+              scrollContainer.scrollTop = 0;
+            }
+          });
+        }
+      });
+    });
+
+  document
+    .querySelectorAll("[data-season-toggle-edit]")
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        const eventKey =
+          button.dataset.seasonToggleEdit;
+
+        seasonEditingEventKey =
+          seasonEditingEventKey === eventKey
+            ? ""
+            : eventKey;
+        renderSeasonPlannerPreservingView("events");
+      });
+    });
+
+  document
+    .querySelectorAll("[data-season-edit-done]")
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        seasonEditingEventKey = "";
+        renderSeasonPlannerPreservingView("events");
+      });
+    });
+
+  document
+    .querySelectorAll("[data-season-next-action]")
+    .forEach(button => {
+      button.addEventListener("click", () => {
+        const action =
+          button.dataset.seasonNextAction;
+        const eventKey =
+          button.dataset.seasonNextEvent;
+        const panelKey =
+          button.dataset.seasonNextPanel;
+
+        if (action === "edit") {
+          seasonEditingEventKey = eventKey;
+        }
+
+        if (panelKey) {
+          seasonOpenDetailPanels.add(panelKey);
+        }
+
+        if (action === "result") {
+          setSeasonPlannerDetailField(
+            eventKey,
+            "result.edit_mode",
+            true
+          );
+        }
+
+        renderSeasonPlannerPreservingView("events");
+
+        window.requestAnimationFrame(() => {
+          if (action === "edit") {
+            document
+              .querySelector("[data-testid='planner-event-edit-form'] select")
+              ?.focus({ preventScroll: true });
+            return;
+          }
+
+          const panel = panelKey
+            ? document.querySelector(
+                `[data-season-detail-panel="${CSS.escape(panelKey)}"]`
+              )
+            : null;
+
+          panel?.querySelector("summary")?.focus({ preventScroll: true });
+          panel?.scrollIntoView({ block: "nearest" });
+        });
       });
     });
 
@@ -9814,7 +10574,7 @@ function renderSeasonPlanner() {
           return;
         }
 
-        toggleFavorite(found);
+        toggleSeasonPlan(found);
       });
     });
 
@@ -9862,7 +10622,7 @@ function renderSeasonPlanner() {
           });
         }
 
-        toggleFavorite(found);
+        toggleSeasonPlan(found);
       });
     });
 }
@@ -10050,20 +10810,28 @@ function setSeasonTab(tabName) {
   document
     .querySelectorAll(".season-tab")
     .forEach(tab => {
-      tab.classList.toggle(
-        "active",
-        tab.dataset.seasonTab === tabName
+      const isActive =
+        tab.dataset.seasonTab === tabName;
+
+      tab.classList.toggle("active", isActive);
+      tab.setAttribute(
+        "aria-selected",
+        isActive ? "true" : "false"
       );
+      tab.tabIndex = isActive ? 0 : -1;
     });
 
   document
     .querySelectorAll(".season-tab-panel")
     .forEach(panel => {
-      panel.classList.toggle(
-        "active",
-        panel.id === `season${tabName.charAt(0).toUpperCase()}${tabName.slice(1)}Panel`
-      );
+      const isActive =
+        panel.id === `season${tabName.charAt(0).toUpperCase()}${tabName.slice(1)}Panel`;
+
+      panel.classList.toggle("active", isActive);
+      panel.hidden = !isActive;
     });
+
+  syncSeasonMobileEventView();
 }
 
 async function openSeasonPlanner() {
@@ -10104,19 +10872,36 @@ async function openSeasonPlanner() {
     String(window.location.hash || "")
       .startsWith("#/planner");
 
-  plannerModal.classList.toggle(
-    "season-planner-page-mode",
-    isPlannerRoute
+  if (!isPlannerRoute) {
+    window.location.hash = "/planner";
+    return;
+  }
+
+  const plannerMount =
+    document.getElementById("plannerPageMount");
+
+  if (
+    plannerMount &&
+    plannerModal.parentElement !== plannerMount
+  ) {
+    plannerMount.appendChild(plannerModal);
+  }
+
+  plannerModal.classList.add(
+    "season-planner-page-mode"
   );
 
-  document.body.classList.toggle(
-    "season-planner-page-open",
-    isPlannerRoute
+  document.body.classList.add(
+    "season-planner-page-open"
   );
 
   plannerModal.classList.add("open");
 
-  setSeasonTab("overview");
+  const activeTab =
+    document.querySelector(".season-tab.active")
+      ?.dataset.seasonTab || "overview";
+
+  setSeasonTab(activeTab);
 
   if (typeof trackEvent === "function") {
     trackEvent("season_planner_opened", {
@@ -10197,7 +10982,57 @@ function initSeasonPlanner() {
       tab.addEventListener("click", () => {
         setSeasonTab(tab.dataset.seasonTab);
       });
+
+      tab.addEventListener("keydown", event => {
+        const tabs =
+          Array.from(document.querySelectorAll(".season-tab"));
+        const currentIndex =
+          tabs.indexOf(tab);
+        let nextIndex = currentIndex;
+
+        if (event.key === "ArrowRight") {
+          nextIndex = (currentIndex + 1) % tabs.length;
+        } else if (event.key === "ArrowLeft") {
+          nextIndex = (currentIndex - 1 + tabs.length) % tabs.length;
+        } else if (event.key === "Home") {
+          nextIndex = 0;
+        } else if (event.key === "End") {
+          nextIndex = tabs.length - 1;
+        } else {
+          return;
+        }
+
+        event.preventDefault();
+        const nextTab = tabs[nextIndex];
+        setSeasonTab(nextTab.dataset.seasonTab);
+        nextTab.focus();
+      });
     });
+
+  const eventsBackButton =
+    document.getElementById("seasonEventsBackButton");
+
+  eventsBackButton?.addEventListener("click", () => {
+    if (history.state?.seasonPlannerDetail) {
+      history.back();
+      return;
+    }
+
+    closeSeasonMobileEventDetail();
+  });
+
+  window.addEventListener("popstate", event => {
+    if (
+      seasonMobileEventDetailOpen &&
+      !event.state?.seasonPlannerDetail
+    ) {
+      closeSeasonMobileEventDetail();
+    }
+  });
+
+  window.addEventListener("resize", () => {
+    window.requestAnimationFrame(syncSeasonMobileEventView);
+  }, { passive: true });
 
   if (openButton) {
     openButton.addEventListener(

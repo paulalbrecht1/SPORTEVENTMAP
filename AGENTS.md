@@ -4,6 +4,16 @@ Diese Regeln ergänzen die Produktvision in `PRODUCT_VISION.md`.
 
 ## Versionsverwaltung
 
+- Rufe vor jeder dateiveraendernden Aufgabe `git fetch origin --prune` auf und
+  vergleiche den aktuellen Branch mit seinem Upstream. Beginne erst danach mit
+  der Umsetzung. Ueberschreibe bei einem Rueckstand oder einer Abweichung keine
+  Remote-Aenderungen, sondern gleiche sie konfliktfrei ab oder dokumentiere den
+  Blocker.
+- Ergaenze bei nicht-trivialen Aenderungen einen kurzen Commit-Body: Was wurde
+  geaendert, warum wurde es geaendert und mit welchen Checks wurde es geprueft.
+- Pruefe nach jedem Push mit `git status -sb`, dass der Branch nicht mehr vor
+  seinem Upstream liegt, und nenne Branch, Commit-ID und Kurzbeschreibung in
+  der Abschlussmeldung.
 - Behandle jede Nutzeranfrage, die Dateien verändert, als eigenen
   nachvollziehbaren Commit.
 - Committe erst, wenn die passenden Prüfungen erfolgreich waren oder ein

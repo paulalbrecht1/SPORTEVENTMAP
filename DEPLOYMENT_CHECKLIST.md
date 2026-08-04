@@ -1,19 +1,20 @@
 # Sport Event Map - Deployment Checklist
 
-This checklist prepares the static HTML/CSS/JavaScript app for a real domain.
-Replace placeholders only after a hosting URL is known.
+This checklist prepares the static HTML/CSS/JavaScript app for a real HTTPS domain.
+Do not invent production URLs, operator details or credentials.
 
-## 1. Build the public package
+## 1. Build and verify the public package
 
-Use Node.js in the project folder:
+From the project folder:
 
 ```powershell
-npm run check
+npm run test:gate
+npm run test:event-detail
 npm run prepare-package
 ```
 
-Only upload the generated `dist` folder. Do not upload `tools`, `tests`,
-`supabase`, private import files, or local API keys.
+Upload only the generated `dist` folder. Do not upload `tools`, `tests`,
+`supabase`, private imports or local credentials.
 
 For a production build with environment-based public runtime configuration:
 
@@ -24,49 +25,40 @@ $env:SPORT_EVENT_MAP_SITE_URL="<PRODUCTION_SITE_URL>"
 npm run prepare-package
 ```
 
-`SPORT_EVENT_MAP_SITE_URL` must be the final HTTPS origin without a trailing
-slash, for example `https://example.com`. Do not enter a guessed domain.
+`SPORT_EVENT_MAP_SITE_URL` must be the final HTTPS origin without a trailing slash.
+The publishable key is public by design. Never use a secret or `service_role` key
+in build variables or browser files.
 
-The Supabase publishable key is public by design. The build still accepts the
-legacy `SPORT_EVENT_MAP_SUPABASE_ANON_KEY` variable for the current project,
-but a new publishable key is preferred before production. Never use a secret
-or `service_role` key in these variables or in browser files.
+## 2. Apply the complete database migration chain
 
-## 2. Apply the database migration
+Prefer the linked CLI workflow so production migration history stays reproducible:
 
-1. Open Supabase.
-2. Select the project.
-3. Open **SQL Editor**.
-4. Click **New query**.
-5. Open
-   `supabase/migrations/20260608_closed_beta_security.sql`.
-6. Paste the complete file into the editor.
-7. Click **Run**.
-8. Confirm that the query finishes without an error.
+```powershell
+supabase migration list --linked
+supabase db push --linked --dry-run
+supabase db push --linked
+supabase migration list --linked
+```
 
-The migration is additive. It enables RLS and creates/updates:
+Review every pending migration before pushing. The v77 baseline contains nine
+ordered migrations through:
 
-- `profiles`
-- `events`
-- `favorites`
-- `season_planner_events`
-- `analytics_events`
-- `user_feedback`
+`supabase/migrations/20260725_closed_beta_gate_hardening.sql`
 
-Then run the complete additive admin workflow upgrade:
+Do not paste only the two old June migrations into a newer project. For a new
+environment, apply the complete ordered chain. Then verify:
 
-`supabase/migrations/20260609_admin_workflow.sql`
+```powershell
+supabase db lint --linked --level warning
+npm run audit:anon
+```
 
-For exact click-by-click instructions and verification queries, see
-`SUPABASE_ADMIN_SETUP.md`.
+See `SUPABASE_ADMIN_SETUP.md` for admin assignment and verification queries.
 
 ## 3. Assign the admin role
 
-Do not promote an admin by frontend email checks.
-
-1. Open **Authentication > Users**.
-2. Copy the intended admin user's UUID.
-3. Run:
+Do not promote an admin through frontend email checks. Copy the intended user's UUID
+from **Authentication > Users**, then run:
 
 ```sql
 update public.profiles
@@ -74,90 +66,52 @@ set role = 'admin', updated_at = now()
 where id = 'REPLACE_WITH_AUTH_USER_UUID';
 ```
 
-4. Verify:
+Verify the UUID, email and role before continuing.
 
-```sql
-select id, email, role
-from public.profiles
-where id = 'REPLACE_WITH_AUTH_USER_UUID';
-```
+## 4. Configure Supabase Auth
 
-## 4. Configure Supabase Auth URLs
+In **Authentication > URL Configuration**:
 
-Open **Authentication > URL Configuration**.
+- Set Site URL to the final `<PRODUCTION_SITE_URL>`.
+- Add the exact production `/index.html` redirect used by the app.
+- Keep only local development redirects that are still used.
+- Remove obsolete preview and deployment URLs.
 
-Set:
+In Auth email/password settings:
 
-- **Site URL**: `<PRODUCTION_SITE_URL>`
+- Enable email signups and confirmation for the beta.
+- Review minimum password requirements.
+- Enable leaked-password protection when the project plan supports it.
+- Customize confirmation and password-reset templates.
+- Test delivery through two different email providers.
 
-Add exact redirect URLs used by the app:
+## 5. Run credential-based production tests
 
-- `<PRODUCTION_SITE_URL>/index.html`
-- `http://127.0.0.1:5500/index.html`
-- `http://localhost:4173/index.html`
-
-Remove obsolete deployment URLs before release. Keep only URLs that are
-actually used for local development or production.
-
-The app uses the configured site URL for:
-
-- registration email confirmation
-- login return flow
-- password reset
-- expired/invalid auth-link fallback
-
-## 5. Configure email authentication
-
-In **Authentication > Providers > Email**:
-
-- enable email signups
-- enable email confirmation for the beta
-- review password minimum requirements
-- customize confirmation and password-reset email templates
-- test delivery to at least two different email providers
-
-## 6. Run RLS tests
-
-Create two normal test accounts and one admin test account. Follow
+Create two normal test accounts and one admin test account as described in
 `tests/README.md`, then run:
 
 ```powershell
 npm run test:rls
 ```
 
-All 10 tests must pass before inviting beta users.
+All 10 tests must pass before inviting testers. Afterward, manually test registration,
+email confirmation, login, logout, session restore and password reset on the final domain.
 
-## 7. Hosting checks
+## 6. Hosting and device checks
 
-- Upload only `dist`.
-- Force HTTPS.
-- Confirm `index.html` opens at the production origin.
-- Confirm `data/events.csv` returns HTTP 200.
-- Confirm Leaflet, MarkerCluster, Papa Parse and Supabase CDN scripts load.
-- Confirm `privacy.html`, `impressum.html` and `contact.html` open.
-- Confirm no directory listing is enabled.
-- Confirm no private key files are present in the deployed files.
+- Force HTTPS and disable directory listing.
+- Confirm `index.html`, `data/events.csv`, `sitemap.xml`, `robots.txt` and legal pages return HTTP 200.
+- Confirm no private key files or source-only directories are deployed.
+- Complete Discovery, favorite, Season Planner, feedback and event-detail flows.
+- Complete event submission and admin approval/rejection end to end.
+- Test one real iOS and one real Android device, including virtual keyboards.
 
-## 8. Auth click test on production
+## 7. Legal and operations gate
 
-1. Register a new beta account.
-2. Confirm the email.
-3. Verify the redirect returns to the production app.
-4. Log out.
-5. Log in again.
-6. Request a password reset.
-7. Open the reset link.
-8. Set a new password in Profile.
-9. Open an old reset link and confirm a friendly expiry message appears.
+- Replace all legal placeholders with actual operator, contact and hosting details.
+- Obtain legal review for the actual beta operator.
+- Back up `data/events.csv`, the production schema/data and the last known-good `dist`.
+- Select 20-50 invited testers and assign a feedback owner and review cadence.
 
-## 9. Final release command
-
-Run immediately before uploading:
-
-```powershell
-npm run check
-npm run review:beta
-npm run prepare-package
-```
-
-Keep a local backup of `data/events.csv` before every data import.
+Do not invite testers until every unchecked item in `BETA_READINESS.md` is either
+completed or explicitly accepted by the responsible operator.

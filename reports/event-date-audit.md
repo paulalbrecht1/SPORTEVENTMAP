@@ -1,6 +1,6 @@
 # Event Date Audit
 
-Generated: 2026-07-10T10:45:06.441Z
+Generated: 2026-07-26T09:12:00.989Z
 Input: data/events.csv
 Events checked: 994
 
@@ -8,8 +8,8 @@ Events checked: 994
 
 - Critical: 0
 - Warning: 0
-- Info: 746
-- Clean: 248
+- Info: 750
+- Clean: 244
 
 ## Review Queue
 
@@ -19,6 +19,15 @@ Events checked: 994
 - Event ID: bielefelder-triathlon-bielefeld-28-06-2026
 - Location: Bielefeld, Germany
 - Current date: 28.06.2026
+- Issues: next_check_overdue
+- Recommended action: Run source verification and move next_check forward.
+
+### Sörmlands 100 Trail Run
+
+- Severity: info
+- Event ID: sormlands-100-trail-run-bjornlunda-11-09-2026
+- Location: Björnlunda, Sweden
+- Current date: 11.09.2026
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 
@@ -46,24 +55,6 @@ Events checked: 994
 - Event ID: ironman-70-3-duisburg-duisburg-16-08-2026
 - Location: Duisburg, Germany
 - Current date: 16.08.2026
-- Issues: next_check_overdue
-- Recommended action: Run source verification and move next_check forward.
-
-### IRONMAN 70.3 Leipzig
-
-- Severity: info
-- Event ID: ironman-70-3-leipzig-leipzig-23-08-2026
-- Location: Leipzig, Germany
-- Current date: 23.08.2026
-- Issues: next_check_overdue
-- Recommended action: Run source verification and move next_check forward.
-
-### IRONMAN 70.3 Erkner
-
-- Severity: info
-- Event ID: ironman-70-3-erkner-erkner-13-09-2026
-- Location: Erkner, Germany
-- Current date: 13.09.2026
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 
@@ -130,21 +121,21 @@ Events checked: 994
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 
-### Köln Triathlon
-
-- Severity: info
-- Event ID: koln-triathlon-koln-06-09-2026
-- Location: Köln, Germany
-- Current date: 06.09.2026
-- Issues: next_check_overdue
-- Recommended action: Run source verification and move next_check forward.
-
 ### Haspa Marathon Hamburg
 
 - Severity: info
 - Event ID: haspa-marathon-hamburg-hamburg-25-04-2027
 - Location: Hamburg, Germany
 - Current date: 25.04.2027
+- Issues: next_check_overdue
+- Recommended action: Run source verification and move next_check forward.
+
+### BMW Berlin Marathon
+
+- Severity: info
+- Event ID: bmw-berlin-marathon-berlin-27-09-2026
+- Location: Berlin, Germany
+- Current date: 27.09.2026
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 
@@ -1777,15 +1768,6 @@ Events checked: 994
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 
-### Generali Berlin Half Marathon
-
-- Severity: info
-- Event ID: generali-berlin-half-marathon-berlin-04-04-2027
-- Location: Berlin, Germany
-- Current date: 04.04.2027
-- Issues: next_check_overdue
-- Recommended action: Run source verification and move next_check forward.
-
 ### HOKA UTMB Mont-Blanc
 
 - Severity: info
@@ -1810,6 +1792,24 @@ Events checked: 994
 - Event ID: challenge-almere-amsterdam-almere-12-09-2026
 - Location: Almere, Netherlands
 - Current date: 12.09.2026
+- Issues: next_check_overdue
+- Recommended action: Run source verification and move next_check forward.
+
+### Challenge Peguera Mallorca
+
+- Severity: info
+- Event ID: challenge-peguera-mallorca-peguera-17-10-2026
+- Location: Peguera, Spain
+- Current date: 17.10.2026
+- Issues: next_check_overdue
+- Recommended action: Run source verification and move next_check forward.
+
+### Challenge Kaiserwinkl-Walchsee
+
+- Severity: info
+- Event ID: challenge-kaiserwinkl-walchsee-walchsee-28-06-2026
+- Location: Walchsee, Austria
+- Current date: 28.06.2026
 - Issues: next_check_overdue
 - Recommended action: Run source verification and move next_check forward.
 

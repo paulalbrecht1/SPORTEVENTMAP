@@ -1,0 +1,7076 @@
+{
+  "tables": [
+    {
+      "name": "analytics_events",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_course",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_details",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_editorial",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_faq",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_race_day",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_registration",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_sources",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_statistics",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_travel",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "event_weather",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "events",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "favorites",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "profiles",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "season_planner_events",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    },
+    {
+      "name": "user_feedback",
+      "owner": "postgres",
+      "schema": "public",
+      "rls_forced": false,
+      "rls_enabled": true,
+      "replica_identity": "d"
+    }
+  ],
+  "columns": [
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_name",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "user_id",
+      "type": "uuid",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "session_id",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_id",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "metadata",
+      "type": "jsonb",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_type",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "anonymous_id",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "page",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source",
+      "type": "text",
+      "table": "analytics_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_course",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "distances",
+      "type": "jsonb",
+      "table": "event_course",
+      "schema": "public",
+      "default": "'[]'::jsonb",
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "main_distance",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_type",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_character",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "surface",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "elevation_gain",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "elevation_loss",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "start_location",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "finish_location",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "start_finish_same_place",
+      "type": "boolean",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "loop_course",
+      "type": "boolean",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "point_to_point",
+      "type": "boolean",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_record_male",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_record_female",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "gpx_url",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "elevation_profile_url",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_map_url",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 19,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "difficulty_rating",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 20,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "beginner_friendly",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 21,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "personal_best_potential",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 22,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "scenic_rating",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 23,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "crowd_support_rating",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 24,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "swim_distance",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 25,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "swim_location",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 26,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "swim_type",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 27,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bike_distance",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 28,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bike_laps",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 29,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bike_elevation",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 30,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bike_character",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 31,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "run_distance",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 32,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "run_laps",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 33,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "run_character",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 34,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "transition_area",
+      "type": "text",
+      "table": "event_course",
+      "schema": "public",
+      "default": null,
+      "ordinal": 35,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_course",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 36,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_course",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 37,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_details",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_id",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_slug",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_name",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "sport_type",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_series",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "date",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "city",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "country",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "region",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "organizer",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "official_website",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "registration_url",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "first_edition",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_status",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "verification_status",
+      "type": "text",
+      "table": "event_details",
+      "schema": "public",
+      "default": "'draft'::text",
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "is_public",
+      "type": "boolean",
+      "table": "event_details",
+      "schema": "public",
+      "default": "false",
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "date",
+      "name": "last_checked",
+      "type": "date",
+      "table": "event_details",
+      "schema": "public",
+      "default": null,
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_details",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 19,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_details",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 20,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "why_this_event_stands_out",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "course_character",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "atmosphere",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "good_fit_for",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "not_ideal_for",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "insider_tips",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "planning_context",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "seo_summary",
+      "type": "text",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_editorial",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_faq",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_faq",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "question",
+      "type": "text",
+      "table": "event_faq",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "answer",
+      "type": "text",
+      "table": "event_faq",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "int4",
+      "name": "sort_order",
+      "type": "integer",
+      "table": "event_faq",
+      "schema": "public",
+      "default": "100",
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_url",
+      "type": "text",
+      "table": "event_faq",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "date",
+      "name": "last_verified",
+      "type": "date",
+      "table": "event_faq",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_faq",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_faq",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "total_cutoff",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "intermediate_cutoffs",
+      "type": "jsonb",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": "'[]'::jsonb",
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "start_time",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "wave_start",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "aid_stations",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "pacers_available",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "timing_system",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bag_drop",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "showers",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "changing_rooms",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "toilets",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "medical_support",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "live_tracking",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "livestream",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "expo_available",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bib_pickup_info",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "swim_cutoff",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 19,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "bike_cutoff",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 20,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "run_cutoff",
+      "type": "text",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": null,
+      "ordinal": 21,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 22,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_race_day",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 23,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_registration",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "registration_status",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "registration_open_date",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "registration_close_date",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "entry_fee_min",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "entry_fee_max",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "currency",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "price_tiers",
+      "type": "jsonb",
+      "table": "event_registration",
+      "schema": "public",
+      "default": "'[]'::jsonb",
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "lottery_available",
+      "type": "boolean",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "qualification_required",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "charity_entries",
+      "type": "boolean",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "waiting_list",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "transfer_possible",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "refund_policy",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "participant_limit",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "sold_out_status",
+      "type": "text",
+      "table": "event_registration",
+      "schema": "public",
+      "default": null,
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_registration",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_registration",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 19,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_sources",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "field_path",
+      "type": "text",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_url",
+      "type": "text",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_type",
+      "type": "text",
+      "table": "event_sources",
+      "schema": "public",
+      "default": "'unknown'::text",
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_label",
+      "type": "text",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "date",
+      "name": "last_verified",
+      "type": "date",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "numeric",
+      "name": "confidence_score",
+      "type": "numeric",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "verification_note",
+      "type": "text",
+      "table": "event_sources",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_sources",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_sources",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "participant_count",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "finisher_count",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "women_percentage",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "average_finish_time",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "last_winner_male",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "last_winner_female",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "last_winning_time_male",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "last_winning_time_female",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "historic_significance",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "notable_facts",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "world_major",
+      "type": "boolean",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "utmb_index",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "boston_qualifier",
+      "type": "boolean",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "championship_status",
+      "type": "text",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": null,
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_statistics",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_travel",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "nearest_airport",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "nearest_train_station",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "public_transport_info",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "parking_info",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "accommodation_info",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "camping_available",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "recommended_arrival",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "recommended_booking_time",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "timezone",
+      "type": "text",
+      "table": "event_travel",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_travel",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_travel",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "event_weather",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "event_detail_id",
+      "type": "uuid",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "average_temperature",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "average_high_temperature",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "average_low_temperature",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "average_rainfall",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "typical_weather",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "heat_risk",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "wind_risk",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "best_conditions_note",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "seasonal_context",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "planning_tips",
+      "type": "text",
+      "table": "event_weather",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "event_weather",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "event_weather",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "int8",
+      "name": "id",
+      "type": "bigint",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 1,
+      "identity": "YES",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "events",
+      "schema": "public",
+      "default": "timezone('utc'::text, now())",
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_name",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "sport",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "date",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "city",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "country",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "address",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "latitude",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "longitude",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "distance",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "description",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_url",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "status",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": "'pending'::text",
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "created_by",
+      "type": "uuid",
+      "table": "events",
+      "schema": "public",
+      "default": "auth.uid()",
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "data_source",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 16,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "image",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 17,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "events",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 18,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_url",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 19,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "registration_status",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": "'unclear'::text",
+      "ordinal": 20,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "status_note",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 21,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "last_checked",
+      "type": "timestamp with time zone",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 22,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "review_priority",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": "'medium'::text",
+      "ordinal": 23,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "bool",
+      "name": "needs_review",
+      "type": "boolean",
+      "table": "events",
+      "schema": "public",
+      "default": "true",
+      "ordinal": 24,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "quality_flags",
+      "type": "jsonb",
+      "table": "events",
+      "schema": "public",
+      "default": "'{}'::jsonb",
+      "ordinal": 25,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "reviewed_at",
+      "type": "timestamp with time zone",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 26,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "reviewed_by",
+      "type": "uuid",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 27,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "review_status",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": "'pending'::text",
+      "ordinal": 28,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "review_note",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 29,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "review_reason",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 30,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "import_batch",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 31,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "source_type",
+      "type": "text",
+      "table": "events",
+      "schema": "public",
+      "default": "'unknown'::text",
+      "ordinal": 32,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "favorites",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "user_id",
+      "type": "uuid",
+      "table": "favorites",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_id",
+      "type": "text",
+      "table": "favorites",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "favorites",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "profiles",
+      "schema": "public",
+      "default": null,
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "email",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "role",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "default": "'user'::text",
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "profiles",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "display_name",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "preferred_language",
+      "type": "text",
+      "table": "profiles",
+      "schema": "public",
+      "default": "'en'::text",
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "user_id",
+      "type": "uuid",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_id",
+      "type": "text",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "priority",
+      "type": "text",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": "'Maybe'::text",
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "planned_distance",
+      "type": "text",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "jsonb",
+      "name": "planner_details",
+      "type": "jsonb",
+      "table": "season_planner_events",
+      "schema": "public",
+      "default": "'{}'::jsonb",
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": "gen_random_uuid()",
+      "ordinal": 1,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "uuid",
+      "name": "user_id",
+      "type": "uuid",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 2,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "session_id",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 3,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "int4",
+      "name": "rating",
+      "type": "integer",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 4,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "message",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 5,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "page",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 6,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 7,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "category",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": "'other'::text",
+      "ordinal": 8,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "summary",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 9,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "product_area",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 10,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "event_id",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 11,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "screenshot_hint",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 12,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "status",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": "'new'::text",
+      "ordinal": 13,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "text",
+      "name": "internal_notes",
+      "type": "text",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": null,
+      "ordinal": 14,
+      "identity": "NO",
+      "nullable": "YES",
+      "generated": "NEVER"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "table": "user_feedback",
+      "schema": "public",
+      "default": "now()",
+      "ordinal": 15,
+      "identity": "NO",
+      "nullable": "NO",
+      "generated": "NEVER"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "analytics_events_anonymous_id_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_anonymous_id_idx ON public.analytics_events USING btree (anonymous_id)"
+    },
+    {
+      "name": "analytics_events_created_at_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_created_at_idx ON public.analytics_events USING btree (created_at DESC)"
+    },
+    {
+      "name": "analytics_events_event_id_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_event_id_idx ON public.analytics_events USING btree (event_id)"
+    },
+    {
+      "name": "analytics_events_event_name_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_event_name_idx ON public.analytics_events USING btree (event_name)"
+    },
+    {
+      "name": "analytics_events_event_type_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_event_type_idx ON public.analytics_events USING btree (event_type)"
+    },
+    {
+      "name": "analytics_events_name_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_name_idx ON public.analytics_events USING btree (event_name)"
+    },
+    {
+      "name": "analytics_events_page_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_page_idx ON public.analytics_events USING btree (page)"
+    },
+    {
+      "name": "analytics_events_pkey",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX analytics_events_pkey ON public.analytics_events USING btree (id)"
+    },
+    {
+      "name": "analytics_events_session_id_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_session_id_idx ON public.analytics_events USING btree (session_id)"
+    },
+    {
+      "name": "analytics_events_user_id_idx",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "CREATE INDEX analytics_events_user_id_idx ON public.analytics_events USING btree (user_id)"
+    },
+    {
+      "name": "event_course_detail_idx",
+      "table": "event_course",
+      "schema": "public",
+      "definition": "CREATE INDEX event_course_detail_idx ON public.event_course USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_course_pkey",
+      "table": "event_course",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_course_pkey ON public.event_course USING btree (id)"
+    },
+    {
+      "name": "event_details_event_slug_key",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_details_event_slug_key ON public.event_details USING btree (event_slug)"
+    },
+    {
+      "name": "event_details_pkey",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_details_pkey ON public.event_details USING btree (id)"
+    },
+    {
+      "name": "event_details_public_idx",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "CREATE INDEX event_details_public_idx ON public.event_details USING btree (is_public, verification_status)"
+    },
+    {
+      "name": "event_details_slug_idx",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "CREATE INDEX event_details_slug_idx ON public.event_details USING btree (event_slug)"
+    },
+    {
+      "name": "event_editorial_detail_idx",
+      "table": "event_editorial",
+      "schema": "public",
+      "definition": "CREATE INDEX event_editorial_detail_idx ON public.event_editorial USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_editorial_pkey",
+      "table": "event_editorial",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_editorial_pkey ON public.event_editorial USING btree (id)"
+    },
+    {
+      "name": "event_faq_detail_idx",
+      "table": "event_faq",
+      "schema": "public",
+      "definition": "CREATE INDEX event_faq_detail_idx ON public.event_faq USING btree (event_detail_id, sort_order)"
+    },
+    {
+      "name": "event_faq_pkey",
+      "table": "event_faq",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_faq_pkey ON public.event_faq USING btree (id)"
+    },
+    {
+      "name": "event_race_day_detail_idx",
+      "table": "event_race_day",
+      "schema": "public",
+      "definition": "CREATE INDEX event_race_day_detail_idx ON public.event_race_day USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_race_day_pkey",
+      "table": "event_race_day",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_race_day_pkey ON public.event_race_day USING btree (id)"
+    },
+    {
+      "name": "event_registration_detail_idx",
+      "table": "event_registration",
+      "schema": "public",
+      "definition": "CREATE INDEX event_registration_detail_idx ON public.event_registration USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_registration_pkey",
+      "table": "event_registration",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_registration_pkey ON public.event_registration USING btree (id)"
+    },
+    {
+      "name": "event_sources_detail_idx",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "CREATE INDEX event_sources_detail_idx ON public.event_sources USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_sources_pkey",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_sources_pkey ON public.event_sources USING btree (id)"
+    },
+    {
+      "name": "event_statistics_detail_idx",
+      "table": "event_statistics",
+      "schema": "public",
+      "definition": "CREATE INDEX event_statistics_detail_idx ON public.event_statistics USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_statistics_pkey",
+      "table": "event_statistics",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_statistics_pkey ON public.event_statistics USING btree (id)"
+    },
+    {
+      "name": "event_travel_detail_idx",
+      "table": "event_travel",
+      "schema": "public",
+      "definition": "CREATE INDEX event_travel_detail_idx ON public.event_travel USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_travel_pkey",
+      "table": "event_travel",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_travel_pkey ON public.event_travel USING btree (id)"
+    },
+    {
+      "name": "event_weather_detail_idx",
+      "table": "event_weather",
+      "schema": "public",
+      "definition": "CREATE INDEX event_weather_detail_idx ON public.event_weather USING btree (event_detail_id)"
+    },
+    {
+      "name": "event_weather_pkey",
+      "table": "event_weather",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX event_weather_pkey ON public.event_weather USING btree (id)"
+    },
+    {
+      "name": "events_created_by_idx",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE INDEX events_created_by_idx ON public.events USING btree (created_by)"
+    },
+    {
+      "name": "events_pkey",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX events_pkey ON public.events USING btree (id)"
+    },
+    {
+      "name": "events_status_idx",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE INDEX events_status_idx ON public.events USING btree (status)"
+    },
+    {
+      "name": "events_status_reviewed_at_idx",
+      "table": "events",
+      "schema": "public",
+      "definition": "CREATE INDEX events_status_reviewed_at_idx ON public.events USING btree (status, reviewed_at DESC)"
+    },
+    {
+      "name": "favorites_pkey",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX favorites_pkey ON public.favorites USING btree (id)"
+    },
+    {
+      "name": "favorites_user_id_event_id_key",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX favorites_user_id_event_id_key ON public.favorites USING btree (user_id, event_id)"
+    },
+    {
+      "name": "favorites_user_id_idx",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "CREATE INDEX favorites_user_id_idx ON public.favorites USING btree (user_id)"
+    },
+    {
+      "name": "profiles_pkey",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX profiles_pkey ON public.profiles USING btree (id)"
+    },
+    {
+      "name": "season_planner_events_pkey",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX season_planner_events_pkey ON public.season_planner_events USING btree (id)"
+    },
+    {
+      "name": "season_planner_events_user_id_event_id_key",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX season_planner_events_user_id_event_id_key ON public.season_planner_events USING btree (user_id, event_id)"
+    },
+    {
+      "name": "season_planner_events_user_id_idx",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "CREATE INDEX season_planner_events_user_id_idx ON public.season_planner_events USING btree (user_id)"
+    },
+    {
+      "name": "user_feedback_created_at_idx",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CREATE INDEX user_feedback_created_at_idx ON public.user_feedback USING btree (created_at DESC)"
+    },
+    {
+      "name": "user_feedback_pkey",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CREATE UNIQUE INDEX user_feedback_pkey ON public.user_feedback USING btree (id)"
+    },
+    {
+      "name": "user_feedback_status_created_at_idx",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CREATE INDEX user_feedback_status_created_at_idx ON public.user_feedback USING btree (status, created_at DESC)"
+    }
+  ],
+  "schemas": [
+    {
+      "name": "private",
+      "owner": "postgres"
+    },
+    {
+      "name": "public",
+      "owner": "pg_database_owner"
+    }
+  ],
+  "policies": [
+    {
+      "name": "Admins can read analytics",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "analytics_events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Clients can submit privacy-safe analytics",
+      "check": "((user_id IS NULL) OR (auth.uid() = user_id))",
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "analytics_events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "analytics_admin_select",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "analytics_events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "analytics_insert_privacy_safe",
+      "check": "(((( SELECT auth.uid() AS uid) IS NULL) AND (user_id IS NULL)) OR ((( SELECT auth.uid() AS uid) IS NOT NULL) AND ((user_id IS NULL) OR (user_id = ( SELECT auth.uid() AS uid)))))",
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "analytics_events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event course",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_course",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event course",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_course",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_course.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event details",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_details",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event details",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_details",
+      "using": "(is_public = true)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event editorial",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_editorial",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event editorial",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_editorial",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_editorial.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event faq",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_faq",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event faq",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_faq",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_faq.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event race day",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_race_day",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event race day",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_race_day",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_race_day.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event registration",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_registration",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event registration",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_registration",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_registration.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event sources",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_sources",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event sources",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_sources",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_sources.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event statistics",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_statistics",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event statistics",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_statistics",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_statistics.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event travel",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_travel",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event travel",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_travel",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_travel.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can manage event weather",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "event_weather",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "ALL",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read published event weather",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "event_weather",
+      "using": "(EXISTS ( SELECT 1\n   FROM event_details d\n  WHERE ((d.id = event_weather.event_detail_id) AND (d.is_public = true))))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can delete events",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can read all events",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can update events",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Authenticated users can submit pending events",
+      "check": "((( SELECT auth.uid() AS uid) IS NOT NULL) AND (created_by = ( SELECT auth.uid() AS uid)) AND (status = 'pending'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Public can read approved events",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(status = 'approved'::text)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can read own submitted events",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(created_by = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_admin_delete",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_admin_insert",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_admin_read_all",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_admin_update",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_public_read_approved",
+      "check": null,
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(status = 'approved'::text)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_users_insert_pending",
+      "check": "((created_by = ( SELECT auth.uid() AS uid)) AND (status = 'pending'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "events_users_read_own_submissions",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "events",
+      "using": "(created_by = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can add own favorites",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can read own favorites",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can remove own favorites",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "favorites_delete_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "favorites_insert_own",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "favorites_select_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "favorites",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can update profiles",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can create own profile",
+      "check": "((id = ( SELECT auth.uid() AS uid)) AND (role = 'user'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can read own profile",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "((( SELECT auth.uid() AS uid) IS NOT NULL) AND ((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.is_admin() AS is_admin)))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can update own profile",
+      "check": "(id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "profiles_admin_update",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "profiles_insert_own_user_role",
+      "check": "((id = ( SELECT auth.uid() AS uid)) AND (COALESCE(role, 'user'::text) = 'user'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "profiles_select_own_or_admin",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "((id = ( SELECT auth.uid() AS uid)) OR ( SELECT private.is_admin() AS is_admin))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "profiles_update_own_without_admin_escalation",
+      "check": "((id = ( SELECT auth.uid() AS uid)) AND (COALESCE(role, 'user'::text) = 'user'::text))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "profiles",
+      "using": "(id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can add own season entries",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can read own season",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can remove own season entries",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Users can update own season entries",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "season_delete_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "season_insert_own",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "season_select_own",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "season_update_own",
+      "check": "(user_id = ( SELECT auth.uid() AS uid))",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "season_planner_events",
+      "using": "(user_id = ( SELECT auth.uid() AS uid))",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can read feedback",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Admins can update feedback",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "Clients can create feedback",
+      "check": "((status = 'new'::text) AND (internal_notes IS NULL) AND (((( SELECT auth.uid() AS uid) IS NULL) AND (user_id IS NULL)) OR ((( SELECT auth.uid() AS uid) IS NOT NULL) AND ((user_id IS NULL) OR (user_id = ( SELECT auth.uid() AS uid))))))",
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "feedback_admin_delete",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "DELETE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "feedback_admin_select",
+      "check": null,
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "SELECT",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "feedback_admin_update",
+      "check": "( SELECT private.is_admin() AS is_admin)",
+      "roles": [
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": "( SELECT private.is_admin() AS is_admin)",
+      "schema": "public",
+      "command": "UPDATE",
+      "permissive": "PERMISSIVE"
+    },
+    {
+      "name": "feedback_insert_privacy_safe",
+      "check": "((COALESCE(status, 'new'::text) = 'new'::text) AND (internal_notes IS NULL) AND (((( SELECT auth.uid() AS uid) IS NULL) AND (user_id IS NULL)) OR ((( SELECT auth.uid() AS uid) IS NOT NULL) AND ((user_id IS NULL) OR (user_id = ( SELECT auth.uid() AS uid))))))",
+      "roles": [
+        "anon",
+        "authenticated"
+      ],
+      "table": "user_feedback",
+      "using": null,
+      "schema": "public",
+      "command": "INSERT",
+      "permissive": "PERMISSIVE"
+    }
+  ],
+  "triggers": [
+    {
+      "name": "event_course_set_updated_at",
+      "table": "event_course",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_course_set_updated_at BEFORE UPDATE ON event_course FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_details_set_updated_at",
+      "table": "event_details",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_details_set_updated_at BEFORE UPDATE ON event_details FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_editorial_set_updated_at",
+      "table": "event_editorial",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_editorial_set_updated_at BEFORE UPDATE ON event_editorial FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_faq_set_updated_at",
+      "table": "event_faq",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_faq_set_updated_at BEFORE UPDATE ON event_faq FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_race_day_set_updated_at",
+      "table": "event_race_day",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_race_day_set_updated_at BEFORE UPDATE ON event_race_day FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_registration_set_updated_at",
+      "table": "event_registration",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_registration_set_updated_at BEFORE UPDATE ON event_registration FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_sources_set_updated_at",
+      "table": "event_sources",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_sources_set_updated_at BEFORE UPDATE ON event_sources FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_statistics_set_updated_at",
+      "table": "event_statistics",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_statistics_set_updated_at BEFORE UPDATE ON event_statistics FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_travel_set_updated_at",
+      "table": "event_travel",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_travel_set_updated_at BEFORE UPDATE ON event_travel FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "event_weather_set_updated_at",
+      "table": "event_weather",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER event_weather_set_updated_at BEFORE UPDATE ON event_weather FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "events_set_updated_at",
+      "table": "events",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER events_set_updated_at BEFORE UPDATE ON events FOR EACH ROW EXECUTE FUNCTION set_updated_at()"
+    },
+    {
+      "name": "profiles_set_updated_at",
+      "table": "profiles",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER profiles_set_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION private.set_updated_at()"
+    },
+    {
+      "name": "season_planner_events_set_updated_at",
+      "table": "season_planner_events",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER season_planner_events_set_updated_at BEFORE UPDATE ON season_planner_events FOR EACH ROW EXECUTE FUNCTION private.set_updated_at()"
+    },
+    {
+      "name": "user_feedback_set_updated_at",
+      "table": "user_feedback",
+      "schema": "public",
+      "enabled": "O",
+      "definition": "CREATE TRIGGER user_feedback_set_updated_at BEFORE UPDATE ON user_feedback FOR EACH ROW EXECUTE FUNCTION private.set_updated_at()"
+    }
+  ],
+  "functions": [
+    {
+      "name": "handle_new_user",
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog, public"
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "language": "plpgsql",
+      "definition": "CREATE OR REPLACE FUNCTION private.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\r\nbegin\r\n  insert into public.profiles (id, email, role)\r\n  values (new.id, new.email, 'user')\r\n  on conflict (id) do update\r\n    set email = excluded.email,\r\n        updated_at = now();\r\n\r\n  return new;\r\nend;\r\n$function$\n",
+      "anon_execute": false,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": false
+    },
+    {
+      "name": "is_admin",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "schema": "private",
+      "language": "sql",
+      "definition": "CREATE OR REPLACE FUNCTION private.is_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$select exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'admin')$function$\n",
+      "anon_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "name": "set_updated_at",
+      "owner": "postgres",
+      "config": [
+        "search_path=pg_catalog"
+      ],
+      "result": "trigger",
+      "schema": "private",
+      "language": "plpgsql",
+      "definition": "CREATE OR REPLACE FUNCTION private.set_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog'\nAS $function$\r\nbegin\r\n  new.updated_at = now();\r\n  return new;\r\nend;\r\n$function$\n",
+      "anon_execute": true,
+      "security_definer": false,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "name": "handle_new_user",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "trigger",
+      "schema": "public",
+      "language": "plpgsql",
+      "definition": "CREATE OR REPLACE FUNCTION public.handle_new_user()\n RETURNS trigger\n LANGUAGE plpgsql\n SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\nbegin\r\n  insert into public.profiles (id, email, role)\r\n  values (new.id, new.email, 'user')\r\n  on conflict (id) do update\r\n    set email = excluded.email,\r\n        updated_at = now();\r\n\r\n  return new;\r\nend;\r\n$function$\n",
+      "anon_execute": true,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    },
+    {
+      "name": "is_admin",
+      "owner": "postgres",
+      "config": [
+        "search_path=public"
+      ],
+      "result": "boolean",
+      "schema": "public",
+      "language": "sql",
+      "definition": "CREATE OR REPLACE FUNCTION public.is_admin()\n RETURNS boolean\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\r\n  select exists (\r\n    select 1\r\n    from public.profiles\r\n    where id = auth.uid()\r\n      and role = 'admin'\r\n  );\r\n$function$\n",
+      "anon_execute": false,
+      "security_definer": true,
+      "identity_arguments": "",
+      "authenticated_execute": false
+    },
+    {
+      "name": "set_updated_at",
+      "owner": "postgres",
+      "config": null,
+      "result": "trigger",
+      "schema": "public",
+      "language": "plpgsql",
+      "definition": "CREATE OR REPLACE FUNCTION public.set_updated_at()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\r\nbegin\r\n  new.updated_at = now();\r\n  return new;\r\nend;\r\n$function$\n",
+      "anon_execute": true,
+      "security_definer": false,
+      "identity_arguments": "",
+      "authenticated_execute": true
+    }
+  ],
+  "sequences": [],
+  "extensions": [
+    {
+      "name": "pg_stat_statements",
+      "schema": "extensions",
+      "version": "1.11"
+    },
+    {
+      "name": "pgcrypto",
+      "schema": "extensions",
+      "version": "1.3"
+    },
+    {
+      "name": "plpgsql",
+      "schema": "pg_catalog",
+      "version": "1.0"
+    },
+    {
+      "name": "supabase_vault",
+      "schema": "vault",
+      "version": "0.3.1"
+    },
+    {
+      "name": "uuid-ossp",
+      "schema": "extensions",
+      "version": "1.1"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "analytics_events_pkey",
+      "type": "p",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "analytics_events_user_id_fkey",
+      "type": "f",
+      "table": "analytics_events",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "event_course_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_course",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_course_pkey",
+      "type": "p",
+      "table": "event_course",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_details_event_slug_key",
+      "type": "u",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "UNIQUE (event_slug)"
+    },
+    {
+      "name": "event_details_pkey",
+      "type": "p",
+      "table": "event_details",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_editorial_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_editorial",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_editorial_pkey",
+      "type": "p",
+      "table": "event_editorial",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_faq_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_faq",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_faq_pkey",
+      "type": "p",
+      "table": "event_faq",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_race_day_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_race_day",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_race_day_pkey",
+      "type": "p",
+      "table": "event_race_day",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_registration_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_registration",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_registration_pkey",
+      "type": "p",
+      "table": "event_registration",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_sources_confidence_check",
+      "type": "c",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "CHECK (confidence_score IS NULL OR confidence_score >= 0::numeric AND confidence_score <= 1::numeric)"
+    },
+    {
+      "name": "event_sources_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_sources_pkey",
+      "type": "p",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_sources_type_check",
+      "type": "c",
+      "table": "event_sources",
+      "schema": "public",
+      "definition": "CHECK (source_type = ANY (ARRAY['official'::text, 'trusted'::text, 'community'::text, 'estimated'::text, 'unknown'::text]))"
+    },
+    {
+      "name": "event_statistics_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_statistics",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_statistics_pkey",
+      "type": "p",
+      "table": "event_statistics",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_travel_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_travel",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_travel_pkey",
+      "type": "p",
+      "table": "event_travel",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "event_weather_event_detail_id_fkey",
+      "type": "f",
+      "table": "event_weather",
+      "schema": "public",
+      "definition": "FOREIGN KEY (event_detail_id) REFERENCES event_details(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "event_weather_pkey",
+      "type": "p",
+      "table": "event_weather",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "events_pkey",
+      "type": "p",
+      "table": "events",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "events_registration_status_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (registration_status = ANY (ARRAY['registration_open'::text, 'registration_not_open'::text, 'sold_out'::text, 'cancelled'::text, 'date_expected'::text, 'unclear'::text, 'confirmed'::text]))"
+    },
+    {
+      "name": "events_review_priority_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (review_priority = ANY (ARRAY['high'::text, 'medium'::text, 'low'::text]))"
+    },
+    {
+      "name": "events_review_status_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (review_status = ANY (ARRAY['approved'::text, 'pending'::text, 'needs_review'::text, 'rejected'::text, 'archived'::text, 'date_expected'::text, 'duplicate'::text, 'confirmed_valid'::text]))"
+    },
+    {
+      "name": "events_reviewed_by_fkey",
+      "type": "f",
+      "table": "events",
+      "schema": "public",
+      "definition": "FOREIGN KEY (reviewed_by) REFERENCES auth.users(id) ON DELETE SET NULL"
+    },
+    {
+      "name": "events_source_type_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (source_type = ANY (ARRAY['official'::text, 'aggregator'::text, 'user_submission'::text, 'batch_import'::text, 'unknown'::text]))"
+    },
+    {
+      "name": "events_status_check",
+      "type": "c",
+      "table": "events",
+      "schema": "public",
+      "definition": "CHECK (status = ANY (ARRAY['pending'::text, 'staging'::text, 'approved'::text, 'needs_review'::text, 'date_expected'::text, 'archived'::text, 'rejected'::text, 'duplicate'::text]))"
+    },
+    {
+      "name": "favorites_pkey",
+      "type": "p",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "favorites_user_id_event_id_key",
+      "type": "u",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "UNIQUE (user_id, event_id)"
+    },
+    {
+      "name": "favorites_user_id_fkey",
+      "type": "f",
+      "table": "favorites",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_id_fkey",
+      "type": "f",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "profiles_pkey",
+      "type": "p",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "profiles_preferred_language_check",
+      "type": "c",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CHECK (preferred_language = ANY (ARRAY['en'::text, 'de'::text]))"
+    },
+    {
+      "name": "profiles_role_check",
+      "type": "c",
+      "table": "profiles",
+      "schema": "public",
+      "definition": "CHECK (role = ANY (ARRAY['user'::text, 'admin'::text]))"
+    },
+    {
+      "name": "season_planner_events_pkey",
+      "type": "p",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "season_planner_events_priority_check",
+      "type": "c",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "CHECK (priority = ANY (ARRAY['A'::text, 'B'::text, 'C'::text, 'Training'::text, 'Maybe'::text]))"
+    },
+    {
+      "name": "season_planner_events_user_id_event_id_key",
+      "type": "u",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "UNIQUE (user_id, event_id)"
+    },
+    {
+      "name": "season_planner_events_user_id_fkey",
+      "type": "f",
+      "table": "season_planner_events",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE"
+    },
+    {
+      "name": "user_feedback_category_check",
+      "type": "c",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CHECK (category = ANY (ARRAY['bug'::text, 'usability'::text, 'incorrect_event_data'::text, 'missing_event'::text, 'season_planner'::text, 'improvement'::text, 'other'::text]))"
+    },
+    {
+      "name": "user_feedback_pkey",
+      "type": "p",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "user_feedback_rating_check",
+      "type": "c",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CHECK (rating IS NULL OR rating >= 1 AND rating <= 5)"
+    },
+    {
+      "name": "user_feedback_status_check",
+      "type": "c",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "CHECK (status = ANY (ARRAY['new'::text, 'reviewed'::text, 'planned'::text, 'resolved'::text, 'rejected'::text]))"
+    },
+    {
+      "name": "user_feedback_user_id_fkey",
+      "type": "f",
+      "table": "user_feedback",
+      "schema": "public",
+      "definition": "FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE SET NULL"
+    }
+  ],
+  "project_ref": "fztupxyxvhvhtihhmtnk",
+  "table_grants": [
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "analytics_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_course",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_details",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_editorial",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_faq",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_race_day",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_registration",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_sources",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_statistics",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_travel",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "event_weather",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "favorites",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "profiles",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "season_planner_events",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "DELETE"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "INSERT"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "REFERENCES"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "SELECT"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRIGGER"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "TRUNCATE"
+    },
+    {
+      "table": "user_feedback",
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "grantable": "NO",
+      "privilege": "UPDATE"
+    }
+  ],
+  "database_name": "postgres",
+  "routine_grants": [
+    {
+      "schema": "private",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "routine": "is_admin",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "private",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "routine": "is_admin",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "routine": "handle_new_user",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "routine": "handle_new_user",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "routine": "handle_new_user",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "routine": "is_admin",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "anon",
+      "grantor": "postgres",
+      "routine": "set_updated_at",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "authenticated",
+      "grantor": "postgres",
+      "routine": "set_updated_at",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    },
+    {
+      "schema": "public",
+      "grantee": "service_role",
+      "grantor": "postgres",
+      "routine": "set_updated_at",
+      "grantable": "NO",
+      "privilege": "EXECUTE"
+    }
+  ],
+  "server_version": "17.6",
+  "captured_at_utc": "2026-07-24T11:48:34.867774",
+  "migration_history": [],
+  "external_triggers": [
+    {
+      "schema": "auth",
+      "table": "users",
+      "name": "on_auth_user_created",
+      "definition": "CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION private.handle_new_user()",
+      "enabled": "O"
+    }
+  ],
+  "migration_history_relation_exists": false
+}

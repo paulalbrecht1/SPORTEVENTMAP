@@ -71,6 +71,10 @@ test("fast Home scrolling uses a stable, paint-efficient scroll surface", async 
 
   const result = await exerciseFastScroll(page, "#landingPage");
 
+  console.log(
+    `SCROLL_PERF p95=${result.p95FrameGap.toFixed(2)}ms maxScrollTop=${result.maxScrollTop.toFixed(0)}`
+  );
+
   expect(result.maxScrollTop).toBeGreaterThan(1500);
   expect(result.bottomScrollTop).toBeGreaterThanOrEqual(result.maxScrollTop - 2);
   expect(result.finalScrollTop).toBeLessThanOrEqual(2);

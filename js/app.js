@@ -497,12 +497,20 @@ function showPlatformPage(route) {
     });
 }
 
-function resetDiscoveryMapAfterLayout(delay = 220) {
+function resetDiscoveryMapAfterLayout(delay = 220, options = {}) {
   if (typeof refreshMapLayout === "function") {
     refreshMapLayout(delay);
   }
 
   window.setTimeout(() => {
+    if (
+      options.restoreEventView &&
+      typeof restoreDiscoveryMapViewBeforeEvent === "function" &&
+      restoreDiscoveryMapViewBeforeEvent()
+    ) {
+      return;
+    }
+
     if (typeof resetDiscoveryMapView === "function") {
       resetDiscoveryMapView();
     }
@@ -673,7 +681,9 @@ function showPlatformRoute(routeInfo, options = {}) {
       closeEventDrawerOnly();
     }
 
-    resetDiscoveryMapAfterLayout(180);
+    resetDiscoveryMapAfterLayout(180, {
+      restoreEventView: Boolean(options.restoreEventView)
+    });
 
     return;
   }
@@ -967,7 +977,10 @@ window.preparePlatformDiscoveryForEvent = function preparePlatformDiscoveryForEv
 
 window.closePlatformEventRoute = function closePlatformEventRoute() {
   if (window.location.hash.startsWith("#/event/")) {
-    navigateToPlatformRoute("discovery");
+    navigateToPlatformRoute("discovery", {
+      replace: true,
+      restoreEventView: true
+    });
   }
 };
 

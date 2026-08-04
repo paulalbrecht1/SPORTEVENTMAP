@@ -91,6 +91,33 @@ test("Mobile Discovery filters stay tappable", async ({ page }) => {
   ).toHaveCount(1);
 });
 
+test("closing an event restores the previous mobile map view", async ({ page }) => {
+  const run = fixtureByName["SEM E2E Future Run"];
+  const previousView = {
+    center: [48.1372, 11.5756],
+    zoom: 11
+  };
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await prepareApp(page, { openDiscoveryPanel: false });
+  await page.waitForTimeout(300);
+
+  await page.evaluate(({ center, zoom }) => {
+    map.setView(center, zoom, { animate: false });
+  }, previousView);
+
+  await openEventDrawer(page, run.event_name);
+  await expect.poll(() => page.evaluate(() => map.getZoom())).toBe(14);
+
+  await closeEventDrawer(page);
+
+  await expect.poll(() => page.evaluate(() => ({
+    center: [map.getCenter().lat, map.getCenter().lng],
+    zoom: map.getZoom()
+  }))).toEqual(previousView);
+  await expect(page).toHaveURL(/#\/discovery$/);
+});
+
 test("official website button stays in the drawer flow in both themes", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];
 

@@ -2103,6 +2103,10 @@ function highlightCard(eventKey) {
 // DRAWER
 function openDrawer(event) {
 
+  if (typeof window.rememberDiscoveryMapViewBeforeEvent === "function") {
+    window.rememberDiscoveryMapViewBeforeEvent();
+  }
+
   const trackedKey =
     getEventKey(event);
 

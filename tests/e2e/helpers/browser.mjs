@@ -34,16 +34,28 @@ const leafletStub = `
     },
     markerClusterGroup() { return this.layerGroup(); },
     map() {
+      let center = { lat: 51.1657, lng: 10.4515 };
+      let zoom = 6;
+
       return {
-        setView() { return this; },
+        setView(coords, nextZoom) {
+          center = { lat: coords[0], lng: coords[1] };
+          zoom = nextZoom;
+          return this;
+        },
         addLayer() {},
         removeLayer() {},
         fitBounds() {},
-        flyTo() {},
+        flyTo(coords, nextZoom) {
+          center = { lat: coords[0], lng: coords[1] };
+          zoom = nextZoom;
+        },
         invalidateSize() {},
         closePopup() {},
+        stop() {},
         on() {},
-        getZoom() { return 6; }
+        getCenter() { return { ...center }; },
+        getZoom() { return zoom; }
       };
     },
     tileLayer() {

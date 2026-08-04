@@ -93,6 +93,8 @@ let allMarkers = [];
 
 let searchInitialized = false;
 
+let discoveryMapViewBeforeEvent = null;
+
 const DISCOVERY_DEFAULT_MAP_CENTER = [
   51.1657,
   10.4515
@@ -125,6 +127,65 @@ function getDiscoveryDefaultMapZoom() {
   return DISCOVERY_DEFAULT_MAP_ZOOM;
 }
 
+function rememberDiscoveryMapViewBeforeEvent() {
+  if (
+    discoveryMapViewBeforeEvent ||
+    typeof map === "undefined" ||
+    !map ||
+    typeof map.getCenter !== "function" ||
+    typeof map.getZoom !== "function"
+  ) {
+    return false;
+  }
+
+  const center = map.getCenter();
+  const zoom = map.getZoom();
+
+  if (
+    !center ||
+    !Number.isFinite(center.lat) ||
+    !Number.isFinite(center.lng) ||
+    !Number.isFinite(zoom)
+  ) {
+    return false;
+  }
+
+  discoveryMapViewBeforeEvent = {
+    center: [center.lat, center.lng],
+    zoom
+  };
+
+  return true;
+}
+
+function restoreDiscoveryMapViewBeforeEvent() {
+  if (
+    !discoveryMapViewBeforeEvent ||
+    typeof map === "undefined" ||
+    !map ||
+    typeof map.setView !== "function"
+  ) {
+    return false;
+  }
+
+  const savedView = discoveryMapViewBeforeEvent;
+  discoveryMapViewBeforeEvent = null;
+
+  if (typeof map.stop === "function") {
+    map.stop();
+  }
+
+  if (typeof map.closePopup === "function") {
+    map.closePopup();
+  }
+
+  map.setView(savedView.center, savedView.zoom, {
+    animate: false
+  });
+
+  return true;
+}
+
 function resetDiscoveryMapView(options = {}) {
   if (
     typeof map === "undefined" ||
@@ -132,6 +193,8 @@ function resetDiscoveryMapView(options = {}) {
   ) {
     return;
   }
+
+  discoveryMapViewBeforeEvent = null;
 
   const zoom =
     Number.isFinite(options.zoom)
@@ -668,6 +731,8 @@ function focusEvent(event) {
     Number.isNaN(lng)
   ) return;
 
+  rememberDiscoveryMapViewBeforeEvent();
+
   map.flyTo([lat, lng], Math.max(map.getZoom(), 14), {
     duration: 1.5
   });
@@ -870,6 +935,12 @@ window.setMapStyle = setMapStyle;
 
 window.resetDiscoveryMapView =
   resetDiscoveryMapView;
+
+window.rememberDiscoveryMapViewBeforeEvent =
+  rememberDiscoveryMapViewBeforeEvent;
+
+window.restoreDiscoveryMapViewBeforeEvent =
+  restoreDiscoveryMapViewBeforeEvent;
 
 window.setVisibleMapMarkers =
   setVisibleMapMarkers;

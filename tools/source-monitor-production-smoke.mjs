@@ -37,6 +37,8 @@ const requiredChecks = [
   "tls_verified",
   "content_hash",
   "semantic_hash",
+  "lifecycle_parser",
+  "result_link_parser",
   "contact_user_agent"
 ];
 const failedChecks = requiredChecks.filter(name => payload.checks?.[name] !== true);

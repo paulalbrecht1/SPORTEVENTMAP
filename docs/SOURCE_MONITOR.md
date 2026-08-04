@@ -154,7 +154,7 @@ Standardwerte pro Domain:
 - `robots.txt` beachten und 24 Stunden cachen
 - ETag und Last-Modified fuer Conditional Requests nutzen
 - `Retry-After` beachten
-- klarer User-Agent `SportEventMapSourceMonitor/2.0 (+https://sporteventmap.de/bot)`
+- klarer User-Agent `SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)`
 
 Die globale Parallelitaet liegt standardmaessig bei 5. Claims enthalten nie zwei laufende Jobs derselben Domain. Robots-Abrufe verwenden ein separates Limit von 250 KB.
 
@@ -185,7 +185,7 @@ Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` 
 Optionale Worker-Konfiguration:
 
 ```text
-SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)
+SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)
 SOURCE_MONITOR_ALLOW_HTTP=false
 SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 SOURCE_MONITOR_SMOKE_SECRET=<mindestens 256 Bit>
@@ -220,7 +220,7 @@ Vor dem Deployment CLI-Befehle immer mit `--help` gegen die installierte Version
 ```bash
 supabase db push
 supabase functions deploy event-source-check --use-api
-supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/2.1 (+mailto:kontakt@sporteventmap.com)"
+supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)"
 supabase secrets set SOURCE_MONITOR_ALLOW_HTTP=false SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 supabase secrets set SOURCE_MONITOR_SMOKE_SECRET="<zufaelliges Secret mit mindestens 256 Bit>"
 ```
@@ -304,12 +304,6 @@ Erforderlich sind `SUPABASE_URL`, ein Publishable-/Anon-Key und das nur
 serverseitig gesetzte `SOURCE_MONITOR_SMOKE_SECRET`.
 
 
-## Vorbereitung fuer Stufe 3
+## Edition Lifecycle
 
-Stufe 3 kann auf `source_crawl_results`, stabilen normalisierten Hashes und `source_review_tasks` aufbauen. Ein Parser darf spaeter ausschliesslich Vorschlaege erzeugen. Fachliche Felder bleiben hinter `event_change_proposals` und expliziter Admin-Freigabe. Empfohlene naechste Schritte:
-
-- versionierte Parser pro Domain oder strukturierte JSON-LD-Extraktion
-- Feld-Diffs mit Confidence und Quellenbeleg
-- Snapshot-Speicher mit enger, konfigurierbarer Retention nur bei relevanten Aenderungen
-- Parser-Regressionsfixtures je Domain
-- weiterhin keine direkte Aktualisierung oeffentlicher Eventdaten
+Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Monitor extrahiert nun Jahrgangs- und Ergebnis-Signale, erstellt daraus aber ausschließlich review-gesteuerte Kandidaten und nicht öffentliche Editionsentwürfe. Bestehende öffentliche Eventdaten werden weiterhin nicht automatisch überschrieben.

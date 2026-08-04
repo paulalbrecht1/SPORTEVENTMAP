@@ -14,9 +14,29 @@
 #adminModal .source-monitor-actions button, #adminModal .source-monitor-actions a, #adminModal .source-monitor-history button { min-height: 34px; padding: 6px 8px; border: 1px solid rgba(148, 163, 184, .3); border-radius: 8px; background: rgba(30, 41, 59, .86); color: #f8fafc; font-size: .68rem; text-decoration: none; }
 #adminModal .source-monitor-history { margin-top: 14px; padding: 14px; border: 1px solid rgba(148, 163, 184, .2); border-radius: 12px; }
 #adminModal .source-monitor-history[hidden] { display: none; }
+#adminModal .edition-lifecycle-inbox { margin: 18px 0; padding: 14px; border: 1px solid rgba(52, 211, 153, .3); border-radius: 12px; background: rgba(6, 78, 59, .14); }
+#adminModal .edition-lifecycle-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+#adminModal .edition-lifecycle-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+#adminModal .edition-lifecycle-kpis > div { min-width: 0; padding: 10px; border: 1px solid rgba(148, 163, 184, .2); border-radius: 10px; background: rgba(15, 23, 42, .58); }
+#adminModal .edition-lifecycle-kpis span, #adminModal .edition-lifecycle-kpis strong { display: block; }
+#adminModal .edition-lifecycle-kpis span { color: var(--text-muted, #aeb8c7); font-size: .7rem; }
+#adminModal .edition-lifecycle-kpis strong { margin-top: 4px; font-size: 1.15rem; }
+#adminModal .edition-lifecycle-toolbar button { min-height: 38px; padding: 7px 11px; border: 1px solid rgba(52, 211, 153, .38); border-radius: 8px; background: rgba(6, 95, 70, .45); color: #ecfdf5; }
+#adminModal .edition-lifecycle-list { display: grid; gap: 10px; }
+#adminModal .edition-lifecycle-card { position: relative; display: grid; grid-template-columns: minmax(220px, 1.5fr) minmax(250px, 1fr) minmax(210px, auto); gap: 12px; padding: 12px; border: 1px solid rgba(148, 163, 184, .22); border-left: 4px solid #f59e0b; border-radius: 10px; background: rgba(15, 23, 42, .55); }
+#adminModal .edition-lifecycle-card.is-critical { border-left-color: #ef4444; }
+#adminModal .edition-lifecycle-card h6 { margin: 5px 0; font-size: .9rem; }
+#adminModal .edition-lifecycle-card p { margin: 0; color: var(--text-muted, #aeb8c7); font-size: .76rem; }
+#adminModal .edition-lifecycle-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 0; }
+#adminModal .edition-lifecycle-card dl div { min-width: 0; }
+#adminModal .edition-lifecycle-card dt { color: var(--text-muted, #aeb8c7); font-size: .65rem; }
+#adminModal .edition-lifecycle-card dd { margin: 2px 0 0; overflow-wrap: anywhere; font-size: .74rem; }
+#adminModal .edition-lifecycle-select { position: absolute; top: 8px; right: 8px; display: flex; gap: 5px; align-items: center; }
 body[data-theme="light"] #adminModal .source-monitor-section, body[data-theme="light"] #adminModal .source-monitor-kpis > div, body[data-theme="light"] #adminModal .source-monitor-history { border-color: #ccd5e2; background: #fff; color: #172033; }
 body[data-theme="light"] #adminModal .source-monitor-table th, body[data-theme="light"] #adminModal .source-monitor-table input { background: #eef2f7; color: #172033; }
 body[data-theme="light"] #adminModal .source-monitor-actions button, body[data-theme="light"] #adminModal .source-monitor-actions a, body[data-theme="light"] #adminModal .source-monitor-history button { background: #f5f7fa; color: #172033; }
+body[data-theme="light"] #adminModal .edition-lifecycle-inbox, body[data-theme="light"] #adminModal .edition-lifecycle-card { border-color: #cbd5e1; background: #fff; color: #172033; }
+body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-color: #cbd5e1; background: #fff; color: #172033; }
 @media (max-width: 1000px) { #adminModal .source-monitor-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) {
   #adminModal .source-monitor-section { padding: 12px; }
@@ -30,5 +50,8 @@ body[data-theme="light"] #adminModal .source-monitor-actions button, body[data-t
   #adminModal .source-monitor-table td::before { content: attr(data-label); color: var(--text-muted, #aeb8c7); font-size: .68rem; font-weight: 700; }
   #adminModal .source-monitor-actions { min-width: 0; }
   #adminModal .source-monitor-actions button, #adminModal .source-monitor-actions a { flex: 1 1 100%; text-align: center; }
+  #adminModal .edition-lifecycle-card { grid-template-columns: minmax(0, 1fr); padding-top: 38px; }
+  #adminModal .edition-lifecycle-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #adminModal .edition-lifecycle-toolbar button { flex: 1 1 100%; }
   body[data-theme="light"] #adminModal .source-monitor-table tr { background: #fff; border-color: #ccd5e2; }
 }

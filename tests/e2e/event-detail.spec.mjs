@@ -52,7 +52,7 @@ async function prepareDetailPage(page, options = {}) {
       localStorage.getItem("sportEventMap.detailE2ESeeded") !== "true"
     ) {
       localStorage.setItem(
-        "favorites",
+        "seasonPlannerEvents",
         JSON.stringify(favorites)
       );
       localStorage.setItem(
@@ -164,7 +164,7 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
 
   let favorites =
     await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("favorites") || "[]")
+      JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]")
     );
 
   expect(favorites).toHaveLength(1);
@@ -179,7 +179,7 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
 
   favorites =
     await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("favorites") || "[]")
+      JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]")
     );
 
   expect(favorites).toEqual([]);
@@ -200,7 +200,7 @@ test("signed-in state loads from the existing Season Planner table", async ({ pa
 
   const favorites =
     await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("favorites") || "[]")
+      JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]")
     );
 
   expect(favorites).toHaveLength(1);
@@ -226,7 +226,7 @@ test("failed cloud save restores the previous state and reports the error", asyn
 
   const favorites =
     await page.evaluate(() =>
-      JSON.parse(localStorage.getItem("favorites") || "[]")
+      JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]")
     );
 
   expect(favorites).toEqual([]);

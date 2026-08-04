@@ -140,6 +140,7 @@ export async function prepareApp(page, options = {}) {
     window.localStorage.setItem("sportEventMap.betaBannerDismissed", "true");
     window.localStorage.setItem("sportEventMap.e2ePrepared", "true");
     window.localStorage.setItem("favorites", JSON.stringify(favorites));
+    window.localStorage.setItem("seasonPlannerEvents", JSON.stringify(favorites));
     window.localStorage.setItem("seasonPlanMeta", JSON.stringify(seasonPlanMeta));
   }, {
     favorites,
@@ -299,7 +300,7 @@ export async function openPlanner(page) {
 
   const plannedEventCount = await page.evaluate(() => {
     try {
-      const stored = JSON.parse(localStorage.getItem("favorites") || "[]");
+      const stored = JSON.parse(localStorage.getItem("seasonPlannerEvents") || "[]");
       return Array.isArray(stored) ? new Set(stored).size : 0;
     } catch (_error) {
       return 0;
@@ -335,11 +336,13 @@ export async function seedPlannerState(page, {
 }) {
   await page.evaluate(({ favorites, seasonPlanMeta }) => {
     window.localStorage.setItem("favorites", JSON.stringify(favorites));
+    window.localStorage.setItem("seasonPlannerEvents", JSON.stringify(favorites));
     window.localStorage.setItem("seasonPlanMeta", JSON.stringify(seasonPlanMeta));
 
     if (typeof window.applyRemotePlanningState === "function") {
       window.applyRemotePlanningState({
         favorites,
+        plannedEditions: favorites,
         seasonMeta: seasonPlanMeta
       });
     }

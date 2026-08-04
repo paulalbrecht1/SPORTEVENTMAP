@@ -86,6 +86,7 @@
 
   function readFavorites() {
     const raw =
+      localStorage.getItem("seasonPlannerEvents") ||
       localStorage.getItem("favorites");
     const parsed =
       raw ? JSON.parse(raw) : [];
@@ -122,7 +123,7 @@
     }
 
     localStorage.setItem(
-      "favorites",
+      "seasonPlannerEvents",
       JSON.stringify(favorites)
     );
 
@@ -259,16 +260,16 @@
   async function writeCloudTable(
     client,
     user,
-    table,
     saved
   ) {
     if (saved) {
       return client
-        .from(table)
+        .from("season_planner_events")
         .upsert(
           {
             user_id: user.id,
-            event_id: getSeasonKey()
+            event_id: getSeasonKey(),
+            edition_id: detailEvent.edition_id || null
           },
           {
             onConflict: "user_id,event_id",
@@ -278,7 +279,7 @@
     }
 
     return client
-      .from(table)
+      .from("season_planner_events")
       .delete()
       .eq("user_id", user.id)
       .eq("event_id", getSeasonKey());
@@ -289,40 +290,24 @@
     user,
     nextSaved
   ) {
-    const tables = [
-      "favorites",
-      "season_planner_events"
-    ];
-    const results =
-      await Promise.all(
-        tables.map(table =>
-          writeCloudTable(
-            client,
-            user,
-            table,
-            nextSaved
-          )
-        )
+    const result =
+      await writeCloudTable(
+        client,
+        user,
+        nextSaved
       );
-    const failed =
-      results.find(result => result && result.error);
 
-    if (!failed) {
+    if (!result?.error) {
       return;
     }
 
-    await Promise.allSettled(
-      tables.map(table =>
-        writeCloudTable(
-          client,
-          user,
-          table,
-          !nextSaved
-        )
-      )
+    await writeCloudTable(
+      client,
+      user,
+      !nextSaved
     );
 
-    throw failed.error;
+    throw result.error;
   }
 
   async function loadRemoteSeasonState() {

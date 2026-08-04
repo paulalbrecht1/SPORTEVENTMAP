@@ -11,6 +11,7 @@ const CATEGORY_DETAILS_PATH = path.join(ROOT, "data", "event-category-details.cs
 const CATEGORY_DETAILS_JSON_PATH = path.join(ROOT, "data", "event-category-details.json");
 const EVENT_KNOWLEDGE_PATH = path.join(ROOT, "data", "event-knowledge.json");
 const EVENT_DETAIL_DATABASE_PATH = path.join(ROOT, "data", "event-detail-database.json");
+const EVENT_ARCHIVE_PATH = path.join(ROOT, "data", "event-editions-public.json");
 const EVENT_DIR = path.join(ROOT, "event");
 const MANIFEST_PATH = path.join(ROOT, "data", "event-pages.json");
 const SITE_URL = "https://sporteventmap.com";
@@ -66,6 +67,11 @@ function getEventYear(event) {
 }
 
 function createSlug(event, seenSlugs) {
+  const suppliedSlug = slugPart(event.edition_slug);
+  if (suppliedSlug && !seenSlugs.has(suppliedSlug)) {
+    seenSlugs.add(suppliedSlug);
+    return suppliedSlug;
+  }
   const baseParts = [
     event.event_name,
     getEventYear(event)
@@ -282,6 +288,35 @@ function loadEventKnowledge() {
       .filter(row => clean(row.event_slug))
       .map(row => [clean(row.event_slug), row])
   );
+}
+
+function loadPublicArchive() {
+  if (!fs.existsSync(EVENT_ARCHIVE_PATH)) {
+    return [];
+  }
+
+  const parsed = JSON.parse(fs.readFileSync(EVENT_ARCHIVE_PATH, "utf8"));
+  return Array.isArray(parsed) ? parsed : Array.isArray(parsed.editions) ? parsed.editions : [];
+}
+
+function buildEditionHistorySection(event) {
+  const results = Array.isArray(event.results) ? event.results : [];
+  const isHistorical = clean(event.discovery_status) === "detail_only";
+  if (!isHistorical && !results.length) {
+    return "";
+  }
+
+  return `<section id="edition-history" class="event-detail-section event-detail-history">
+    <div class="event-detail-section-heading">
+      <span class="event-detail-kicker">Edition archive</span>
+      <h2>${escapeHtml(getEventYear(event) || "Historical edition")}</h2>
+    </div>
+    ${isHistorical ? "<p>This edition has finished and is no longer shown on the discovery map. Its verified facts and results remain available for year-to-year comparison.</p>" : ""}
+    ${results.length ? `<div class="event-detail-result-links">${results.map(result => {
+      const url = safeWebsite(result.url);
+      return url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(result.title || "Official results")}</a>` : "";
+    }).join("")}</div>` : "<p>Official results have not been published yet.</p>"}
+  </section>`;
 }
 
 function loadEventDetailDatabase() {
@@ -3730,6 +3765,12 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
         html: buildRaceGuideFaqSection(event, detailRows, richDetails, knowledge)
       },
       {
+        id: "edition-history",
+        icon: "star",
+        labelKey: "detail.performance",
+        html: buildEditionHistorySection(event)
+      },
+      {
         id: "sources",
         icon: "check",
         labelKey: "detail.sources",
@@ -3796,6 +3837,9 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <script>
     window.sportEventMapDetailConfig = {
       event: ${escapeJson({
+        event_id: event.event_id || null,
+        edition_id: event.edition_id || null,
+        edition_year: event.edition_year || getEventYear(event) || null,
         event_key: eventKey,
         event_slug: slug,
         event_name: clean(event.event_name),
@@ -3828,14 +3872,25 @@ function removeGeneratedPages() {
 
 function main() {
   const rows = parseCsvFile(EVENTS_PATH);
+  const archiveRows = loadPublicArchive();
   const categoryDetails =
     loadCategoryDetails();
   const eventKnowledge =
     loadEventKnowledge();
   const richEventDetails =
     loadEventDetailDatabase();
+  const mergedRows = [...rows, ...archiveRows];
+  const uniqueRows = new Map();
+  mergedRows.forEach(event => {
+    const naturalKey = [event.event_name, event.date, event.city, event.country]
+      .map(clean)
+      .join("|")
+      .toLowerCase();
+    const key = naturalKey.replace(/\|/g, "") ? naturalKey : clean(event.edition_slug) || clean(event.edition_id);
+    uniqueRows.set(key, { ...(uniqueRows.get(key) || {}), ...event });
+  });
   const selected =
-    rows.filter(event =>
+    [...uniqueRows.values()].filter(event =>
       clean(event.event_name) &&
       clean(event.city) &&
       clean(event.country)
@@ -3890,8 +3945,6 @@ function main() {
 }
 
 main();
-
-
 
 
 

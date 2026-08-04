@@ -2875,12 +2875,12 @@ async function loadRemotePlanningState(user) {
     const favoritesPromise =
       supabaseClient
         .from("favorites")
-        .select("event_id")
+        .select("event_id,event_ref")
         .eq("user_id", user.id);
     let seasonPromise =
       supabaseClient
         .from("season_planner_events")
-        .select("event_id, priority, planned_distance, planner_details")
+        .select("event_id, edition_id, priority, planned_distance, planner_details")
         .eq("user_id", user.id);
 
     let [
@@ -2918,7 +2918,17 @@ async function loadRemotePlanningState(user) {
 
     const remoteFavorites =
       (favoritesResult.data || [])
-        .map(row => row.event_id)
+        .map(row => {
+          if (!row.event_ref || typeof events === "undefined" || !Array.isArray(events)) {
+            return row.event_id;
+          }
+          const currentEdition = events.find(item =>
+            String(item.event_id || "") === String(row.event_ref)
+          );
+          return currentEdition && typeof getEventKey === "function"
+            ? getEventKey(currentEdition)
+            : row.event_id;
+        })
         .filter(Boolean);
 
     const remoteSeasonMeta =
@@ -2935,8 +2945,14 @@ async function loadRemotePlanningState(user) {
           return result;
         }, {});
 
+    const remotePlannedEditions =
+      (seasonResult.data || [])
+        .map(row => row.event_id)
+        .filter(Boolean);
+
     const planningState = {
       favorites: remoteFavorites,
+      plannedEditions: remotePlannedEditions,
       seasonMeta: remoteSeasonMeta
     };
 
@@ -2977,73 +2993,41 @@ async function syncFavoriteToSupabase(event, isFavoriteNow) {
       return;
     }
 
+    const eventRef = Number(event?.event_id) || null;
+    const favoriteId = eventRef ? `event:${eventRef}` : eventId;
+
     if (isFavoriteNow) {
-      const [
-        favoriteResult,
-        seasonResult
-      ] = await Promise.all([
-        supabaseClient
+      const favoriteResult = await supabaseClient
           .from("favorites")
           .upsert(
             {
               user_id: user.id,
-              event_id: eventId
+              event_id: favoriteId,
+              event_ref: eventRef
             },
             {
               onConflict: "user_id,event_id",
               ignoreDuplicates: true
             }
-          ),
-        supabaseClient
-          .from("season_planner_events")
-          .upsert(
-            {
-              user_id: user.id,
-              event_id: eventId
-            },
-            {
-              onConflict: "user_id,event_id",
-              ignoreDuplicates: true
-            }
-          )
-      ]);
+          );
 
-      if (
-        favoriteResult.error ||
-        seasonResult.error
-      ) {
-        throw (
-          favoriteResult.error ||
-          seasonResult.error
-        );
+      if (favoriteResult.error) {
+        throw favoriteResult.error;
       }
       return;
     }
 
-    const [
-      favoriteResult,
-      seasonResult
-    ] = await Promise.all([
-      supabaseClient
+    let favoriteDelete = supabaseClient
         .from("favorites")
         .delete()
-        .eq("user_id", user.id)
-        .eq("event_id", eventId),
-      supabaseClient
-        .from("season_planner_events")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("event_id", eventId)
-    ]);
+        .eq("user_id", user.id);
+    favoriteDelete = eventRef
+      ? favoriteDelete.eq("event_ref", eventRef)
+      : favoriteDelete.eq("event_id", favoriteId);
+    const favoriteResult = await favoriteDelete;
 
-    if (
-      favoriteResult.error ||
-      seasonResult.error
-    ) {
-      throw (
-        favoriteResult.error ||
-        seasonResult.error
-      );
+    if (favoriteResult.error) {
+      throw favoriteResult.error;
     }
   } catch (error) {
     console.warn(
@@ -3053,6 +3037,63 @@ async function syncFavoriteToSupabase(event, isFavoriteNow) {
     showAppMessage(
       "Sync delayed",
       "The change is saved on this device, but cloud sync is currently unavailable."
+    );
+  }
+}
+
+async function syncSeasonEditionToSupabase(event, isPlannedNow) {
+  try {
+    const {
+      data: { user }
+    } = await supabaseClient.auth.getUser();
+
+    if (!user) {
+      return;
+    }
+
+    const eventId =
+      typeof getEventKey === "function"
+        ? getEventKey(event)
+        : String(event?.event_key || "");
+
+    if (!eventId) {
+      return;
+    }
+
+    let result;
+    if (isPlannedNow) {
+      result = await supabaseClient
+        .from("season_planner_events")
+        .upsert(
+          {
+            user_id: user.id,
+            event_id: eventId,
+            edition_id: event?.edition_id || null
+          },
+          {
+            onConflict: "user_id,event_id",
+            ignoreDuplicates: true
+          }
+        );
+    } else {
+      result = await supabaseClient
+        .from("season_planner_events")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("event_id", eventId);
+    }
+
+    if (result.error) {
+      throw result.error;
+    }
+  } catch (error) {
+    console.warn(
+      "Season edition cloud sync failed:",
+      error
+    );
+    showAppMessage(
+      "Sync delayed",
+      "The Season Planner change is saved on this device, but cloud sync is currently unavailable."
     );
   }
 }
@@ -3095,6 +3136,15 @@ async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
     ) {
       payload.planner_details =
         patch.planner_details || {};
+    }
+
+    if (typeof events !== "undefined" && Array.isArray(events)) {
+      const edition = events.find(item =>
+        typeof getEventKey === "function" && getEventKey(item) === eventId
+      );
+      if (edition?.edition_id) {
+        payload.edition_id = edition.edition_id;
+      }
     }
 
     let { error } =
@@ -3141,6 +3191,9 @@ async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
 
 window.syncFavoriteToSupabase =
   syncFavoriteToSupabase;
+
+window.syncSeasonEditionToSupabase =
+  syncSeasonEditionToSupabase;
 
 window.syncSeasonPlanMetaToSupabase =
   syncSeasonPlanMetaToSupabase;
@@ -4584,6 +4637,23 @@ function ensureSourceMonitorSection() {
       <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
       <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
     </div>
+    <section id="editionLifecycleInbox" class="edition-lifecycle-inbox" aria-labelledby="editionLifecycleTitle">
+      <div class="admin-data-operations-section-heading">
+        <div><span class="admin-eyebrow">Edition Lifecycle</span><h5 id="editionLifecycleTitle">Nur Ausnahmen bearbeiten</h5><p>Vergangene Austragungen werden automatisch archiviert. Hier erscheinen nur neue Jahrgaenge, Ergebnisse und echte Fehler.</p></div>
+        <p id="editionLifecycleStatus" class="admin-section-status" aria-live="polite"></p>
+      </div>
+      <div class="edition-lifecycle-kpis">
+        <div><span>Ausnahmen</span><strong id="editionLifecycleTotal">0</strong></div>
+        <div><span>Neue Jahrgaenge</span><strong id="editionLifecycleSuccessors">0</strong></div>
+        <div><span>Ergebnisse</span><strong id="editionLifecycleResults">0</strong></div>
+        <div><span>Kritisch</span><strong id="editionLifecycleCritical">0</strong></div>
+      </div>
+      <div class="edition-lifecycle-toolbar">
+        <button type="button" data-lifecycle-action="select-all">Alle freigabefaehigen waehlen</button>
+        <button type="button" data-lifecycle-action="approve-selected">Auswahl freigeben</button>
+      </div>
+      <div id="editionLifecycleList" class="edition-lifecycle-list"></div>
+    </section>
     <div class="source-monitor-table-wrap">
       <table class="source-monitor-table">
         <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
@@ -4618,6 +4688,15 @@ const sourceMonitorElements = {
     noSchedule: document.getElementById("sourceMonitorNoSchedule")
   }
 };
+const editionLifecycleElements = {
+  section: document.getElementById("editionLifecycleInbox"),
+  status: document.getElementById("editionLifecycleStatus"),
+  list: document.getElementById("editionLifecycleList"),
+  total: document.getElementById("editionLifecycleTotal"),
+  successors: document.getElementById("editionLifecycleSuccessors"),
+  results: document.getElementById("editionLifecycleResults"),
+  critical: document.getElementById("editionLifecycleCritical")
+};
 
 const adminTabs =
   document.querySelectorAll(".admin-tab");
@@ -4644,6 +4723,7 @@ let dataOpsRuns = [];
 let sourceMonitorJobs = [];
 let sourceMonitorResults = [];
 let sourceMonitorReviews = [];
+let editionLifecycleInbox = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
@@ -4995,6 +5075,98 @@ function setSourceMonitorKpi(name, value) {
   if (sourceMonitorElements.kpis[name]) sourceMonitorElements.kpis[name].textContent = String(value);
 }
 
+function setEditionLifecycleStatus(message, type = "") {
+  if (!editionLifecycleElements.status) return;
+  editionLifecycleElements.status.className = `admin-section-status ${type}`.trim();
+  editionLifecycleElements.status.textContent = message;
+}
+
+function renderEditionLifecycleInbox() {
+  if (!editionLifecycleElements.list) return;
+  const rows = editionLifecycleInbox.slice().sort((left, right) => {
+    const weights = { critical: 0, high: 1, medium: 2 };
+    return (weights[left.priority] ?? 3) - (weights[right.priority] ?? 3) ||
+      String(left.created_at || "").localeCompare(String(right.created_at || ""));
+  });
+  editionLifecycleElements.total.textContent = String(rows.length);
+  editionLifecycleElements.successors.textContent = String(rows.filter(row => row.item_type === "new_edition").length);
+  editionLifecycleElements.results.textContent = String(rows.filter(row => row.item_type === "result").length);
+  editionLifecycleElements.critical.textContent = String(rows.filter(row => row.priority === "critical").length);
+
+  if (!rows.length) {
+    editionLifecycleElements.list.innerHTML = '<p class="admin-quality-empty">Keine manuelle Ausnahme offen. Der Lifecycle laeuft automatisch.</p>';
+    return;
+  }
+
+  const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
+  const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
+  editionLifecycleElements.list.innerHTML = rows.slice(0, 300).map(row => {
+    const event = eventById.get(String(row.event_id));
+    const edition = editionById.get(String(row.edition_id));
+    const canApprove = ["approve_successor", "approve_result"].includes(row.batch_action);
+    const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : "";
+    const sourceUrl = safeAdminUrl(row.metadata?.source_url || row.metadata?.url || "");
+    return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
+      ${canApprove ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
+      <div><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(row.priority)}</span><h6>${escapeAdminHTML(row.title)}</h6><p>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)} · ${escapeAdminHTML(row.description)}</p></div>
+      <dl><div><dt>Typ</dt><dd>${escapeAdminHTML(row.item_type)}</dd></div><div><dt>Status</dt><dd>${escapeAdminHTML(row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${Math.round(Number(row.confidence) * 100)}%`}</dd></div><div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
+      <div class="source-monitor-actions">
+        ${canApprove ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
+        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
+        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Austragung oeffnen</a>` : ""}
+      </div>
+    </article>`;
+  }).join("");
+}
+
+async function approveEditionLifecycleItems(items) {
+  const successorIds = items.filter(item => item.item_type === "new_edition").map(item => item.item_id);
+  const resultIds = items.filter(item => item.item_type === "result").map(item => item.item_id);
+  const responses = [];
+  if (successorIds.length) responses.push(await supabaseClient.rpc("approve_edition_succession_candidates", { p_candidate_ids: successorIds, p_limit: successorIds.length }));
+  if (resultIds.length) responses.push(await supabaseClient.rpc("approve_edition_result_candidates", { p_result_ids: resultIds, p_limit: resultIds.length }));
+  const failed = responses.find(result => result.error);
+  if (failed) throw failed.error;
+  return responses.reduce((count, result) => count + Number(result.data?.approved_count || 0), 0);
+}
+
+async function handleEditionLifecycleAction(button) {
+  const action = button.dataset.lifecycleAction;
+  if (action === "select-all") {
+    editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]").forEach(input => { input.checked = true; });
+    setEditionLifecycleStatus("Alle freigabefaehigen Ausnahmen wurden ausgewaehlt.", "success");
+    return;
+  }
+  let items = [];
+  if (action === "approve-selected") {
+    const selected = new Set([...editionLifecycleElements.list.querySelectorAll("[data-lifecycle-select]:checked")].map(input => input.value));
+    items = editionLifecycleInbox.filter(item => selected.has(String(item.item_id)));
+    if (!items.length) { setEditionLifecycleStatus("Bitte mindestens eine Ausnahme auswaehlen.", "error"); return; }
+  } else {
+    items = editionLifecycleInbox.filter(item => String(item.item_id) === String(button.dataset.itemId));
+  }
+
+  setButtonLoading(button, true, action === "reject" ? "Ablehnen ..." : "Freigeben ...");
+  try {
+    if (action === "reject") {
+      const item = items[0];
+      let result;
+      if (item?.item_type === "new_edition") result = await supabaseClient.from("edition_succession_candidates").update({ candidate_status: "rejected", reviewed_at: new Date().toISOString(), review_notes: "In der Exception-Inbox abgelehnt." }).eq("id", item.item_id);
+      if (item?.item_type === "result") result = await supabaseClient.from("edition_results").update({ publication_status: "archived", result_status: "unavailable", reviewed_at: new Date().toISOString() }).eq("id", item.item_id);
+      if (result?.error) throw result.error;
+      setEditionLifecycleStatus("Ausnahme wurde geschlossen.", "success");
+    } else {
+      const approvedCount = await approveEditionLifecycleItems(items);
+      setEditionLifecycleStatus(`${approvedCount} Eintraege wurden kontrolliert veroeffentlicht.`, "success");
+    }
+    await loadDataOperations();
+  } catch (error) {
+    setEditionLifecycleStatus(getFriendlyErrorMessage(error, "Lifecycle-Aktion fehlgeschlagen."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
 function toDateTimeLocal(value) {
   if (!value) return "";
   const date = new Date(value);
@@ -5016,6 +5188,7 @@ function sourceMonitorLatestBy(rows, key) {
 
 function renderSourceMonitor() {
   if (!sourceMonitorElements.tableBody) return;
+  renderEditionLifecycleInbox();
   const nowIso = new Date().toISOString();
   const today = nowIso.slice(0, 10);
   const todayResults = sourceMonitorResults.filter(row => String(row.fetched_at || "").slice(0, 10) === today);
@@ -5127,9 +5300,9 @@ async function handleSourceMonitorAction(button) {
 async function loadDataOperations() {
   if (!dataOpsElements.panel) return;
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
-  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult] = await Promise.all([
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
-    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
     loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
     loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,entity_type,rule_code,proposed_changes,observed_values,confidence,reason,source_url,proposal_status,detected_at,reviewed_at"),
@@ -5137,9 +5310,10 @@ async function loadDataOperations() {
     loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
     loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
-    loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at")
+    loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at"),
+    loadSourceMonitorRecent("admin_exception_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata")
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult].find(result => result.error);
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
@@ -5147,7 +5321,9 @@ async function loadDataOperations() {
   }
   dataOpsEvents = eventsResult.rows || [];
   dataOpsEditions = editionsResult.rows || [];
-  dataOpsIssues = (issuesResult.rows || []).filter(issue => issue.status === "open");
+  dataOpsIssues = (issuesResult.rows || []).filter(issue =>
+    issue.status === "open" && ["error", "critical"].includes(issue.severity)
+  );
   dataOpsSources = sourcesResult.rows || [];
   dataOpsProposals = (proposalsResult.rows || []).filter(row => row.proposal_status === "pending");
   dataOpsAlerts = (alertsResult.rows || []).filter(row => row.alert_status === "open");
@@ -5155,6 +5331,7 @@ async function loadDataOperations() {
   sourceMonitorJobs = jobsResult.rows || [];
   sourceMonitorResults = crawlResultsResult.rows || [];
   sourceMonitorReviews = reviewsResult.rows || [];
+  editionLifecycleInbox = lifecycleResult.rows || [];
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   renderDataOperations();
@@ -5262,6 +5439,11 @@ dataOpsElements.panel?.addEventListener("click", event => {
   if (button) handleDataOpsAction(button);
 });
 sourceMonitorElements.section?.addEventListener("click", event => {
+  const lifecycleButton = event.target.closest("[data-lifecycle-action]");
+  if (lifecycleButton) {
+    handleEditionLifecycleAction(lifecycleButton);
+    return;
+  }
   const button = event.target.closest("[data-source-action]");
   if (button) handleSourceMonitorAction(button);
 });

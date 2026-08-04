@@ -239,6 +239,46 @@ await test(
 );
 
 await test(
+  "1b. Public archive is readable while lifecycle exceptions stay private",
+  async () => {
+    const archive = await restRequest("public_event_archive?select=event_id,edition_id,discovery_status,results&limit=5");
+    assert.equal(archive.response.ok, true, JSON.stringify(archive.data));
+
+    const anonymousInbox = await restRequest("admin_exception_inbox?select=item_id&limit=1");
+    assert.equal(
+      anonymousInbox.response.status === 401 ||
+      anonymousInbox.response.status === 403 ||
+      (anonymousInbox.response.ok && Array.isArray(anonymousInbox.data) && anonymousInbox.data.length === 0),
+      true,
+      JSON.stringify(anonymousInbox.data)
+    );
+  }
+);
+
+await test(
+  "1c. Normal users cannot create result records or read the exception inbox",
+  async () => {
+    const resultInsert = await restRequest("edition_results", {
+      token: userA.token,
+      method: "POST",
+      prefer: "return=representation",
+      body: {
+        event_id: publicFixtureEventId,
+        edition_id: "00000000-0000-0000-0000-000000000000",
+        result_type: "official_results",
+        official_url: "https://example.com/results",
+        fingerprint: `rls-result-${runId}`
+      }
+    });
+    assert.equal(resultInsert.response.ok, false);
+
+    const inbox = await restRequest("admin_exception_inbox?select=item_id&limit=1", { token: userA.token });
+    assert.equal(inbox.response.ok, true);
+    assert.deepEqual(inbox.data, []);
+  }
+);
+
+await test(
   "2. Anonymous users cannot read profiles",
   async () => {
     const { response, data } =
@@ -1146,6 +1186,79 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         { token: admin.token }
       );
       assert.deepEqual(publicFactsAfter.data, publicFactsBefore.data, "Crawler changed public event facts.");
+    }
+  );
+
+  await test(
+    "17. Successor detection creates a private draft and only an admin batch can publish it",
+    async () => {
+      const sources = await serviceRequest(
+        `event_sources?select=id,event_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&limit=1`
+      );
+      assert.equal(sources.response.ok, true, JSON.stringify(sources.data));
+      assert.equal(sources.data.length, 1);
+      const source = sources.data[0];
+      const crawlResults = await serviceRequest(
+        `source_crawl_results?select=id&source_id=eq.${encodeURIComponent(source.id)}&order=fetched_at.desc&limit=1`
+      );
+      assert.equal(crawlResults.response.ok, true, JSON.stringify(crawlResults.data));
+      assert.equal(crawlResults.data.length, 1);
+
+      const detected = await serviceRequest("rpc/register_edition_successor_candidate", {
+        method: "POST",
+        body: {
+          p_source_id: source.id,
+          p_crawl_result_id: crawlResults.data[0].id,
+          p_candidate: {
+            year: 2028,
+            start_date: "2028-12-30",
+            end_date: "2028-12-30",
+            name: `Lifecycle ${runId}`,
+            registration_url: `https://example.com/${runId}/register-2028`,
+            confidence: 0.97,
+            evidence: { type: "json_ld" }
+          },
+          p_worker_version: "rls-lifecycle-test"
+        }
+      });
+      assert.equal(detected.response.ok, true, JSON.stringify(detected.data));
+      assert.equal(detected.data.status, "draft_created");
+      assert.ok(detected.data.draft_edition_id);
+
+      const anonymousDraft = await restRequest(
+        `event_editions?select=id&id=eq.${encodeURIComponent(detected.data.draft_edition_id)}`
+      );
+      assert.equal(anonymousDraft.response.ok, true);
+      assert.deepEqual(anonymousDraft.data, []);
+
+      const normalInbox = await restRequest(
+        `admin_exception_inbox?select=item_id&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
+        { token: userA.token }
+      );
+      assert.equal(normalInbox.response.ok, true);
+      assert.deepEqual(normalInbox.data, []);
+
+      const adminInbox = await restRequest(
+        `admin_exception_inbox?select=item_id,batch_action&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
+        { token: admin.token }
+      );
+      assert.equal(adminInbox.response.ok, true, JSON.stringify(adminInbox.data));
+      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["approve_successor"]);
+
+      const approved = await restRequest("rpc/approve_edition_succession_candidates", {
+        token: admin.token,
+        method: "POST",
+        body: { p_candidate_ids: [detected.data.candidate_id], p_limit: 1 }
+      });
+      assert.equal(approved.response.ok, true, JSON.stringify(approved.data));
+      assert.equal(approved.data.approved_count, 1);
+
+      const publicArchive = await restRequest(
+        `public_event_archive?select=edition_id,edition_year,discovery_status&edition_id=eq.${encodeURIComponent(detected.data.draft_edition_id)}`
+      );
+      assert.equal(publicArchive.response.ok, true, JSON.stringify(publicArchive.data));
+      assert.deepEqual(publicArchive.data.map(row => row.edition_year), [2028]);
+      assert.deepEqual(publicArchive.data.map(row => row.discovery_status), ["active"]);
     }
   );
 }

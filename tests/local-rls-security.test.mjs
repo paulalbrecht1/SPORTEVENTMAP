@@ -168,6 +168,58 @@ assert.deepEqual(
 );
 console.log("Local Supabase hardening assertions passed.");
 
+runSupabase([
+  "db",
+  "query",
+  "--local",
+  `do $lifecycle$
+  declare
+    fixture_event_id bigint;
+    fixture_edition_id uuid;
+    lifecycle_result jsonb;
+  begin
+    insert into public.events (
+      event_name, sport, date, city, country, event_url, status,
+      publication_status, event_status, verification_status
+    ) values (
+      '[LIFECYCLE TEST] archive fixture', 'Running', '01.01.2020',
+      'Berlin', 'Germany', 'https://example.com/lifecycle-archive', 'approved',
+      'published', 'active', 'verified'
+    ) returning id into fixture_event_id;
+
+    select id into fixture_edition_id
+    from public.event_editions
+    where event_id = fixture_event_id
+    order by edition_year
+    limit 1;
+
+    update public.event_editions
+    set start_date = date '2020-01-01', end_date = date '2020-01-01',
+        edition_status = 'scheduled', publication_status = 'published',
+        discovery_status = 'active'
+    where id = fixture_edition_id;
+
+    lifecycle_result := private.run_edition_lifecycle(date '2026-01-01');
+    if (lifecycle_result->>'archived_editions')::integer < 1 then
+      raise exception 'Lifecycle did not archive the past fixture';
+    end if;
+    if exists (select 1 from public.public_event_discovery where event_id = fixture_event_id) then
+      raise exception 'Archived fixture remained in discovery';
+    end if;
+    if not exists (
+      select 1 from public.public_event_archive
+      where event_id = fixture_event_id and discovery_status = 'detail_only'
+    ) then
+      raise exception 'Archived fixture disappeared from public history';
+    end if;
+
+    delete from public.events where id = fixture_event_id;
+    delete from public.data_workflow_runs where id = (lifecycle_result->>'run_id')::bigint;
+  end
+  $lifecycle$;`
+]);
+console.log("Edition lifecycle archival and public history assertions passed.");
+
 const password = `Local-RLS-${runId}-Aa1!`;
 const users = [];
 

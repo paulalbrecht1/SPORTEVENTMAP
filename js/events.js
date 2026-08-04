@@ -5,6 +5,18 @@ let favorites =
     localStorage.getItem("favorites")
   ) || [];
 
+const storedSeasonPlannerEvents =
+  localStorage.getItem("seasonPlannerEvents");
+let plannedEditions = storedSeasonPlannerEvents
+  ? JSON.parse(storedSeasonPlannerEvents)
+  : [...favorites];
+if (!storedSeasonPlannerEvents) {
+  localStorage.setItem(
+    "seasonPlannerEvents",
+    JSON.stringify(plannedEditions)
+  );
+}
+
 let csvEventsPromise = null;
 let seasonTimeInputSaveTimer = null;
 const seasonOpenDetailPanels =
@@ -239,11 +251,23 @@ function isFavorite(event) {
   );
 }
 
+function isPlannedEdition(event) {
+  const aliases = getEventKeyAliases(event);
+  return aliases.some(alias => plannedEditions.includes(alias));
+}
+
 
 function saveFavorites() {
   localStorage.setItem(
     "favorites",
     JSON.stringify(favorites)
+  );
+}
+
+function savePlannedEditions() {
+  localStorage.setItem(
+    "seasonPlannerEvents",
+    JSON.stringify(plannedEditions)
   );
 }
 
@@ -391,7 +415,13 @@ function applyRemotePlanningState(state = {}) {
       ? [...new Set(state.favorites)]
       : [];
 
+  plannedEditions =
+    Array.isArray(state.plannedEditions)
+      ? [...new Set(state.plannedEditions)]
+      : [];
+
   saveFavorites();
+  savePlannedEditions();
 
   localStorage.setItem(
     "seasonPlanMeta",
@@ -676,7 +706,7 @@ async function addEventToSeasonPlanner(event, options = {}) {
     return false;
   }
 
-  if (isFavorite(event)) {
+  if (isPlannedEdition(event)) {
     if (typeof showToast === "function") {
       showToast(
         "Already in Season Planner",
@@ -688,7 +718,7 @@ async function addEventToSeasonPlanner(event, options = {}) {
     return true;
   }
 
-  toggleFavorite(event);
+  toggleSeasonPlan(event);
 
   if (typeof showToast === "function") {
     showToast(
@@ -1675,7 +1705,7 @@ async function loadCsvEvents() {
 
 // Supabase is the source of truth after the controlled catalog import. The
 // versioned CSV remains a read-only export/fallback during rollout or outages.
-const MIN_SUPABASE_CATALOG_ROWS = 900;
+const MIN_SUPABASE_CATALOG_ROWS = 1;
 
 async function loadEvents(callback) {
   let loadedEvents = [];
@@ -2164,12 +2194,12 @@ function openDrawer(event) {
 
     <div class="drawer-action-row">
       <button
-        class="drawer-season-btn ${isFavorite(event) ? "active" : ""}"
+        class="drawer-season-btn ${isPlannedEdition(event) ? "active" : ""}"
         type="button"
         data-event-key="${escapeHTML(getEventKey(event))}"
         data-testid="drawer-add-to-planner"
       >
-        ${isFavorite(event) ? "Saved in Season" : "Add to Season"}
+        ${isPlannedEdition(event) ? "Saved in Season" : "Add to Season"}
       </button>
 
       <button
@@ -2323,7 +2353,7 @@ function openDrawer(event) {
           });
 
         const active =
-          added && isFavorite(event);
+          added && isPlannedEdition(event);
 
         drawerSeasonBtn.classList.toggle(
           "active",
@@ -2452,16 +2482,6 @@ function toggleFavorite(event) {
       }
     );
 
-    trackEvent(
-      isNowFavorite
-        ? "season_event_added"
-        : "season_event_removed",
-      {
-        event_id: key,
-        sport: event.sport || "",
-        saved_events: favorites.length
-      }
-    );
   }
 
   if (
@@ -2539,6 +2559,38 @@ function toggleFavorite(event) {
 
 }
 
+function toggleSeasonPlan(event) {
+  const key = getEventKey(event);
+  const aliases = new Set(getEventKeyAliases(event));
+  const wasPlanned = plannedEditions.some(item => aliases.has(item));
+
+  plannedEditions = plannedEditions.filter(item => !aliases.has(item));
+  if (!wasPlanned) {
+    plannedEditions.push(key);
+  }
+
+  const isNowPlanned = !wasPlanned;
+  savePlannedEditions();
+
+  if (typeof window.syncSeasonEditionToSupabase === "function") {
+    window.syncSeasonEditionToSupabase(event, isNowPlanned);
+  }
+  if (typeof trackEvent === "function") {
+    trackEvent(isNowPlanned ? "season_event_added" : "season_event_removed", {
+      event_id: key,
+      sport: event.sport || "",
+      saved_events: plannedEditions.length
+    });
+  }
+
+  updateFavoriteButtons(event);
+  const seasonPlanner = document.getElementById("seasonPlannerModal");
+  if (seasonPlanner?.classList.contains("open") && typeof renderSeasonPlanner === "function") {
+    renderSeasonPlanner();
+  }
+  return isNowPlanned;
+}
+
 function updateFavoriteButtons(event) {
   const key =
     getEventKey(event);
@@ -2596,9 +2648,10 @@ function updateFavoriteButtons(event) {
         return;
       }
 
-      button.classList.toggle("active", active);
+      const planned = isPlannedEdition(event);
+      button.classList.toggle("active", planned);
       button.textContent =
-        active
+        planned
           ? "Saved in Season"
           : "Add to Season";
     });
@@ -7802,7 +7855,7 @@ function getFavoriteEventsForSeason() {
   }
 
   return events
-    .filter(event => isFavorite(event))
+    .filter(event => isPlannedEdition(event))
     .sort((first, second) => {
       const firstDate =
         parseSeasonDate(first.date);
@@ -10517,7 +10570,7 @@ function renderSeasonPlanner() {
           return;
         }
 
-        toggleFavorite(found);
+        toggleSeasonPlan(found);
       });
     });
 
@@ -10565,7 +10618,7 @@ function renderSeasonPlanner() {
           });
         }
 
-        toggleFavorite(found);
+        toggleSeasonPlan(found);
       });
     });
 }

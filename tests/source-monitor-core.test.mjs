@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   evaluateRobots,
   extractSemanticSignals,
+  extractLifecycleSignals,
   NORMALIZATION_VERSION,
   SourceFetchError,
   fetchSource,
@@ -42,6 +43,27 @@ await assert.rejects(() => validateSourceUrl("https://safe.test", { resolveDns: 
 
 const normalizedV1 = normalizeRelevantContent(fixture("event-v1.html"));
 const normalizedDynamic = normalizeRelevantContent(fixture("event-v1-dynamic.html"));
+
+const lifecycleSignals = extractLifecycleSignals(`
+  <script type="application/ld+json">{
+    "@context":"https://schema.org","@type":"SportsEvent","name":"Testlauf 2027",
+    "startDate":"2027-09-12","endDate":"2027-09-12",
+    "offers":{"url":"/anmeldung-2027"}
+  }</script>
+  <a href="/ergebnisse/2026.pdf">Ergebnisse 2026</a>
+`, "text/html", "https://example.com/event");
+assert.deepEqual(lifecycleSignals.editions[0], {
+  start_date: "2027-09-12",
+  end_date: "2027-09-12",
+  name: "Testlauf 2027",
+  registration_url: "https://example.com/anmeldung-2027",
+  confidence: 0.97,
+  evidence_type: "json_ld",
+  year: 2027
+});
+assert.equal(lifecycleSignals.results[0].url, "https://example.com/ergebnisse/2026.pdf");
+assert.equal(lifecycleSignals.results[0].result_type, "official_results");
+assert.deepEqual(extractLifecycleSignals("Termin: 31.02.2027").editions, [], "Impossible dates must be ignored.");
 const normalizedV2 = normalizeRelevantContent(fixture("event-v2.html"));
 assert.equal(normalizedV1, normalizedDynamic, "Dynamic navigation, cookie, scripts and timestamps must not alter the relevant content.");
 assert.notEqual(normalizedV1, normalizedV2);

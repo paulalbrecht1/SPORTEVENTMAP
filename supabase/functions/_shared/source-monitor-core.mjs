@@ -224,6 +224,101 @@ export function extractSemanticSignals(content, contentType = "text/html") {
   });
 }
 
+
+function normalizeLifecycleDate(value) {
+  const text = String(value || "").trim();
+  let match = text.match(/\b((?:19|20)\d{2})-(\d{2})-(\d{2})\b/);
+  if (!match) {
+    match = text.match(/\b(\d{1,2})[./](\d{1,2})[./]((?:19|20)\d{2})\b/);
+    if (match) match = [match[0], match[3], match[2].padStart(2, "0"), match[1].padStart(2, "0")];
+  }
+  if (!match) return null;
+  const date = `${match[1]}-${match[2]}-${match[3]}`;
+  const parsed = new Date(`${date}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date ? null : date;
+}
+
+function jsonLdEntries(value) {
+  if (Array.isArray(value)) return value.flatMap(jsonLdEntries);
+  if (!value || typeof value !== "object") return [];
+  if (Array.isArray(value["@graph"])) return value["@graph"].flatMap(jsonLdEntries);
+  return [value];
+}
+
+function absoluteHttpUrl(value, baseUrl) {
+  try {
+    const url = new URL(String(value || ""), baseUrl || undefined);
+    return ["http:", "https:"].includes(url.protocol) ? url.toString() : null;
+  } catch { return null; }
+}
+
+export function extractLifecycleSignals(content, contentType = "text/html", baseUrl = null) {
+  const raw = String(content || "").normalize("NFKC");
+  const editionMap = new Map();
+  const resultMap = new Map();
+  const rememberEdition = candidate => {
+    const startDate = normalizeLifecycleDate(candidate.start_date);
+    if (!startDate) return;
+    const key = startDate;
+    const normalized = { ...candidate, start_date: startDate, year: Number(startDate.slice(0, 4)) };
+    if (candidate.end_date) normalized.end_date = normalizeLifecycleDate(candidate.end_date);
+    const previous = editionMap.get(key);
+    if (!previous || normalized.confidence > previous.confidence) editionMap.set(key, normalized);
+  };
+  const rememberResult = candidate => {
+    const url = absoluteHttpUrl(candidate.url, baseUrl);
+    if (!url) return;
+    const key = url.replace(/#.*$/, "");
+    const previous = resultMap.get(key);
+    if (!previous || candidate.confidence > previous.confidence) resultMap.set(key, { ...candidate, url: key });
+  };
+
+  const structuredBlocks = contentType.includes("json") ? [raw] :
+    [...raw.matchAll(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script\s*>/gi)].map(match => match[1]);
+  for (const block of structuredBlocks) {
+    try {
+      for (const entry of jsonLdEntries(JSON.parse(block))) {
+        const type = String(entry?.["@type"] || "").toLowerCase();
+        if (!/(event|sports?event)/.test(type)) continue;
+        const offer = Array.isArray(entry.offers) ? entry.offers[0] : entry.offers;
+        rememberEdition({
+          start_date: entry.startDate,
+          end_date: entry.endDate,
+          name: entry.name || null,
+          registration_url: absoluteHttpUrl(offer?.url, baseUrl),
+          confidence: 0.97,
+          evidence_type: "json_ld"
+        });
+      }
+    } catch { /* malformed structured data is ignored */ }
+  }
+
+  if (!contentType.includes("json")) {
+    const visible = decodeEntities(raw
+      .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
+      .replace(/<[^>]+>/g, " "))
+      .replace(/\s+/g, " ");
+    for (const match of visible.matchAll(/\b(?:19|20)\d{2}-\d{2}-\d{2}\b|\b\d{1,2}[./]\d{1,2}[./](?:19|20)\d{2}\b/g)) {
+      rememberEdition({ start_date: match[0], end_date: null, name: null, registration_url: null, confidence: 0.72, evidence_type: "visible_date" });
+    }
+    for (const match of raw.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a\s*>/gi)) {
+      const label = decodeEntities(match[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
+      if (!/(ergebnis|result|timing|urkunde|certificate|zielzeit)/i.test(`${match[1]} ${label}`)) continue;
+      rememberResult({
+        url: match[1],
+        title: label || "Offizielle Ergebnisse",
+        result_type: /(urkunde|certificate)/i.test(`${match[1]} ${label}`) ? "certificate" : "official_results",
+        confidence: 0.88,
+        evidence_type: "result_link"
+      });
+    }
+  }
+
+  return {
+    editions: [...editionMap.values()].sort((left, right) => left.start_date.localeCompare(right.start_date)),
+    results: [...resultMap.values()].sort((left, right) => right.confidence - left.confidence || left.url.localeCompare(right.url))
+  };
+}
 export async function sha256Hex(value) {
   const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;
   const digest = await crypto.subtle.digest("SHA-256", bytes);

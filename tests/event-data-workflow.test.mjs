@@ -20,7 +20,17 @@ const migrationPath = path.join(
   "20260728_event_data_operations_foundation.sql"
 );
 const migration = fs.readFileSync(migrationPath, "utf8");
-const events = parseCsvFile(path.join(root, "data", "events.csv"));
+const activeEvents = parseCsvFile(path.join(root, "data", "events.csv"));
+const archivePayload = JSON.parse(
+  fs.readFileSync(path.join(root, "data", "event-editions-public.json"), "utf8")
+);
+const events = archivePayload.editions.map(row => ({
+  ...row,
+  // The original importer expects the legacy public registration vocabulary.
+  verification_status: row.registration_status === "unknown"
+    ? "unclear"
+    : row.registration_status
+}));
 const manifestRows = JSON.parse(
   fs.readFileSync(path.join(root, "data", "event-pages.json"), "utf8")
 );
@@ -32,7 +42,12 @@ const prepared = prepareMigration(events, {
   today: new Date("2026-07-28T00:00:00Z")
 });
 
-assert.equal(events.length, 994, "Curated source row count changed unexpectedly.");
+assert.equal(events.length, 994, "Public archive row count changed unexpectedly.");
+assert.ok(activeEvents.length > 0, "Discovery fallback must retain upcoming editions.");
+assert.ok(
+  activeEvents.length < events.length,
+  "Discovery fallback must exclude archived editions."
+);
 assert.equal(prepared.editions.length, events.length, "Every curated row must become one edition.");
 assert.equal(prepared.events.length, 993, "The current data should group exactly one multi-year event brand.");
 assert.deepEqual(prepared.rejected, [], "No curated row may be lost during preparation.");

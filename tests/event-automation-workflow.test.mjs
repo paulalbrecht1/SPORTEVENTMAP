@@ -49,7 +49,7 @@ assert.ok(worker.includes("verify_event_source_cron_secret"));
 assert.doesNotMatch(worker, /\.from\(["']events["']\)\.update/);
 assert.doesNotMatch(worker, /\.from\(["']event_editions["']\)\.update/);
 
-assert.ok(eventsClient.includes("MIN_SUPABASE_CATALOG_ROWS = 900"));
+assert.ok(eventsClient.includes("MIN_SUPABASE_CATALOG_ROWS = 1"));
 assert.ok(eventsClient.includes('"csv-fallback"'));
 assert.ok(adminClient.includes('data-dataops-action="approve-proposal"'));
 assert.ok(adminClient.includes('data-dataops-action="resolve-alert"'));

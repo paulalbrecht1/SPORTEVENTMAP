@@ -47,7 +47,9 @@ function createCloud(options = {}) {
     failTable = ""
   } = options;
 
+  const calls = [];
   return {
+    calls,
     auth: {
       async getUser() {
         return {
@@ -60,6 +62,7 @@ function createCloud(options = {}) {
       }
     },
     from(table) {
+      calls.push(table);
       let operation = "select";
 
       return {
@@ -238,7 +241,7 @@ async function createHarness(options = {}) {
     "true"
   );
   assert.deepEqual(
-    JSON.parse(harness.store.get("favorites")),
+    JSON.parse(harness.store.get("seasonPlannerEvents")),
     [eventKey]
   );
 
@@ -263,17 +266,18 @@ async function createHarness(options = {}) {
     "Removed from your Season Planner."
   );
   assert.deepEqual(
-    JSON.parse(reloaded.store.get("favorites")),
+    JSON.parse(reloaded.store.get("seasonPlannerEvents")),
     []
   );
 }
 
 {
+  const cloud = createCloud({
+    remoteSaved: true
+  });
   const harness =
     await createHarness({
-      cloud: createCloud({
-        remoteSaved: true
-      })
+      cloud
     });
 
   assert.equal(
@@ -281,9 +285,10 @@ async function createHarness(options = {}) {
     "✓ Added to Season"
   );
   assert.deepEqual(
-    JSON.parse(harness.store.get("favorites")),
+    JSON.parse(harness.store.get("seasonPlannerEvents")),
     [eventKey]
   );
+  assert.equal(cloud.calls.includes("favorites"), false, "Season planning must not write event favorites.");
 }
 
 {
@@ -309,7 +314,7 @@ async function createHarness(options = {}) {
     "Could not save this event right now."
   );
   assert.deepEqual(
-    JSON.parse(harness.store.get("favorites") || "[]"),
+    JSON.parse(harness.store.get("seasonPlannerEvents") || "[]"),
     []
   );
 }

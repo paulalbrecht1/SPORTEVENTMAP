@@ -730,6 +730,55 @@ await test(
       body: { p_country_code: "DE" }
     });
     assert.equal(phaseAMetrics.response.ok, false, "Normal user could read Phase-A evaluation metrics.");
+
+    const protectedAdminRpcs = [
+      [
+        "run_event_validation",
+        { p_event_id: publicFixtureEventId, p_edition_id: null }
+      ],
+      [
+        "enqueue_source_crawl",
+        {
+          p_source_id: crypto.randomUUID(),
+          p_priority: 1,
+          p_scheduled_at: new Date().toISOString(),
+          p_trigger_source: "admin"
+        }
+      ],
+      ["reset_source_crawl_failures", { p_source_id: crypto.randomUUID() }],
+      [
+        "resolve_source_review_task",
+        {
+          p_task_id: crypto.randomUUID(),
+          p_status: "resolved",
+          p_notes: "must not be accepted"
+        }
+      ],
+      ["retry_source_crawl_job", { p_job_id: crypto.randomUUID() }]
+    ];
+
+    for (const [rpc, body] of protectedAdminRpcs) {
+      const result = await restRequest(`rpc/${rpc}`, {
+        token: userA.token,
+        method: "POST",
+        body
+      });
+      assert.equal(
+        result.response.ok,
+        false,
+        `Normal user could execute protected admin RPC ${rpc}.`
+      );
+    }
+
+    const invalidCronSecret = await restRequest(
+      "rpc/verify_event_source_cron_secret",
+      {
+        method: "POST",
+        body: { p_secret: `invalid-${runId}` }
+      }
+    );
+    assert.equal(invalidCronSecret.response.ok, true, JSON.stringify(invalidCronSecret.data));
+    assert.equal(invalidCronSecret.data, false, "Invalid cron secret was accepted.");
   }
 );
 

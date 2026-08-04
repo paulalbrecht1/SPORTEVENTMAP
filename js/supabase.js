@@ -149,7 +149,7 @@ const ANALYTICS_ANONYMOUS_KEY =
 
 const FEEDBACK_EMAIL =
   APP_CONFIG.feedbackEmail ||
-  "feedback@[your-domain].com";
+  "kontakt@sporteventmap.com";
 
 const ANALYTICS_EVENT_ALIASES = {
   search_used: "search_performed",

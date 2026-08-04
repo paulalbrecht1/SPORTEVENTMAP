@@ -204,6 +204,28 @@ assert.match(detailPageSource, /ensureControls/);
 pass("global light and dark themes cover application, detail and legal views");
 
 [
+  "index.html",
+  "contact.html",
+  "terms.html",
+  "js/supabase.js",
+  "tools/create-publish-package.js"
+].forEach(file => {
+  const source = read(file);
+
+  assert.doesNotMatch(
+    source,
+    /\[CONTACT EMAIL\]|\[your-domain\]/,
+    `Public contact placeholder remains in ${file}`
+  );
+  assert.match(
+    source,
+    /kontakt@sporteventmap\.com/,
+    `Operator contact address is missing from ${file}`
+  );
+});
+pass("public beta contact paths contain no placeholder address");
+
+[
   "Discovery professional visual system",
   "body.platform-route-discovery:not(.landing-open) .platform-nav a",
   "body.platform-route-discovery:not(.landing-open) .event-card",

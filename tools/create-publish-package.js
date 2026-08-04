@@ -173,7 +173,7 @@ function writeRuntimeConfig() {
     feedbackEmail:
       process.env.SPORT_EVENT_MAP_FEEDBACK_EMAIL ||
       readExistingConfigValue("feedbackEmail") ||
-      "feedback@[your-domain].com"
+      "kontakt@sporteventmap.com"
   };
 
   if (

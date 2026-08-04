@@ -4607,66 +4607,106 @@ const dataOpsElements = {
     openAlerts: document.getElementById("dataOpsOpenAlerts")
   }
 };
-function ensureSourceMonitorSection() {
+function ensureDataOpsReviewWorkspace() {
   if (!document.getElementById("sourceMonitorStyles")) {
     const styles = document.createElement("link");
     styles.id = "sourceMonitorStyles";
     styles.rel = "stylesheet";
-    styles.href = "css/source-monitor.css?v=20260729-source-monitor-v1";
+    styles.href = "css/source-monitor.css?v=20260804-review-inbox-v2";
     document.head.appendChild(styles);
   }
   const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
-  if (!operationsRoot || document.getElementById("sourceMonitorSection")) return;
-  const section = document.createElement("section");
-  section.id = "sourceMonitorSection";
-  section.className = "source-monitor-section";
-  section.innerHTML = `
-    <div class="admin-data-operations-section-heading">
-      <div><span class="admin-eyebrow">Source Monitor</span><h4>Technische Quellenpruefung</h4><p>Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</p></div>
-      <p id="sourceMonitorStatus" class="admin-section-status" aria-live="polite"></p>
-    </div>
-    <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen">
-      <div><span>Heute geprueft</span><strong id="sourceMonitorCheckedToday">0</strong></div>
-      <div><span>Unveraendert</span><strong id="sourceMonitorUnchanged">0</strong></div>
-      <div><span>Veraendert</span><strong id="sourceMonitorChanged">0</strong></div>
-      <div><span>Nicht erreichbar</span><strong id="sourceMonitorUnreachable">0</strong></div>
-      <div><span>Fehlgeschlagen</span><strong id="sourceMonitorFailed">0</strong></div>
-      <div><span>Wiederholungen</span><strong id="sourceMonitorRetries">0</strong></div>
-      <div><span>Dead Letter</span><strong id="sourceMonitorDeadLetter">0</strong></div>
-      <div><span>Durchschnitt</span><strong id="sourceMonitorAverageTime">--</strong></div>
-      <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
-      <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
-    </div>
-    <section id="editionLifecycleInbox" class="edition-lifecycle-inbox" aria-labelledby="editionLifecycleTitle">
-      <div class="admin-data-operations-section-heading">
-        <div><span class="admin-eyebrow">Edition Lifecycle</span><h5 id="editionLifecycleTitle">Nur Ausnahmen bearbeiten</h5><p>Vergangene Austragungen werden automatisch archiviert. Hier erscheinen nur neue Jahrgaenge, Ergebnisse und echte Fehler.</p></div>
+  if (!operationsRoot) return;
+
+  if (!document.getElementById("editionLifecycleInbox")) {
+    const review = document.createElement("section");
+    review.id = "editionLifecycleInbox";
+    review.className = "edition-lifecycle-inbox admin-review-inbox";
+    review.setAttribute("aria-labelledby", "editionLifecycleTitle");
+    review.innerHTML = `
+      <div class="admin-data-operations-section-heading admin-review-inbox-heading">
+        <div><span class="admin-eyebrow">Review Inbox</span><h4 id="editionLifecycleTitle">Jetzt zu pruefen</h4><p>Hier stehen nur Entscheidungen. Sichere Routinefaelle warten auf automatische Bestaetigung oder werden selbststaendig verarbeitet.</p></div>
         <p id="editionLifecycleStatus" class="admin-section-status" aria-live="polite"></p>
       </div>
-      <div class="edition-lifecycle-kpis">
-        <div><span>Ausnahmen</span><strong id="editionLifecycleTotal">0</strong></div>
-        <div><span>Neue Jahrgaenge</span><strong id="editionLifecycleSuccessors">0</strong></div>
-        <div><span>Ergebnisse</span><strong id="editionLifecycleResults">0</strong></div>
-        <div><span>Kritisch</span><strong id="editionLifecycleCritical">0</strong></div>
+      <div class="edition-lifecycle-kpis" aria-label="Review Inbox Kennzahlen">
+        <div><span>Jetzt entscheiden</span><strong id="editionLifecycleDecisions">0</strong></div>
+        <div><span>Wartet automatisch</span><strong id="editionLifecycleWaiting">0</strong></div>
+        <div><span>Sammelfreigabe</span><strong id="editionLifecycleBatch">0</strong></div>
+        <div><span>Blockiert / kritisch</span><strong id="editionLifecycleBlocked">0</strong></div>
       </div>
-      <div class="edition-lifecycle-toolbar">
-        <button type="button" data-lifecycle-action="select-all">Alle freigabefaehigen waehlen</button>
+      <div class="edition-lifecycle-toolbar admin-review-inbox-toolbar">
+        <label>Ansicht
+          <select id="editionLifecycleFilter">
+            <option value="action">Jetzt zu pruefen</option>
+            <option value="waiting">Wartet auf Automatik</option>
+            <option value="blocked">Blockiert / kritisch</option>
+            <option value="all">Alle Ausnahmen</option>
+          </select>
+        </label>
+        <button type="button" data-lifecycle-action="select-all">Freigabefaehige waehlen</button>
         <button type="button" data-lifecycle-action="approve-selected">Auswahl freigeben</button>
       </div>
-      <div id="editionLifecycleList" class="edition-lifecycle-list"></div>
-    </section>
-    <div class="source-monitor-table-wrap">
-      <table class="source-monitor-table">
-        <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
-        <tbody id="sourceMonitorTableBody"></tbody>
-      </table>
-    </div>
-    <section id="sourceMonitorHistory" class="source-monitor-history" hidden>
-      <div class="admin-data-operations-section-heading"><div><h5>Crawl-Historie</h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history">Schliessen</button></div>
-      <div id="sourceMonitorHistoryList" class="admin-data-operations-list"></div>
-    </section>`;
+      <div id="editionLifecycleList" class="edition-lifecycle-list" aria-live="polite"></div>`;
+    operationsRoot.insertBefore(review, operationsRoot.querySelector(".admin-data-operations-kpis"));
+  }
+
+  if (!document.getElementById("dataOpsInventoryDetails")) {
+    const inventory = document.createElement("details");
+    inventory.id = "dataOpsInventoryDetails";
+    inventory.className = "admin-secondary-details";
+    inventory.innerHTML = `<summary><span><strong>Alle Events &amp; manuelle Suche</strong><small>Gesamtbestand, Filter und Einzelfallverwaltung</small></span><span id="dataOpsInventorySummaryCount">Bestand laden</span></summary><div class="admin-secondary-details-body"></div>`;
+    const firstInventoryNode = operationsRoot.querySelector(".admin-data-operations-kpis");
+    operationsRoot.insertBefore(inventory, firstInventoryNode);
+    const body = inventory.querySelector(".admin-secondary-details-body");
+    [
+      firstInventoryNode,
+      operationsRoot.querySelector(".admin-data-operations-filters"),
+      dataOpsElements.status,
+      ...operationsRoot.querySelectorAll(":scope > .admin-data-operations-grid")
+    ].filter(Boolean).forEach(node => body.appendChild(node));
+  }
+}
+
+function ensureSourceMonitorSection() {
+  const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
+  if (!operationsRoot || document.getElementById("sourceMonitorSection")) return;
+  const section = document.createElement("details");
+  section.id = "sourceMonitorSection";
+  section.className = "source-monitor-section admin-secondary-details";
+  section.innerHTML = `
+    <summary><span><strong>Source Monitor &amp; Systemstatus</strong><small>Crawls, Erreichbarkeit, Retries und technische Details</small></span><span id="sourceMonitorSummaryStatus">Technik</span></summary>
+    <div class="admin-secondary-details-body source-monitor-content">
+      <div class="admin-data-operations-section-heading">
+        <div><span class="admin-eyebrow">Source Monitor</span><h4>Technische Quellenpruefung</h4><p>Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</p></div>
+        <p id="sourceMonitorStatus" class="admin-section-status" aria-live="polite"></p>
+      </div>
+      <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen">
+        <div><span>Heute geprueft</span><strong id="sourceMonitorCheckedToday">0</strong></div>
+        <div><span>Unveraendert</span><strong id="sourceMonitorUnchanged">0</strong></div>
+        <div><span>Veraendert</span><strong id="sourceMonitorChanged">0</strong></div>
+        <div><span>Nicht erreichbar</span><strong id="sourceMonitorUnreachable">0</strong></div>
+        <div><span>Fehlgeschlagen</span><strong id="sourceMonitorFailed">0</strong></div>
+        <div><span>Wiederholungen</span><strong id="sourceMonitorRetries">0</strong></div>
+        <div><span>Dead Letter</span><strong id="sourceMonitorDeadLetter">0</strong></div>
+        <div><span>Durchschnitt</span><strong id="sourceMonitorAverageTime">--</strong></div>
+        <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
+        <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
+      </div>
+      <div class="source-monitor-table-wrap">
+        <table class="source-monitor-table">
+          <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
+          <tbody id="sourceMonitorTableBody"></tbody>
+        </table>
+      </div>
+      <section id="sourceMonitorHistory" class="source-monitor-history" hidden>
+        <div class="admin-data-operations-section-heading"><div><h5>Crawl-Historie</h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history">Schliessen</button></div>
+        <div id="sourceMonitorHistoryList" class="admin-data-operations-list"></div>
+      </section>
+    </div>`;
   operationsRoot.insertBefore(section, dataOpsElements.historyPanel || null);
 }
 
+ensureDataOpsReviewWorkspace();
 ensureSourceMonitorSection();
 const sourceMonitorElements = {
   section: document.getElementById("sourceMonitorSection"),
@@ -4692,10 +4732,11 @@ const editionLifecycleElements = {
   section: document.getElementById("editionLifecycleInbox"),
   status: document.getElementById("editionLifecycleStatus"),
   list: document.getElementById("editionLifecycleList"),
-  total: document.getElementById("editionLifecycleTotal"),
-  successors: document.getElementById("editionLifecycleSuccessors"),
-  results: document.getElementById("editionLifecycleResults"),
-  critical: document.getElementById("editionLifecycleCritical")
+  filter: document.getElementById("editionLifecycleFilter"),
+  decisions: document.getElementById("editionLifecycleDecisions"),
+  waiting: document.getElementById("editionLifecycleWaiting"),
+  batch: document.getElementById("editionLifecycleBatch"),
+  blocked: document.getElementById("editionLifecycleBlocked")
 };
 
 const adminTabs =
@@ -5081,6 +5122,29 @@ function setEditionLifecycleStatus(message, type = "") {
   editionLifecycleElements.status.textContent = message;
 }
 
+function getReviewInboxCategory(row) {
+  if (row.batch_action === "wait_automation") return "waiting";
+  if (row.priority === "critical" || row.batch_action === "review") return "blocked";
+  return "action";
+}
+
+function formatReviewInboxValue(value) {
+  if (value == null || value === "") return "—";
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function renderReviewInboxDiff(row) {
+  const oldValues = row.metadata?.old_values || {};
+  const newValues = row.metadata?.new_values || {};
+  const keys = [...new Set([...Object.keys(oldValues), ...Object.keys(newValues)])]
+    .filter(key => JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key]));
+  if (!keys.length) return "";
+  return `<div class="admin-review-diff" aria-label="Erkannte Aenderungen">${keys.map(key => `
+    <div><span>${escapeAdminHTML(key.replaceAll("_", " "))}</span><del>${escapeAdminHTML(formatReviewInboxValue(oldValues[key]))}</del><strong>${escapeAdminHTML(formatReviewInboxValue(newValues[key]))}</strong></div>
+  `).join("")}</div>`;
+}
+
 function renderEditionLifecycleInbox() {
   if (!editionLifecycleElements.list) return;
   const rows = editionLifecycleInbox.slice().sort((left, right) => {
@@ -5088,30 +5152,54 @@ function renderEditionLifecycleInbox() {
     return (weights[left.priority] ?? 3) - (weights[right.priority] ?? 3) ||
       String(left.created_at || "").localeCompare(String(right.created_at || ""));
   });
-  editionLifecycleElements.total.textContent = String(rows.length);
-  editionLifecycleElements.successors.textContent = String(rows.filter(row => row.item_type === "new_edition").length);
-  editionLifecycleElements.results.textContent = String(rows.filter(row => row.item_type === "result").length);
-  editionLifecycleElements.critical.textContent = String(rows.filter(row => row.priority === "critical").length);
+  const actionable = rows.filter(row => getReviewInboxCategory(row) !== "waiting");
+  const waiting = rows.filter(row => getReviewInboxCategory(row) === "waiting");
+  const batch = rows.filter(row => ["approve_successor", "approve_result"].includes(row.batch_action));
+  const blocked = rows.filter(row => getReviewInboxCategory(row) === "blocked");
+  if (editionLifecycleElements.decisions) editionLifecycleElements.decisions.textContent = String(actionable.length);
+  if (editionLifecycleElements.waiting) editionLifecycleElements.waiting.textContent = String(waiting.length);
+  if (editionLifecycleElements.batch) editionLifecycleElements.batch.textContent = String(batch.length);
+  if (editionLifecycleElements.blocked) editionLifecycleElements.blocked.textContent = String(blocked.length);
+
+  const inventorySummary = document.getElementById("dataOpsInventorySummaryCount");
+  if (inventorySummary) inventorySummary.textContent = `${dataOpsEvents.length} Events · ${dataOpsEditions.length} Austragungen`;
+  const selectedFilter = editionLifecycleElements.filter?.value || "action";
+  const visibleRows = selectedFilter === "all"
+    ? rows
+    : rows.filter(row => getReviewInboxCategory(row) === selectedFilter);
 
   if (!rows.length) {
-    editionLifecycleElements.list.innerHTML = '<p class="admin-quality-empty">Keine manuelle Ausnahme offen. Der Lifecycle laeuft automatisch.</p>';
+    editionLifecycleElements.list.innerHTML = '<div class="admin-review-inbox-empty"><strong>Keine Entscheidung offen</strong><p>Archivierung, Quellenpruefung und sichere Lifecycle-Aktualisierungen laufen automatisch.</p></div>';
+    return;
+  }
+  if (!visibleRows.length) {
+    editionLifecycleElements.list.innerHTML = selectedFilter === "action"
+      ? '<div class="admin-review-inbox-empty"><strong>Jetzt ist nichts zu pruefen</strong><p>Offene Routinefaelle warten auf ihre automatische Quellenbestaetigung.</p></div>'
+      : '<p class="admin-quality-empty">Keine Eintraege in dieser Ansicht.</p>';
     return;
   }
 
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
   const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
-  editionLifecycleElements.list.innerHTML = rows.slice(0, 300).map(row => {
+  const typeLabels = { new_edition: "Neuer Jahrgang", result: "Ergebnisse", proposal: "Datenaenderung", source: "Quelle", validation: "Datenfehler", workflow: "Systemfehler" };
+  editionLifecycleElements.list.innerHTML = visibleRows.slice(0, 300).map(row => {
     const event = eventById.get(String(row.event_id));
     const edition = editionById.get(String(row.edition_id));
     const canApprove = ["approve_successor", "approve_result"].includes(row.batch_action);
+    const canApproveProposal = row.batch_action === "approve_proposal";
+    const isWaiting = row.batch_action === "wait_automation";
     const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : "";
     const sourceUrl = safeAdminUrl(row.metadata?.source_url || row.metadata?.url || "");
+    const confirmations = Number(row.metadata?.confirmations || 0);
+    const requiredConfirmations = Number(row.metadata?.required_confirmations || 0);
     return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
       ${canApprove ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
-      <div><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(row.priority)}</span><h6>${escapeAdminHTML(row.title)}</h6><p>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)} · ${escapeAdminHTML(row.description)}</p></div>
-      <dl><div><dt>Typ</dt><dd>${escapeAdminHTML(row.item_type)}</dd></div><div><dt>Status</dt><dd>${escapeAdminHTML(row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${Math.round(Number(row.confidence) * 100)}%`}</dd></div><div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
+      <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewInboxDiff(row)}</div>
+      <dl><div><dt>Status</dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt>Bestaetigungen</dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
       <div class="source-monitor-actions">
         ${canApprove ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
+        ${canApproveProposal ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Aenderung uebernehmen</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Ablehnen</button>` : ""}
+        ${["source", "validation", "workflow"].includes(row.item_type) ? `<button type="button" data-lifecycle-action="resolve-exception" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Als erledigt markieren</button>` : ""}
         ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
         ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Austragung oeffnen</a>` : ""}
       </div>
@@ -5148,13 +5236,35 @@ async function handleEditionLifecycleAction(button) {
 
   setButtonLoading(button, true, action === "reject" ? "Ablehnen ..." : "Freigeben ...");
   try {
-    if (action === "reject") {
+    if (action === "resolve-exception") {
+      const item = items[0];
+      let result;
+      if (item?.item_type === "source") result = await supabaseClient.rpc("resolve_source_exception_bundle", { p_source_id: item.metadata?.source_id, p_notes: "Technisches Quellenbuendel in der Review Inbox erledigt." });
+      if (item?.item_type === "validation") {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        result = await supabaseClient.from("validation_issues").update({ status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", item.item_id);
+      }
+      if (item?.item_type === "workflow") {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        result = await supabaseClient.from("data_workflow_alerts").update({ alert_status: "resolved", resolved_at: new Date().toISOString(), resolved_by: user?.id || null }).eq("id", item.item_id);
+      }
+      if (result?.error) throw result.error;
+      setEditionLifecycleStatus("Ausnahme wurde als erledigt markiert.", "success");
+    } else if (action === "reject") {
       const item = items[0];
       let result;
       if (item?.item_type === "new_edition") result = await supabaseClient.from("edition_succession_candidates").update({ candidate_status: "rejected", reviewed_at: new Date().toISOString(), review_notes: "In der Exception-Inbox abgelehnt." }).eq("id", item.item_id);
       if (item?.item_type === "result") result = await supabaseClient.from("edition_results").update({ publication_status: "archived", result_status: "unavailable", reviewed_at: new Date().toISOString() }).eq("id", item.item_id);
+      if (item?.item_type === "proposal") {
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        result = await supabaseClient.from("event_change_proposals").update({ proposal_status: "rejected", reviewed_at: new Date().toISOString(), reviewed_by: user?.id || null, review_notes: "In der Review Inbox abgelehnt." }).eq("id", item.item_id).eq("proposal_status", "pending");
+      }
       if (result?.error) throw result.error;
       setEditionLifecycleStatus("Ausnahme wurde geschlossen.", "success");
+    } else if (items[0]?.item_type === "proposal") {
+      const { error } = await supabaseClient.rpc("apply_event_change_proposal", { p_proposal_id: items[0].item_id, p_review_notes: "In der Review Inbox geprueft und freigegeben." });
+      if (error) throw error;
+      setEditionLifecycleStatus("Die konkrete Datenaenderung wurde uebernommen und protokolliert.", "success");
     } else {
       const approvedCount = await approveEditionLifecycleItems(items);
       setEditionLifecycleStatus(`${approvedCount} Eintraege wurden kontrolliert veroeffentlicht.`, "success");
@@ -5203,6 +5313,9 @@ function renderSourceMonitor() {
   setSourceMonitorKpi("averageTime", timed.length ? `${Math.round(timed.reduce((sum, value) => sum + value, 0) / timed.length)} ms` : "--");
   setSourceMonitorKpi("overdue", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= nowIso).length);
   setSourceMonitorKpi("noSchedule", dataOpsSources.filter(row => row.is_active && !row.next_fetch_at).length);
+  const technicalProblemCount = sourceMonitorJobs.filter(row => ["failed", "dead_letter"].includes(row.status)).length;
+  const sourceSummary = document.getElementById("sourceMonitorSummaryStatus");
+  if (sourceSummary) sourceSummary.textContent = technicalProblemCount ? `${technicalProblemCount} technische Probleme` : `${todayResults.length} heute geprueft`;
 
   const resultBySource = sourceMonitorLatestBy(sourceMonitorResults, "source_id");
   const jobBySource = sourceMonitorLatestBy(sourceMonitorJobs, "source_id");
@@ -5311,7 +5424,7 @@ async function loadDataOperations() {
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
     loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
     loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at"),
-    loadSourceMonitorRecent("admin_exception_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata")
+    loadSourceMonitorRecent("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata")
   ]);
   const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult].find(result => result.error);
   if (failed) {
@@ -5325,8 +5438,12 @@ async function loadDataOperations() {
     issue.status === "open" && ["error", "critical"].includes(issue.severity)
   );
   dataOpsSources = sourcesResult.rows || [];
-  dataOpsProposals = (proposalsResult.rows || []).filter(row => row.proposal_status === "pending");
-  dataOpsAlerts = (alertsResult.rows || []).filter(row => row.alert_status === "open");
+  dataOpsProposals = (proposalsResult.rows || []).filter(row =>
+    row.proposal_status === "pending" && Object.keys(row.proposed_changes || {}).length > 0
+  );
+  dataOpsAlerts = (alertsResult.rows || []).filter(row =>
+    row.alert_status === "open" && ["error", "critical"].includes(row.severity)
+  );
   dataOpsRuns = runsResult.rows || [];
   sourceMonitorJobs = jobsResult.rows || [];
   sourceMonitorResults = crawlResultsResult.rows || [];
@@ -5335,7 +5452,9 @@ async function loadDataOperations() {
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   renderDataOperations();
-  setDataOpsStatus(`${dataOpsEvents.length} Events, ${dataOpsEditions.length} Austragungen, ${dataOpsProposals.length} Vorschläge und ${dataOpsAlerts.length} Alarme geladen.`, "success");
+  const waitingCount = editionLifecycleInbox.filter(item => item.batch_action === "wait_automation").length;
+  const decisionCount = editionLifecycleInbox.length - waitingCount;
+  setDataOpsStatus(`${decisionCount} Entscheidungen offen · ${waitingCount} warten auf Automatik · ${dataOpsEvents.length} Events im Bestand.`, "success");
 }
 
 async function runDataOperationsValidation() {
@@ -5439,14 +5558,14 @@ dataOpsElements.panel?.addEventListener("click", event => {
   if (button) handleDataOpsAction(button);
 });
 sourceMonitorElements.section?.addEventListener("click", event => {
-  const lifecycleButton = event.target.closest("[data-lifecycle-action]");
-  if (lifecycleButton) {
-    handleEditionLifecycleAction(lifecycleButton);
-    return;
-  }
   const button = event.target.closest("[data-source-action]");
   if (button) handleSourceMonitorAction(button);
 });
+editionLifecycleElements.section?.addEventListener("click", event => {
+  const button = event.target.closest("[data-lifecycle-action]");
+  if (button) handleEditionLifecycleAction(button);
+});
+editionLifecycleElements.filter?.addEventListener("change", renderEditionLifecycleInbox);
 
 const KNOWLEDGE_CHILD_TABLES = {
   registration: "event_registration",

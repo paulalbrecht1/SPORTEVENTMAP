@@ -2,9 +2,9 @@
 
 ## Ziel und Sicherheitsgrenze
 
-`events` beschreibt die dauerhafte Veranstaltung, `event_editions` eine konkrete Austragung. Vergangene Austragungen verschwinden automatisch aus Discovery und Karte, bleiben aber als veröffentlichte historische Jahresseite erhalten. Ergebnisse werden editionsbezogen gespeichert. Der Source Monitor darf neue Jahrgänge und Ergebnislinks erkennen, erzeugt daraus jedoch ausschließlich nicht öffentliche Entwürfe.
+`events` beschreibt die dauerhafte Veranstaltung, `event_editions` eine konkrete Austragung. Vergangene Austragungen verschwinden automatisch aus Discovery und Karte, bleiben aber als veröffentlichte historische Jahresseite erhalten. Ergebnisse werden editionsbezogen gespeichert. Der Source Monitor darf neue Jahrgänge und Ergebnislinks erkennen und erzeugt zunächst nicht öffentliche Entwürfe.
 
-Eine automatische Veröffentlichung ist vorbereitet, aber standardmäßig deaktiviert. `edition_lifecycle_settings.auto_publish_enabled` bleibt `false`, bis ausreichende Produktionsdaten, Parser-Precision und ein expliziter Freigabeprozess vorliegen.
+Seit Migration `20260813_review_inbox_safe_automation.sql` ist eine eng begrenzte automatische Veröffentlichung aktiv. Sie gilt ausschließlich für neue Editionsentwürfe und offizielle Ergebnislinks. Bestehende öffentliche Eventfelder wie Name, Ort, Geodaten, Absage oder Datumsänderung werden weiterhin niemals ungeprüft überschrieben.
 
 ## Zustände
 
@@ -38,18 +38,35 @@ Der Worker extrahiert ausschließlich beobachtbare Signale:
 - sichtbare ISO- und deutsche Datumsformate als schwächeres Signal.
 - offizielle Ergebnis-, Timing- und Urkundenlinks.
 
-Ein Kandidat muss ein späteres Jahr und ein späteres Datum als die letzte bekannte Edition besitzen. Ab `auto_draft_threshold` entsteht idempotent eine Edition mit `publication_status=draft` und `discovery_status=suppressed`. Ein erneuter Crawl aktualisiert denselben Fingerprint statt Duplikate anzulegen.
+Ein Kandidat muss ein späteres Jahr und ein späteres Datum als die letzte etablierte Edition besitzen. Ab `auto_draft_threshold` entsteht idempotent eine Edition mit `publication_status=draft` und `discovery_status=suppressed`. Ein erneuter Crawl bestätigt denselben Fingerprint statt Duplikate anzulegen; der automatisch erzeugte Entwurf wird dabei bewusst nicht als bereits etablierter Jahrgang gewertet. Abweichende Daten für dasselbe Jahr werden als Konflikt markiert.
+
+## Bestätigungsbasierte Auto-Freigabe
+
+Ein neuer Jahrgang wird nur automatisch veröffentlicht, wenn alle Bedingungen erfüllt sind:
+
+- bekannte Quelle vom Typ `official_event_website` oder `official_registration_platform`
+- ausschließlich HTTPS
+- strukturiertes Schema.org-/JSON-LD-Datum
+- mindestens zwei unterschiedliche Crawls
+- standardmäßig mindestens 24 Stunden zwischen Bestätigungen
+- bestätigte Konfidenz von mindestens `0.995`
+- kein abweichender Kandidat für dasselbe Jahr
+- keine offenen Validation-Issues der Stufe `error` oder `critical`
+- aktive Quelle ohne aktuelle Fehlerfolge
+
+Ergebnislinks benötigen ebenfalls zwei zeitversetzte Bestätigungen einer offiziellen HTTPS-Quelle und eine bestätigte Konfidenz von mindestens `0.980`. Alle automatischen Veröffentlichungen setzen `auto_published_at`, speichern einen maschinenlesbaren Grund und laufen durch das Audit-Log. Die zentralen Schalter und Schwellen liegen in `edition_lifecycle_settings`; ein Abschalten erfordert kein neues Deployment.
 
 ## Exception-only Admin-Workflow
 
-`admin_exception_inbox` ist eine `security_invoker`-View und enthält nur:
+`admin_exception_inbox` sammelt die Roh-Ausnahmen. Die darauf aufbauende `admin_review_inbox` ist ebenfalls eine `security_invoker`-View und speist die oben platzierte „Jetzt zu prüfen“-Inbox. Sie bündelt technische Fehler zu genau einem Eintrag pro Quelle und enthält nur:
 
 - neue Jahrgänge und Konflikte,
 - Ergebnislinks im Entwurf,
+- konkrete Feldänderungsvorschläge,
 - kritische Quellenfehler,
 - Validation- und Workflowfehler mit Schweregrad `error` oder `critical`.
 
-Admins können sichere Entwürfe einzeln oder gesammelt über `approve_edition_succession_candidates` beziehungsweise `approve_edition_result_candidates` veröffentlichen. Ablehnungen bleiben nachvollziehbar gespeichert. Die Freigabe prüft erneut Mindestkonfidenz, Datum, Quelle und Draftstatus.
+Routinefälle, die lediglich auf ihre zweite automatische Bestätigung warten, stehen in einer getrennten Ansicht und zählen nicht als aktuelle Entscheidung. Hash-only-Änderungen ohne erkannten Feldunterschied werden als technische Information protokolliert, aber nicht mehr als menschliche Aufgabe geführt. Mehrere Dead-Letter-, Unerreichbarkeits- und Workflow-Meldungen derselben Quelle erscheinen als ein Bündel und werden über `resolve_source_exception_bundle` gemeinsam geschlossen. Admins können verbleibende Entwürfe einzeln oder gesammelt über `approve_edition_succession_candidates` beziehungsweise `approve_edition_result_candidates` veröffentlichen. Ablehnungen bleiben nachvollziehbar gespeichert.
 
 ## Favoriten und Saisonplaner
 
@@ -75,7 +92,7 @@ Der Seitengenerator kombiniert beide Datenquellen, nutzt stabile `edition_slug`-
 - Kandidaten-RPCs sind ausschließlich für `service_role` freigegeben.
 - Sammelfreigaben verlangen `private.is_admin()`.
 - Views laufen mit den Rechten des Aufrufers (`security_invoker`).
-- Kein Source-Monitor-Pfad überschreibt Event-Fakten direkt.
+- Kein Source-Monitor-Pfad überschreibt bestehende Event-Fakten direkt. Die einzigen automatischen öffentlichen Änderungen sind die kontrollierte Veröffentlichung neuer Editionsentwürfe und bestätigter Ergebnislinks.
 
 ## Tests und Deployment
 
@@ -96,8 +113,8 @@ Deployment-Reihenfolge:
 5. Cron-Job, erste Archivierungszahlen und Exception-Inbox kontrollieren.
 6. Erst danach den öffentlichen Archivexport und statische Seiten veröffentlichen.
 
-Neue Secrets sind nicht erforderlich. Der Worker nutzt weiterhin die in `SOURCE_MONITOR.md` dokumentierten Source-Monitor-Secrets; der User-Agent lautet ab Worker 3.0 `SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)`.
+Neue Secrets sind nicht erforderlich. Der Worker nutzt weiterhin die in `SOURCE_MONITOR.md` dokumentierten Source-Monitor-Secrets; der User-Agent lautet ab Worker 3.1 `SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)`.
 
 ## Vorbereitung für die nächste Stufe
 
-Vor einer kontrollierten Auto-Veröffentlichung müssen mindestens Precision/Recall pro Signalquelle, Fehlfreigaben, Zeitabstand zwischen Detection und Bestätigung sowie Domain-spezifische Parserqualität gemessen werden. Auto-Publish darf anschließend nur für mehrfach bestätigte, konfliktfreie Kandidaten mit gültiger offizieller Quelle und sehr hoher Konfidenz aktiviert werden. Fachliche Änderungen bestehender Editionen bleiben weiterhin proposal- oder review-gesteuert.
+Für die nächste Stufe sollen Precision/Recall, Fehlfreigaben, Bestätigungsdauer und Domain-spezifische Parserqualität aus den gesetzten Automationsfeldern gemessen werden. Erst nach ausreichenden Produktionsdaten dürfen weitere Felder wie Anmeldestatus automatisch aktualisiert werden. Fachliche Änderungen bestehender Editionen bleiben bis dahin proposal- oder review-gesteuert.

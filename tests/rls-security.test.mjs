@@ -244,7 +244,7 @@ await test(
     const archive = await restRequest("public_event_archive?select=event_id,edition_id,discovery_status,results&limit=5");
     assert.equal(archive.response.ok, true, JSON.stringify(archive.data));
 
-    const anonymousInbox = await restRequest("admin_exception_inbox?select=item_id&limit=1");
+    const anonymousInbox = await restRequest("admin_review_inbox?select=item_id&limit=1");
     assert.equal(
       anonymousInbox.response.status === 401 ||
       anonymousInbox.response.status === 403 ||
@@ -272,7 +272,7 @@ await test(
     });
     assert.equal(resultInsert.response.ok, false);
 
-    const inbox = await restRequest("admin_exception_inbox?select=item_id&limit=1", { token: userA.token });
+    const inbox = await restRequest("admin_review_inbox?select=item_id&limit=1", { token: userA.token });
     assert.equal(inbox.response.ok, true);
     assert.deepEqual(inbox.data, []);
   }
@@ -1158,7 +1158,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         `source_review_tasks?select=task_type,status,priority&source_id=eq.${encodeURIComponent(source.id)}&status=eq.open`
       );
       assert.equal(reviewTasks.response.ok, true, JSON.stringify(reviewTasks.data));
-      assert.ok(reviewTasks.data.some(row => row.task_type === "content_changed" && row.priority === "high"));
+      assert.ok(reviewTasks.data.some(row => row.task_type === "content_changed" && row.priority === "low"));
 
       const sourceAudit = await serviceRequest(
         `event_audit_log?select=entity_type,entity_id,field_name,change_source&entity_type=eq.source&entity_id=eq.${encodeURIComponent(source.id)}`
@@ -1186,11 +1186,28 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         { token: admin.token }
       );
       assert.deepEqual(publicFactsAfter.data, publicFactsBefore.data, "Crawler changed public event facts.");
+
+      const normalBundleResolution = await restRequest("rpc/resolve_source_exception_bundle", {
+        token: userA.token,
+        method: "POST",
+        body: { p_source_id: source.id, p_notes: "must not be allowed" }
+      });
+      assert.equal(normalBundleResolution.response.ok, false);
+
+      const adminBundleResolution = await restRequest("rpc/resolve_source_exception_bundle", {
+        token: admin.token,
+        method: "POST",
+        body: { p_source_id: source.id, p_notes: "RLS bundle test" }
+      });
+      assert.equal(adminBundleResolution.response.ok, true, JSON.stringify(adminBundleResolution.data));
+      assert.equal(String(adminBundleResolution.data.source_id), String(source.id));
+      assert.ok(Number.isInteger(Number(adminBundleResolution.data.resolved_tasks)));
+      assert.ok(Number.isInteger(Number(adminBundleResolution.data.resolved_alerts)));
     }
   );
 
   await test(
-    "17. Successor detection creates a private draft and only an admin batch can publish it",
+    "17. First successor detection stays private and an admin can publish it before auto-confirmation",
     async () => {
       const sources = await serviceRequest(
         `event_sources?select=id,event_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&limit=1`
@@ -1232,18 +1249,18 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.deepEqual(anonymousDraft.data, []);
 
       const normalInbox = await restRequest(
-        `admin_exception_inbox?select=item_id&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
+        `admin_review_inbox?select=item_id&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
         { token: userA.token }
       );
       assert.equal(normalInbox.response.ok, true);
       assert.deepEqual(normalInbox.data, []);
 
       const adminInbox = await restRequest(
-        `admin_exception_inbox?select=item_id,batch_action&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
+        `admin_review_inbox?select=item_id,batch_action&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
         { token: admin.token }
       );
       assert.equal(adminInbox.response.ok, true, JSON.stringify(adminInbox.data));
-      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["approve_successor"]);
+      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["wait_automation"]);
 
       const approved = await restRequest("rpc/approve_edition_succession_candidates", {
         token: admin.token,

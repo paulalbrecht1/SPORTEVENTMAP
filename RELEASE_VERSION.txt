@@ -1,4 +1,4 @@
 Sport Event Map - Cloudflare beta release
-Version: 20260804-edition-lifecycle-v78
+Version: 20260804-review-inbox-v79
 Built for upload: use the complete dist folder contents
-Includes: 520 active Discovery editions, 994 public archive/detail pages, Edition Lifecycle and succession review, Source Monitor 3.0, separate favorites and Season Planner editions, admin operations styles, sitemap, legal pages, icons, CSS, JavaScript and 25 aligned Supabase migrations
+Includes: 520 active Discovery editions, 994 public archive/detail pages, deduplicated exception-first Review Inbox, confirmation-gated edition and result publication, Source Monitor 3.1, separate favorites and Season Planner editions, admin operations styles, sitemap, legal pages, icons, CSS, JavaScript and 27 aligned Supabase migrations

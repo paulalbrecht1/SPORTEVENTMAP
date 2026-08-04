@@ -1,0 +1,682 @@
+-- Exception-first review inbox and confirmation-gated lifecycle automation.
+-- Public event facts remain review-only. Automation is limited to publishing
+-- successor edition drafts and official result links after repeated evidence.
+
+begin;
+
+alter table public.edition_lifecycle_settings
+  add column if not exists auto_publish_min_confirmations integer not null default 2,
+  add column if not exists auto_result_publish_enabled boolean not null default true,
+  add column if not exists auto_result_publish_threshold numeric(4,3) not null default 0.980,
+  add column if not exists auto_result_min_confirmations integer not null default 2,
+  add column if not exists min_confirmation_interval_hours integer not null default 24;
+
+alter table public.edition_lifecycle_settings
+  drop constraint if exists edition_lifecycle_auto_publish_confirmations_check,
+  add constraint edition_lifecycle_auto_publish_confirmations_check
+    check (auto_publish_min_confirmations between 2 and 10),
+  drop constraint if exists edition_lifecycle_auto_result_threshold_check,
+  add constraint edition_lifecycle_auto_result_threshold_check
+    check (auto_result_publish_threshold between 0.900 and 1),
+  drop constraint if exists edition_lifecycle_auto_result_confirmations_check,
+  add constraint edition_lifecycle_auto_result_confirmations_check
+    check (auto_result_min_confirmations between 2 and 10),
+  drop constraint if exists edition_lifecycle_confirmation_interval_check,
+  add constraint edition_lifecycle_confirmation_interval_check
+    check (min_confirmation_interval_hours between 0 and 168);
+
+-- The user explicitly enabled the conservative automatic path. Existing
+-- candidates start with one confirmation and therefore cannot publish during
+-- this migration.
+update public.edition_lifecycle_settings
+set auto_publish_enabled = true,
+    auto_publish_threshold = greatest(auto_publish_threshold, 0.995),
+    auto_publish_min_confirmations = greatest(auto_publish_min_confirmations, 2),
+    auto_result_publish_enabled = true,
+    auto_result_publish_threshold = greatest(auto_result_publish_threshold, 0.980),
+    auto_result_min_confirmations = greatest(auto_result_min_confirmations, 2),
+    min_confirmation_interval_hours = greatest(min_confirmation_interval_hours, 24),
+    updated_at = now()
+where singleton;
+
+alter table public.edition_succession_candidates
+  add column if not exists confirmation_count integer not null default 1,
+  add column if not exists confirmed_confidence numeric(4,3),
+  add column if not exists last_confirmation_at timestamptz,
+  add column if not exists auto_published_at timestamptz,
+  add column if not exists automation_reason text;
+
+alter table public.edition_succession_candidates
+  drop constraint if exists edition_succession_confirmation_count_check,
+  add constraint edition_succession_confirmation_count_check check (confirmation_count between 1 and 100),
+  drop constraint if exists edition_succession_confirmed_confidence_check,
+  add constraint edition_succession_confirmed_confidence_check
+    check (confirmed_confidence is null or confirmed_confidence between 0 and 1);
+
+update public.edition_succession_candidates
+set confirmed_confidence = confidence,
+    last_confirmation_at = coalesce(last_confirmation_at, last_detected_at, first_detected_at)
+where confirmed_confidence is null or last_confirmation_at is null;
+
+alter table public.edition_succession_candidates
+  alter column confirmed_confidence set not null,
+  alter column confirmed_confidence set default 0.500,
+  alter column last_confirmation_at set default now();
+
+alter table public.edition_results
+  add column if not exists confirmation_count integer not null default 1,
+  add column if not exists confirmed_confidence numeric(4,3),
+  add column if not exists last_confirmation_at timestamptz,
+  add column if not exists auto_published_at timestamptz,
+  add column if not exists automation_reason text;
+
+alter table public.edition_results
+  drop constraint if exists edition_results_confirmation_count_check,
+  add constraint edition_results_confirmation_count_check check (confirmation_count between 1 and 100),
+  drop constraint if exists edition_results_confirmed_confidence_check,
+  add constraint edition_results_confirmed_confidence_check
+    check (confirmed_confidence is null or confirmed_confidence between 0 and 1);
+
+update public.edition_results
+set confirmed_confidence = confidence,
+    last_confirmation_at = coalesce(last_confirmation_at, last_checked_at, created_at)
+where confirmed_confidence is null or last_confirmation_at is null;
+
+alter table public.edition_results
+  alter column confirmed_confidence set not null,
+  alter column confirmed_confidence set default 0.500,
+  alter column last_confirmation_at set default now();
+
+-- Repeated crawls must compare a successor against the latest established
+-- edition, not against the private draft generated by the first detection.
+create or replace function public.register_edition_successor_candidate(
+  p_source_id uuid,
+  p_crawl_result_id bigint,
+  p_candidate jsonb,
+  p_worker_version text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = pg_catalog, public, private
+as $$
+declare
+  source public.event_sources;
+  event_row public.events;
+  predecessor public.event_editions;
+  existing_edition public.event_editions;
+  draft public.event_editions;
+  candidate public.edition_succession_candidates;
+  settings public.edition_lifecycle_settings;
+  candidate_start date;
+  candidate_end date;
+  candidate_year smallint;
+  candidate_confidence numeric(4,3);
+  candidate_registration text;
+  candidate_fingerprint text;
+begin
+  if coalesce((select auth.jwt()->>'role'), '') <> 'service_role' then
+    raise exception 'service role required' using errcode = '42501';
+  end if;
+
+  select * into source from public.event_sources where id = p_source_id;
+  if source.id is null then raise exception 'source not found' using errcode = 'P0002'; end if;
+  select * into event_row from public.events where id = source.event_id;
+  select * into settings from public.edition_lifecycle_settings where singleton;
+  select * into predecessor from public.event_editions
+  where event_id = source.event_id
+    and (publication_status = 'published' or generated_from_candidate_id is null)
+  order by edition_year desc, start_date desc nulls last limit 1;
+
+  begin
+    candidate_start := nullif(p_candidate->>'start_date', '')::date;
+    candidate_end := nullif(p_candidate->>'end_date', '')::date;
+    candidate_year := coalesce(nullif(p_candidate->>'year', '')::smallint, extract(year from candidate_start)::smallint);
+    candidate_confidence := coalesce(nullif(p_candidate->>'confidence', '')::numeric, 0.500);
+  exception when others then
+    raise exception 'invalid successor candidate payload' using errcode = '22023';
+  end;
+
+  if candidate_start is null or candidate_year is null or extract(year from candidate_start)::smallint <> candidate_year then
+    raise exception 'candidate year and start date are required and must match' using errcode = '22023';
+  end if;
+  if candidate_year > extract(year from current_date)::integer + 5 then
+    raise exception 'candidate year is outside the supported horizon' using errcode = '22023';
+  end if;
+  if predecessor.id is not null and candidate_year <= predecessor.edition_year then
+    return jsonb_build_object('accepted', false, 'reason', 'not_a_newer_edition');
+  end if;
+  if predecessor.start_date is not null and candidate_start <= predecessor.start_date then
+    return jsonb_build_object('accepted', false, 'reason', 'date_not_after_predecessor');
+  end if;
+
+  candidate_registration := nullif(p_candidate->>'registration_url', '');
+  if candidate_registration is not null and candidate_registration !~* '^https?://[^[:space:]]+$' then
+    candidate_registration := null;
+  end if;
+  candidate_fingerprint := source.event_id::text || ':' || candidate_year::text || ':' || candidate_start::text;
+
+  insert into public.edition_succession_candidates (
+    event_id, source_id, crawl_result_id, predecessor_edition_id,
+    candidate_year, candidate_start_date, candidate_end_date, candidate_name,
+    registration_url, source_url, confidence, evidence, fingerprint
+  ) values (
+    source.event_id, source.id, p_crawl_result_id, predecessor.id,
+    candidate_year, candidate_start, candidate_end, nullif(p_candidate->>'name', ''),
+    candidate_registration, source.source_url, candidate_confidence,
+    coalesce(p_candidate->'evidence', '{}'::jsonb)
+      || case when p_candidate ? 'evidence_type'
+        then jsonb_build_object('evidence_type', p_candidate->>'evidence_type') else '{}'::jsonb end
+      || jsonb_build_object('worker_version', p_worker_version),
+    candidate_fingerprint
+  )
+  on conflict (fingerprint) do update set
+    crawl_result_id = excluded.crawl_result_id,
+    source_id = excluded.source_id,
+    candidate_end_date = coalesce(excluded.candidate_end_date, edition_succession_candidates.candidate_end_date),
+    candidate_name = coalesce(excluded.candidate_name, edition_succession_candidates.candidate_name),
+    registration_url = coalesce(excluded.registration_url, edition_succession_candidates.registration_url),
+    confidence = greatest(edition_succession_candidates.confidence, excluded.confidence),
+    evidence = edition_succession_candidates.evidence || excluded.evidence,
+    last_detected_at = now(),
+    updated_at = now()
+  returning * into candidate;
+
+  select * into existing_edition from public.event_editions
+  where event_id = source.event_id and edition_year = candidate_year;
+
+  if existing_edition.id is not null then
+    update public.edition_succession_candidates
+    set draft_edition_id = existing_edition.id,
+        candidate_status = case
+          when existing_edition.start_date is distinct from candidate_start then 'conflict'
+          when existing_edition.publication_status = 'published' then 'superseded'
+          else 'draft_created' end
+    where id = candidate.id returning * into candidate;
+  elsif candidate_confidence >= settings.auto_draft_threshold then
+    insert into public.event_editions (
+      event_id, edition_year, edition_slug, legacy_event_key, start_date, end_date,
+      registration_url, registration_status, edition_status, publication_status,
+      race_formats, legacy_distance, source_url, verification_status, data_confidence,
+      needs_review, review_priority, next_check_at, discovery_status,
+      predecessor_edition_id, generated_from_source_id, generated_from_candidate_id,
+      auto_publish_eligible
+    ) values (
+      source.event_id, candidate_year, event_row.slug || '-' || candidate_year::text,
+      lower(btrim(coalesce(event_row.canonical_name, event_row.event_name, '')) || '|' ||
+        to_char(candidate_start, 'DD.MM.YYYY') || '|' || btrim(coalesce(event_row.city, '')) || '|' ||
+        btrim(coalesce(event_row.country, ''))),
+      candidate_start, candidate_end, candidate_registration,
+      case when candidate_registration is null then 'unknown' else 'registration_open' end,
+      'scheduled', 'draft', coalesce(predecessor.race_formats, '[]'::jsonb),
+      predecessor.legacy_distance, source.source_url, 'unverified', candidate_confidence,
+      true, 'high', now() + interval '7 days', 'suppressed', predecessor.id,
+      source.id, candidate.id, candidate_confidence >= settings.batch_approval_threshold
+    ) returning * into draft;
+
+    update public.edition_succession_candidates
+    set draft_edition_id = draft.id, candidate_status = 'draft_created'
+    where id = candidate.id returning * into candidate;
+  end if;
+
+  if candidate.candidate_status <> 'superseded' then
+    insert into public.source_review_tasks (
+      source_id, event_id, edition_id, crawl_result_id, task_type, status,
+      priority, title, description, fingerprint
+    ) values (
+      source.id, source.event_id, candidate.draft_edition_id, p_crawl_result_id,
+      'new_edition_candidate', 'open',
+      case when candidate.confidence >= settings.auto_draft_threshold then 'high' else 'medium' end,
+      'Neue Austragung ' || candidate_year::text || ' erkannt',
+      case when candidate.draft_edition_id is null
+        then 'Ein neuer Jahrgang wurde erkannt und benoetigt eine Zuordnungspruefung.'
+        else 'Ein nicht oeffentlicher Editionsentwurf wurde automatisch erzeugt und kann gesammelt freigegeben werden.' end,
+      'succession:' || candidate.id::text
+    ) on conflict (fingerprint) do update set
+      crawl_result_id = excluded.crawl_result_id,
+      edition_id = excluded.edition_id,
+      priority = excluded.priority,
+      title = excluded.title,
+      description = excluded.description,
+      status = 'open', reviewed_at = null, reviewed_by = null, updated_at = now();
+  end if;
+
+  return jsonb_build_object(
+    'accepted', true,
+    'candidate_id', candidate.id,
+    'status', candidate.candidate_status,
+    'draft_edition_id', candidate.draft_edition_id,
+    'confidence', candidate.confidence,
+    'confirmation_count', candidate.confirmation_count,
+    'confirmed_confidence', candidate.confirmed_confidence
+  );
+end;
+$$;
+
+revoke all on function public.register_edition_successor_candidate(uuid, bigint, jsonb, text)
+  from public, anon, authenticated;
+grant execute on function public.register_edition_successor_candidate(uuid, bigint, jsonb, text)
+  to service_role;
+
+create or replace function private.track_successor_confirmation()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+declare
+  settings public.edition_lifecycle_settings;
+  elapsed_ok boolean := false;
+  next_count integer;
+  base_confidence numeric;
+begin
+  select * into settings from public.edition_lifecycle_settings where singleton;
+  if tg_op = 'INSERT' then
+    new.confirmation_count := greatest(1, coalesce(new.confirmation_count, 1));
+    new.confirmed_confidence := greatest(new.confidence, coalesce(new.confirmed_confidence, 0));
+    new.last_confirmation_at := coalesce(new.last_confirmation_at, now());
+    return new;
+  end if;
+
+  elapsed_ok := new.crawl_result_id is distinct from old.crawl_result_id
+    and now() >= coalesce(old.last_confirmation_at, old.first_detected_at)
+      + make_interval(hours => coalesce(settings.min_confirmation_interval_hours, 24));
+  next_count := old.confirmation_count + case when elapsed_ok then 1 else 0 end;
+  base_confidence := greatest(old.confidence, new.confidence);
+  new.confirmation_count := next_count;
+  new.confirmed_confidence := least(0.999,
+    1 - power(1 - base_confidence, greatest(1, next_count)));
+  new.last_confirmation_at := case when elapsed_ok then now() else old.last_confirmation_at end;
+  new.auto_published_at := old.auto_published_at;
+  new.automation_reason := old.automation_reason;
+  return new;
+end;
+$$;
+
+revoke all on function private.track_successor_confirmation() from public, anon, authenticated;
+
+drop trigger if exists edition_succession_track_confirmation on public.edition_succession_candidates;
+create trigger edition_succession_track_confirmation
+before insert or update of crawl_result_id, confidence
+on public.edition_succession_candidates
+for each row execute function private.track_successor_confirmation();
+
+create or replace function private.track_result_confirmation()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+declare
+  settings public.edition_lifecycle_settings;
+  elapsed_ok boolean := false;
+  next_count integer;
+  base_confidence numeric;
+begin
+  select * into settings from public.edition_lifecycle_settings where singleton;
+  if tg_op = 'INSERT' then
+    new.confirmation_count := greatest(1, coalesce(new.confirmation_count, 1));
+    new.confirmed_confidence := greatest(new.confidence, coalesce(new.confirmed_confidence, 0));
+    new.last_confirmation_at := coalesce(new.last_confirmation_at, now());
+    return new;
+  end if;
+
+  elapsed_ok := new.crawl_result_id is distinct from old.crawl_result_id
+    and now() >= coalesce(old.last_confirmation_at, old.created_at)
+      + make_interval(hours => coalesce(settings.min_confirmation_interval_hours, 24));
+  next_count := old.confirmation_count + case when elapsed_ok then 1 else 0 end;
+  base_confidence := greatest(old.confidence, new.confidence);
+  new.confirmation_count := next_count;
+  new.confirmed_confidence := least(0.999,
+    1 - power(1 - base_confidence, greatest(1, next_count)));
+  new.last_confirmation_at := case when elapsed_ok then now() else old.last_confirmation_at end;
+  new.auto_published_at := old.auto_published_at;
+  new.automation_reason := old.automation_reason;
+  return new;
+end;
+$$;
+
+revoke all on function private.track_result_confirmation() from public, anon, authenticated;
+
+drop trigger if exists edition_results_track_confirmation on public.edition_results;
+create trigger edition_results_track_confirmation
+before insert or update of crawl_result_id, confidence
+on public.edition_results
+for each row execute function private.track_result_confirmation();
+
+create or replace function private.auto_publish_confirmed_successor()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public, private
+as $$
+declare
+  candidate public.edition_succession_candidates;
+  source public.event_sources;
+  settings public.edition_lifecycle_settings;
+begin
+  select * into candidate from public.edition_succession_candidates where id = new.id for update;
+  if candidate.id is null or candidate.candidate_status <> 'draft_created'
+     or candidate.auto_published_at is not null or candidate.draft_edition_id is null then
+    return null;
+  end if;
+  select * into settings from public.edition_lifecycle_settings where singleton;
+  select * into source from public.event_sources where id = candidate.source_id;
+
+  if not settings.auto_publish_enabled
+     or candidate.confirmation_count < settings.auto_publish_min_confirmations
+     or candidate.confirmed_confidence < settings.auto_publish_threshold
+     or coalesce(candidate.evidence->>'evidence_type', candidate.evidence->>'type', '') <> 'json_ld'
+     or source.source_type not in ('official_event_website', 'official_registration_platform')
+     or source.source_url !~* '^https://[^[:space:]]+$'
+     or not source.is_active or source.consecutive_failures <> 0
+     or exists (
+       select 1 from public.edition_succession_candidates conflict
+       where conflict.event_id = candidate.event_id
+         and conflict.candidate_year = candidate.candidate_year
+         and conflict.id <> candidate.id
+         and conflict.candidate_start_date <> candidate.candidate_start_date
+         and conflict.candidate_status in ('detected', 'draft_created', 'conflict')
+     )
+     or exists (
+       select 1 from public.validation_issues issue
+       where issue.event_id = candidate.event_id and issue.status = 'open'
+         and issue.severity in ('error', 'critical')
+     ) then
+    return null;
+  end if;
+
+  perform set_config('app.change_source', 'crawler', true);
+  perform set_config('app.change_reason',
+    'Automatically published after repeated JSON-LD confirmation from an official HTTPS source', true);
+  perform set_config('app.source_url', source.source_url, true);
+
+  update public.event_editions edition
+  set publication_status = 'published',
+      discovery_status = case when coalesce(edition.end_date, edition.start_date) < current_date
+        then 'detail_only' else 'active' end,
+      discovery_archived_at = case when coalesce(edition.end_date, edition.start_date) < current_date
+        then coalesce(edition.discovery_archived_at, now()) else null end,
+      archive_reason = case when coalesce(edition.end_date, edition.start_date) < current_date
+        then 'event_completed' else null end,
+      verification_status = 'verified',
+      data_confidence = greatest(edition.data_confidence, candidate.confirmed_confidence),
+      needs_review = false, review_priority = 'low', last_verified_at = now(),
+      published_at = coalesce(edition.published_at, now()), updated_at = now()
+  where edition.id = candidate.draft_edition_id
+    and edition.event_id = candidate.event_id
+    and edition.publication_status = 'draft'
+    and edition.start_date = candidate.candidate_start_date
+    and edition.source_url = candidate.source_url;
+
+  if found then
+    update public.edition_succession_candidates
+    set candidate_status = 'approved', reviewed_at = now(), reviewed_by = null,
+        auto_published_at = now(),
+        automation_reason = 'official_https_json_ld_reconfirmed',
+        review_notes = 'Automatically published after confirmation gate', updated_at = now()
+    where id = candidate.id;
+    update public.source_review_tasks
+    set status = 'resolved', reviewed_at = now(), reviewed_by = null,
+        review_notes = 'Automatically resolved after confirmation gate', updated_at = now()
+    where fingerprint = 'succession:' || candidate.id::text and status = 'open';
+  end if;
+  return null;
+end;
+$$;
+
+revoke all on function private.auto_publish_confirmed_successor() from public, anon, authenticated;
+
+drop trigger if exists edition_succession_auto_publish on public.edition_succession_candidates;
+create constraint trigger edition_succession_auto_publish
+after insert or update on public.edition_succession_candidates
+deferrable initially deferred
+for each row execute function private.auto_publish_confirmed_successor();
+
+create or replace function private.auto_publish_confirmed_result()
+returns trigger
+language plpgsql
+security definer
+set search_path = pg_catalog, public, private
+as $$
+declare
+  result_row public.edition_results;
+  source public.event_sources;
+  settings public.edition_lifecycle_settings;
+begin
+  select * into result_row from public.edition_results where id = new.id for update;
+  if result_row.id is null or result_row.publication_status <> 'draft'
+     or result_row.result_status <> 'candidate' or result_row.auto_published_at is not null then
+    return null;
+  end if;
+  select * into settings from public.edition_lifecycle_settings where singleton;
+  select * into source from public.event_sources where id = result_row.source_id;
+
+  if not settings.auto_result_publish_enabled
+     or result_row.confirmation_count < settings.auto_result_min_confirmations
+     or result_row.confirmed_confidence < settings.auto_result_publish_threshold
+     or result_row.official_url !~* '^https://[^[:space:]]+$'
+     or source.source_type not in ('official_event_website', 'official_registration_platform')
+     or source.source_url !~* '^https://[^[:space:]]+$'
+     or not source.is_active or source.consecutive_failures <> 0
+     or exists (
+       select 1 from public.validation_issues issue
+       where issue.event_id = result_row.event_id and issue.status = 'open'
+         and issue.severity in ('error', 'critical')
+     ) then
+    return null;
+  end if;
+
+  perform set_config('app.change_source', 'crawler', true);
+  perform set_config('app.change_reason',
+    'Automatically published official result link after repeated confirmation', true);
+  perform set_config('app.source_url', source.source_url, true);
+
+  update public.edition_results
+  set publication_status = 'published', result_status = 'available',
+      published_at = coalesce(published_at, now()), reviewed_at = now(), reviewed_by = null,
+      auto_published_at = now(), automation_reason = 'official_https_result_reconfirmed', updated_at = now()
+  where id = result_row.id and publication_status = 'draft' and result_status = 'candidate';
+
+  if found then
+    update public.event_editions set results_status = 'available', updated_at = now()
+    where id = result_row.edition_id;
+    update public.source_review_tasks
+    set status = 'resolved', reviewed_at = now(), reviewed_by = null,
+        review_notes = 'Official result link automatically confirmed', updated_at = now()
+    where fingerprint = 'result:' || result_row.id::text and status = 'open';
+  end if;
+  return null;
+end;
+$$;
+
+revoke all on function private.auto_publish_confirmed_result() from public, anon, authenticated;
+
+drop trigger if exists edition_results_auto_publish on public.edition_results;
+create constraint trigger edition_results_auto_publish
+after insert or update on public.edition_results
+deferrable initially deferred
+for each row execute function private.auto_publish_confirmed_result();
+
+-- Hash-only observations are useful audit evidence, but they are not concrete
+-- field changes and must not occupy the human review queue.
+create or replace function private.classify_informational_change_proposal()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.rule_code = 'source_content_changed' and new.proposed_changes = '{}'::jsonb then
+    new.proposal_status := 'superseded';
+    new.reviewed_at := coalesce(new.reviewed_at, now());
+    new.review_notes := coalesce(new.review_notes,
+      'Informational hash change; no concrete event field was proposed.');
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.classify_informational_change_proposal() from public, anon, authenticated;
+
+drop trigger if exists event_change_proposals_classify_information on public.event_change_proposals;
+create trigger event_change_proposals_classify_information
+before insert or update of proposed_changes, proposal_status
+on public.event_change_proposals
+for each row execute function private.classify_informational_change_proposal();
+
+update public.event_change_proposals
+set proposal_status = 'superseded', reviewed_at = coalesce(reviewed_at, now()),
+    review_notes = coalesce(review_notes,
+      'Informational hash change; no concrete event field was proposed.'), updated_at = now()
+where proposal_status = 'pending' and rule_code = 'source_content_changed'
+  and proposed_changes = '{}'::jsonb;
+
+update public.source_review_tasks
+set priority = 'low', updated_at = now()
+where status = 'open' and task_type = 'content_changed' and priority <> 'low';
+
+create or replace function private.classify_source_review_priority()
+returns trigger
+language plpgsql
+security invoker
+set search_path = pg_catalog, public
+as $$
+begin
+  if new.task_type = 'content_changed' then
+    new.priority := 'low';
+  end if;
+  return new;
+end;
+$$;
+
+revoke all on function private.classify_source_review_priority() from public, anon, authenticated;
+
+drop trigger if exists source_review_tasks_classify_priority on public.source_review_tasks;
+create trigger source_review_tasks_classify_priority
+before insert or update of task_type, priority
+on public.source_review_tasks
+for each row execute function private.classify_source_review_priority();
+
+create or replace view public.admin_exception_inbox
+with (security_invoker = true)
+as
+select 'new_edition'::text as item_type, candidate.id::text as item_id,
+  candidate.event_id, candidate.draft_edition_id as edition_id,
+  case when candidate.candidate_status = 'conflict' then 'critical'
+       when candidate.confidence >= 0.9 then 'high' else 'medium' end as priority,
+  'Neue Austragung ' || candidate.candidate_year::text as title,
+  case
+    when candidate.candidate_status = 'conflict' then 'Widerspruechliche Angaben muessen entschieden werden.'
+    when candidate.draft_edition_id is null then 'Neue Austragung erkannt; Zuordnung pruefen.'
+    when source.source_type in ('official_event_website', 'official_registration_platform')
+      and candidate.source_url ~* '^https://'
+      and coalesce(candidate.evidence->>'evidence_type', candidate.evidence->>'type', '') = 'json_ld'
+      and candidate.confirmation_count < settings.auto_publish_min_confirmations
+      then 'Sicherer Entwurf wartet auf eine zweite, zeitversetzte Quellenbestaetigung.'
+    else 'Nicht oeffentlicher Entwurf ist bereit fuer die Freigabe.' end as description,
+  candidate.confirmed_confidence as confidence, candidate.candidate_status as status,
+  candidate.first_detected_at as created_at,
+  case
+    when candidate.candidate_status = 'conflict' then 'review'
+    when candidate.candidate_status = 'draft_created'
+      and settings.auto_publish_enabled
+      and source.source_type in ('official_event_website', 'official_registration_platform')
+      and candidate.source_url ~* '^https://'
+      and coalesce(candidate.evidence->>'evidence_type', candidate.evidence->>'type', '') = 'json_ld'
+      and candidate.confirmation_count < settings.auto_publish_min_confirmations
+      then 'wait_automation'
+    when candidate.candidate_status = 'draft_created' then 'approve_successor'
+    else 'review' end as batch_action,
+  jsonb_build_object(
+    'source_id', candidate.source_id, 'candidate_year', candidate.candidate_year,
+    'old_values', jsonb_build_object('start_date', predecessor.start_date, 'edition_year', predecessor.edition_year),
+    'new_values', jsonb_build_object('start_date', candidate.candidate_start_date,
+      'end_date', candidate.candidate_end_date, 'registration_url', candidate.registration_url),
+    'source_url', candidate.source_url, 'source_type', source.source_type,
+    'evidence_type', coalesce(candidate.evidence->>'evidence_type', candidate.evidence->>'type'),
+    'confirmations', candidate.confirmation_count,
+    'required_confirmations', settings.auto_publish_min_confirmations,
+    'confirmed_confidence', candidate.confirmed_confidence
+  ) as metadata
+from public.edition_succession_candidates candidate
+join public.event_sources source on source.id = candidate.source_id
+cross join public.edition_lifecycle_settings settings
+left join public.event_editions predecessor on predecessor.id = candidate.predecessor_edition_id
+where candidate.candidate_status in ('detected', 'draft_created', 'conflict')
+union all
+select 'result'::text, result.id::text, result.event_id, result.edition_id,
+  case when result.confirmed_confidence >= 0.9 then 'high' else 'medium' end,
+  coalesce(result.title, 'Ergebnisse erkannt'),
+  case when settings.auto_result_publish_enabled
+      and source.source_type in ('official_event_website', 'official_registration_platform')
+      and source.source_url ~* '^https://'
+      and result.confirmation_count < settings.auto_result_min_confirmations
+    then 'Ergebnislink wartet auf eine zweite, zeitversetzte Quellenbestaetigung.'
+    else 'Offizieller Ergebnislink wartet auf Freigabe.' end,
+  result.confirmed_confidence, result.result_status, result.created_at,
+  case when settings.auto_result_publish_enabled
+      and source.source_type in ('official_event_website', 'official_registration_platform')
+      and source.source_url ~* '^https://'
+      and result.confirmation_count < settings.auto_result_min_confirmations
+    then 'wait_automation' else 'approve_result' end,
+  jsonb_build_object(
+    'source_id', result.source_id,
+    'old_values', jsonb_build_object('results_status', 'expected'),
+    'new_values', jsonb_build_object('results_status', 'available', 'official_url', result.official_url),
+    'url', result.official_url, 'source_url', source.source_url, 'source_type', source.source_type,
+    'confirmations', result.confirmation_count,
+    'required_confirmations', settings.auto_result_min_confirmations,
+    'confirmed_confidence', result.confirmed_confidence
+  )
+from public.edition_results result
+join public.event_sources source on source.id = result.source_id
+cross join public.edition_lifecycle_settings settings
+where result.publication_status = 'draft' and result.result_status = 'candidate'
+union all
+select 'proposal'::text, proposal.id::text, proposal.event_id, proposal.edition_id,
+  case when proposal.confidence >= 0.9 then 'high' else 'medium' end,
+  'Konkrete Datenaenderung: ' || proposal.rule_code,
+  coalesce(proposal.reason, 'Ein konkreter Feldwert wartet auf Entscheidung.'),
+  proposal.confidence, proposal.proposal_status, proposal.detected_at, 'approve_proposal',
+  jsonb_build_object(
+    'source_id', proposal.source_id, 'source_url', proposal.source_url,
+    'old_values', proposal.baseline_values, 'new_values', proposal.proposed_changes,
+    'observed_values', proposal.observed_values, 'rule_code', proposal.rule_code
+  )
+from public.event_change_proposals proposal
+where proposal.proposal_status = 'pending' and proposal.proposed_changes <> '{}'::jsonb
+union all
+select 'source'::text, task.id::text, task.event_id, task.edition_id,
+  task.priority, task.title, task.description, null::numeric, task.status,
+  task.created_at, 'review', jsonb_build_object('source_id', task.source_id, 'task_type', task.task_type)
+from public.source_review_tasks task
+where task.status = 'open'
+  and task.task_type not in ('new_edition_candidate', 'results_available', 'content_changed')
+  and task.priority in ('high', 'critical')
+union all
+select 'validation'::text, issue.id::text, issue.event_id, issue.edition_id,
+  case issue.severity when 'critical' then 'critical' else 'high' end,
+  issue.rule_code, issue.description, null::numeric, issue.status,
+  issue.created_at, 'review', jsonb_build_object('severity', issue.severity)
+from public.validation_issues issue
+where issue.status = 'open' and issue.severity in ('error', 'critical')
+union all
+select 'workflow'::text, alert.id::text, alert.event_id, alert.edition_id,
+  case alert.severity when 'critical' then 'critical' else 'high' end,
+  alert.title, alert.description, null::numeric, alert.alert_status,
+  alert.created_at, 'review', alert.metadata
+from public.data_workflow_alerts alert
+where alert.alert_status = 'open' and alert.severity in ('error', 'critical');
+
+revoke all on public.admin_exception_inbox from public, anon, authenticated;
+grant select on public.admin_exception_inbox to authenticated;
+
+comment on view public.admin_exception_inbox is
+  'Unified exception-only admin queue with field diffs, automation waiting states and critical workflow items.';
+comment on column public.edition_succession_candidates.confirmed_confidence is
+  'Conservative score raised only by time-separated crawl confirmations; never used for existing event-field overwrites.';
+comment on column public.edition_results.confirmed_confidence is
+  'Confirmation-gated score used only for publishing official edition result links.';
+
+commit;

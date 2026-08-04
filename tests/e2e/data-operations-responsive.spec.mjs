@@ -15,6 +15,8 @@ test("Data Operations stays usable across themes and required viewports", async 
   await prepareApp(page, {
     openDiscoveryPanel: false
   });
+  await page.waitForSelector("#sourceMonitorSection", { state: "attached" });
+  await page.waitForSelector("#editionLifecycleInbox", { state: "attached" });
 
   for (const theme of ["light", "dark"]) {
     for (const viewport of viewports) {
@@ -37,6 +39,9 @@ test("Data Operations stays usable across themes and required viewports", async 
         dataOperations.classList.add("active");
         dataOperations.hidden = false;
 
+        const sourceDetails = document.getElementById("sourceMonitorSection");
+        sourceDetails.open = true;
+
         const sourceBody = document.getElementById("sourceMonitorTableBody");
         sourceBody.innerHTML = `<tr>
           <td data-label="Event / Austragung"><strong>Test Marathon</strong><span>2026</span></td>
@@ -46,12 +51,23 @@ test("Data Operations stays usable across themes and required viewports", async 
           <td data-label="Review"><span>kein offenes Review</span></td>
           <td data-label="Aktionen"><div class="source-monitor-actions"><button type="button">Jetzt pruefen</button><a href="https://example.com">Quelle oeffnen</a></div></td>
         </tr>`;
+
+        const reviewList = document.getElementById("editionLifecycleList");
+        reviewList.innerHTML = `<article class="edition-lifecycle-card is-high">
+          <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-high">Neuer Jahrgang</span></div><h6>Neue Austragung 2027</h6><p><strong>Test Marathon</strong> · Offizieller Entwurf wartet auf Entscheidung.</p><div class="admin-review-diff"><div><span>start date</span><del>12.09.2026</del><strong>11.09.2027</strong></div></div></div>
+          <dl><div><dt>Status</dt><dd>draft_created</dd></div><div><dt>Konfidenz</dt><dd>99,5%</dd></div></dl>
+          <div class="source-monitor-actions"><button type="button">Freigeben</button><a href="https://example.com">Quelle oeffnen</a></div>
+        </article>`;
       }, theme);
 
       await expect(page.locator("#adminDataOperationsPanel")).toBeVisible();
-      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(6);
+      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(7);
       await expect(page.locator("#adminDataOperationsPanel input[type=\"date\"]")).toHaveCount(2);
       await expect(page.locator("#runDataValidationBtn")).toBeVisible();
+      await expect(page.locator("#editionLifecycleInbox")).toBeVisible();
+      await expect(page.locator("#editionLifecycleInbox .edition-lifecycle-kpis > div")).toHaveCount(4);
+      await expect(page.locator("#editionLifecycleList .edition-lifecycle-card")).toBeVisible();
+      await expect(page.locator("#dataOpsInventoryDetails")).toBeVisible();
       await expect(page.locator("#sourceMonitorSection")).toBeVisible();
       await expect(page.locator("#sourceMonitorSection .source-monitor-kpis > div")).toHaveCount(10);
       await expect(page.locator("#sourceMonitorTableBody tr")).toHaveCount(1);

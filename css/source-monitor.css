@@ -37,6 +37,44 @@ body[data-theme="light"] #adminModal .source-monitor-table th, body[data-theme="
 body[data-theme="light"] #adminModal .source-monitor-actions button, body[data-theme="light"] #adminModal .source-monitor-actions a, body[data-theme="light"] #adminModal .source-monitor-history button { background: #f5f7fa; color: #172033; }
 body[data-theme="light"] #adminModal .edition-lifecycle-inbox, body[data-theme="light"] #adminModal .edition-lifecycle-card { border-color: #cbd5e1; background: #fff; color: #172033; }
 body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-color: #cbd5e1; background: #fff; color: #172033; }
+
+#adminModal .admin-review-inbox { order: -1; margin: 4px 0 18px; padding: 18px; border: 2px solid rgba(16, 185, 129, .42); background: linear-gradient(145deg, rgba(6, 78, 59, .25), rgba(15, 23, 42, .34)); }
+#adminModal .admin-review-inbox-heading h4 { margin: 3px 0 5px; font-size: 1.15rem; }
+#adminModal .admin-review-inbox-toolbar { align-items: end; }
+#adminModal .admin-review-inbox-toolbar label { display: grid; gap: 5px; min-width: 210px; color: var(--text-muted, #aeb8c7); font-size: .7rem; }
+#adminModal .admin-review-inbox-toolbar select { min-height: 38px; padding: 7px 30px 7px 10px; border: 1px solid rgba(148, 163, 184, .35); border-radius: 8px; background: #0f172a; color: #f8fafc; }
+#adminModal .admin-review-card-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+#adminModal .admin-review-automation-badge { display: inline-flex; padding: 4px 8px; border: 1px solid rgba(56, 189, 248, .35); border-radius: 999px; background: rgba(14, 116, 144, .22); color: #bae6fd; font-size: .65rem; font-weight: 700; }
+#adminModal .admin-review-diff { display: grid; gap: 5px; margin-top: 10px; }
+#adminModal .admin-review-diff > div { display: grid; grid-template-columns: minmax(110px, .55fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; padding: 7px 8px; border-radius: 7px; background: rgba(15, 23, 42, .55); }
+#adminModal .admin-review-diff span { color: var(--text-muted, #aeb8c7); font-size: .66rem; text-transform: capitalize; }
+#adminModal .admin-review-diff del { color: #fca5a5; font-size: .72rem; overflow-wrap: anywhere; }
+#adminModal .admin-review-diff strong { color: #86efac; font-size: .72rem; overflow-wrap: anywhere; }
+#adminModal .admin-review-inbox-empty { padding: 24px 16px; border: 1px dashed rgba(52, 211, 153, .38); border-radius: 10px; text-align: center; }
+#adminModal .admin-review-inbox-empty strong { display: block; margin-bottom: 5px; color: #86efac; }
+#adminModal .admin-review-inbox-empty p { margin: 0; color: var(--text-muted, #aeb8c7); }
+
+#adminModal .admin-secondary-details { min-width: 0; margin: 12px 0; padding: 0; overflow: clip; border: 1px solid rgba(148, 163, 184, .24); border-radius: 12px; background: rgba(15, 23, 42, .28); }
+#adminModal .admin-secondary-details > summary { display: flex; justify-content: space-between; gap: 14px; align-items: center; min-height: 54px; padding: 12px 15px; cursor: pointer; list-style: none; }
+#adminModal .admin-secondary-details > summary::-webkit-details-marker { display: none; }
+#adminModal .admin-secondary-details > summary::after { content: "▾"; flex: 0 0 auto; color: var(--text-muted, #aeb8c7); transition: transform .18s ease; }
+#adminModal .admin-secondary-details[open] > summary::after { transform: rotate(180deg); }
+#adminModal .admin-secondary-details > summary > span:first-child { display: grid; gap: 2px; min-width: 0; }
+#adminModal .admin-secondary-details > summary strong { font-size: .86rem; }
+#adminModal .admin-secondary-details > summary small { color: var(--text-muted, #aeb8c7); font-size: .69rem; }
+#adminModal .admin-secondary-details > summary > span:last-of-type { margin-left: auto; color: var(--text-muted, #aeb8c7); font-size: .72rem; white-space: nowrap; }
+#adminModal .admin-secondary-details-body { padding: 4px 14px 16px; border-top: 1px solid rgba(148, 163, 184, .18); }
+#adminModal .source-monitor-section { padding: 0; }
+#adminModal .source-monitor-content { padding-top: 14px; }
+
+body[data-theme="light"] #adminModal .admin-review-inbox { border-color: #86cfae; background: linear-gradient(145deg, #f0fdf4, #fff); }
+body[data-theme="light"] #adminModal .admin-review-inbox-toolbar select { border-color: #cbd5e1; background: #fff; color: #172033; }
+body[data-theme="light"] #adminModal .admin-review-automation-badge { border-color: #7dd3fc; background: #e0f2fe; color: #075985; }
+body[data-theme="light"] #adminModal .admin-review-diff > div { background: #f8fafc; }
+body[data-theme="light"] #adminModal .admin-review-diff del { color: #b91c1c; }
+body[data-theme="light"] #adminModal .admin-review-diff strong { color: #166534; }
+body[data-theme="light"] #adminModal .admin-secondary-details { border-color: #d5dce6; background: #f8fafc; }
+body[data-theme="light"] #adminModal .admin-secondary-details-body { border-color: #e2e8f0; }
 @media (max-width: 1000px) { #adminModal .source-monitor-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 760px) {
   #adminModal .source-monitor-section { padding: 12px; }
@@ -53,5 +91,11 @@ body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-colo
   #adminModal .edition-lifecycle-card { grid-template-columns: minmax(0, 1fr); padding-top: 38px; }
   #adminModal .edition-lifecycle-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   #adminModal .edition-lifecycle-toolbar button { flex: 1 1 100%; }
+  #adminModal .admin-review-inbox { padding: 13px; }
+  #adminModal .admin-review-inbox-toolbar label { width: 100%; min-width: 0; }
+  #adminModal .admin-review-diff > div { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  #adminModal .admin-secondary-details > summary { align-items: flex-start; }
+  #adminModal .admin-secondary-details > summary > span:last-of-type { display: none; }
+  #adminModal .admin-secondary-details-body { padding: 4px 10px 12px; }
   body[data-theme="light"] #adminModal .source-monitor-table tr { background: #fff; border-color: #ccd5e2; }
 }

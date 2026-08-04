@@ -34,7 +34,7 @@ function runSupabase(args) {
   if (result.status !== 0) {
     throw new Error(
       `supabase ${args.join(" ")} failed:\n${
-        result.error?.stack || result.stderr || result.stdout || "unknown error"
+        result.error?.stack || [result.stderr, result.stdout].filter(Boolean).join("\n") || "unknown error"
       }`
     );
   }
@@ -219,6 +219,159 @@ runSupabase([
   $lifecycle$;`
 ]);
 console.log("Edition lifecycle archival and public history assertions passed.");
+
+const automationFixture = `[AUTO CONFIRM TEST] ${runId}`;
+runSupabase([
+  "db",
+  "query",
+  "--local",
+  `do $automation$
+  declare
+    fixture_event_id bigint;
+    fixture_edition_id uuid;
+    fixture_source_id uuid;
+    job_one uuid;
+    job_two uuid;
+    job_three uuid;
+    job_four uuid;
+    crawl_one bigint;
+    crawl_two bigint;
+    crawl_three bigint;
+    crawl_four bigint;
+  begin
+    perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
+    update public.edition_lifecycle_settings
+    set auto_publish_enabled = true,
+        auto_result_publish_enabled = true,
+        min_confirmation_interval_hours = 0,
+        auto_publish_threshold = 0.995,
+        auto_result_publish_threshold = 0.980
+    where singleton;
+
+    insert into public.events (
+      event_name, sport, date, city, country, event_url, status,
+      publication_status, event_status, verification_status
+    ) values (
+      '${automationFixture}', 'Running', '01.01.2026', 'Berlin', 'Germany',
+      'https://example.com/auto-confirm-${runId}', 'approved',
+      'published', 'active', 'verified'
+    ) returning id into fixture_event_id;
+
+    select id into fixture_edition_id from public.event_editions
+    where event_id = fixture_event_id order by edition_year limit 1;
+    update public.event_editions
+    set edition_year = 2026, start_date = date '2026-01-01', end_date = date '2026-01-01',
+        publication_status = 'published', discovery_status = 'detail_only', edition_status = 'completed'
+    where id = fixture_edition_id;
+
+    insert into public.event_sources (
+      event_id, source_type, source_url, parser_type, is_active, crawl_status,
+      consecutive_failures
+    ) values (
+      fixture_event_id, 'official_event_website',
+      'https://example.com/auto-confirm-${runId}', 'json_ld', true, 'success', 0
+    ) returning id into fixture_source_id;
+
+    insert into public.source_crawl_jobs (source_id, event_id, status, idempotency_key, trigger_source)
+    values (fixture_source_id, fixture_event_id, 'completed', 'auto-1-${runId}', 'test') returning id into job_one;
+    insert into public.source_crawl_results (
+      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      change_status, worker_version, processing_status
+    ) values (job_one, fixture_source_id, fixture_event_id, 1, 200,
+      'https://example.com/auto-confirm-${runId}', 'changed', 'test', 'completed') returning id into crawl_one;
+
+    insert into public.source_crawl_jobs (source_id, event_id, status, idempotency_key, trigger_source)
+    values (fixture_source_id, fixture_event_id, 'completed', 'auto-2-${runId}', 'test') returning id into job_two;
+    insert into public.source_crawl_results (
+      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      change_status, worker_version, processing_status
+    ) values (job_two, fixture_source_id, fixture_event_id, 1, 200,
+      'https://example.com/auto-confirm-${runId}', 'unchanged', 'test', 'completed') returning id into crawl_two;
+
+    perform public.register_edition_successor_candidate(
+      fixture_source_id, crawl_one,
+      jsonb_build_object('year', 2027, 'start_date', '2027-09-12', 'end_date', '2027-09-12',
+        'name', '${automationFixture} 2027', 'confidence', 0.97,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')),
+      'safe-automation-test'
+    );
+    perform public.register_edition_successor_candidate(
+      fixture_source_id, crawl_two,
+      jsonb_build_object('year', 2027, 'start_date', '2027-09-12', 'end_date', '2027-09-12',
+        'name', '${automationFixture} 2027', 'confidence', 0.97,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')),
+      'safe-automation-test'
+    );
+
+    insert into public.source_crawl_jobs (source_id, event_id, status, idempotency_key, trigger_source)
+    values (fixture_source_id, fixture_event_id, 'completed', 'auto-3-${runId}', 'test') returning id into job_three;
+    insert into public.source_crawl_results (
+      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      change_status, worker_version, processing_status
+    ) values (job_three, fixture_source_id, fixture_event_id, 1, 200,
+      'https://example.com/auto-confirm-${runId}', 'changed', 'test', 'completed') returning id into crawl_three;
+
+    insert into public.source_crawl_jobs (source_id, event_id, status, idempotency_key, trigger_source)
+    values (fixture_source_id, fixture_event_id, 'completed', 'auto-4-${runId}', 'test') returning id into job_four;
+    insert into public.source_crawl_results (
+      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      change_status, worker_version, processing_status
+    ) values (job_four, fixture_source_id, fixture_event_id, 1, 200,
+      'https://example.com/auto-confirm-${runId}', 'unchanged', 'test', 'completed') returning id into crawl_four;
+
+    perform public.register_edition_result_candidate(
+      fixture_source_id, crawl_three,
+      'https://results.example.com/${runId}/2026', 'Offizielle Ergebnisse 2026', 0.88
+    );
+    perform public.register_edition_result_candidate(
+      fixture_source_id, crawl_four,
+      'https://results.example.com/${runId}/2026', 'Offizielle Ergebnisse 2026', 0.88
+    );
+  end
+  $automation$;`
+]);
+
+const [automationState] = queryLocal(`
+  select
+    exists (
+      select 1 from public.event_editions edition
+      join public.events event on event.id = edition.event_id
+      where event.event_name = '${automationFixture}' and edition.edition_year = 2027
+        and edition.publication_status = 'published' and edition.discovery_status = 'active'
+    ) as successor_auto_published,
+    exists (
+      select 1 from public.edition_succession_candidates candidate
+      join public.events event on event.id = candidate.event_id
+      where event.event_name = '${automationFixture}' and candidate.confirmation_count = 2
+        and candidate.confirmed_confidence >= 0.995 and candidate.auto_published_at is not null
+    ) as successor_confirmed,
+    exists (
+      select 1 from public.edition_results result
+      join public.events event on event.id = result.event_id
+      where event.event_name = '${automationFixture}' and result.confirmation_count = 2
+        and result.confirmed_confidence >= 0.980 and result.publication_status = 'published'
+        and result.auto_published_at is not null
+    ) as result_auto_published,
+    not exists (
+      select 1 from public.admin_review_inbox inbox
+      join public.events event on event.id = inbox.event_id
+      where event.event_name = '${automationFixture}'
+    ) as inbox_cleared
+`);
+assert.deepEqual(automationState, {
+  successor_auto_published: true,
+  successor_confirmed: true,
+  result_auto_published: true,
+  inbox_cleared: true
+});
+runSupabase([
+  "db", "query", "--local",
+  `do $cleanup$ begin
+     delete from public.events where event_name = '${automationFixture}';
+     update public.edition_lifecycle_settings set min_confirmation_interval_hours = 24 where singleton;
+   end $cleanup$;`
+]);
+console.log("Confirmation-gated successor and result auto-publication assertions passed.");
 
 const password = `Local-RLS-${runId}-Aa1!`;
 const users = [];

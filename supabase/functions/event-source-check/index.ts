@@ -10,9 +10,9 @@ import {
 import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-3.0.0";
+const WORKER_VERSION = "source-monitor-3.1.0";
 const DEFAULT_BATCH_SIZE = 5;
-const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)";
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -299,7 +299,12 @@ async function recordLifecycleSignals(
       p_candidate: {
         ...successor,
         final_url: fetched.finalUrl,
-        crawl_result_id: crawlResultId
+        crawl_result_id: crawlResultId,
+        evidence: {
+          evidence_type: successor.evidence_type || "unknown",
+          final_url: fetched.finalUrl,
+          crawl_result_id: crawlResultId
+        }
       },
       p_worker_version: WORKER_VERSION
     });

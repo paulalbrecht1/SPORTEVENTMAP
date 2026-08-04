@@ -2,9 +2,9 @@
 
 ## Zweck und Sicherheitsgrenze
 
-Der Source Monitor prueft bestehende offizielle Event- und Registrierungsseiten serverseitig. Er speichert technische Abrufdaten, vergleicht normalisierte Content-Hashes und erzeugt Review-Aufgaben. Er uebernimmt keine Eventdaten aus Seiteninhalten und aendert keine oeffentlichen Event-Fakten wie Name, Datum, Ort, Distanz, Beschreibung oder Anmeldelink.
+Der Source Monitor prueft bestehende offizielle Event- und Registrierungsseiten serverseitig. Er speichert technische Abrufdaten, vergleicht normalisierte Content-Hashes und erzeugt Review-Aufgaben. Er überschreibt keine bestehenden öffentlichen Event-Fakten wie Name, Datum, Ort, Distanz, Beschreibung oder Anmeldelink. Als eng begrenzte Ausnahme darf die Lifecycle-Schicht einen neuen Jahrgang oder offiziellen Ergebnislink nach mehrfacher sicherer Bestätigung veröffentlichen.
 
-Zulaessige automatische Aenderungen sind auf technische Quellenfelder, Queue-Status, `needs_review`, technische Verifizierungsstatus, Validierungsprobleme, Review-Aufgaben, Workflow-Alerts und Audit-Eintraege begrenzt. Ein einzelner `404` oder ein anderer Abruffehler loescht oder archiviert niemals ein Event.
+Zulässige automatische Änderungen umfassen technische Quellenfelder, Queue-Status, `needs_review`, technische Verifizierungsstatus, Validierungsprobleme, Review-Aufgaben, Workflow-Alerts, Audit-Einträge sowie die in `EDITION_LIFECYCLE.md` definierten bestätigten neuen Editionen und Ergebnislinks. Ein einzelner `404` oder ein anderer Abruffehler löscht oder archiviert niemals ein Event.
 
 ## Architektur
 
@@ -154,7 +154,7 @@ Standardwerte pro Domain:
 - `robots.txt` beachten und 24 Stunden cachen
 - ETag und Last-Modified fuer Conditional Requests nutzen
 - `Retry-After` beachten
-- klarer User-Agent `SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)`
+- klarer User-Agent `SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)`
 
 Die globale Parallelitaet liegt standardmaessig bei 5. Claims enthalten nie zwei laufende Jobs derselben Domain. Robots-Abrufe verwenden ein separates Limit von 250 KB.
 
@@ -168,7 +168,9 @@ Die globale Parallelitaet liegt standardmaessig bei 5. Claims enthalten nie zwei
 
 ## Admin-Dashboard
 
-Der Bereich "Source Monitor" liegt in "Event Data Operations" und zeigt:
+Der Admin-Bereich beginnt mit der „Review Inbox / Jetzt zu prüfen“. Sie zeigt ausschließlich konkrete Entscheidungen, Konflikte und kritische Fehler. Routinefälle, die auf eine zweite Quellenbestätigung warten, besitzen eine getrennte Ansicht. Der vollständige Eventbestand und der technische Bereich „Source Monitor & Systemstatus“ sind standardmäßig eingeklappt.
+
+Der technische Bereich liegt weiterhin in "Event Data Operations" und zeigt:
 
 - heute gepruefte, unveraenderte, veraenderte und nicht erreichbare Quellen
 - fehlgeschlagene Crawls, geplante Retries und Dead-Letter-Jobs
@@ -185,7 +187,7 @@ Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` 
 Optionale Worker-Konfiguration:
 
 ```text
-SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)
+SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)
 SOURCE_MONITOR_ALLOW_HTTP=false
 SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 SOURCE_MONITOR_SMOKE_SECRET=<mindestens 256 Bit>
@@ -220,7 +222,7 @@ Vor dem Deployment CLI-Befehle immer mit `--help` gegen die installierte Version
 ```bash
 supabase db push
 supabase functions deploy event-source-check --use-api
-supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.0 (+mailto:kontakt@sporteventmap.com)"
+supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)"
 supabase secrets set SOURCE_MONITOR_ALLOW_HTTP=false SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 supabase secrets set SOURCE_MONITOR_SMOKE_SECRET="<zufaelliges Secret mit mindestens 256 Bit>"
 ```
@@ -306,4 +308,4 @@ serverseitig gesetzte `SOURCE_MONITOR_SMOKE_SECRET`.
 
 ## Edition Lifecycle
 
-Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Monitor extrahiert nun Jahrgangs- und Ergebnis-Signale, erstellt daraus aber ausschließlich review-gesteuerte Kandidaten und nicht öffentliche Editionsentwürfe. Bestehende öffentliche Eventdaten werden weiterhin nicht automatisch überschrieben.
+Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Monitor extrahiert Jahrgangs- und Ergebnis-Signale und erstellt zunächst nicht öffentliche Editionsentwürfe. Wiederholt bestätigte, konfliktfreie Signale aus offiziellen HTTPS-Quellen dürfen neue Editionen und Ergebnislinks kontrolliert veröffentlichen. Bestehende öffentliche Eventfelder werden weiterhin nicht automatisch überschrieben.

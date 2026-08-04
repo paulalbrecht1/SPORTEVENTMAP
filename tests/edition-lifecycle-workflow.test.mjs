@@ -6,6 +6,8 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
 const migration = read("supabase/migrations/20260810_edition_lifecycle_succession_engine.sql");
+const automationMigration = read("supabase/migrations/20260813_review_inbox_safe_automation.sql");
+const inboxMigration = read("supabase/migrations/20260814_review_inbox_deduplication.sql");
 const worker = read("supabase/functions/event-source-check/index.ts");
 const core = read("supabase/functions/_shared/source-monitor-core.mjs");
 const admin = read("js/supabase.js");
@@ -33,10 +35,34 @@ for (const fragment of [
 assert.ok(core.includes("extractLifecycleSignals"));
 assert.ok(worker.includes("register_edition_successor_candidate"));
 assert.ok(worker.includes("register_edition_result_candidate"));
+assert.ok(worker.includes("evidence_type: successor.evidence_type"));
 assert.doesNotMatch(worker, /\.from\(["']event_editions["']\)\.update/);
-assert.ok(admin.includes("admin_exception_inbox"));
+assert.ok(admin.includes("admin_review_inbox"));
 assert.ok(admin.includes("approve_edition_succession_candidates"));
 assert.ok(admin.includes("approve_edition_result_candidates"));
+assert.ok(admin.includes("Jetzt zu pruefen"));
+assert.ok(admin.includes("wait_automation"));
+assert.ok(admin.includes("renderReviewInboxDiff"));
+for (const fragment of [
+  "auto_publish_min_confirmations",
+  "auto_result_publish_enabled",
+  "min_confirmation_interval_hours",
+  "private.track_successor_confirmation",
+  "private.auto_publish_confirmed_successor",
+  "private.auto_publish_confirmed_result",
+  "confirmed_confidence",
+  "wait_automation",
+  "proposal.proposed_changes <> '{}'::jsonb",
+  "with (security_invoker = true)"
+]) assert.ok(automationMigration.includes(fragment), `Safe automation migration missing ${fragment}`);
+for (const fragment of [
+  "create or replace view public.admin_review_inbox",
+  "with (security_invoker = true)",
+  "distinct on (task.source_id)",
+  "create or replace function public.resolve_source_exception_bundle",
+  "security invoker",
+  "private.is_admin()"
+]) assert.ok(inboxMigration.includes(fragment), `Review inbox migration missing ${fragment}`);
 assert.ok(details.includes('.from("season_planner_events")'));
 assert.doesNotMatch(details, /const tables\s*=\s*\[\s*["']favorites/);
 assert.ok(exporter.includes("public_event_archive"));

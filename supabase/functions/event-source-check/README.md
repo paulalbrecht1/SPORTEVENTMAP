@@ -11,7 +11,7 @@ Queue-backed, server-only Source Monitor worker.
 - Records only technical per-domain aggregates used for respectful rate tuning.
 - Commits result, source state, retry/dead-letter state and review metadata in the existing database transaction.
 - Enriches that result idempotently with semantic hash, pinned IP evidence and domain telemetry.
-- Never writes parsed values or public event facts.
+- Passes only successor dates and official result links to review-gated RPCs. Existing public event facts are never overwritten; a new edition or result link can publish only after the database confirmation gate succeeds.
 
 Runtime variables are documented in `docs/SOURCE_MONITOR.md`.
 

@@ -1,9 +1,9 @@
 # Event source check
 
-> Stage-4 preparation: Worker `source-monitor-4.0.0-preparation` records every
-> technical and field-level policy decision in simulation mode. Global dry-run
-> prevents automatic content changes; discovery, geocoding and country pilots
-> remain paused until an explicit rollout decision.
+> German Phase-A observation: Worker `source-monitor-4.1.0-phase-a-shadow`
+> records technical and field-level Shadow evidence only for explicitly bound
+> German pilot sources. Global dry-run prevents automatic content changes;
+> observation, scheduler, geocoding and AT/CH pilots ship disabled.
 
 Queue-backed, server-only Source Monitor worker.
 
@@ -21,6 +21,7 @@ deterministische Stufe-3-Extraktion aus. Feldwerte werden normalisiert und als
 - Records only technical per-domain aggregates used for respectful rate tuning.
 - Commits result, source state, retry/dead-letter state and review metadata in the existing database transaction.
 - Enriches that result idempotently with semantic hash, pinned IP evidence and domain telemetry.
+- Calls `record_stage_four_shadow_observations` after result processing. The call is contained, service-role-only and becomes a no-op unless the source is a bound DE pilot and the server-side observation gate is enabled.
 - Passes only successor dates and official result links to review-gated RPCs. Existing public event facts are never overwritten; a new edition or result link can publish only after the database confirmation gate succeeds.
 
 Runtime variables are documented in `docs/SOURCE_MONITOR.md`.

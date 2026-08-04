@@ -11,9 +11,9 @@ import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.0.0-preparation";
+const WORKER_VERSION = "source-monitor-4.1.0-phase-a-shadow";
 const DEFAULT_BATCH_SIZE = 5;
-const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.0-preparation (+mailto:kontakt@sporteventmap.com)";
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -266,6 +266,18 @@ async function recordObservation(admin: ReturnType<typeof createClient>, claim: 
   return data;
 }
 
+async function recordPhaseAShadowObservation(
+  admin: ReturnType<typeof createClient>,
+  crawlResultId: string | number | null
+) {
+  if (!crawlResultId) return { recorded: 0, skipped: "crawl_result_missing", dry_run: true };
+  const { data, error } = await admin.rpc("record_stage_four_shadow_observations", {
+    p_crawl_result_id: crawlResultId
+  });
+  if (error) throw new Error(`Phase-A shadow observation failed: ${cleanError(error)}`);
+  return data;
+}
+
 
 async function recordLifecycleSignals(
   admin: ReturnType<typeof createClient>,
@@ -455,13 +467,22 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     } catch (error) {
       technicalAutomation.error = cleanError(error);
     }
+    let phaseAObservation: Record<string, unknown> = { recorded: 0, dry_run: true, public_event_changes: 0, error: null };
+    try {
+      phaseAObservation = {
+        ...phaseAObservation,
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+      };
+    } catch (error) {
+      phaseAObservation.error = cleanError(error);
+    }
     let lifecycle = { editions: 0, results: 0, error: null as string | null };
     try {
       lifecycle = { ...lifecycle, ...await recordLifecycleSignals(admin, claim, fetched, transaction?.result_id || null) };
     } catch (error) {
       lifecycle.error = cleanError(error);
     }
-    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, technical_automation: technicalAutomation, lifecycle };
+    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, technical_automation: technicalAutomation, phase_a_observation: phaseAObservation, lifecycle };
   } catch (error) {
     const failure = error instanceof SourceFetchError
       ? error
@@ -494,7 +515,16 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       changeConfidence: "technical",
       changeReasons: [failure.code]
     }, String(fetchPolicy.userAgent));
-    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation };
+    let phaseAObservation: Record<string, unknown> = { recorded: 0, dry_run: true, public_event_changes: 0, error: null };
+    try {
+      phaseAObservation = {
+        ...phaseAObservation,
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+      };
+    } catch (shadowError) {
+      phaseAObservation.error = cleanError(shadowError);
+    }
+    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation, phase_a_observation: phaseAObservation };
   }
 }
 

@@ -1,5 +1,7 @@
 # Stufe 4 – sichere Vorbereitung und Phase-A-Simulation
 
+Die konkrete Betriebsanleitung für reale deutsche Shadow-Beobachtungen, Pilotquellen, Review, Golden Dataset und Phase-B-Readiness steht in [STAGE_FOUR_GERMANY_OBSERVATION.md](STAGE_FOUR_GERMANY_OBSERVATION.md).
+
 ## Status und Sicherheitsgrenze
 
 Stufe 4 ist technisch vorbereitet, aber nicht produktiv aktiviert. Die Migration

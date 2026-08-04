@@ -624,6 +624,13 @@ await test(
       "data_quality_snapshots",
       "bulk_operations",
       "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -662,6 +669,13 @@ await test(
       "data_quality_snapshots",
       "bulk_operations",
       "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -709,6 +723,13 @@ await test(
       true,
       "Normal-user edition update unexpectedly changed a row."
     );
+
+    const phaseAMetrics = await restRequest("rpc/get_stage_four_observation_metrics", {
+      token: userA.token,
+      method: "POST",
+      body: { p_country_code: "DE" }
+    });
+    assert.equal(phaseAMetrics.response.ok, false, "Normal user could read Phase-A evaluation metrics.");
   }
 );
 
@@ -879,6 +900,13 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "data_quality_snapshots",
       "bulk_operations",
       "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -921,6 +949,70 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(monitoringRefresh.response.ok, true, JSON.stringify(monitoringRefresh.data));
       assert.equal(typeof monitoringRefresh.data.queue_length, "number");
+    }
+  );
+
+  await test(
+    "15b. German Phase-A controls remain dry-run, inactive, private and theoretical",
+    async () => {
+      const settings = await serviceRequest("stage_four_settings?select=dry_run,automation_enabled,observation_enabled,observation_scheduler_enabled,observation_country_code");
+      assert.equal(settings.response.ok, true, JSON.stringify(settings.data));
+      assert.deepEqual(settings.data, [{
+        dry_run: true,
+        automation_enabled: false,
+        observation_enabled: false,
+        observation_scheduler_enabled: false,
+        observation_country_code: "DE"
+      }]);
+
+      const countries = await serviceRequest("country_rollouts?select=country_code,rollout_status,automation_enabled,geocoding_enabled&order=country_code.asc");
+      assert.equal(countries.response.ok, true, JSON.stringify(countries.data));
+      const byCountry = new Map(countries.data.map(row => [row.country_code, row]));
+      assert.equal(byCountry.get("DE").rollout_status, "observation");
+      assert.equal(byCountry.get("DE").automation_enabled, false);
+      assert.equal(byCountry.get("DE").geocoding_enabled, false);
+      for (const code of ["AT", "CH"]) {
+        assert.equal(byCountry.get(code).rollout_status, "pilot_disabled");
+        assert.equal(byCountry.get(code).automation_enabled, false);
+        assert.equal(byCountry.get(code).geocoding_enabled, false);
+      }
+
+      const pilots = await restRequest("stage_four_pilot_sources?select=id,country_code,pilot_status,event_source_id", { token: admin.token });
+      assert.equal(pilots.response.ok, true, JSON.stringify(pilots.data));
+      assert.equal(pilots.data.length, 12);
+      assert.ok(pilots.data.every(row => row.country_code === "DE" && row.pilot_status === "candidate" && row.event_source_id == null));
+
+      const metrics = await restRequest("rpc/get_stage_four_observation_metrics", {
+        token: admin.token,
+        method: "POST",
+        body: { p_country_code: "DE" }
+      });
+      assert.equal(metrics.response.ok, true, JSON.stringify(metrics.data));
+      assert.equal(metrics.data.reviewed_sample, 0);
+      assert.equal(metrics.data.sample_sufficient, false);
+      assert.equal(metrics.data.precision, null);
+
+      const readiness = await serviceRequest("rpc/refresh_stage_four_phase_b_readiness", { method: "POST", body: {} });
+      assert.equal(readiness.response.ok, true, JSON.stringify(readiness.data));
+      const readinessRows = await serviceRequest("stage_four_readiness_snapshots?select=theoretically_ready,metrics,blockers&order=calculated_at.desc&limit=3");
+      assert.equal(readinessRows.response.ok, true, JSON.stringify(readinessRows.data));
+      assert.ok(readinessRows.data.every(row => row.theoretically_ready === false && row.metrics.phase_b_activated === false));
+
+      const enqueue = await restRequest("rpc/enqueue_stage_four_observation_runs", {
+        token: admin.token,
+        method: "POST",
+        body: { p_limit: 10, p_trigger_source: "admin" }
+      });
+      assert.equal(enqueue.response.ok, true, JSON.stringify(enqueue.data));
+      assert.equal(Number(enqueue.data.queued), 0, "Observation enqueue bypassed the global observation kill-switch.");
+      assert.equal(enqueue.data.blocked_reason, "global_observation_stop_or_unsafe_settings");
+
+      const unsafeSettings = await serviceRequest("stage_four_settings?singleton=eq.true", {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { dry_run: false }
+      });
+      assert.equal(unsafeSettings.response.ok, false, "Database accepted unsafe non-dry-run settings.");
     }
   );
 }

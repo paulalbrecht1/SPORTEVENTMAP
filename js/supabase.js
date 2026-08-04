@@ -4620,7 +4620,7 @@ function ensureDataOpsReviewWorkspace() {
     const styles = document.createElement("link");
     styles.id = "sourceMonitorStyles";
     styles.rel = "stylesheet";
-    styles.href = "css/source-monitor.css?v=20260816-stage-four-preparation";
+    styles.href = "css/source-monitor.css?v=20260818-germany-observation";
     document.head.appendChild(styles);
   }
   const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
@@ -4742,6 +4742,25 @@ function ensureStageFourOperationsSection() {
       <section><div class="stage-four-section-title"><h5>Länder &amp; Datenqualität</h5><span>DE → AT → CH</span></div><div id="stageFourCountriesList" class="stage-four-country-grid"></div></section>
       <section><div class="stage-four-section-title"><h5>Geocoding &amp; Limits</h5><span>Cache + Rate Limits</span></div><div id="stageFourGeocodingList" class="stage-four-list"></div></section>
     </div>
+    <section class="stage-four-observation-workspace" aria-labelledby="stageFourObservationTitle">
+      <div class="stage-four-section-title"><div><h5 id="stageFourObservationTitle">Deutsche Beobachtungsphase</h5><p>Echte Quellen, Shadow-Entscheidungen und manuelle Kalibrierung. Keine öffentliche Mutation.</p></div><div class="stage-four-actions"><button type="button" data-stage-four-action="enqueue-observations">Fällige Piloten einplanen</button><button type="button" data-stage-four-action="refresh-phase-a">Evaluation aktualisieren</button></div></div>
+      <div class="stage-four-kpis stage-four-observation-kpis">
+        <div><span>Pilotprofile</span><strong id="stageFourPilotCount">0</strong></div>
+        <div><span>Beobachtungen</span><strong id="stageFourObservationCount">0</strong></div>
+        <div><span>Review-Rückstand</span><strong id="stageFourObservationBacklog">0</strong></div>
+        <div><span>Precision</span><strong id="stageFourObservationPrecision">–</strong></div>
+        <div><span>Review-Fallzahl</span><strong id="stageFourObservationSample">0</strong></div>
+        <div><span>Phase-B-Readiness</span><strong id="stageFourReadinessState">NICHT BEREIT</strong></div>
+      </div>
+      <div class="stage-four-grid stage-four-observation-grid">
+        <section><div class="stage-four-section-title"><h5>Pilotübersicht &amp; Quellen</h5><span id="stageFourPilotSummary">0 aktiv</span></div><div id="stageFourPilotSourcesList" class="stage-four-list"><p class="admin-quality-empty">Pilotprofile werden geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5>Beobachtungen &amp; Review</h5><span>Training/Kalibrierung</span></div><div id="stageFourObservationsList" class="stage-four-list"><p class="admin-quality-empty">Beobachtungen werden geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5>Evaluation &amp; Readiness</h5><span>nur theoretisch</span></div><div id="stageFourEvaluationList" class="stage-four-list"><p class="admin-quality-empty">Evaluation wird geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5>Policy Shadow-Modus</h5><span>was würde passieren?</span></div><div id="stageFourShadowDecisionsList" class="stage-four-list"><p class="admin-quality-empty">Shadow-Entscheidungen werden geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5>Golden Dataset</h5><span id="stageFourGoldenSummary">0 Fälle</span></div><div id="stageFourGoldenCasesList" class="stage-four-list"><p class="admin-quality-empty">Golden Dataset wird geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5>Läufe &amp; Monitoring</h5><span>abbruch- und fortsetzbar</span></div><div id="stageFourObservationRunsList" class="stage-four-list"><p class="admin-quality-empty">Läufe werden geladen.</p></div></section>
+      </div>
+    </section>
     <section class="stage-four-bulk">
       <div class="stage-four-section-title"><div><h5>Sichere Sammelaktion</h5><p>Erst Vorschau, dann explizite Bestätigung; Phase A simuliert ausschließlich.</p></div><span>max. 100</span></div>
       <div class="stage-four-bulk-form">
@@ -4796,6 +4815,12 @@ const stageFourElements = {
   discovery: document.getElementById("stageFourDiscoveryList"),
   countries: document.getElementById("stageFourCountriesList"),
   geocoding: document.getElementById("stageFourGeocodingList"),
+  pilotSources: document.getElementById("stageFourPilotSourcesList"),
+  observations: document.getElementById("stageFourObservationsList"),
+  evaluation: document.getElementById("stageFourEvaluationList"),
+  shadowDecisions: document.getElementById("stageFourShadowDecisionsList"),
+  goldenCases: document.getElementById("stageFourGoldenCasesList"),
+  observationRuns: document.getElementById("stageFourObservationRunsList"),
   reliabilityCount: document.getElementById("stageFourReliabilityCount"),
   discoverySummary: document.getElementById("stageFourDiscoverySummary"),
   bulkAction: document.getElementById("stageFourBulkAction"),
@@ -4809,7 +4834,17 @@ const stageFourElements = {
     duplicates: document.getElementById("stageFourDuplicateCount"),
     geocoding: document.getElementById("stageFourGeocodingCount"),
     quality: document.getElementById("stageFourQualityScore")
-  }
+  },
+  observationKpis: {
+    pilots: document.getElementById("stageFourPilotCount"),
+    observations: document.getElementById("stageFourObservationCount"),
+    backlog: document.getElementById("stageFourObservationBacklog"),
+    precision: document.getElementById("stageFourObservationPrecision"),
+    sample: document.getElementById("stageFourObservationSample"),
+    readiness: document.getElementById("stageFourReadinessState")
+  },
+  pilotSummary: document.getElementById("stageFourPilotSummary"),
+  goldenSummary: document.getElementById("stageFourGoldenSummary")
 };
 
 const adminTabs =
@@ -4850,6 +4885,13 @@ let stageFourCountries = [];
 let stageFourQuality = [];
 let stageFourUsage = [];
 let stageFourBulkOperations = [];
+let stageFourPilotSources = [];
+let stageFourObservationRuns = [];
+let stageFourObservations = [];
+let stageFourObservationReviews = [];
+let stageFourObservationMetrics = null;
+let stageFourReadiness = [];
+let stageFourGoldenCases = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
@@ -5574,7 +5616,7 @@ function renderStageFourOperations() {
   const dryRun = stageFourSettings.dry_run !== false;
   const stopped = stageFourSettings.global_emergency_stop || !stageFourSettings.automation_enabled;
   stageFourElements.safety.className = `stage-four-safety ${dryRun || stopped ? "is-safe" : "is-live"}`;
-  stageFourElements.safety.innerHTML = `<strong>${dryRun ? "DRY-RUN AKTIV" : "LIVE-MODUS"}</strong><span>Phase ${escapeAdminHTML(stageFourSettings.rollout_phase)} · Automatik ${stageFourSettings.automation_enabled ? "aktiviert" : "deaktiviert"} · Not-Aus ${stageFourSettings.global_emergency_stop ? "aktiv" : "bereit"}</span><small>Limits: ${Number(stageFourSettings.daily_crawl_limit || 0)} Crawls/Tag · ${Number(stageFourSettings.daily_geocoding_limit || 0)} Geocodes/Tag · ${Number(stageFourSettings.maximum_queue_length || 0)} Queue</small>`;
+  stageFourElements.safety.innerHTML = `<strong>${dryRun ? "DRY-RUN AKTIV" : "LIVE-MODUS"}</strong><span>Phase ${escapeAdminHTML(stageFourSettings.rollout_phase)} · Automatik ${stageFourSettings.automation_enabled ? "aktiviert" : "deaktiviert"} · Beobachtung ${stageFourSettings.observation_enabled ? "aktiv" : "gestoppt"} · Scheduler ${stageFourSettings.observation_scheduler_enabled ? "aktiv" : "gestoppt"}</span><small>Nur ${escapeAdminHTML(stageFourSettings.observation_country_code || "DE")} · ${Number(stageFourSettings.daily_crawl_limit || 0)} Crawls/Tag · Geocoding-Provider aus · öffentliche Mutationen 0</small>`;
 
   const openCandidates = stageFourDiscoveryCandidates.filter(row => row.review_status === "pending");
   const openDuplicates = stageFourDuplicates.filter(row => row.review_status === "pending");
@@ -5614,6 +5656,57 @@ function renderStageFourOperations() {
     <article class="stage-four-card"><div><strong>${escapeAdminHTML(job.original_location_text)}</strong><span class="stage-four-decision is-review">${escapeAdminHTML(job.job_status)}</span></div><p>${escapeAdminHTML(job.normalized_address)} · ${escapeAdminHTML(job.country_code)} · ${escapeAdminHTML(job.provider)}</p><small>${escapeAdminHTML((job.validation_warnings || []).join(", ") || job.error_message || "wartet auf Verarbeitung")}</small></article>`).join("");
 }
 
+function setStageFourObservationKpi(key, value) {
+  if (stageFourElements.observationKpis[key]) stageFourElements.observationKpis[key].textContent = value;
+}
+
+function renderStageFourObservationWorkspace() {
+  if (!stageFourElements.pilotSources) return;
+  const reviewsByObservation = new Map(stageFourObservationReviews.map(row => [String(row.observation_id), row]));
+  const activePilots = stageFourPilotSources.filter(row => row.pilot_status === "pilot_observation");
+  const reviewBacklog = stageFourObservations.filter(row => !reviewsByObservation.has(String(row.id)) && row.review_status !== "excluded");
+  const latestReadiness = new Map();
+  [...stageFourReadiness].sort((a, b) => String(b.calculated_at).localeCompare(String(a.calculated_at))).forEach(row => {
+    if (!latestReadiness.has(String(row.criterion_id))) latestReadiness.set(String(row.criterion_id), row);
+  });
+  const readinessRows = [...latestReadiness.values()];
+  const theoreticallyReady = readinessRows.length > 0 && readinessRows.every(row => row.theoretically_ready);
+  const metrics = stageFourObservationMetrics || {};
+  setStageFourObservationKpi("pilots", stageFourPilotSources.length);
+  setStageFourObservationKpi("observations", Number(metrics.total_observations || stageFourObservations.length));
+  setStageFourObservationKpi("backlog", reviewBacklog.length);
+  setStageFourObservationKpi("precision", metrics.precision == null ? "–" : `${(Number(metrics.precision) * 100).toFixed(1)}%`);
+  setStageFourObservationKpi("sample", `${Number(metrics.reviewed_sample || 0)}${metrics.sample_sufficient ? "" : " ⚠"}`);
+  setStageFourObservationKpi("readiness", theoreticallyReady ? "THEORETISCH BEREIT" : "NICHT BEREIT");
+  stageFourElements.pilotSummary.textContent = `${activePilots.length} aktiv · ${stageFourPilotSources.filter(row => row.pilot_status === "paused").length} pausiert`;
+  stageFourElements.goldenSummary.textContent = `${stageFourGoldenCases.length} Fälle`;
+
+  stageFourElements.pilotSources.innerHTML = stageFourPilotSources.map(pilot => {
+    const source = dataOpsSources.find(row => String(row.id) === String(pilot.event_source_id));
+    const candidateSources = dataOpsSources.filter(row => String(row.source_host || "").replace(/^www\./, "") === String(pilot.domain).replace(/^www\./, ""));
+    const binding = source ? `<small>Gebunden: ${escapeAdminHTML(source.source_url)}</small>` : `<label class="stage-four-inline-field">Bestehende Eventquelle<select data-pilot-binding><option value="">nicht gebunden</option>${candidateSources.map(item => `<option value="${escapeAdminHTML(item.id)}">${escapeAdminHTML(item.source_url)}</option>`).join("")}</select></label>`;
+    const controls = source
+      ? `<button type="button" data-stage-four-action="pilot-status" data-pilot-id="${pilot.id}" data-pilot-status="${pilot.pilot_status === "paused" ? "pilot_observation" : "paused"}">${pilot.pilot_status === "paused" ? "Beobachtung fortsetzen" : "Quelle pausieren"}</button>`
+      : `<button type="button" data-stage-four-action="bind-pilot" data-pilot-id="${pilot.id}">Sicher binden</button>`;
+    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(pilot.source_name)}</strong><span class="stage-four-decision is-${pilot.pilot_status === "pilot_observation" ? "review" : "block"}">${escapeAdminHTML(pilot.pilot_status)}</span></div><p>${escapeAdminHTML(pilot.source_type)} · DE · ${escapeAdminHTML(pilot.domain)} · ${(Number(pilot.initial_reliability) * 100).toFixed(0)}% Startwert</p>${binding}<small>Intervall ${Number(pilot.check_interval_minutes)} min · ${Number(pilot.requests_per_minute)}/min · ${Number(pilot.requests_per_day)}/Tag · ${escapeAdminHTML(pilot.parser_version)}</small><div class="stage-four-card-actions">${controls}<a href="${escapeAdminHTML(pilot.source_url)}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a></div></article>`;
+  }).join("") || '<p class="admin-quality-empty">Keine deutschen Pilotprofile konfiguriert.</p>';
+
+  stageFourElements.observations.innerHTML = [...stageFourObservations].sort((a, b) => String(b.observed_at).localeCompare(String(a.observed_at))).slice(0, 30).map(observation => {
+    const review = reviewsByObservation.get(String(observation.id));
+    const decision = `${observation.decision_mode}: ${observation.policy_result}${observation.would_execute ? " · würde ausführen" : ""}`;
+    const reviewControl = review
+      ? `<small>Bewertet: ${escapeAdminHTML(review.review_result)} · ${escapeAdminHTML(review.rationale)}</small>`
+      : `<div class="stage-four-review-control"><select data-observation-review><option value="correct">korrekt</option><option value="partially_correct">teilweise korrekt</option><option value="incorrect">falsch</option><option value="outdated">veraltet</option><option value="duplicate">Dublette</option><option value="source_unsuitable">Quelle ungeeignet</option><option value="unclear">unklar</option><option value="manual_review_required">manuelle Prüfung notwendig</option></select><button type="button" data-stage-four-action="review-observation" data-observation-id="${observation.id}">Bewertung speichern</button></div>`;
+    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(observation.field_name)}</strong><span class="stage-four-decision is-${observation.policy_result === "block" ? "block" : "review"}">${escapeAdminHTML(decision)}</span></div><p>${escapeAdminHTML(observation.change_status)} · Confidence ${observation.confidence == null ? "–" : `${(Number(observation.confidence) * 100).toFixed(0)}%`} · Reliability ${(Number(observation.source_reliability) * 100).toFixed(0)}%</p><small>${escapeAdminHTML(observation.blocked_reason || (observation.parsing_warnings || []).join(", ") || "keine Warnung")} · Parser ${escapeAdminHTML(observation.parser_version)} · Policy ${escapeAdminHTML(observation.policy_version)}</small>${reviewControl}${review ? `<button type="button" data-stage-four-action="promote-golden" data-observation-id="${observation.id}">Als Golden Case markieren</button>` : ""}</article>`;
+  }).join("") || '<p class="admin-quality-empty">Noch keine realen Beobachtungen vorhanden.</p>';
+
+  stageFourElements.evaluation.innerHTML = `<article class="stage-four-card"><div><strong>Manuell bewertete Vorschläge</strong><b>${Number(metrics.reviewed_sample || 0)}</b></div><p>Precision ${metrics.precision == null ? "–" : `${(Number(metrics.precision) * 100).toFixed(2)}%`} · False Positives ${metrics.false_positive_rate == null ? "–" : `${(Number(metrics.false_positive_rate) * 100).toFixed(2)}%`} · Konflikte ${metrics.conflict_rate == null ? "–" : `${(Number(metrics.conflict_rate) * 100).toFixed(1)}%`}</p><small>${metrics.sample_sufficient ? "Stichprobe für operative Metrik ausreichend" : "Kleine Stichprobe: Kennzahlen nicht als Freigabe interpretieren"}</small></article>` + readinessRows.map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.dimension_type)} · ${escapeAdminHTML(row.dimension_key)}</strong><span class="stage-four-decision is-${row.theoretically_ready ? "review" : "block"}">${row.theoretically_ready ? "theoretisch bereit" : "nicht bereit"}</span></div><p>${Number(row.reviewed_count)} Reviews · Precision ${row.precision == null ? "–" : `${(Number(row.precision) * 100).toFixed(2)}%`}</p><small>${escapeAdminHTML((row.blockers || []).join(", ") || "Kriterien rechnerisch erfüllt")} · Phase B wird niemals automatisch aktiviert</small></article>`).join("");
+
+  stageFourElements.shadowDecisions.innerHTML = [...stageFourDecisions].filter(row => row.decision_mode === "shadow" || row.dry_run).slice(0, 20).map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.policy_code || "default_review")}</strong><span class="stage-four-decision is-${escapeAdminHTML(row.effective_decision)}">${escapeAdminHTML(row.effective_decision)}</span></div><p>${escapeAdminHTML(row.action_code)} · würde ausführen: ${row.would_execute ? "ja" : "nein"} · tatsächlich: ${row.actually_executed ? "JA" : "nein"}</p><small>${escapeAdminHTML((row.prerequisites_unmet || row.decision_reasons || []).join(", ") || row.blocked_reason || "Voraussetzungen erfüllt")}</small></article>`).join("") || '<p class="admin-quality-empty">Noch keine Shadow-Entscheidungen.</p>';
+  stageFourElements.goldenCases.innerHTML = stageFourGoldenCases.slice(0, 20).map(item => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(item.case_type)}</strong><span class="stage-four-decision is-${item.regression_status === "passed" ? "auto_apply" : "review"}">${escapeAdminHTML(item.regression_status)}</span></div><p>Parser ${escapeAdminHTML(item.parser_version)} · Policy ${escapeAdminHTML(item.policy_version)}</p><small>${escapeAdminHTML(item.notes || "Manuell geprüfter Regressionsfall")}</small></article>`).join("") || '<p class="admin-quality-empty">Golden Dataset wartet auf manuell geprüfte reale Fälle.</p>';
+  stageFourElements.observationRuns.innerHTML = stageFourObservationRuns.slice(0, 20).map(run => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(run.run_status)} · ${String(run.id).slice(0, 8)}</strong><span>${Number(run.observation_count)} Beobachtungen</span></div><p>${escapeAdminHTML(run.trigger_source)} · ${escapeAdminHTML(run.parser_version)} · ${escapeAdminHTML(run.policy_version)}</p><small>${escapeAdminHTML(run.error_message || run.idempotency_key)}</small>${["queued", "running"].includes(run.run_status) ? `<button type="button" data-stage-four-action="stop-observation-run" data-run-id="${run.id}">Lauf stoppen</button>` : ""}${run.run_status === "paused" ? `<button type="button" data-stage-four-action="resume-observation-run" data-run-id="${run.id}">Lauf fortsetzen</button>` : ""}</article>`).join("") || '<p class="admin-quality-empty">Noch keine Beobachtungsläufe.</p>';
+}
+
 async function loadStageFourRecent(table, columns, orderColumn, limit = 1000) {
   const { data, error } = await supabaseClient.from(table).select(columns)
     .order(orderColumn, { ascending: false }).limit(limit);
@@ -5623,10 +5716,10 @@ async function loadStageFourRecent(table, columns, orderColumn, limit = 1000) {
 async function loadStageFourOperations() {
   if (!stageFourElements.section) return;
   const results = await Promise.all([
-    loadAdminTablePages("stage_four_settings", "singleton,automation_enabled,dry_run,rollout_phase,maximum_parallel_workers,daily_crawl_limit,daily_geocoding_limit,daily_ai_cost_cents,maximum_queue_length,maximum_candidates_per_source,reliability_minimum_sample,reliability_auto_threshold,global_emergency_stop,change_reason,updated_at"),
+    loadAdminTablePages("stage_four_settings", "singleton,automation_enabled,dry_run,rollout_phase,maximum_parallel_workers,daily_crawl_limit,daily_geocoding_limit,daily_ai_cost_cents,maximum_queue_length,maximum_candidates_per_source,reliability_minimum_sample,reliability_auto_threshold,global_emergency_stop,observation_enabled,observation_scheduler_enabled,observation_country_code,observation_policy_version,observation_last_heartbeat_at,change_reason,updated_at"),
     loadAdminTablePages("automation_policies", "id,policy_code,policy_version,name,description,priority,decision,minimum_phase,field_names,change_types,action_codes,minimum_confidence,minimum_reliability,minimum_reviewed_sample,maximum_error_rate,enabled"),
     loadAdminTablePages("source_reliability_metrics", "id,source_id,source_host,source_type,extractor_version,adapter_version,field_name,country_code,proposal_count,reviewed_count,acceptance_rate,rejection_rate,error_rate,average_confidence,source_reliability_score,score_reasons,calculated_at"),
-    loadStageFourRecent("automation_decisions", "id,proposal_id,event_id,edition_id,policy_code,action_code,recommended_decision,effective_decision,decision_status,dry_run,confidence,reliability_score,decision_reasons,evaluated_at", "evaluated_at"),
+    loadStageFourRecent("automation_decisions", "id,proposal_id,event_id,edition_id,policy_code,action_code,recommended_decision,effective_decision,decision_status,dry_run,decision_mode,would_execute,actually_executed,prerequisites_met,prerequisites_unmet,blocked_reason,parser_version,policy_version,confidence,reliability_score,decision_reasons,evaluated_at", "evaluated_at"),
     loadAdminTablePages("discovery_sources", "id,source_name,source_type,country_code,source_url,discovery_method,adapter_version,is_official,is_active,is_paused,last_discovered_at,next_discovery_at,last_error"),
     loadStageFourRecent("discovery_candidates", "id,discovery_source_id,detected_event_name,normalized_event_name,possible_start_date,city,region,country_code,sport,distances,official_url,registration_url,confidence,possible_event_id,match_status,geocoding_status,validation_warnings,review_status,detected_at", "detected_at"),
     loadStageFourRecent("duplicate_candidates", "id,discovery_candidate_id,left_event_id,right_event_id,matched_event_id,duplicate_score,classification,match_factors,review_status,created_at", "created_at"),
@@ -5647,7 +5740,22 @@ async function loadStageFourOperations() {
   [stageFourPolicies, stageFourReliability, stageFourDecisions, stageFourDiscoverySources,
     stageFourDiscoveryCandidates, stageFourDuplicates, stageFourGeocodingJobs, stageFourCountries,
     stageFourQuality, stageFourUsage, stageFourBulkOperations] = results.slice(1).map(result => result.rows || []);
+  const observationResults = await Promise.all([
+    loadAdminTablePages("stage_four_pilot_sources", "id,source_key,event_source_id,source_name,source_type,domain,source_url,country_code,pilot_status,initial_reliability,allowed_observation_fields,blocked_mutation_fields,check_interval_minutes,requests_per_minute,requests_per_day,parser_version,activation_reason,rollout_phase,last_observation_at,next_observation_at,paused_reason"),
+    loadStageFourRecent("stage_four_observation_runs", "id,pilot_source_id,source_id,event_id,crawl_job_id,run_status,trigger_source,idempotency_key,started_at,finished_at,observation_count,proposal_count,error_count,parser_version,policy_version,dry_run,error_message,created_at", "created_at"),
+    loadStageFourRecent("stage_four_observations", "id,run_id,pilot_source_id,source_id,event_id,proposal_id,decision_id,observed_at,http_status,technically_reachable,content_hash,change_status,field_name,previous_value,observed_value,normalized_value,confidence,source_reliability,policy_code,policy_result,decision_mode,would_execute,actually_executed,prerequisites_met,prerequisites_unmet,conflicts,duplicate_match_level,parsing_warnings,country_code,country_valid,proposed_action,blocked_reason,dry_run,parser_version,policy_version,review_status,raw_evidence", "observed_at"),
+    loadStageFourRecent("stage_four_observation_reviews", "id,observation_id,review_result,reviewed_fields,correct_value,error_category,rationale,policy_decision_correct,confidence_appropriate,reliability_adjustment_recommended,parser_problem,pause_source_recommended,reviewed_by,reviewed_at", "reviewed_at"),
+    loadStageFourRecent("stage_four_readiness_snapshots", "id,criterion_id,dimension_type,dimension_key,reviewed_count,confirmed_change_count,precision,false_positive_rate,sample_sufficient,theoretically_ready,blockers,metrics,calculated_at", "calculated_at"),
+    loadStageFourRecent("stage_four_golden_cases", "id,observation_id,review_id,case_type,expected_values,expected_policy_result,source_snapshot_hash,fixture_path,parser_version,policy_version,regression_status,approved,notes,created_at,last_regression_at", "created_at"),
+    supabaseClient.rpc("get_stage_four_observation_metrics", { p_country_code: "DE" })
+  ]);
+  const observationFailure = observationResults.find(result => result.error);
+  if (observationFailure) throw observationFailure.error;
+  [stageFourPilotSources, stageFourObservationRuns, stageFourObservations, stageFourObservationReviews,
+    stageFourReadiness, stageFourGoldenCases] = observationResults.slice(0, 6).map(result => result.rows || []);
+  stageFourObservationMetrics = observationResults[6].data || null;
   renderStageFourOperations();
+  renderStageFourObservationWorkspace();
   setStageFourStatus(`${stageFourDecisions.length} Policy-Entscheidungen · ${stageFourDiscoveryCandidates.length} Discovery-Kandidaten · kein automatischer Publish.`, "success");
 }
 
@@ -5670,6 +5778,75 @@ async function handleStageFourAction(button) {
       const results = await Promise.all(proposals.map(proposal => supabaseClient.rpc("evaluate_change_proposal_automation", { p_proposal_id: proposal.id, p_persist: true })));
       const failed = results.find(result => result.error);
       if (failed) throw failed.error;
+      await loadStageFourOperations();
+    }
+    if (action === "refresh-phase-a") {
+      const results = await Promise.all([
+        supabaseClient.rpc("refresh_stage_four_phase_a_reliability"),
+        supabaseClient.rpc("refresh_stage_four_phase_b_readiness"),
+        supabaseClient.rpc("refresh_stage_four_observation_monitoring")
+      ]);
+      const failed = results.find(result => result.error);
+      if (failed) throw failed.error;
+      await loadStageFourOperations();
+    }
+    if (action === "enqueue-observations") {
+      const { data, error } = await supabaseClient.rpc("enqueue_stage_four_observation_runs", { p_limit: 10, p_trigger_source: "admin" });
+      if (error) throw error;
+      setStageFourStatus(`${Number(data?.queued || 0)} deutsche Pilotquellen eingeplant, ${Number(data?.skipped || 0)} übersprungen. Öffentliche Mutationen bleiben gesperrt.`, "success");
+      await loadStageFourOperations();
+    }
+    if (action === "bind-pilot") {
+      const card = button.closest(".stage-four-card");
+      const eventSourceId = card?.querySelector("[data-pilot-binding]")?.value;
+      if (!eventSourceId) throw new Error("Eine bereits geprüfte deutsche Eventquelle mit passender Domain auswählen.");
+      const { error } = await supabaseClient.rpc("bind_stage_four_pilot_source", { p_pilot_source_id: button.dataset.pilotId, p_event_source_id: eventSourceId, p_reason: "Admin binding for German Phase-A observation" });
+      if (error) throw error;
+      await loadStageFourOperations();
+    }
+    if (action === "pilot-status") {
+      const reason = button.dataset.pilotStatus === "paused" ? "Admin pause in Phase-A observation" : "Admin resume after source review";
+      const { error } = await supabaseClient.rpc("set_stage_four_pilot_source_status", { p_pilot_source_id: button.dataset.pilotId, p_status: button.dataset.pilotStatus, p_reason: reason });
+      if (error) throw error;
+      await loadStageFourOperations();
+    }
+    if (action === "review-observation") {
+      const observation = stageFourObservations.find(row => String(row.id) === String(button.dataset.observationId));
+      const result = button.closest(".stage-four-review-control")?.querySelector("[data-observation-review]")?.value;
+      if (!observation || !result) throw new Error("Beobachtung oder Bewertung fehlt.");
+      const rationale = window.prompt("Kurze Begründung der Trainingsbewertung (mindestens 3 Zeichen):", "Manuell gegen die reale Quelle geprüft.");
+      if (rationale == null) return;
+      const correctRaw = window.prompt("Optionaler korrekter Sollwert (leer lassen, wenn nicht nötig):", "");
+      const correctValue = correctRaw ? { value: correctRaw } : null;
+      const policyCorrect = window.confirm("War die Policy-Entscheidung korrekt?");
+      const confidenceAppropriate = window.confirm("War der Confidence-Wert angemessen?");
+      const parserProblem = window.confirm("Liegt ein Parserproblem vor?");
+      const pauseSource = result === "source_unsuitable" && window.confirm("Quelle zusätzlich pausieren?");
+      const { error } = await supabaseClient.rpc("review_stage_four_observation", {
+        p_observation_id: observation.id, p_review_result: result, p_reviewed_fields: [observation.field_name],
+        p_correct_value: correctValue, p_error_category: parserProblem ? "parser_problem" : result,
+        p_rationale: rationale, p_policy_correct: policyCorrect, p_confidence_appropriate: confidenceAppropriate,
+        p_adjust_reliability: ["incorrect", "source_unsuitable", "partially_correct"].includes(result),
+        p_parser_problem: parserProblem, p_pause_source: pauseSource
+      });
+      if (error) throw error;
+      await loadStageFourOperations();
+    }
+    if (action === "promote-golden") {
+      const observation = stageFourObservations.find(row => String(row.id) === String(button.dataset.observationId));
+      const caseType = window.prompt("Golden-Case-Typ, z. B. unchanged_event, registration_opened, misleading_content:", observation?.change_status === "unchanged" ? "unchanged_event" : "misleading_content");
+      if (!caseType) return;
+      const { error } = await supabaseClient.rpc("promote_stage_four_golden_case", { p_observation_id: observation.id, p_case_type: caseType, p_expected_values: { [observation.field_name]: observation.normalized_value }, p_expected_policy_result: observation.policy_result, p_notes: "Manuell geprüfter realer Phase-A-Fall" });
+      if (error) throw error;
+      await loadStageFourOperations();
+    }
+    if (action === "stop-observation-run" || action === "resume-observation-run") {
+      const rpc = action === "stop-observation-run" ? "stop_stage_four_observation_run" : "resume_stage_four_observation_run";
+      const args = action === "stop-observation-run"
+        ? { p_run_id: button.dataset.runId, p_reason: "Admin stop from Data Operations Center", p_pause_source: true }
+        : { p_run_id: button.dataset.runId, p_reason: "Admin resume after investigation" };
+      const { error } = await supabaseClient.rpc(rpc, args);
+      if (error) throw error;
       await loadStageFourOperations();
     }
     if (action === "preview-bulk") {

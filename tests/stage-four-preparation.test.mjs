@@ -131,7 +131,7 @@ assert.match(migration, /live bulk execution is not enabled/i);
 assert.match(migration, /candidate batch exceeds configured limit/i);
 
 const worker = read("supabase/functions/event-source-check/index.ts");
-assert.match(worker, /source-monitor-4\.0\.0-preparation/);
+assert.match(worker, /source-monitor-4\.1\.0-phase-a-shadow/);
 assert.match(worker, /simulate_stage_four_for_crawl/);
 assert.match(worker, /record_stage_four_crawl_automation/);
 

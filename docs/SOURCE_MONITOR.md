@@ -311,6 +311,12 @@ Erforderlich sind `SUPABASE_URL`, ein Publishable-/Anon-Key und das nur
 serverseitig gesetzte `SOURCE_MONITOR_SMOKE_SECRET`.
 
 
+## Stufe 4: deutsche Phase-A-Beobachtung
+
+Worker-Version `source-monitor-4.1.0-phase-a-shadow` zeichnet nach jedem Crawl optional eine Shadow-Beobachtung auf. Die RPC akzeptiert ausschließlich Service-Role-Aufrufe, gebundene deutsche Pilotquellen und die sichere Konfiguration `dry_run=true`, `automation_enabled=false`, `observation_enabled=true`. Ist Beobachtung global gestoppt oder stammt der Crawl nicht von einem Pilotprofil, wird ohne Nebeneffekt übersprungen. Öffentliche Eventdaten werden durch diese Integration nicht geschrieben.
+
+Pilotbetrieb, Stop/Resume, Review, Reliability, Monitoring, Golden Dataset und Readiness sind in [STAGE_FOUR_GERMANY_OBSERVATION.md](STAGE_FOUR_GERMANY_OBSERVATION.md) beschrieben. Der bestehende Produktions-Cron wird durch die Migration weder geändert noch für Phase A aktiviert.
+
 ## Edition Lifecycle
 
 Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Monitor extrahiert Jahrgangs- und Ergebnis-Signale und erstellt zunächst nicht öffentliche Editionsentwürfe. Wiederholt bestätigte, konfliktfreie Signale aus offiziellen HTTPS-Quellen dürfen neue Editionen und Ergebnislinks kontrolliert veröffentlichen. Bestehende öffentliche Eventfelder werden weiterhin nicht automatisch überschrieben.

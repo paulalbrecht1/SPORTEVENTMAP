@@ -42,7 +42,7 @@
     "test:data-workflow": "node tests/event-data-workflow.test.mjs",
     "test:event-automation": "node tests/event-automation-workflow.test.mjs",
     "test:source-monitor": "node tests/source-monitor-core.test.mjs && node tests/source-monitor-pinned-http.test.mjs && node tests/source-monitor-workflow.test.mjs && node tests/source-monitor-extraction.test.mjs",
-    "test:stage-four": "node tests/stage-four-preparation.test.mjs",
+    "test:stage-four": "node tests/stage-four-preparation.test.mjs && node tests/stage-four-observation.test.mjs",
     "test:edition-lifecycle": "node tests/edition-lifecycle-workflow.test.mjs && node tests/event-detail-toggle.test.mjs",
     "smoke:source-monitor:production": "node tools/source-monitor-production-smoke.mjs",
     "data:migrate:dry": "node tools/migrate-events-to-editions.js",

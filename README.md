@@ -75,3 +75,7 @@ eigenen, nachvollziehbaren Commit. Details stehen in
 Die aktuelle Priorität liegt auf Eventsuche, Datenqualität, mobiler Nutzung
 und Saisonplanung. Die vollständige Strategie steht in
 [PRODUCT_VISION.md](PRODUCT_VISION.md).
+
+Der aktuelle technische und operative Projektstand sowie das priorisierte
+weitere Vorgehen sind in
+[PROJECT_STATUS_2026-08-04.md](PROJECT_STATUS_2026-08-04.md) dokumentiert.

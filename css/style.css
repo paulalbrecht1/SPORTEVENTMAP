@@ -28100,7 +28100,7 @@ html:has(body.event-detail-page) {
    Keep the quick event overview drawer above the map instead of letting it
    sit behind the absolute map layer. */
 @media (min-width: 1024px) {
-  body.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #eventDrawer {
+  body.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #eventDrawer.open {
     position: absolute !important;
     top: 18px !important;
     right: 18px !important;
@@ -36744,15 +36744,15 @@ body.platform-route-discovery:not(.landing-open) .leaflet-control-attribution {
 }
 
 /* Cluster colors communicate grouping only; count and size carry the magnitude. */
-body.platform-route-discovery:not(.landing-open) .marker-cluster-small,
-body.platform-route-discovery:not(.landing-open) .marker-cluster-medium,
-body.platform-route-discovery:not(.landing-open) .marker-cluster-large {
+#map .marker-cluster-small,
+#map .marker-cluster-medium,
+#map .marker-cluster-large {
   background: rgba(15, 118, 110, 0.28) !important;
 }
 
-body.platform-route-discovery:not(.landing-open) .marker-cluster-small div,
-body.platform-route-discovery:not(.landing-open) .marker-cluster-medium div,
-body.platform-route-discovery:not(.landing-open) .marker-cluster-large div {
+#map .marker-cluster-small div,
+#map .marker-cluster-medium div,
+#map .marker-cluster-large div {
   background: rgba(15, 83, 76, 0.9) !important;
   color: #ffffff !important;
   border: 1px solid rgba(153, 246, 228, 0.58) !important;
@@ -39058,6 +39058,13 @@ html[data-theme="dark"] {
   --theme-subtle: #94a3b8;
   --theme-border: rgba(148, 163, 184, 0.22);
   --theme-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+  --theme-action: #22c55e;
+  --theme-action-hover: #4ade80;
+  --theme-action-text: #052e16;
+  --theme-selected: rgba(34, 197, 94, 0.16);
+  --theme-disabled: #64748b;
+  --theme-danger: #f87171;
+  --theme-success: #4ade80;
 }
 
 html[data-theme="light"] {
@@ -39087,6 +39094,13 @@ html[data-theme="light"] {
   --theme-subtle: #6b7d73;
   --theme-border: rgba(15, 23, 42, 0.13);
   --theme-shadow: 0 22px 55px rgba(15, 23, 42, 0.12);
+  --theme-action: #16803d;
+  --theme-action-hover: #166534;
+  --theme-action-text: #ffffff;
+  --theme-selected: rgba(22, 163, 74, 0.12);
+  --theme-disabled: #7a8b82;
+  --theme-danger: #b91c1c;
+  --theme-success: #15803d;
 }
 
 .global-theme-toggle {
@@ -43697,4 +43711,724 @@ body[data-theme="light"] #adminModal #closeAdminModal:hover {
   #adminModal .analytics-section-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* UI/UX hardening: stable Discovery readiness and shared semantic states. */
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #sidebar,
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #eventDrawer,
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #map {
+  transition: none !important;
+}
+
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #map {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+@media (min-width: 1024px) {
+  body.platform-route-discovery.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #map {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+#map {
+  position: relative;
+  isolation: isolate;
+}
+
+.map-loading-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 9px;
+  padding: 24px;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(34, 197, 94, 0.16), transparent 15rem),
+    linear-gradient(135deg, var(--theme-page), var(--theme-surface-soft));
+  color: var(--theme-text);
+  text-align: center;
+}
+
+.map-loading-overlay[hidden] {
+  display: none;
+}
+
+.map-loading-overlay strong {
+  color: var(--theme-text);
+  font-size: 0.98rem;
+}
+
+.map-loading-overlay > span:last-child {
+  color: var(--theme-muted);
+  font-size: 0.78rem;
+}
+
+.map-loading-spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid var(--theme-border);
+  border-top-color: var(--theme-action);
+  border-radius: 50%;
+  animation: mapLoadingSpin 700ms linear infinite;
+}
+
+@keyframes mapLoadingSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Markers and controls never leak through while data and layout converge. */
+#map[aria-busy="true"] :is(
+  .leaflet-marker-pane,
+  .leaflet-shadow-pane,
+  .leaflet-tooltip-pane,
+  .leaflet-popup-pane,
+  .leaflet-control-container
+) {
+  visibility: hidden;
+}
+
+html[data-theme="light"] .platform-page-actions > :is(a, button):first-child {
+  border-color: var(--theme-action) !important;
+  background: var(--theme-action) !important;
+  color: var(--theme-action-text) !important;
+  box-shadow: 0 12px 28px rgba(22, 101, 52, 0.18) !important;
+}
+
+html[data-theme="light"] .platform-page-actions > :is(a, button):first-child:is(:hover, :focus-visible) {
+  border-color: var(--theme-action-hover) !important;
+  background: var(--theme-action-hover) !important;
+}
+
+html[data-theme="light"] .platform-page-actions > :is(a, button):not(:first-child) {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface) !important;
+  color: #14532d !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07) !important;
+}
+
+html[data-theme="light"] .platform-page :is(
+  .platform-page-hero > span,
+  .platform-feature-grid article > span
+) {
+  border-color: rgba(22, 163, 74, 0.28);
+  background: var(--theme-selected);
+  color: #166534;
+}
+
+html[data-theme="light"] .community-search-placeholder {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] .community-search-placeholder label {
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="light"] .community-search-placeholder input {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-text) !important;
+}
+
+html[data-theme="light"] :is(input, textarea)::placeholder {
+  color: var(--theme-subtle);
+  opacity: 1;
+}
+
+html[data-theme="light"] :is(button, input, select, textarea):disabled {
+  color: var(--theme-disabled) !important;
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+html[data-theme="light"] :is(
+  .event-list-empty,
+  .event-list-loading,
+  .season-empty-detail,
+  .admin-empty-state,
+  .profile-empty-state
+) {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-muted) !important;
+}
+
+/* The Home visuals are DOM/CSS compositions. Paint containment prevents a
+   product preview or card shadow from invalidating unrelated sections. */
+.sem-home :is(
+  .sem-hero,
+  .sem-trust,
+  .sem-section,
+  .sem-final-cta,
+  .sem-footer
+) {
+  contain: paint;
+}
+
+@media (max-width: 430px) {
+  .platform-page-actions {
+    display: grid !important;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .platform-page-actions > :is(a, button) {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    white-space: normal;
+  }
+
+  #mobileFilterBtn,
+  #toggleSidebar,
+  #platformMenuBtn,
+  #platformMenuCloseBtn,
+  #closeDiscoveryPanelBtn {
+    min-width: 44px !important;
+    min-height: 44px !important;
+  }
+
+  #sidebar,
+  .platform-mobile-menu,
+  #eventDrawer {
+    max-width: 100vw !important;
+  }
+
+  :is(
+    #sidebar-header,
+    .platform-page,
+    .platform-page-shell,
+    .platform-feature-grid,
+    .platform-feature-grid article,
+    .community-search-placeholder
+  ) {
+    min-width: 0;
+  }
+
+  .community-search-placeholder input,
+  #sidebar-header :is(input, select, button) {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-loading-spinner {
+    animation-duration: 1.4s;
+  }
+}
+
+/* Event Wiki light-mode depth parity ---------------------------------------
+   Keeps the airy light palette while borrowing the layered surfaces and
+   green glow that give the dark-mode Wiki its visual hierarchy. */
+html[data-theme="light"] body.platform-route-events {
+  --event-wiki-glow-strong: rgba(34, 197, 94, 0.17);
+  --event-wiki-glow-soft: rgba(34, 197, 94, 0.085);
+  --event-wiki-border: rgba(21, 128, 61, 0.22);
+  --event-wiki-shadow: rgba(22, 101, 52, 0.09);
+}
+
+html[data-theme="light"] body.platform-route-events .platform-pages {
+  background:
+    radial-gradient(circle at 8% 2%, rgba(34, 197, 94, 0.13), transparent 31%),
+    radial-gradient(circle at 92% 78%, rgba(16, 185, 129, 0.07), transparent 28%),
+    linear-gradient(145deg, #eaf4ee 0%, #f4f8f5 52%, #edf5f0 100%) !important;
+}
+
+html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-page-hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(24px, 3vw, 38px);
+  border: 1px solid var(--event-wiki-border) !important;
+  border-radius: 24px;
+  background:
+    radial-gradient(ellipse at 8% 0%, var(--event-wiki-glow-strong), transparent 48%),
+    linear-gradient(145deg, rgba(247, 253, 249, 0.98) 0%, rgba(255, 255, 255, 0.94) 64%, rgba(245, 251, 247, 0.96) 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 22px 54px rgba(15, 23, 42, 0.09),
+    0 10px 34px var(--event-wiki-shadow) !important;
+}
+
+html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-feature-grid article {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--event-wiki-border) !important;
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 8% 0%, var(--event-wiki-glow-soft), transparent 52%),
+    linear-gradient(150deg, rgba(248, 253, 250, 0.98) 0%, rgba(255, 255, 255, 0.96) 72%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 14px 34px rgba(15, 23, 42, 0.075),
+    0 7px 24px rgba(22, 101, 52, 0.055) !important;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+@media (hover: hover) {
+  html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-feature-grid article:hover {
+    transform: translateY(-3px);
+    border-color: rgba(21, 128, 61, 0.34) !important;
+    box-shadow:
+      inset 0 1px 0 #ffffff,
+      0 18px 40px rgba(15, 23, 42, 0.095),
+      0 10px 30px rgba(22, 101, 52, 0.085) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-page-hero {
+    border-radius: 20px;
+  }
+
+  html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-feature-grid article {
+    border-radius: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="light"] body.platform-route-events #eventWikiPage .platform-feature-grid article {
+    transition: none;
+  }
+}
+
+/* Anonymous Season Planner state ----------------------------------------- */
+.planner-auth-required[hidden] {
+  display: none !important;
+}
+
+.planner-auth-required {
+  display: grid;
+  min-height: calc(100dvh - var(--topbar-height, 114px));
+  padding: clamp(24px, 6vw, 72px);
+  place-items: center;
+}
+
+.planner-auth-card {
+  display: grid;
+  justify-items: center;
+  width: min(620px, 100%);
+  padding: clamp(30px, 5vw, 52px);
+  overflow: hidden;
+  border: 1px solid rgba(74, 222, 128, 0.22);
+  border-radius: 26px;
+  background:
+    radial-gradient(ellipse at 50% -12%, rgba(34, 197, 94, 0.2), transparent 48%),
+    linear-gradient(145deg, rgba(15, 32, 28, 0.98), rgba(8, 19, 28, 0.98));
+  color: #f8fafc;
+  text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 28px 70px rgba(0, 0, 0, 0.3),
+    0 12px 42px rgba(34, 197, 94, 0.08);
+}
+
+.planner-auth-icon {
+  display: grid;
+  width: 66px;
+  height: 66px;
+  margin-bottom: 22px;
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 20px;
+  place-items: center;
+  background: rgba(34, 197, 94, 0.13);
+  color: #86efac;
+  box-shadow: 0 12px 28px rgba(34, 197, 94, 0.12);
+}
+
+.planner-auth-icon svg {
+  width: 34px;
+  height: 34px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.planner-auth-card > span {
+  color: #86efac;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.planner-auth-card h2 {
+  max-width: 15ch;
+  margin: 12px 0 14px;
+  color: #f8fafc;
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 950;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.planner-auth-card p {
+  max-width: 52ch;
+  margin: 0;
+  color: rgba(226, 232, 240, 0.78);
+  font-size: clamp(0.98rem, 1.5vw, 1.08rem);
+  font-weight: 650;
+  line-height: 1.65;
+  text-wrap: balance;
+}
+
+#plannerAuthLoginBtn {
+  min-height: 48px;
+  margin-top: 28px;
+  padding: 0 22px;
+  border: 1px solid rgba(74, 222, 128, 0.42);
+  border-radius: 13px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #052e16;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(34, 197, 94, 0.2);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+#plannerAuthLoginBtn:is(:hover, :focus-visible) {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 36px rgba(34, 197, 94, 0.27);
+}
+
+html[data-theme="light"] .planner-auth-card {
+  border-color: rgba(21, 128, 61, 0.24);
+  background:
+    radial-gradient(ellipse at 50% -12%, rgba(34, 197, 94, 0.17), transparent 48%),
+    linear-gradient(145deg, rgba(248, 253, 250, 0.98), rgba(255, 255, 255, 0.97));
+  color: #122019;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 24px 64px rgba(15, 23, 42, 0.1),
+    0 10px 36px rgba(22, 101, 52, 0.08);
+}
+
+html[data-theme="light"] .planner-auth-icon {
+  border-color: rgba(21, 128, 61, 0.24);
+  background: rgba(34, 197, 94, 0.11);
+  color: #15803d;
+}
+
+html[data-theme="light"] .planner-auth-card > span {
+  color: #166534;
+}
+
+html[data-theme="light"] .planner-auth-card h2 {
+  color: #122019;
+}
+
+html[data-theme="light"] .planner-auth-card p {
+  color: #52675c;
+}
+
+@media (max-width: 600px) {
+  .planner-auth-required {
+    min-height: calc(100dvh - var(--mobile-topbar-height, 110px));
+    padding: 18px 14px 32px;
+  }
+
+  .planner-auth-card {
+    padding: 28px 20px 30px;
+    border-radius: 20px;
+  }
+
+  .planner-auth-icon {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 18px;
+    border-radius: 17px;
+  }
+
+  .planner-auth-card h2 {
+    font-size: clamp(1.8rem, 9vw, 2.45rem);
+  }
+
+  #plannerAuthLoginBtn {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #plannerAuthLoginBtn {
+    transition: none;
+  }
+}
+
+/* Match the platform theme toggle to the Home header in light mode. */
+html[data-theme="light"] #topbar #authArea > .global-theme-toggle {
+  padding: 4px !important;
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-muted) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 7px 18px rgba(2, 6, 23, 0.12) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-theme="light"] #topbar #authArea > .global-theme-toggle:hover {
+  border-color: rgba(34, 197, 94, 0.42) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-muted) !important;
+}
+
+html[data-theme="light"] #topbar #authArea > .global-theme-toggle:focus-visible {
+  border-color: rgba(34, 197, 94, 0.62) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-muted) !important;
+  box-shadow:
+    0 0 0 3px rgba(34, 197, 94, 0.18),
+    0 9px 22px rgba(2, 6, 23, 0.14) !important;
+}
+
+@media (min-width: 768px) {
+  html[data-theme="light"] #topbar #authArea > .global-theme-toggle {
+    width: 58px !important;
+    min-width: 58px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+  }
+}
+
+/* Home hero spacing and complete light-mode product previews. */
+.sem-home .sem-hero-note {
+  margin-top: 26px;
+}
+
+html[data-theme="light"] .sem-home .sem-product-frame {
+  border-color: rgba(21, 128, 61, 0.2);
+  background: #f8fbf9;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 24px 58px rgba(15, 23, 42, 0.11),
+    0 10px 34px rgba(22, 101, 52, 0.07);
+}
+
+html[data-theme="light"] .sem-home .sem-browser-bar {
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+  background: linear-gradient(180deg, #ffffff, #f1f6f3);
+}
+
+html[data-theme="light"] .sem-home .sem-browser-bar strong {
+  color: #64776d;
+}
+
+html[data-theme="light"] .sem-home :is(
+  .sem-preview-shell,
+  .sem-discovery-ui,
+  .sem-planner-ui
+) {
+  background: #edf5f0;
+}
+
+html[data-theme="light"] .sem-home .sem-preview-topbar {
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+  background: #f8fbf9;
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-preview-topbar b {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-preview-topbar i {
+  background: rgba(34, 197, 94, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(21, 128, 61, 0.12);
+}
+
+html[data-theme="light"] .sem-home .sem-preview-list {
+  border-right-color: rgba(15, 23, 42, 0.1);
+  background: #f1f6f3;
+}
+
+html[data-theme="light"] .sem-home .sem-mini-search,
+html[data-theme="light"] .sem-home .sem-ui-search {
+  border-color: rgba(15, 23, 42, 0.12);
+  background: #ffffff;
+  color: #52675c;
+  box-shadow: inset 0 1px 0 #ffffff, 0 5px 14px rgba(15, 23, 42, 0.045);
+}
+
+html[data-theme="light"] .sem-home :is(
+  .sem-mini-filters span,
+  .sem-ui-chip-row span
+) {
+  border-color: rgba(21, 128, 61, 0.22);
+  background: rgba(34, 197, 94, 0.09);
+  color: #166534;
+}
+
+html[data-theme="light"] .sem-home .sem-mini-event {
+  border-color: rgba(21, 128, 61, 0.22);
+  background: linear-gradient(145deg, #ffffff, #f5faf7);
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.055);
+}
+
+html[data-theme="light"] .sem-home .sem-mini-event-muted {
+  border-color: rgba(15, 23, 42, 0.11);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+html[data-theme="light"] .sem-home .sem-mini-event strong,
+html[data-theme="light"] .sem-home .sem-mini-event b {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-mini-event :is(small, .sem-mini-status) {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home :is(
+  .sem-preview-map,
+  .sem-result-map
+) {
+  background:
+    linear-gradient(32deg, transparent 46%, rgba(71, 104, 86, 0.15) 47%, rgba(71, 104, 86, 0.15) 49%, transparent 50%),
+    linear-gradient(145deg, transparent 43%, rgba(71, 104, 86, 0.12) 44%, rgba(71, 104, 86, 0.12) 46%, transparent 47%),
+    radial-gradient(circle at 70% 24%, #cde8d5 0 12%, transparent 12.3%),
+    radial-gradient(circle at 28% 77%, #d7ecdd 0 18%, transparent 18.3%),
+    #e5f1e9;
+}
+
+html[data-theme="light"] .sem-home .sem-road,
+html[data-theme="light"] .sem-home .sem-map-route {
+  background: rgba(52, 83, 67, 0.22);
+}
+
+html[data-theme="light"] .sem-home :is(
+  .sem-pin,
+  .sem-result-map > i
+) {
+  border-color: rgba(229, 241, 233, 0.94);
+  background: #16803d;
+  box-shadow: 0 5px 14px rgba(22, 101, 52, 0.22);
+}
+
+html[data-theme="light"] .sem-home .sem-next-race-card {
+  border-color: rgba(21, 128, 61, 0.2);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-theme="light"] .sem-home .sem-next-race-card div b,
+html[data-theme="light"] .sem-home .sem-next-race-card > strong {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-discovery-controls {
+  border-bottom-color: rgba(15, 23, 42, 0.1);
+  background: #f8fbf9;
+}
+
+html[data-theme="light"] .sem-home .sem-discovery-controls p {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-discovery-controls p strong {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-discovery-results {
+  background: #edf5f0;
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack {
+  border-right-color: rgba(15, 23, 42, 0.1);
+  background: #f4f8f5;
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack article {
+  border-color: rgba(15, 23, 42, 0.11);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack article:first-child {
+  border-color: rgba(21, 128, 61, 0.25);
+  background: linear-gradient(145deg, #ffffff, #f1f9f4);
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack i {
+  background: linear-gradient(145deg, #dff2e5, #bfe2ca);
+  box-shadow: inset 0 0 0 1px rgba(21, 128, 61, 0.12);
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack strong {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-result-stack span {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-planner-summary {
+  border-color: rgba(21, 128, 61, 0.22);
+  background:
+    radial-gradient(circle at 8% 0%, rgba(34, 197, 94, 0.12), transparent 56%),
+    linear-gradient(145deg, #f4fbf6, #ffffff);
+  box-shadow: 0 7px 18px rgba(22, 101, 52, 0.06);
+}
+
+html[data-theme="light"] .sem-home .sem-planner-summary strong,
+html[data-theme="light"] .sem-home .sem-planner-summary > b {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-planner-summary span,
+html[data-theme="light"] .sem-home .sem-planner-summary div small,
+html[data-theme="light"] .sem-home .sem-planner-summary > b small {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-season-stats span,
+html[data-theme="light"] .sem-home .sem-season-events article {
+  border-color: rgba(15, 23, 42, 0.11);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.045);
+}
+
+html[data-theme="light"] .sem-home .sem-season-stats {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-season-stats b,
+html[data-theme="light"] .sem-home .sem-season-events strong {
+  color: #122019;
+}
+
+html[data-theme="light"] .sem-home .sem-season-line i {
+  background: #cbdcd1;
+}
+
+html[data-theme="light"] .sem-home .sem-season-events span {
+  color: #52675c;
+}
+
+html[data-theme="light"] .sem-home .sem-season-events em {
+  background: rgba(34, 197, 94, 0.13);
+  color: #166534;
 }

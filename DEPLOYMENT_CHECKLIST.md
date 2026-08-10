@@ -20,7 +20,7 @@ For a production build with environment-based public runtime configuration:
 
 ```powershell
 $env:SPORT_EVENT_MAP_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-$env:SPORT_EVENT_MAP_SUPABASE_PUBLIC_KEY="YOUR_PUBLISHABLE_KEY"
+$env:SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY="YOUR_PUBLISHABLE_KEY"
 $env:SPORT_EVENT_MAP_SITE_URL="<PRODUCTION_SITE_URL>"
 npm run prepare-package
 ```

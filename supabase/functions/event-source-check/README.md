@@ -1,6 +1,16 @@
 # Event source check
 
+> German Phase-A observation: Worker `source-monitor-4.1.0-phase-a-shadow`
+> records technical and field-level Shadow evidence only for explicitly bound
+> German pilot sources. Global dry-run prevents automatic content changes;
+> observation, scheduler, geocoding and AT/CH pilots ship disabled.
+
 Queue-backed, server-only Source Monitor worker.
+
+Worker `source-monitor-3.2.0` führt nach einem neuen oder geänderten Crawl die
+deterministische Stufe-3-Extraktion aus. Feldwerte werden normalisiert und als
+`event_change_proposals` gespeichert; der Worker schreibt keine extrahierten
+öffentlichen Eventfakten. Details: `docs/SOURCE_MONITOR_EXTRACTION.md`.
 
 - Authenticates Supabase Cron with an anon JWT plus one-way verified Cron secret, or accepts a verified Admin/service-role token.
 - Calls the bounded scheduler, then atomically leases at most 20 jobs (default 5).
@@ -11,6 +21,7 @@ Queue-backed, server-only Source Monitor worker.
 - Records only technical per-domain aggregates used for respectful rate tuning.
 - Commits result, source state, retry/dead-letter state and review metadata in the existing database transaction.
 - Enriches that result idempotently with semantic hash, pinned IP evidence and domain telemetry.
+- Calls `record_stage_four_shadow_observations` after result processing. The call is contained, service-role-only and becomes a no-op unless the source is a bound DE pilot and the server-side observation gate is enabled.
 - Passes only successor dates and official result links to review-gated RPCs. Existing public event facts are never overwritten; a new edition or result link can publish only after the database confirmation gate succeeds.
 
 Runtime variables are documented in `docs/SOURCE_MONITOR.md`.
@@ -34,7 +45,7 @@ Do not expose secret/service-role keys in browser code.
 Read-only production smoke test:
 
 ```bash
-SUPABASE_URL=... SUPABASE_ANON_KEY=... SOURCE_MONITOR_SMOKE_SECRET=... \
+SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... SUPABASE_EDGE_JWT=... SOURCE_MONITOR_SMOKE_SECRET=... \
   npm run smoke:source-monitor:production
 ```
 

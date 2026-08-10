@@ -27,6 +27,49 @@ async function ensurePlannerSectionOpen(page, testId) {
   }
 }
 
+test("Anonymous Planner route shows localized login guidance", async ({ page }) => {
+  await prepareApp(page, {
+    route: "planner",
+    openDiscoveryPanel: false
+  });
+
+  const authRequired = page.getByTestId("planner-auth-required");
+
+  await expect(authRequired).toBeVisible();
+  await expect(authRequired.locator("h2"))
+    .toHaveText("Log in to plan your season.");
+  await expect(authRequired.locator("p"))
+    .toContainText("linked to your account");
+  await expect(page.getByTestId("season-planner"))
+    .not.toHaveClass(/open/);
+
+  await page.locator("#topbarLanguageSelect").selectOption("de");
+  await expect(authRequired.locator("h2"))
+    .toHaveText("Melde dich an, um deine Saison zu planen.");
+  await expect(authRequired.locator("p"))
+    .toContainText("mit deinem Konto verknüpft");
+  await expect(page.locator("#plannerAuthLoginBtn"))
+    .toHaveText("Zum Login");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileLayout = await page.evaluate(() => {
+    const card = document.querySelector(".planner-auth-card").getBoundingClientRect();
+
+    return {
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      cardLeft: card.left,
+      cardRight: card.right
+    };
+  });
+
+  expect(mobileLayout.overflow).toBeLessThanOrEqual(2);
+  expect(mobileLayout.cardLeft).toBeGreaterThanOrEqual(0);
+  expect(mobileLayout.cardRight).toBeLessThanOrEqual(391);
+
+  await page.locator("#plannerAuthLoginBtn").click();
+  await expect(page.locator("#authModal")).toHaveClass(/open/);
+});
+
 test("Planner event, priority, target time, note and just-for-fun survive reload", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];
 

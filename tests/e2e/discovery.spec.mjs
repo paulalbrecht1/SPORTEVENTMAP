@@ -46,6 +46,17 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
     document.querySelectorAll("[data-testid='event-card']").length === 4
   );
 
+  if (await page.getByTestId("discovery-panel-toggle").getAttribute("aria-expanded") === "false") {
+    await page.getByTestId("discovery-panel-toggle").click();
+  }
+  await page.locator("#countryFilter").selectOption("DE");
+  await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
+  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await page.locator("#countryFilter").selectOption("AT");
+  await expect(page.getByTestId("event-card")).toHaveCount(0);
+  await page.getByTestId("filter-reset").click();
+  await expect(page.locator("#countryFilter")).toHaveValue("all");
+
   await waitForEventList(page);
   await page.getByTestId("filter-sport-triathlon").click();
   await expect(page.locator("#discoveryFilterCount")).toBeVisible();
@@ -186,4 +197,230 @@ test("fullscreen custom range aligns and sport pills are not clipped", async ({ 
     expect(geometry.activePill.top).toBeGreaterThanOrEqual(geometry.filters.top);
     expect(geometry.activePill.bottom).toBeLessThanOrEqual(geometry.filters.bottom);
   }
+});
+
+test("Discovery initializes once and only reveals its final ready state", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await prepareApp(page, {
+    route: "home",
+    openDiscoveryPanel: false
+  });
+
+  await expect.poll(() =>
+    page.evaluate(() => window.__discoveryMapDiagnostics.instances)
+  ).toBe(0);
+
+  await page.evaluate(() => {
+    window.location.hash = "/discovery";
+  });
+
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#mapLoadingOverlay")).toBeHidden();
+  await expect.poll(() =>
+    page.evaluate(() => window.__discoveryMapDiagnostics.instances)
+  ).toBe(1);
+
+  await page.evaluate(() => {
+    map.setView([48.1372, 11.5756], 11, { animate: false });
+    window.location.hash = "/home";
+  });
+  await expect(page.locator("body")).toHaveClass(/landing-open/);
+
+  await page.evaluate(() => {
+    window.location.hash = "/discovery";
+  });
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+
+  const lifecycle = await page.evaluate(() => ({
+    ...window.__discoveryMapDiagnostics,
+    center: [map.getCenter().lat, map.getCenter().lng],
+    zoom: map.getZoom()
+  }));
+
+  expect(lifecycle.instances).toBe(1);
+  expect(lifecycle.activations).toBe(2);
+  expect(lifecycle.center).toEqual([48.1372, 11.5756]);
+  expect(lifecycle.zoom).toBe(11);
+});
+
+test("Home to Discovery reaches the final shell before markers are revealed", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await prepareApp(page, {
+    route: "home",
+    openDiscoveryPanel: false
+  });
+
+  const initialClusterColor = await page.evaluate(() => {
+    const defaultClusterStyles = document.createElement("style");
+    defaultClusterStyles.textContent = `
+      .marker-cluster-small {
+        background: rgba(110, 204, 57, 0.6);
+      }
+    `;
+    document.head.append(defaultClusterStyles);
+
+    const cluster = document.createElement("div");
+    cluster.className = "marker-cluster marker-cluster-small";
+    cluster.innerHTML = "<div><span>3</span></div>";
+    document.querySelector("#map").append(cluster);
+
+    return getComputedStyle(cluster).backgroundColor;
+  });
+
+  expect(initialClusterColor).toBe("rgba(15, 118, 110, 0.28)");
+
+  await page.evaluate(() => {
+    window.__discoveryTransitionTiming = {
+      startedAt: null,
+      landingClosedAt: null,
+      readyAt: null
+    };
+    window.__discoveryTransitionFrames = [];
+
+    const sampleDiscoveryShell = () => {
+      const now = performance.now();
+      const mapElement = document.querySelector("#map");
+      const sidebarElement = document.querySelector("#sidebar");
+      const drawerElement = document.querySelector("#eventDrawer");
+
+      window.__discoveryTransitionFrames.push({
+        time: now,
+        mapWidth: mapElement.getBoundingClientRect().width,
+        sidebarWidth: sidebarElement.getBoundingClientRect().width,
+        drawerWidth: drawerElement.getBoundingClientRect().width,
+        drawerPosition: getComputedStyle(drawerElement).position,
+        drawerOpen: drawerElement.classList.contains("open"),
+        busy: mapElement.getAttribute("aria-busy") === "true"
+      });
+
+      if (
+        window.__discoveryTransitionTiming.readyAt === null ||
+        now - window.__discoveryTransitionTiming.readyAt < 300
+      ) {
+        requestAnimationFrame(sampleDiscoveryShell);
+      }
+    };
+
+    document.addEventListener(
+      "click",
+      event => {
+        if (event.target.closest('[data-landing-route="discovery"]')) {
+          window.__discoveryTransitionTiming.startedAt = performance.now();
+          requestAnimationFrame(sampleDiscoveryShell);
+        }
+      },
+      { capture: true, once: true }
+    );
+
+    const observer = new MutationObserver(() => {
+      if (
+        window.__discoveryTransitionTiming.landingClosedAt === null &&
+        !document.body.classList.contains("landing-open")
+      ) {
+        window.__discoveryTransitionTiming.landingClosedAt = performance.now();
+      }
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    window.addEventListener(
+      "sport-event-map-discovery-ready",
+      () => {
+        window.__discoveryTransitionTiming.readyAt = performance.now();
+        observer.disconnect();
+      },
+      { once: true }
+    );
+  });
+
+  await page
+    .locator('.landing-page [data-landing-route="discovery"]')
+    .first()
+    .click();
+
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+  await page.waitForTimeout(320);
+
+  const transition = await page.evaluate(() => {
+    const topbar = document.querySelector("#topbar").getBoundingClientRect();
+    const app = document.querySelector("#app").getBoundingClientRect();
+
+    const visibleMapWidths = window.__discoveryTransitionFrames
+      .filter(frame => !frame.busy)
+      .map(frame => frame.mapWidth);
+    const visibleShellFrames = window.__discoveryTransitionFrames
+      .filter(frame => !frame.busy);
+
+    return {
+      ...window.__discoveryTransitionTiming,
+      bodyClasses: document.body.className,
+      appGap: app.top - topbar.bottom,
+      appHeight: app.height,
+      visibleMapWidthDelta:
+        Math.max(...visibleMapWidths) - Math.min(...visibleMapWidths),
+      maxVisibleSidebarWidth:
+        Math.max(...visibleShellFrames.map(frame => frame.sidebarWidth)),
+      maxVisibleClosedDrawerWidth:
+        Math.max(...visibleShellFrames
+          .filter(frame => !frame.drawerOpen)
+          .map(frame => frame.drawerWidth)),
+      visibleDrawerPositions:
+        [...new Set(visibleShellFrames.map(frame => frame.drawerPosition))]
+    };
+  });
+
+  expect(transition.landingClosedAt).not.toBeNull();
+  expect(transition.readyAt).not.toBeNull();
+  expect(transition.startedAt).not.toBeNull();
+  expect(transition.landingClosedAt).toBeLessThanOrEqual(transition.readyAt);
+  expect(transition.landingClosedAt - transition.startedAt).toBeLessThan(150);
+  expect(transition.bodyClasses).not.toMatch(/landing-(open|exiting|revealing-app)/);
+  expect(transition.appGap).toBeGreaterThanOrEqual(11);
+  expect(transition.appGap).toBeLessThanOrEqual(13);
+  expect(transition.appHeight).toBeGreaterThan(600);
+  expect(transition.visibleMapWidthDelta).toBeLessThanOrEqual(1);
+  expect(transition.maxVisibleSidebarWidth).toBeLessThanOrEqual(1);
+  expect(transition.maxVisibleClosedDrawerWidth).toBeLessThanOrEqual(2.5);
+  expect(transition.visibleDrawerPositions).toEqual(["absolute"]);
+});
+
+test("combined filters keep marker and result state identical", async ({ page }) => {
+  await prepareApp(page);
+
+  await page.getByTestId("filter-sport-running").click();
+  await page.locator("#distanceFilterToggle").click();
+  await page.locator('[data-distance-filter="10k"]').click();
+  await page.locator("#countryFilter").selectOption("DE");
+  await page.locator("#dateFilter").selectOption("upcoming");
+
+  await expect(page.getByTestId("event-card")).toHaveCount(1);
+  await expect(page.getByTestId("event-card").first()).toContainText(
+    "SEM E2E Future Run"
+  );
+
+  const synchronizedKeys = await page.evaluate(() => ({
+    cards: [...document.querySelectorAll('[data-testid="event-card"]')]
+      .map(card => card.dataset.key)
+      .sort(),
+    markers: [...window.__visibleDiscoveryMarkerKeys].sort()
+  }));
+
+  expect(synchronizedKeys.markers).toEqual(synchronizedKeys.cards);
+
+  await page.getByTestId("filter-reset").click();
+  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await expect(page.getByTestId("filter-sport-all")).toHaveClass(/active/);
+  await expect(page.locator('[data-distance-filter="10k"]')).not.toHaveClass(/active/);
+  await expect(page.locator("#countryFilter")).toHaveValue("all");
+  await expect(page.locator("#dateFilter")).toHaveValue("all");
+
+  const resetCounts = await page.evaluate(() => ({
+    cards: document.querySelectorAll('[data-testid="event-card"]').length,
+    markers: window.__visibleDiscoveryMarkerKeys.length
+  }));
+
+  expect(resetCounts.markers).toBe(resetCounts.cards);
 });

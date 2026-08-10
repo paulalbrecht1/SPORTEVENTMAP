@@ -17,6 +17,7 @@ test("Data Operations stays usable across themes and required viewports", async 
   });
   await page.waitForSelector("#sourceMonitorSection", { state: "attached" });
   await page.waitForSelector("#editionLifecycleInbox", { state: "attached" });
+  await page.waitForSelector("#stageFourOperationsCenter", { state: "attached" });
 
   for (const theme of ["light", "dark"]) {
     for (const viewport of viewports) {
@@ -61,7 +62,7 @@ test("Data Operations stays usable across themes and required viewports", async 
       }, theme);
 
       await expect(page.locator("#adminDataOperationsPanel")).toBeVisible();
-      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(7);
+      await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(17);
       await expect(page.locator("#adminDataOperationsPanel input[type=\"date\"]")).toHaveCount(2);
       await expect(page.locator("#runDataValidationBtn")).toBeVisible();
       await expect(page.locator("#editionLifecycleInbox")).toBeVisible();
@@ -72,6 +73,14 @@ test("Data Operations stays usable across themes and required viewports", async 
       await expect(page.locator("#sourceMonitorSection .source-monitor-kpis > div")).toHaveCount(10);
       await expect(page.locator("#sourceMonitorTableBody tr")).toHaveCount(1);
       await expect(page.locator("#sourceMonitorTableBody button").first()).toBeVisible();
+      await expect(page.locator("#stageFourOperationsCenter")).toBeVisible();
+      await expect(page.locator("#stageFourOperationsCenter > .stage-four-kpis > div")).toHaveCount(6);
+      await expect(page.locator("#stageFourOperationsCenter .stage-four-observation-workspace")).toBeVisible();
+      await expect(page.locator("#stageFourOperationsCenter .stage-four-observation-kpis > div")).toHaveCount(6);
+      await expect(page.locator("#stageFourPilotSourcesList")).toBeVisible();
+      await expect(page.locator("#stageFourObservationsList")).toBeVisible();
+      await expect(page.locator("#stageFourEvaluationList")).toBeVisible();
+      await expect(page.locator("#stageFourGoldenCasesList")).toBeVisible();
 
       const sourceLayout = await page.locator("#sourceMonitorSection").evaluate(section => ({
         tableHeadDisplay: getComputedStyle(section.querySelector("thead")).display,

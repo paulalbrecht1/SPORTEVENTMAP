@@ -15,8 +15,8 @@ supabase secrets set WORLD_TRIATHLON_API_KEY=your_world_triathlon_key
 Supabase automatically provides:
 
 - `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_PUBLISHABLE_KEY` or the platform-provided `SUPABASE_PUBLISHABLE_KEYS`
+- `SUPABASE_SECRET_KEY` or the platform-provided `SUPABASE_SECRET_KEYS`
 
 ## Deploy
 

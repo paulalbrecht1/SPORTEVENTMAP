@@ -225,7 +225,7 @@
 
     if (
       !appConfig.supabaseUrl ||
-      !appConfig.supabaseAnonKey ||
+      !appConfig.supabasePublishableKey ||
       typeof window.ensureSupabaseFeaturesLoaded !== "function"
     ) {
       return {

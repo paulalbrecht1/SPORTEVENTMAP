@@ -7,7 +7,7 @@
     !supabase ||
     typeof supabase.createClient !== "function" ||
     !config.supabaseUrl ||
-    !config.supabaseAnonKey
+    !config.supabasePublishableKey
   ) {
     window.sportEventMapDetailSupabaseClient = null;
     return;
@@ -16,6 +16,6 @@
   window.sportEventMapDetailSupabaseClient =
     supabase.createClient(
       config.supabaseUrl,
-      config.supabaseAnonKey
+      config.supabasePublishableKey
     );
 })();

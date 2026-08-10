@@ -1,5 +1,10 @@
 # Source Monitor
 
+Die automatische Feldextraktion, Normalisierung, Confidence-Bewertung und Admin-Review aus Stufe 3 ist in [SOURCE_MONITOR_EXTRACTION.md](SOURCE_MONITOR_EXTRACTION.md) dokumentiert.
+
+Die sichere Phase-A-Vorbereitung für Policy-Simulation, Reliability, Discovery,
+Geocoding und DACH-Piloten ist in [STAGE_FOUR_PREPARATION.md](STAGE_FOUR_PREPARATION.md) dokumentiert.
+
 ## Zweck und Sicherheitsgrenze
 
 Der Source Monitor prueft bestehende offizielle Event- und Registrierungsseiten serverseitig. Er speichert technische Abrufdaten, vergleicht normalisierte Content-Hashes und erzeugt Review-Aufgaben. Er überschreibt keine bestehenden öffentlichen Event-Fakten wie Name, Datum, Ort, Distanz, Beschreibung oder Anmeldelink. Als eng begrenzte Ausnahme darf die Lifecycle-Schicht einen neuen Jahrgang oder offiziellen Ergebnislink nach mehrfacher sicherer Bestätigung veröffentlichen.
@@ -154,7 +159,7 @@ Standardwerte pro Domain:
 - `robots.txt` beachten und 24 Stunden cachen
 - ETag und Last-Modified fuer Conditional Requests nutzen
 - `Retry-After` beachten
-- klarer User-Agent `SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)`
+- klarer User-Agent `SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)`
 
 Die globale Parallelitaet liegt standardmaessig bei 5. Claims enthalten nie zwei laufende Jobs derselben Domain. Robots-Abrufe verwenden ein separates Limit von 250 KB.
 
@@ -182,12 +187,12 @@ Aktionen: sofort pruefen, Termin setzen, pausieren, reaktivieren, Historie, Quel
 
 ## Umgebungsvariablen und Secrets
 
-Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` und `SUPABASE_SECRET_KEYS` bereit. Legacy-Projekte koennen weiterhin `SUPABASE_ANON_KEY` und `SUPABASE_SERVICE_ROLE_KEY` verwenden. Secret-/Service-Keys duerfen nie im Browser oder Repository liegen.
+Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` und `SUPABASE_SECRET_KEYS` bereit. Browser erhalten ausschliesslich einen Publishable Key; Secret-/Service-Keys duerfen nie im Browser oder Repository liegen.
 
 Optionale Worker-Konfiguration:
 
 ```text
-SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)
+SOURCE_MONITOR_USER_AGENT=SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)
 SOURCE_MONITOR_ALLOW_HTTP=false
 SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 SOURCE_MONITOR_SMOKE_SECRET=<mindestens 256 Bit>
@@ -222,7 +227,7 @@ Vor dem Deployment CLI-Befehle immer mit `--help` gegen die installierte Version
 ```bash
 supabase db push
 supabase functions deploy event-source-check --use-api
-supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)"
+supabase secrets set SOURCE_MONITOR_USER_AGENT="SportEventMapSourceMonitor/3.2 (+mailto:kontakt@sporteventmap.com)"
 supabase secrets set SOURCE_MONITOR_ALLOW_HTTP=false SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true
 supabase secrets set SOURCE_MONITOR_SMOKE_SECRET="<zufaelliges Secret mit mindestens 256 Bit>"
 ```
@@ -305,6 +310,12 @@ npm run smoke:source-monitor:production
 Erforderlich sind `SUPABASE_URL`, ein Publishable-/Anon-Key und das nur
 serverseitig gesetzte `SOURCE_MONITOR_SMOKE_SECRET`.
 
+
+## Stufe 4: deutsche Phase-A-Beobachtung
+
+Worker-Version `source-monitor-4.1.0-phase-a-shadow` zeichnet nach jedem Crawl optional eine Shadow-Beobachtung auf. Die RPC akzeptiert ausschließlich Service-Role-Aufrufe, gebundene deutsche Pilotquellen und die sichere Konfiguration `dry_run=true`, `automation_enabled=false`, `observation_enabled=true`. Ist Beobachtung global gestoppt oder stammt der Crawl nicht von einem Pilotprofil, wird ohne Nebeneffekt übersprungen. Öffentliche Eventdaten werden durch diese Integration nicht geschrieben.
+
+Pilotbetrieb, Stop/Resume, Review, Reliability, Monitoring, Golden Dataset und Readiness sind in [STAGE_FOUR_GERMANY_OBSERVATION.md](STAGE_FOUR_GERMANY_OBSERVATION.md) beschrieben. Der bestehende Produktions-Cron wird durch die Migration weder geändert noch für Phase A aktiviert.
 
 ## Edition Lifecycle
 

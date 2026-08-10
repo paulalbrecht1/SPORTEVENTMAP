@@ -69,6 +69,50 @@ test("theme selection is consistent across every main view and persists", async 
   ).toBeVisible();
 });
 
+test("Discovery theme toggle matches the Home treatment in light mode", async ({ page }) => {
+  await prepareApp(page, {
+    route: "home",
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() => {
+    window.SportEventMapTheme.apply("light", {
+      persist: true
+    });
+  });
+
+  const readToggleAppearance = selector =>
+    page.locator(selector).evaluate(button => {
+      const style = getComputedStyle(button);
+
+      return {
+        width: style.width,
+        height: style.height,
+        padding: style.padding,
+        backgroundColor: style.backgroundColor,
+        borderColor: style.borderColor,
+        boxShadow: style.boxShadow
+      };
+    });
+
+  const homeAppearance = await readToggleAppearance(
+    '.sem-header-actions [data-theme-toggle-context="landing-desktop"]'
+  );
+
+  await page.goto("/index.html#/discovery");
+  await expect(page.locator("body"))
+    .toHaveClass(/platform-route-discovery/);
+  const discoveryToggle = page.locator(
+    '#authArea [data-theme-toggle-context="platform-desktop"]'
+  );
+  await expect(discoveryToggle).toBeVisible();
+
+  const discoveryAppearance = await readToggleAppearance(
+    '#authArea [data-theme-toggle-context="platform-desktop"]'
+  );
+
+  expect(discoveryAppearance).toEqual(homeAppearance);
+});
+
 test("Discovery search is prominent in dark mode without changing light mode", async ({ page }) => {
   await prepareApp(page, {
     allowPlanner: true,

@@ -8,11 +8,12 @@ import {
   validateSourceUrl
 } from "../_shared/source-monitor-core.mjs";
 import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
+import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-3.1.0";
+const WORKER_VERSION = "source-monitor-4.1.0-phase-a-shadow";
 const DEFAULT_BATCH_SIZE = 5;
-const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/3.1 (+mailto:kontakt@sporteventmap.com)";
+const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
@@ -42,8 +43,8 @@ function runtimeKeys() {
   const publishable = readKeyDictionary("SUPABASE_PUBLISHABLE_KEYS");
   const secret = readKeyDictionary("SUPABASE_SECRET_KEYS");
   return {
-    anonKey: Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || publishable.default || "",
-    serviceKey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY") || secret.default || ""
+    publishableKey: Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || publishable.default || "",
+    serviceKey: Deno.env.get("SUPABASE_SECRET_KEY") || secret.default || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
   };
 }
 
@@ -63,7 +64,7 @@ function pinnedTransport() {
   }
 }
 
-async function authorize(request: Request, supabaseUrl: string, anonKey: string) {
+async function authorize(request: Request, supabaseUrl: string, publishableKey: string, serviceKey: string) {
   const smokeSecret = Deno.env.get("SOURCE_MONITOR_SMOKE_SECRET") || "";
   if (smokeSecret && request.headers.get("x-source-monitor-smoke-secret") === smokeSecret) {
     return { kind: "smoke", userId: null };
@@ -73,13 +74,16 @@ async function authorize(request: Request, supabaseUrl: string, anonKey: string)
   const payload = parseJwtPayload(token);
   if (payload?.role === "service_role") return { kind: "service_role", userId: null };
 
-  const userClient = createClient(supabaseUrl, anonKey, {
+  const userClient = createClient(supabaseUrl, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: authorization } }
   });
   const cronSecret = request.headers.get("x-cron-secret") || "";
-  if (payload?.role === "anon" && cronSecret) {
-    const { data, error } = await userClient.rpc("verify_event_source_cron_secret", { p_secret: cronSecret });
+  if (cronSecret) {
+    const serviceClient = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+    const { data, error } = await serviceClient.rpc("verify_event_source_cron_secret", { p_secret: cronSecret });
     if (!error && data === true) return { kind: "scheduler", userId: null };
   }
 
@@ -265,6 +269,18 @@ async function recordObservation(admin: ReturnType<typeof createClient>, claim: 
   return data;
 }
 
+async function recordPhaseAShadowObservation(
+  admin: ReturnType<typeof createClient>,
+  crawlResultId: string | number | null
+) {
+  if (!crawlResultId) return { recorded: 0, skipped: "crawl_result_missing", dry_run: true };
+  const { data, error } = await admin.rpc("record_stage_four_shadow_observations", {
+    p_crawl_result_id: crawlResultId
+  });
+  if (error) throw new Error(`Phase-A shadow observation failed: ${cleanError(error)}`);
+  return data;
+}
+
 
 async function recordLifecycleSignals(
   admin: ReturnType<typeof createClient>,
@@ -327,6 +343,64 @@ async function recordLifecycleSignals(
   }
   return { editions: editionCount, results: resultCount };
 }
+
+async function recordExtractionSignals(
+  admin: ReturnType<typeof createClient>,
+  claim: Record<string, unknown>,
+  fetched: Record<string, unknown>,
+  crawlResultId: string | null,
+  changeStatus: string
+) {
+  if (!crawlResultId || fetched.notModified || !fetched.rawText || !["changed", "first_seen"].includes(changeStatus)) {
+    return { candidates: 0, proposals: 0, adapters: [] };
+  }
+  const [eventResult, editionsResult, proposalsResult, controlsResult] = await Promise.all([
+    admin.from("events")
+      .select("id,event_name,canonical_name,sport,country,region,city,address,latitude,longitude,event_status,organizer_name,description,image")
+      .eq("id", claim.event_id).single(),
+    admin.from("event_editions")
+      .select("id,event_id,edition_year,start_date,end_date,start_time,registration_url,registration_status,edition_status,price_min,price_max,currency,participant_limit,race_formats")
+      .eq("event_id", claim.event_id).order("edition_year", { ascending: false }),
+    admin.from("event_change_proposals")
+      .select("field_name,normalized_value,proposal_status,reviewed_at,created_at")
+      .eq("event_id", claim.event_id).order("created_at", { ascending: false }).limit(500),
+    admin.from("event_field_controls")
+      .select("edition_id,field_name,is_locked,manual_value,lock_reason,lock_expires_at,source_priority")
+      .eq("event_id", claim.event_id)
+  ]);
+  const contextError = eventResult.error || editionsResult.error || proposalsResult.error || controlsResult.error;
+  if (contextError) throw new Error(`Extraction context failed: ${cleanError(contextError)}`);
+
+  const editions = editionsResult.data || [];
+  const targetEdition = claim.edition_id
+    ? editions.find(edition => String(edition.id) === String(claim.edition_id))
+    : editions.find(edition => String(edition.end_date || edition.start_date || "") >= new Date().toISOString().slice(0, 10)) || editions[0] || null;
+  const extraction = extractEventChanges(String(fetched.rawText), {
+    contentType: String(fetched.contentType || "text/html"),
+    sourceUrl: String(fetched.finalUrl || claim.source_url),
+    event: eventResult.data,
+    edition: targetEdition,
+    editions,
+    previousProposals: proposalsResult.data || [],
+    fieldControls: (controlsResult.data || []).filter(control => !control.edition_id || String(control.edition_id) === String(targetEdition?.id)),
+    source: { source_type: claim.source_type, source_url: claim.source_url }
+  });
+  if (!extraction.proposals.length) {
+    return { candidates: extraction.candidates.length, proposals: 0, adapters: extraction.adapters, diagnostics: extraction.diagnostics };
+  }
+  const { data, error } = await admin.rpc("record_extraction_proposals", {
+    p_source_id: claim.source_id,
+    p_crawl_result_id: crawlResultId,
+    p_proposals: extraction.proposals,
+    p_worker_version: WORKER_VERSION
+  });
+  if (error) throw new Error(`Extraction proposal transaction failed: ${cleanError(error)}`);
+  const { data: automation, error: automationError } = await admin.rpc("simulate_stage_four_for_crawl", {
+    p_crawl_result_id: crawlResultId
+  });
+  if (automationError) throw new Error(`Stage-4 simulation failed: ${cleanError(automationError)}`);
+  return { candidates: extraction.candidates.length, proposals: extraction.proposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data, automation };
+}
 async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
   const startedAt = Date.now();
   const { error: domainPolicyEnsureError } = await admin
@@ -380,13 +454,38 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       changeConfidence: classification.confidence,
       changeReasons: classification.reasons
     }, String(fetchPolicy.userAgent));
+    let extraction: Record<string, unknown> = { candidates: 0, proposals: 0, adapters: [], error: null };
+    try {
+      extraction = { ...extraction, ...await recordExtractionSignals(admin, claim, fetched, transaction?.result_id || null, changeStatus) };
+    } catch (error) {
+      extraction.error = cleanError(error);
+    }
+    let technicalAutomation: Record<string, unknown> = { dry_run: true, public_event_changes: 0, error: null };
+    try {
+      if (transaction?.result_id) {
+        const { data, error } = await admin.rpc("record_stage_four_crawl_automation", { p_crawl_result_id: transaction.result_id });
+        if (error) throw error;
+        technicalAutomation = { ...technicalAutomation, ...(data || {}) };
+      }
+    } catch (error) {
+      technicalAutomation.error = cleanError(error);
+    }
+    let phaseAObservation: Record<string, unknown> = { recorded: 0, dry_run: true, public_event_changes: 0, error: null };
+    try {
+      phaseAObservation = {
+        ...phaseAObservation,
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+      };
+    } catch (error) {
+      phaseAObservation.error = cleanError(error);
+    }
     let lifecycle = { editions: 0, results: 0, error: null as string | null };
     try {
       lifecycle = { ...lifecycle, ...await recordLifecycleSignals(admin, claim, fetched, transaction?.result_id || null) };
     } catch (error) {
       lifecycle.error = cleanError(error);
     }
-    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, lifecycle };
+    return { source_id: claim.source_id, job_id: claim.job_id, status: changeStatus, confidence: classification.confidence, transaction, observation, extraction, technical_automation: technicalAutomation, phase_a_observation: phaseAObservation, lifecycle };
   } catch (error) {
     const failure = error instanceof SourceFetchError
       ? error
@@ -419,7 +518,16 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
       changeConfidence: "technical",
       changeReasons: [failure.code]
     }, String(fetchPolicy.userAgent));
-    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation };
+    let phaseAObservation: Record<string, unknown> = { recorded: 0, dry_run: true, public_event_changes: 0, error: null };
+    try {
+      phaseAObservation = {
+        ...phaseAObservation,
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+      };
+    } catch (shadowError) {
+      phaseAObservation.error = cleanError(shadowError);
+    }
+    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation, phase_a_observation: phaseAObservation };
   }
 }
 
@@ -495,10 +603,10 @@ async function runProductionSmoke(admin: ReturnType<typeof createClient>, supaba
 Deno.serve(async request => {
   if (request.method !== "POST") return response({ error: "Method not allowed" }, 405);
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-  const { anonKey, serviceKey } = runtimeKeys();
-  if (!supabaseUrl || !anonKey || !serviceKey) return response({ error: "Missing Supabase runtime secrets" }, 500);
+  const { publishableKey, serviceKey } = runtimeKeys();
+  if (!supabaseUrl || !publishableKey || !serviceKey) return response({ error: "Missing Supabase runtime keys" }, 500);
 
-  const authorized = await authorize(request, supabaseUrl, anonKey);
+  const authorized = await authorize(request, supabaseUrl, publishableKey, serviceKey);
   if (!authorized) return response({ error: "Admin or scheduler authorization required" }, 403);
   const body = await request.json().catch(() => ({}));
   const requestedBatch = Number(body.batch_size || DEFAULT_BATCH_SIZE);

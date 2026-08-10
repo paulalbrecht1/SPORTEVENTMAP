@@ -21,7 +21,7 @@ if [ -n "$blocked_files" ]; then
   exit 1
 fi
 
-secret_pattern='(sk-[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|(api_secret|service_role|private_key)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']{8,}["'"'])'
+secret_pattern='(sk-[A-Za-z0-9_-]{20,}|sb_secret_[A-Za-z0-9_-]{20,}|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{30,}|eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}|-----BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY-----|(api_secret|service_role|private_key|jwt_secret|database_url|postgres_password|smtp_password|webhook_secret|cron_secret)[[:space:]]*[:=][[:space:]]*["'"'][^"'"']{8,}["'"'])'
 
 secret_files="$(git grep --cached -I -l -E "$secret_pattern" -- . 2>/dev/null || true)"
 

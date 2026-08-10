@@ -27,7 +27,7 @@
   <script src="js/theme.js?v=20260725-publish-runtime-v96"></script>
 
   <!-- DEIN CSS -->
-  <link rel="stylesheet" href="css/style.css?v=20260726-mobile-filter-sheet-v115" />
+  <link rel="stylesheet" href="css/style.css?v=20260810-discovery-transition-v118" />
   <link rel="stylesheet" href="css/data-operations.css?v=20260728-data-operations-v1" />
 </head>
 
@@ -80,8 +80,8 @@
       <nav class="sem-desktop-nav" aria-label="Primary navigation">
         <a class="active" href="#/home" data-landing-route="home" aria-current="page">Home</a>
         <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
       </nav>
 
       <div class="sem-header-actions">
@@ -113,8 +113,8 @@
     </div>
     <a href="#/home" data-landing-route="home">Home</a>
     <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-    <a href="#/planner" data-landing-route="planner">Season Planner</a>
     <a href="#/events" data-landing-route="events">Event Wiki</a>
+    <a href="#/planner" data-landing-route="planner">Season Planner</a>
     <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
     <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
   </nav>
@@ -380,8 +380,8 @@
       </div>
       <nav aria-label="Footer navigation">
         <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <button type="button" id="homeAddEventBtn">Submit an event</button>
       </nav>
       <nav aria-label="Legal links">
@@ -666,7 +666,39 @@
     aria-labelledby="plannerPageTitle"
   >
     <h1 id="plannerPageTitle" class="sr-only">Season Planner</h1>
-    <div id="plannerPageMount" class="planner-page-mount"></div>
+    <div id="plannerPageMount" class="planner-page-mount">
+      <section
+        id="plannerAuthRequired"
+        class="planner-auth-required"
+        aria-labelledby="plannerAuthRequiredTitle"
+        data-testid="planner-auth-required"
+        hidden
+      >
+        <div class="planner-auth-card">
+          <div class="planner-auth-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M7 3v3M17 3v3M4.5 9h15M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+              <path d="m8 15 2.2 2.2L16 11.5" />
+            </svg>
+          </div>
+          <span data-i18n="platform.plannerAuth.kicker">Personal Season Planner</span>
+          <h2 id="plannerAuthRequiredTitle" data-i18n="platform.plannerAuth.title">
+            Log in to plan your season.
+          </h2>
+          <p data-i18n="platform.plannerAuth.copy">
+            Your Season Planner is linked to your account so your saved races,
+            priorities and planning notes stay available across devices.
+          </p>
+          <button
+            id="plannerAuthLoginBtn"
+            type="button"
+            data-i18n="platform.plannerAuth.button"
+          >
+            Log in to Season Planner
+          </button>
+        </div>
+      </section>
+    </div>
   </section>
 
   <section
@@ -770,6 +802,21 @@
      <option value="date" selected> By date </option>
      <option value="name"> Alphabetical </option>
   </select>
+
+        </div>
+
+        <div class="filter-select-card filter-country-card">
+
+          <label for="countryFilter">
+            Country
+          </label>
+
+          <select id="countryFilter">
+            <option value="all">All countries</option>
+            <option value="DE">Germany</option>
+            <option value="AT">Austria</option>
+            <option value="CH">Switzerland</option>
+          </select>
 
         </div>
 
@@ -1071,7 +1118,23 @@
     </div>
 
     <!-- MAP -->
-    <div id="map" data-testid="map"></div>
+    <div
+      id="map"
+      data-testid="map"
+      aria-busy="true"
+      aria-describedby="mapLoadingMessage"
+    >
+      <div
+        id="mapLoadingOverlay"
+        class="map-loading-overlay"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="map-loading-spinner" aria-hidden="true"></span>
+        <strong id="mapLoadingMessage">Loading events…</strong>
+        <span>Preparing the map and filters.</span>
+      </div>
+    </div>
 
     <aside
       id="eventMapLegend"
@@ -2061,7 +2124,7 @@
     <p class="feedback-email-note">
       Found a missing event or want to send more context?
       Use this form or email
-      <a id="feedbackEmailLink" href="mailto:feedback@[your-domain].com">feedback@[your-domain].com</a>.
+      <a id="feedbackEmailLink" href="mailto:kontakt@sporteventmap.com">kontakt@sporteventmap.com</a>.
     </p>
 
     <div class="feedback-prompt-list">
@@ -3012,6 +3075,16 @@
         <div class="admin-data-operations-grid admin-data-operations-review-grid">
           <section>
             <div class="admin-data-operations-section-heading"><div><h4>Automatische Änderungsvorschläge</h4><p id="dataOpsProposalResultCount">0 offen</p></div></div>
+            <div class="proposal-review-filters" aria-label="Filter für Änderungsvorschläge">
+              <label>Status<select id="dataOpsProposalStatusFilter"><option value="pending">pending</option><option value="">Alle</option><option value="accepted">accepted</option><option value="rejected">rejected</option><option value="edited_and_accepted">edited_and_accepted</option><option value="superseded">superseded</option><option value="expired">expired</option></select></label>
+              <label>Änderung<select id="dataOpsProposalTypeFilter"><option value="">Alle</option></select></label>
+              <label>Feld<select id="dataOpsProposalFieldFilter"><option value="">Alle</option></select></label>
+              <label>Confidence<select id="dataOpsProposalConfidenceFilter"><option value="0">Alle</option><option value="0.9">≥ 90%</option><option value="0.75">≥ 75%</option><option value="0.5">≥ 50%</option></select></label>
+              <label>Quelle<select id="dataOpsProposalSourceFilter"><option value="">Alle</option></select></label>
+              <label>Domain<select id="dataOpsProposalDomainFilter"><option value="">Alle</option></select></label>
+              <label>Priorität<select id="dataOpsProposalPriorityFilter"><option value="">Alle</option><option value="critical">critical</option><option value="high">high</option><option value="medium">medium</option><option value="low">low</option></select></label>
+              <label>Alter<select id="dataOpsProposalAgeFilter"><option value="">Alle</option><option value="1">≤ 1 Tag</option><option value="7">≤ 7 Tage</option><option value="30">≤ 30 Tage</option></select></label>
+            </div>
             <div id="dataOpsProposalsList" class="admin-data-operations-list" aria-live="polite"></div>
           </section>
           <section>
@@ -3389,13 +3462,9 @@
 
 <script defer src="js/events.js?v=20260729-map-view-restore-v112"></script>
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
-<script defer src="js/map.js?v=20260729-map-view-restore-v112"></script>
+<script defer src="js/map.js?v=20260810-uiux-hardening-v113"></script>
 <script defer src="js/search.js?v=20260726-phone-planner-fix-v70"></script>
-<script defer src="js/app.js?v=20260729-map-view-restore-v96"></script>
+<script defer src="js/app.js?v=20260810-discovery-transition-v99"></script>
 
 </body>
 </html>
-
-
-
-

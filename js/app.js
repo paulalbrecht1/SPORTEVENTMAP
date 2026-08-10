@@ -29,6 +29,52 @@ let suppressEventRouteUpdate =
 
 let sidebarTransitionTimer;
 
+let landingExitTimer;
+
+let landingRevealTimer;
+
+let discoveryShellStabilizationToken = 0;
+
+function clearLandingTransitionTimers() {
+  window.clearTimeout(landingExitTimer);
+  window.clearTimeout(landingRevealTimer);
+  landingExitTimer = undefined;
+  landingRevealTimer = undefined;
+}
+
+function stabilizeDiscoveryShellForEntry() {
+  const stabilizationToken =
+    ++discoveryShellStabilizationToken;
+
+  document.body.classList.add(
+    "discovery-shell-stabilizing"
+  );
+
+  // Keep transitions disabled through one complete paint. Enabling them on
+  // the following frame cannot animate stale sidebar or drawer dimensions.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (
+        stabilizationToken !==
+        discoveryShellStabilizationToken
+      ) {
+        return;
+      }
+
+      document.body.classList.remove(
+        "discovery-shell-stabilizing"
+      );
+    });
+  });
+}
+
+function cancelDiscoveryShellStabilization() {
+  discoveryShellStabilizationToken += 1;
+  document.body.classList.remove(
+    "discovery-shell-stabilizing"
+  );
+}
+
 function updateSidebarToggleState() {
   if (!sidebar || !toggleBtn) {
     return;
@@ -115,6 +161,14 @@ function setSidebarExpanded(expanded, options = {}) {
   syncSidebarState();
 
   if (wasExpanded === shouldExpand) {
+    return;
+  }
+
+  if (options.animate === false) {
+    window.clearTimeout(sidebarTransitionTimer);
+    document.body.classList.remove(
+      "sidebar-is-transitioning"
+    );
     return;
   }
 
@@ -253,6 +307,7 @@ function showLandingPage(options = {}) {
     );
   }
 
+  clearLandingTransitionTimers();
   document.body.classList.remove("landing-revealing-app");
   document.body.classList.remove("landing-exiting");
   document.body.classList.add("landing-open");
@@ -270,6 +325,7 @@ function hideLandingPage(afterHide, options = {}) {
     document.body.classList.contains("landing-open");
 
   localStorage.setItem("sportEventMap.landingSeen", "true");
+  clearLandingTransitionTimers();
 
   if (
     (
@@ -286,6 +342,11 @@ function hideLandingPage(afterHide, options = {}) {
   }
 
   if (!isLandingOpen) {
+    document.body.classList.remove(
+      "landing-exiting",
+      "landing-revealing-app"
+    );
+
     if (typeof afterHide === "function") {
       afterHide();
     }
@@ -293,12 +354,14 @@ function hideLandingPage(afterHide, options = {}) {
     return;
   }
 
-  document.body.classList.add("landing-exiting");
-  document.body.classList.add("landing-revealing-app");
-
-  setTimeout(() => {
+  const finishLandingHide = (immediate = false) => {
     document.body.classList.remove("landing-open");
     document.body.classList.remove("landing-exiting");
+
+    if (immediate) {
+      document.body.classList.remove("landing-revealing-app");
+    }
+
     setLandingBackgroundInert(false);
 
     if (typeof refreshMapLayout === "function") {
@@ -307,7 +370,9 @@ function hideLandingPage(afterHide, options = {}) {
 
     if (typeof trackEvent === "function") {
       trackEvent("map_viewed", {
-        source: "landing_transition",
+        source: immediate
+          ? "landing_direct"
+          : "landing_transition",
         page: "event_map"
       });
     }
@@ -320,9 +385,28 @@ function hideLandingPage(afterHide, options = {}) {
       maybeShowWelcomeModal();
     }
 
-    setTimeout(() => {
-      document.body.classList.remove("landing-revealing-app");
-    }, 260);
+    if (!immediate) {
+      landingRevealTimer = window.setTimeout(() => {
+        document.body.classList.remove("landing-revealing-app");
+        landingRevealTimer = undefined;
+      }, 260);
+    }
+  };
+
+  // Leaflet must never measure or reveal the map while the landing page still
+  // owns the shell layout. Discovery swaps directly to its final rectangle;
+  // content readiness is communicated by the map loading overlay instead.
+  if (options.immediate) {
+    finishLandingHide(true);
+    return;
+  }
+
+  document.body.classList.add("landing-exiting");
+  document.body.classList.add("landing-revealing-app");
+
+  landingExitTimer = window.setTimeout(() => {
+    landingExitTimer = undefined;
+    finishLandingHide(false);
   }, 520);
 }
 
@@ -498,6 +582,13 @@ function showPlatformPage(route) {
 }
 
 function resetDiscoveryMapAfterLayout(delay = 220, options = {}) {
+  if (typeof window.activateDiscoveryMap === "function") {
+    window.activateDiscoveryMap({
+      restoreEventView: Boolean(options.restoreEventView)
+    });
+    return;
+  }
+
   if (typeof refreshMapLayout === "function") {
     refreshMapLayout(delay);
   }
@@ -536,6 +627,10 @@ function openEventRoute(slug, attempt = 0) {
   setPlatformRouteClasses("discovery");
   showPlatformPage("");
   document.body.classList.remove("landing-open");
+
+  if (typeof window.activateDiscoveryMap === "function") {
+    window.activateDiscoveryMap();
+  }
 
   const found =
     findEventByPlatformSlug(slug);
@@ -632,6 +727,10 @@ function showPlatformRoute(routeInfo, options = {}) {
       : route;
 
   if (route !== "discovery") {
+    cancelDiscoveryShellStabilization();
+  }
+
+  if (route !== "discovery") {
     document.body.classList.remove("mobile-filter-open");
 
     if (sidebar && !sidebar.classList.contains("closed")) {
@@ -665,15 +764,12 @@ function showPlatformRoute(routeInfo, options = {}) {
     return;
   }
 
-  hideLandingPage(null, {
-    keepLandingHash: true,
-    skipWelcome: true
-  });
-
   if (route === "discovery") {
+    stabilizeDiscoveryShellForEntry();
     setPlatformRouteClasses("discovery");
     showPlatformPage("");
     setSidebarExpanded(false, {
+      animate: false,
       refresh: false
     });
 
@@ -681,12 +777,23 @@ function showPlatformRoute(routeInfo, options = {}) {
       closeEventDrawerOnly();
     }
 
+    hideLandingPage(null, {
+      immediate: true,
+      keepLandingHash: true,
+      skipWelcome: true
+    });
+
     resetDiscoveryMapAfterLayout(180, {
       restoreEventView: Boolean(options.restoreEventView)
     });
 
     return;
   }
+
+  hideLandingPage(null, {
+    keepLandingHash: true,
+    skipWelcome: true
+  });
 
   if (route === "planner") {
     closeEventDrawerOnly();
@@ -866,6 +973,17 @@ function initPlatformShell() {
       if (typeof openSeasonPlanner === "function") {
         openSeasonPlanner();
       }
+    });
+
+  document
+    .getElementById("plannerAuthLoginBtn")
+    ?.addEventListener("click", () => {
+      if (typeof openAuthModal === "function") {
+        openAuthModal("login");
+        return;
+      }
+
+      document.getElementById("loginBtn")?.click();
     });
 
   document

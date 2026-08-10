@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 
 const requiredEnvironment = [
   "SUPABASE_URL",
-  "SUPABASE_ANON_KEY",
+  "SUPABASE_PUBLISHABLE_KEY",
   "TEST_USER_A_EMAIL",
   "TEST_USER_A_PASSWORD",
   "TEST_USER_B_EMAIL",
@@ -24,8 +24,8 @@ if (missingEnvironment.length) {
 const baseUrl =
   process.env.SUPABASE_URL.replace(/\/+$/, "");
 
-const anonKey =
-  process.env.SUPABASE_ANON_KEY;
+const publishableKey =
+  process.env.SUPABASE_PUBLISHABLE_KEY;
 
 const runId =
   `rls-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -37,7 +37,7 @@ async function signIn(email, password) {
       {
         method: "POST",
         headers: {
-          apikey: anonKey,
+          apikey: publishableKey,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -64,8 +64,8 @@ async function signIn(email, password) {
 
 function restHeaders(token, prefer = "") {
   return {
-    apikey: anonKey,
-    Authorization: `Bearer ${token || anonKey}`,
+    apikey: publishableKey,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "Content-Type": "application/json",
     ...(prefer ? { Prefer: prefer } : {})
   };
@@ -612,6 +612,25 @@ await test(
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -638,6 +657,25 @@ await test(
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -662,6 +700,13 @@ await test(
         true,
         "Non-admin Source Monitor settings access was not blocked."
       );
+      const stageFourSettings = await restRequest("stage_four_settings?select=singleton,dry_run,automation_enabled", token ? { token } : {});
+      assert.equal(
+        stageFourSettings.response.status === 401 || stageFourSettings.response.status === 403 ||
+          (stageFourSettings.response.ok && Array.isArray(stageFourSettings.data) && stageFourSettings.data.length === 0),
+        true,
+        "Non-admin Stage-4 settings access was not blocked."
+      );
     }
 
     const update = await restRequest(
@@ -677,6 +722,70 @@ await test(
       !update.response.ok || (Array.isArray(update.data) && update.data.length === 0),
       true,
       "Normal-user edition update unexpectedly changed a row."
+    );
+
+    const phaseAMetrics = await restRequest("rpc/get_stage_four_observation_metrics", {
+      token: userA.token,
+      method: "POST",
+      body: { p_country_code: "DE" }
+    });
+    assert.equal(phaseAMetrics.response.ok, false, "Normal user could read Phase-A evaluation metrics.");
+
+    const protectedAdminRpcs = [
+      [
+        "run_event_validation",
+        { p_event_id: publicFixtureEventId, p_edition_id: null }
+      ],
+      [
+        "enqueue_source_crawl",
+        {
+          p_source_id: crypto.randomUUID(),
+          p_priority: 1,
+          p_scheduled_at: new Date().toISOString(),
+          p_trigger_source: "admin"
+        }
+      ],
+      ["reset_source_crawl_failures", { p_source_id: crypto.randomUUID() }],
+      [
+        "resolve_source_review_task",
+        {
+          p_task_id: crypto.randomUUID(),
+          p_status: "resolved",
+          p_notes: "must not be accepted"
+        }
+      ],
+      ["retry_source_crawl_job", { p_job_id: crypto.randomUUID() }]
+    ];
+
+    for (const [rpc, body] of protectedAdminRpcs) {
+      const result = await restRequest(`rpc/${rpc}`, {
+        token: userA.token,
+        method: "POST",
+        body
+      });
+      assert.equal(
+        result.response.ok,
+        false,
+        `Normal user could execute protected admin RPC ${rpc}.`
+      );
+    }
+
+    const invalidCronSecret = await restRequest(
+      "rpc/verify_event_source_cron_secret",
+      {
+        method: "POST",
+        body: { p_secret: `invalid-${runId}` }
+      }
+    );
+    assert.equal(
+      invalidCronSecret.response.ok,
+      false,
+      "Anonymous callers retained access to cron-secret verification."
+    );
+    assert.equal(
+      invalidCronSecret.data?.code,
+      "42501",
+      JSON.stringify(invalidCronSecret.data)
     );
   }
 );
@@ -802,13 +911,28 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(normalApply.response.ok, false);
 
+      const normalSimulation = await restRequest("rpc/evaluate_change_proposal_automation", {
+        token: userA.token,
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_persist: true }
+      });
+      assert.equal(normalSimulation.response.ok, false);
+
+      const simulation = await serviceRequest("rpc/evaluate_change_proposal_automation", {
+        method: "POST",
+        body: { p_proposal_id: proposal.data[0].id, p_persist: true }
+      });
+      assert.equal(simulation.response.ok, true, JSON.stringify(simulation.data));
+      assert.equal(simulation.data.dry_run, true);
+      assert.equal(simulation.data.effective_decision, "block");
+
       const adminApply = await restRequest("rpc/apply_event_change_proposal", {
         token: admin.token,
         method: "POST",
         body: { p_proposal_id: proposal.data[0].id, p_review_notes: "approved in test" }
       });
       assert.equal(adminApply.response.ok, true, JSON.stringify(adminApply.data));
-      assert.equal(adminApply.data.proposal_status, "approved");
+      assert.equal(adminApply.data.proposal_status, "accepted");
     }
   );
 
@@ -821,6 +945,25 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       "event_audit_log",
       "crawler_domain_policies",
       "event_change_proposals",
+      "event_field_controls",
+      "automation_scope_controls",
+      "automation_policies",
+      "source_reliability_metrics",
+      "automation_decisions",
+      "discovery_sources",
+      "discovery_candidates",
+      "duplicate_candidates",
+      "geocoding_jobs",
+      "data_quality_snapshots",
+      "bulk_operations",
+      "stage_four_audit_log",
+      "stage_four_pilot_sources",
+      "stage_four_observation_runs",
+      "stage_four_observations",
+      "stage_four_observation_reviews",
+      "stage_four_golden_cases",
+      "stage_four_readiness_criteria",
+      "stage_four_readiness_snapshots",
       "data_workflow_runs",
       "data_workflow_alerts",
       "source_crawl_jobs",
@@ -836,6 +979,97 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         });
         assert.equal(response.ok, true, `${table} service-role request failed with ${response.status}`);
       }
+      for (const [table, column] of [
+        ["stage_four_settings", "singleton"],
+        ["country_rollouts", "country_code"],
+        ["geocoding_cache", "cache_key"],
+        ["stage_four_usage_daily", "usage_date"],
+        ["bulk_operation_items", "operation_id"]
+      ]) {
+        const response = await fetch(`${baseUrl}/rest/v1/${table}?select=${column}&limit=1`, {
+          headers: {
+            apikey: process.env.SUPABASE_SERVICE_ROLE_KEY,
+            Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
+          }
+        });
+        assert.equal(response.ok, true, `${table} service-role request failed with ${response.status}`);
+      }
+      const qualityRefresh = await serviceRequest("rpc/refresh_data_quality_snapshots", {
+        method: "POST",
+        body: {}
+      });
+      assert.equal(qualityRefresh.response.ok, true, JSON.stringify(qualityRefresh.data));
+      assert.equal(Number(qualityRefresh.data), 3);
+      const monitoringRefresh = await serviceRequest("rpc/refresh_stage_four_monitoring", {
+        method: "POST",
+        body: {}
+      });
+      assert.equal(monitoringRefresh.response.ok, true, JSON.stringify(monitoringRefresh.data));
+      assert.equal(typeof monitoringRefresh.data.queue_length, "number");
+    }
+  );
+
+  await test(
+    "15b. German Phase-A controls remain dry-run, inactive, private and theoretical",
+    async () => {
+      const settings = await serviceRequest("stage_four_settings?select=dry_run,automation_enabled,observation_enabled,observation_scheduler_enabled,observation_country_code");
+      assert.equal(settings.response.ok, true, JSON.stringify(settings.data));
+      assert.deepEqual(settings.data, [{
+        dry_run: true,
+        automation_enabled: false,
+        observation_enabled: false,
+        observation_scheduler_enabled: false,
+        observation_country_code: "DE"
+      }]);
+
+      const countries = await serviceRequest("country_rollouts?select=country_code,rollout_status,automation_enabled,geocoding_enabled&order=country_code.asc");
+      assert.equal(countries.response.ok, true, JSON.stringify(countries.data));
+      const byCountry = new Map(countries.data.map(row => [row.country_code, row]));
+      assert.equal(byCountry.get("DE").rollout_status, "observation");
+      assert.equal(byCountry.get("DE").automation_enabled, false);
+      assert.equal(byCountry.get("DE").geocoding_enabled, false);
+      for (const code of ["AT", "CH"]) {
+        assert.equal(byCountry.get(code).rollout_status, "pilot_disabled");
+        assert.equal(byCountry.get(code).automation_enabled, false);
+        assert.equal(byCountry.get(code).geocoding_enabled, false);
+      }
+
+      const pilots = await restRequest("stage_four_pilot_sources?select=id,country_code,pilot_status,event_source_id", { token: admin.token });
+      assert.equal(pilots.response.ok, true, JSON.stringify(pilots.data));
+      assert.equal(pilots.data.length, 12);
+      assert.ok(pilots.data.every(row => row.country_code === "DE" && row.pilot_status === "candidate" && row.event_source_id == null));
+
+      const metrics = await restRequest("rpc/get_stage_four_observation_metrics", {
+        token: admin.token,
+        method: "POST",
+        body: { p_country_code: "DE" }
+      });
+      assert.equal(metrics.response.ok, true, JSON.stringify(metrics.data));
+      assert.equal(metrics.data.reviewed_sample, 0);
+      assert.equal(metrics.data.sample_sufficient, false);
+      assert.equal(metrics.data.precision, null);
+
+      const readiness = await serviceRequest("rpc/refresh_stage_four_phase_b_readiness", { method: "POST", body: {} });
+      assert.equal(readiness.response.ok, true, JSON.stringify(readiness.data));
+      const readinessRows = await serviceRequest("stage_four_readiness_snapshots?select=theoretically_ready,metrics,blockers&order=calculated_at.desc&limit=3");
+      assert.equal(readinessRows.response.ok, true, JSON.stringify(readinessRows.data));
+      assert.ok(readinessRows.data.every(row => row.theoretically_ready === false && row.metrics.phase_b_activated === false));
+
+      const enqueue = await restRequest("rpc/enqueue_stage_four_observation_runs", {
+        token: admin.token,
+        method: "POST",
+        body: { p_limit: 10, p_trigger_source: "admin" }
+      });
+      assert.equal(enqueue.response.ok, true, JSON.stringify(enqueue.data));
+      assert.equal(Number(enqueue.data.queued), 0, "Observation enqueue bypassed the global observation kill-switch.");
+      assert.equal(enqueue.data.blocked_reason, "global_observation_stop_or_unsafe_settings");
+
+      const unsafeSettings = await serviceRequest("stage_four_settings?singleton=eq.true", {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { dry_run: false }
+      });
+      assert.equal(unsafeSettings.response.ok, false, "Database accepted unsafe non-dry-run settings.");
     }
   );
 }

@@ -33,7 +33,7 @@ function parseArgs(argv) {
 
 async function requestPage(url, key, view, offset, limit) {
   const response = await fetch(`${url}/rest/v1/${view}?select=*&order=edition_slug.asc&offset=${offset}&limit=${limit}`, {
-    headers: { apikey: key, Authorization: `Bearer ${key}` }
+    headers: { apikey: key }
   });
   if (!response.ok) throw new Error(`Supabase export failed (${response.status}): ${(await response.text()).slice(0, 500)}`);
   return response.json();
@@ -52,8 +52,8 @@ async function requestAll(url, key, view) {
 async function main() {
   const args = parseArgs(process.argv);
   const url = clean(process.env.SUPABASE_URL).replace(/\/$/, "");
-  const key = clean(process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY);
-  if (!url || !key) throw new Error("Set SUPABASE_URL and SUPABASE_ANON_KEY or SUPABASE_PUBLISHABLE_KEY.");
+  const key = clean(process.env.SUPABASE_PUBLISHABLE_KEY);
+  if (!url || !key) throw new Error("Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.");
   if (!args.write) throw new Error("Export is explicit: add --write and review the git diff before publishing.");
 
   const [rows, archiveRows] = await Promise.all([

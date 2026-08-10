@@ -1,6 +1,6 @@
 window.SPORT_EVENT_MAP_CONFIG = {
   supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabasePublishableKey: "",
 
   // Leave empty locally. Set the deployed HTTPS origin before release.
   siteUrl: "",

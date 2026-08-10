@@ -5,9 +5,9 @@ const required = name => {
 };
 
 const supabaseUrl = required("SUPABASE_URL").replace(/\/$/, "");
-const apiKey = (process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_PUBLISHABLE_KEY || "").trim();
+const apiKey = required("SUPABASE_PUBLISHABLE_KEY");
+const edgeJwt = required("SUPABASE_EDGE_JWT");
 const smokeSecret = required("SOURCE_MONITOR_SMOKE_SECRET");
-if (!apiKey) throw new Error("Missing SUPABASE_ANON_KEY or SUPABASE_PUBLISHABLE_KEY.");
 
 const controller = new AbortController();
 const timeout = setTimeout(() => controller.abort(), 30000);
@@ -17,7 +17,7 @@ try {
     method: "POST",
     signal: controller.signal,
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Bearer ${edgeJwt}`,
       apikey: apiKey,
       "Content-Type": "application/json",
       "x-source-monitor-smoke-secret": smokeSecret

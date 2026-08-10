@@ -275,12 +275,38 @@ test("Home to Discovery reaches the final shell before markers are revealed", as
       landingClosedAt: null,
       readyAt: null
     };
+    window.__discoveryTransitionFrames = [];
+
+    const sampleDiscoveryShell = () => {
+      const now = performance.now();
+      const mapElement = document.querySelector("#map");
+      const sidebarElement = document.querySelector("#sidebar");
+      const drawerElement = document.querySelector("#eventDrawer");
+
+      window.__discoveryTransitionFrames.push({
+        time: now,
+        mapWidth: mapElement.getBoundingClientRect().width,
+        sidebarWidth: sidebarElement.getBoundingClientRect().width,
+        drawerWidth: drawerElement.getBoundingClientRect().width,
+        drawerPosition: getComputedStyle(drawerElement).position,
+        drawerOpen: drawerElement.classList.contains("open"),
+        busy: mapElement.getAttribute("aria-busy") === "true"
+      });
+
+      if (
+        window.__discoveryTransitionTiming.readyAt === null ||
+        now - window.__discoveryTransitionTiming.readyAt < 300
+      ) {
+        requestAnimationFrame(sampleDiscoveryShell);
+      }
+    };
 
     document.addEventListener(
       "click",
       event => {
         if (event.target.closest('[data-landing-route="discovery"]')) {
           window.__discoveryTransitionTiming.startedAt = performance.now();
+          requestAnimationFrame(sampleDiscoveryShell);
         }
       },
       { capture: true, once: true }
@@ -316,16 +342,33 @@ test("Home to Discovery reaches the final shell before markers are revealed", as
     .click();
 
   await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+  await page.waitForTimeout(320);
 
   const transition = await page.evaluate(() => {
     const topbar = document.querySelector("#topbar").getBoundingClientRect();
     const app = document.querySelector("#app").getBoundingClientRect();
 
+    const visibleMapWidths = window.__discoveryTransitionFrames
+      .filter(frame => !frame.busy)
+      .map(frame => frame.mapWidth);
+    const visibleShellFrames = window.__discoveryTransitionFrames
+      .filter(frame => !frame.busy);
+
     return {
       ...window.__discoveryTransitionTiming,
       bodyClasses: document.body.className,
       appGap: app.top - topbar.bottom,
-      appHeight: app.height
+      appHeight: app.height,
+      visibleMapWidthDelta:
+        Math.max(...visibleMapWidths) - Math.min(...visibleMapWidths),
+      maxVisibleSidebarWidth:
+        Math.max(...visibleShellFrames.map(frame => frame.sidebarWidth)),
+      maxVisibleClosedDrawerWidth:
+        Math.max(...visibleShellFrames
+          .filter(frame => !frame.drawerOpen)
+          .map(frame => frame.drawerWidth)),
+      visibleDrawerPositions:
+        [...new Set(visibleShellFrames.map(frame => frame.drawerPosition))]
     };
   });
 
@@ -338,6 +381,10 @@ test("Home to Discovery reaches the final shell before markers are revealed", as
   expect(transition.appGap).toBeGreaterThanOrEqual(11);
   expect(transition.appGap).toBeLessThanOrEqual(13);
   expect(transition.appHeight).toBeGreaterThan(600);
+  expect(transition.visibleMapWidthDelta).toBeLessThanOrEqual(1);
+  expect(transition.maxVisibleSidebarWidth).toBeLessThanOrEqual(1);
+  expect(transition.maxVisibleClosedDrawerWidth).toBeLessThanOrEqual(2.5);
+  expect(transition.visibleDrawerPositions).toEqual(["absolute"]);
 });
 
 test("combined filters keep marker and result state identical", async ({ page }) => {

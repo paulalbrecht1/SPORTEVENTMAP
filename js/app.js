@@ -33,11 +33,46 @@ let landingExitTimer;
 
 let landingRevealTimer;
 
+let discoveryShellStabilizationToken = 0;
+
 function clearLandingTransitionTimers() {
   window.clearTimeout(landingExitTimer);
   window.clearTimeout(landingRevealTimer);
   landingExitTimer = undefined;
   landingRevealTimer = undefined;
+}
+
+function stabilizeDiscoveryShellForEntry() {
+  const stabilizationToken =
+    ++discoveryShellStabilizationToken;
+
+  document.body.classList.add(
+    "discovery-shell-stabilizing"
+  );
+
+  // Keep transitions disabled through one complete paint. Enabling them on
+  // the following frame cannot animate stale sidebar or drawer dimensions.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (
+        stabilizationToken !==
+        discoveryShellStabilizationToken
+      ) {
+        return;
+      }
+
+      document.body.classList.remove(
+        "discovery-shell-stabilizing"
+      );
+    });
+  });
+}
+
+function cancelDiscoveryShellStabilization() {
+  discoveryShellStabilizationToken += 1;
+  document.body.classList.remove(
+    "discovery-shell-stabilizing"
+  );
 }
 
 function updateSidebarToggleState() {
@@ -126,6 +161,14 @@ function setSidebarExpanded(expanded, options = {}) {
   syncSidebarState();
 
   if (wasExpanded === shouldExpand) {
+    return;
+  }
+
+  if (options.animate === false) {
+    window.clearTimeout(sidebarTransitionTimer);
+    document.body.classList.remove(
+      "sidebar-is-transitioning"
+    );
     return;
   }
 
@@ -684,6 +727,10 @@ function showPlatformRoute(routeInfo, options = {}) {
       : route;
 
   if (route !== "discovery") {
+    cancelDiscoveryShellStabilization();
+  }
+
+  if (route !== "discovery") {
     document.body.classList.remove("mobile-filter-open");
 
     if (sidebar && !sidebar.classList.contains("closed")) {
@@ -718,9 +765,11 @@ function showPlatformRoute(routeInfo, options = {}) {
   }
 
   if (route === "discovery") {
+    stabilizeDiscoveryShellForEntry();
     setPlatformRouteClasses("discovery");
     showPlatformPage("");
     setSidebarExpanded(false, {
+      animate: false,
       refresh: false
     });
 

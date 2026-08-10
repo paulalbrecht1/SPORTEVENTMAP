@@ -28100,7 +28100,7 @@ html:has(body.event-detail-page) {
    Keep the quick event overview drawer above the map instead of letting it
    sit behind the absolute map layer. */
 @media (min-width: 1024px) {
-  body.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #eventDrawer {
+  body.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #eventDrawer.open {
     position: absolute !important;
     top: 18px !important;
     right: 18px !important;
@@ -43714,6 +43714,31 @@ body[data-theme="light"] #adminModal #closeAdminModal:hover {
 }
 
 /* UI/UX hardening: stable Discovery readiness and shared semantic states. */
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #sidebar,
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #eventDrawer,
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #map {
+  transition: none !important;
+}
+
+body.platform-route-discovery.discovery-shell-stabilizing:not(.landing-open):not(.event-list-fullscreen) #map {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+@media (min-width: 1024px) {
+  body.platform-route-discovery.sidebar-collapsed:not(.landing-open):not(.event-list-fullscreen) #map {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
 #map {
   position: relative;
   isolation: isolate;

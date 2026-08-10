@@ -1,117 +1,61 @@
-# Sport Event Map - Deployment Checklist
+# Deployment Checklist
 
-This checklist prepares the static HTML/CSS/JavaScript app for a real HTTPS domain.
-Do not invent production URLs, operator details or credentials.
+Use this checklist for controlled SportEventMap releases. Cloudflare Pages uses
+Direct Upload; GitHub pushes do not change the public website.
 
-## 1. Build and verify the public package
+## 1. Source State
 
-From the project folder:
+- Work on a dedicated branch and review the complete diff.
+- Confirm the branch contains no local credentials or private import files.
+- Merge only a tested, reviewable commit into `main`.
 
-```powershell
-npm run test:gate
-npm run test:event-detail
-npm run prepare-package
-```
+## 2. Reproducible Build
 
-Upload only the generated `dist` folder. Do not upload `tools`, `tests`,
-`supabase`, private imports or local credentials.
-
-For a production build with environment-based public runtime configuration:
+From the project directory run:
 
 ```powershell
-$env:SPORT_EVENT_MAP_SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-$env:SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY="YOUR_PUBLISHABLE_KEY"
-$env:SPORT_EVENT_MAP_SITE_URL="<PRODUCTION_SITE_URL>"
-npm run prepare-package
+npm.cmd ci
+npm.cmd run test:all
+npm.cmd run prepare-package
 ```
 
-`SPORT_EVENT_MAP_SITE_URL` must be the final HTTPS origin without a trailing slash.
-The publishable key is public by design. Never use a secret or `service_role` key
-in build variables or browser files.
+Confirm `dist/` contains the homepage, event pages, `data/events.csv`,
+`sitemap.xml`, `robots.txt` and legal pages. Browser configuration may contain
+only the public Supabase URL and publishable key.
 
-## 2. Apply the complete database migration chain
+## 3. Backend Compatibility
 
-Prefer the linked CLI workflow so production migration history stays reproducible:
+- Review pending Supabase migrations and Edge Function changes separately.
+- Follow `docs/stage4/production-migration-plan.md` when Stage-4 changes are included.
+- Preserve RLS, admin checks and server-side secret verification.
+- Run the local RLS suite and the read-only live anonymous audit.
+- Do not publish a frontend that depends on an undeployed backend change.
+
+## 4. Cloudflare Preview
+
+Create a preview deployment with Wrangler:
 
 ```powershell
-supabase migration list --linked
-supabase db push --linked --dry-run
-supabase db push --linked
-supabase migration list --linked
+npx wrangler pages deploy dist --project-name=sporteventmap --branch=<preview-branch>
 ```
 
-Review every pending migration before pushing. The v77 baseline contains nine
-ordered migrations through:
+Verify Home, Discovery, map, filters, event details, authentication, profile,
+favorites, Season Planner, admin surfaces, feedback and public event pages.
 
-`supabase/migrations/20260725_closed_beta_gate_hardening.sql`
+## 5. Production Release
 
-Do not paste only the two old June migrations into a newer project. For a new
-environment, apply the complete ordered chain. Then verify:
+After the preview succeeds, deploy the exact tested `main` build:
 
 ```powershell
-supabase db lint --linked --level warning
-npm run audit:anon
+npx wrangler pages deploy dist --project-name=sporteventmap --branch=main
 ```
 
-See `SUPABASE_ADMIN_SETUP.md` for admin assignment and verification queries.
+Record the Git commit and Cloudflare deployment URL. Re-run the public HTTP
+smoke checks and confirm Supabase requests, authentication and RLS behavior.
 
-## 3. Assign the admin role
+## 6. Manual Dashboard Checks
 
-Do not promote an admin through frontend email checks. Copy the intended user's UUID
-from **Authentication > Users**, then run:
-
-```sql
-update public.profiles
-set role = 'admin', updated_at = now()
-where id = 'REPLACE_WITH_AUTH_USER_UUID';
-```
-
-Verify the UUID, email and role before continuing.
-
-## 4. Configure Supabase Auth
-
-In **Authentication > URL Configuration**:
-
-- Set Site URL to the final `<PRODUCTION_SITE_URL>`.
-- Add the exact production `/index.html` redirect used by the app.
-- Keep only local development redirects that are still used.
-- Remove obsolete preview and deployment URLs.
-
-In Auth email/password settings:
-
-- Enable email signups and confirmation for the beta.
-- Review minimum password requirements.
-- Enable leaked-password protection when the project plan supports it.
-- Customize confirmation and password-reset templates.
-- Test delivery through two different email providers.
-
-## 5. Run credential-based production tests
-
-Create two normal test accounts and one admin test account as described in
-`tests/README.md`, then run:
-
-```powershell
-npm run test:rls
-```
-
-All 10 tests must pass before inviting testers. Afterward, manually test registration,
-email confirmation, login, logout, session restore and password reset on the final domain.
-
-## 6. Hosting and device checks
-
-- Force HTTPS and disable directory listing.
-- Confirm `index.html`, `data/events.csv`, `sitemap.xml`, `robots.txt` and legal pages return HTTP 200.
-- Confirm no private key files or source-only directories are deployed.
-- Complete Discovery, favorite, Season Planner, feedback and event-detail flows.
-- Complete event submission and admin approval/rejection end to end.
-- Test one real iOS and one real Android device, including virtual keyboards.
-
-## 7. Legal and operations gate
-
-- Replace all legal placeholders with actual operator, contact and hosting details.
-- Obtain legal review for the actual beta operator.
-- Back up `data/events.csv`, the production schema/data and the last known-good `dist`.
-- Select 20-50 invited testers and assign a feedback owner and review cadence.
-
-Do not invite testers until every unchecked item in `BETA_READINESS.md` is either
-completed or explicitly accepted by the responsible operator.
+- Keep Supabase Auth redirect URLs aligned with the production domain.
+- Keep leaked-password protection enabled.
+- Review Supabase Security Advisor findings after backend changes.
+- Retain the previous known-good deployment for rollback.

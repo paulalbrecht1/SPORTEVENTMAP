@@ -32,6 +32,8 @@ reports/event-geo-audit.*
 reports/event-geo-fixes-proposed.json
 reports/responsive-layout-audit.*
 reports/responsive-qa-report.*
+exports/event-url-list.csv
+exports/event-url-list.md
 
 # Reproducible local data-pipeline outputs
 data/events.before-dedupe.csv

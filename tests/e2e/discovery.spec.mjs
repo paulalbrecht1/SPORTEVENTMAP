@@ -243,6 +243,103 @@ test("Discovery initializes once and only reveals its final ready state", async 
   expect(lifecycle.zoom).toBe(11);
 });
 
+test("Home to Discovery reaches the final shell before markers are revealed", async ({ page }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 });
+  await prepareApp(page, {
+    route: "home",
+    openDiscoveryPanel: false
+  });
+
+  const initialClusterColor = await page.evaluate(() => {
+    const defaultClusterStyles = document.createElement("style");
+    defaultClusterStyles.textContent = `
+      .marker-cluster-small {
+        background: rgba(110, 204, 57, 0.6);
+      }
+    `;
+    document.head.append(defaultClusterStyles);
+
+    const cluster = document.createElement("div");
+    cluster.className = "marker-cluster marker-cluster-small";
+    cluster.innerHTML = "<div><span>3</span></div>";
+    document.querySelector("#map").append(cluster);
+
+    return getComputedStyle(cluster).backgroundColor;
+  });
+
+  expect(initialClusterColor).toBe("rgba(15, 118, 110, 0.28)");
+
+  await page.evaluate(() => {
+    window.__discoveryTransitionTiming = {
+      startedAt: null,
+      landingClosedAt: null,
+      readyAt: null
+    };
+
+    document.addEventListener(
+      "click",
+      event => {
+        if (event.target.closest('[data-landing-route="discovery"]')) {
+          window.__discoveryTransitionTiming.startedAt = performance.now();
+        }
+      },
+      { capture: true, once: true }
+    );
+
+    const observer = new MutationObserver(() => {
+      if (
+        window.__discoveryTransitionTiming.landingClosedAt === null &&
+        !document.body.classList.contains("landing-open")
+      ) {
+        window.__discoveryTransitionTiming.landingClosedAt = performance.now();
+      }
+    });
+
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    window.addEventListener(
+      "sport-event-map-discovery-ready",
+      () => {
+        window.__discoveryTransitionTiming.readyAt = performance.now();
+        observer.disconnect();
+      },
+      { once: true }
+    );
+  });
+
+  await page
+    .locator('.landing-page [data-landing-route="discovery"]')
+    .first()
+    .click();
+
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+
+  const transition = await page.evaluate(() => {
+    const topbar = document.querySelector("#topbar").getBoundingClientRect();
+    const app = document.querySelector("#app").getBoundingClientRect();
+
+    return {
+      ...window.__discoveryTransitionTiming,
+      bodyClasses: document.body.className,
+      appGap: app.top - topbar.bottom,
+      appHeight: app.height
+    };
+  });
+
+  expect(transition.landingClosedAt).not.toBeNull();
+  expect(transition.readyAt).not.toBeNull();
+  expect(transition.startedAt).not.toBeNull();
+  expect(transition.landingClosedAt).toBeLessThanOrEqual(transition.readyAt);
+  expect(transition.landingClosedAt - transition.startedAt).toBeLessThan(150);
+  expect(transition.bodyClasses).not.toMatch(/landing-(open|exiting|revealing-app)/);
+  expect(transition.appGap).toBeGreaterThanOrEqual(11);
+  expect(transition.appGap).toBeLessThanOrEqual(13);
+  expect(transition.appHeight).toBeGreaterThan(600);
+});
+
 test("combined filters keep marker and result state identical", async ({ page }) => {
   await prepareApp(page);
 

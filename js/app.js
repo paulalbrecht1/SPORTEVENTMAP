@@ -29,6 +29,17 @@ let suppressEventRouteUpdate =
 
 let sidebarTransitionTimer;
 
+let landingExitTimer;
+
+let landingRevealTimer;
+
+function clearLandingTransitionTimers() {
+  window.clearTimeout(landingExitTimer);
+  window.clearTimeout(landingRevealTimer);
+  landingExitTimer = undefined;
+  landingRevealTimer = undefined;
+}
+
 function updateSidebarToggleState() {
   if (!sidebar || !toggleBtn) {
     return;
@@ -253,6 +264,7 @@ function showLandingPage(options = {}) {
     );
   }
 
+  clearLandingTransitionTimers();
   document.body.classList.remove("landing-revealing-app");
   document.body.classList.remove("landing-exiting");
   document.body.classList.add("landing-open");
@@ -270,6 +282,7 @@ function hideLandingPage(afterHide, options = {}) {
     document.body.classList.contains("landing-open");
 
   localStorage.setItem("sportEventMap.landingSeen", "true");
+  clearLandingTransitionTimers();
 
   if (
     (
@@ -286,6 +299,11 @@ function hideLandingPage(afterHide, options = {}) {
   }
 
   if (!isLandingOpen) {
+    document.body.classList.remove(
+      "landing-exiting",
+      "landing-revealing-app"
+    );
+
     if (typeof afterHide === "function") {
       afterHide();
     }
@@ -293,12 +311,14 @@ function hideLandingPage(afterHide, options = {}) {
     return;
   }
 
-  document.body.classList.add("landing-exiting");
-  document.body.classList.add("landing-revealing-app");
-
-  setTimeout(() => {
+  const finishLandingHide = (immediate = false) => {
     document.body.classList.remove("landing-open");
     document.body.classList.remove("landing-exiting");
+
+    if (immediate) {
+      document.body.classList.remove("landing-revealing-app");
+    }
+
     setLandingBackgroundInert(false);
 
     if (typeof refreshMapLayout === "function") {
@@ -307,7 +327,9 @@ function hideLandingPage(afterHide, options = {}) {
 
     if (typeof trackEvent === "function") {
       trackEvent("map_viewed", {
-        source: "landing_transition",
+        source: immediate
+          ? "landing_direct"
+          : "landing_transition",
         page: "event_map"
       });
     }
@@ -320,9 +342,28 @@ function hideLandingPage(afterHide, options = {}) {
       maybeShowWelcomeModal();
     }
 
-    setTimeout(() => {
-      document.body.classList.remove("landing-revealing-app");
-    }, 260);
+    if (!immediate) {
+      landingRevealTimer = window.setTimeout(() => {
+        document.body.classList.remove("landing-revealing-app");
+        landingRevealTimer = undefined;
+      }, 260);
+    }
+  };
+
+  // Leaflet must never measure or reveal the map while the landing page still
+  // owns the shell layout. Discovery swaps directly to its final rectangle;
+  // content readiness is communicated by the map loading overlay instead.
+  if (options.immediate) {
+    finishLandingHide(true);
+    return;
+  }
+
+  document.body.classList.add("landing-exiting");
+  document.body.classList.add("landing-revealing-app");
+
+  landingExitTimer = window.setTimeout(() => {
+    landingExitTimer = undefined;
+    finishLandingHide(false);
   }, 520);
 }
 
@@ -676,11 +717,6 @@ function showPlatformRoute(routeInfo, options = {}) {
     return;
   }
 
-  hideLandingPage(null, {
-    keepLandingHash: true,
-    skipWelcome: true
-  });
-
   if (route === "discovery") {
     setPlatformRouteClasses("discovery");
     showPlatformPage("");
@@ -692,12 +728,23 @@ function showPlatformRoute(routeInfo, options = {}) {
       closeEventDrawerOnly();
     }
 
+    hideLandingPage(null, {
+      immediate: true,
+      keepLandingHash: true,
+      skipWelcome: true
+    });
+
     resetDiscoveryMapAfterLayout(180, {
       restoreEventView: Boolean(options.restoreEventView)
     });
 
     return;
   }
+
+  hideLandingPage(null, {
+    keepLandingHash: true,
+    skipWelcome: true
+  });
 
   if (route === "planner") {
     closeEventDrawerOnly();

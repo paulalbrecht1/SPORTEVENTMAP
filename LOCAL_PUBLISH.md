@@ -1,82 +1,52 @@
-# Local Publish Package
+# Local Build and Cloudflare Release
 
-The app is currently developed and tested locally. Hosting is intentionally
-postponed until the event database, mobile experience and product flow are more
-complete.
+The public website is generated into `dist/`. GitHub and Cloudflare are not
+connected, so commits and merges never publish the website automatically.
 
-The project still keeps a clean `dist/` package because it is useful for later
-drag-and-drop hosting.
+## Install, Test and Build
 
-## What `dist/` Is
-
-`dist/` is the public website folder. It contains only the app files that a
-static host needs:
-
-- `index.html`
-- legal/contact pages
-- `css/style.css`
-- browser JavaScript files
-- `data/events.csv`
-
-It does not contain import tools, Supabase SQL setup files, review CSVs or
-private API key files.
-
-## Create The Local Public Package
-
-Run:
+Run all commands from the project directory:
 
 ```powershell
-node tools/check-publish-readiness.js
-node tools/create-publish-package.js
+npm.cmd ci
+npm.cmd run test:all
+npm.cmd run prepare-package
 ```
 
-Then test locally:
+Only publish when every command succeeds. The build may contain a Supabase URL
+and publishable browser key. Never place secret, service-role or database
+credentials in browser files or build variables.
+
+## Local Smoke Test
+
+Serve the generated package locally:
 
 ```powershell
-cd dist
+Set-Location dist
 python -m http.server 4174
 ```
 
-Open:
+Open `http://localhost:4174`, complete the main user flows, then return to the
+project directory before running Wrangler.
 
-```text
-http://localhost:4174
-```
+## Cloudflare Preview
 
-## Later Drag-And-Drop Hosting
-
-When the app is ready to publish, create a fresh `dist/` folder with:
+Deploy a preview before every production release:
 
 ```powershell
-node tools/create-publish-package.js
+npx wrangler pages deploy dist --project-name=sporteventmap --branch=<preview-branch>
 ```
 
-Then upload the contents of the `dist/` folder to a static hosting provider.
+Test the returned preview URL. A preview deployment does not replace the public
+production deployment.
 
-After the site has a real URL, update Supabase Authentication URL settings:
+## Production Release
 
-- Site URL
-- Redirect URLs
-- Password reset redirect URL
+After a successful preview and smoke test, deploy the tested `main` build:
 
-## Supabase Checklist Before Sharing A Public URL
+```powershell
+npx wrangler pages deploy dist --project-name=sporteventmap --branch=main
+```
 
-1. Run `supabase/admin-roles.sql` in Supabase SQL Editor.
-2. Confirm your profile role is `admin`.
-3. Confirm logged-out users can read only approved events.
-4. Confirm pending/rejected events do not appear on the public map.
-5. Confirm normal users do not see the Admin button.
-6. Enable email confirmation if you want only verified emails.
-7. Configure password reset redirects after the live URL exists.
-
-## Data Publishing Flow
-
-For more event data:
-
-1. Put raw imports into `data/imports/raw/`.
-2. Normalize them into `data/imports/normalized/`.
-3. Run the build pipeline.
-4. Review `data/imports/review/`.
-5. Publish only the cleaned final `data/events.csv`.
-
-The product focus stays Germany first, then Europe.
+If a release contains Supabase migrations or Edge Function changes, coordinate
+and verify those backend changes before publishing the dependent frontend.

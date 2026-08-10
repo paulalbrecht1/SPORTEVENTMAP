@@ -80,8 +80,8 @@
       <nav class="sem-desktop-nav" aria-label="Primary navigation">
         <a class="active" href="#/home" data-landing-route="home" aria-current="page">Home</a>
         <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
       </nav>
 
       <div class="sem-header-actions">
@@ -113,8 +113,8 @@
     </div>
     <a href="#/home" data-landing-route="home">Home</a>
     <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-    <a href="#/planner" data-landing-route="planner">Season Planner</a>
     <a href="#/events" data-landing-route="events">Event Wiki</a>
+    <a href="#/planner" data-landing-route="planner">Season Planner</a>
     <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
     <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
   </nav>
@@ -380,8 +380,8 @@
       </div>
       <nav aria-label="Footer navigation">
         <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <a href="#/events" data-landing-route="events">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner">Season Planner</a>
         <button type="button" id="homeAddEventBtn">Submit an event</button>
       </nav>
       <nav aria-label="Legal links">
@@ -666,7 +666,39 @@
     aria-labelledby="plannerPageTitle"
   >
     <h1 id="plannerPageTitle" class="sr-only">Season Planner</h1>
-    <div id="plannerPageMount" class="planner-page-mount"></div>
+    <div id="plannerPageMount" class="planner-page-mount">
+      <section
+        id="plannerAuthRequired"
+        class="planner-auth-required"
+        aria-labelledby="plannerAuthRequiredTitle"
+        data-testid="planner-auth-required"
+        hidden
+      >
+        <div class="planner-auth-card">
+          <div class="planner-auth-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M7 3v3M17 3v3M4.5 9h15M6 5h12a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z" />
+              <path d="m8 15 2.2 2.2L16 11.5" />
+            </svg>
+          </div>
+          <span data-i18n="platform.plannerAuth.kicker">Personal Season Planner</span>
+          <h2 id="plannerAuthRequiredTitle" data-i18n="platform.plannerAuth.title">
+            Log in to plan your season.
+          </h2>
+          <p data-i18n="platform.plannerAuth.copy">
+            Your Season Planner is linked to your account so your saved races,
+            priorities and planning notes stay available across devices.
+          </p>
+          <button
+            id="plannerAuthLoginBtn"
+            type="button"
+            data-i18n="platform.plannerAuth.button"
+          >
+            Log in to Season Planner
+          </button>
+        </div>
+      </section>
+    </div>
   </section>
 
   <section

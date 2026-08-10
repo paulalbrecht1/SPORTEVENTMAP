@@ -976,6 +976,17 @@ function initPlatformShell() {
     });
 
   document
+    .getElementById("plannerAuthLoginBtn")
+    ?.addEventListener("click", () => {
+      if (typeof openAuthModal === "function") {
+        openAuthModal("login");
+        return;
+      }
+
+      document.getElementById("loginBtn")?.click();
+    });
+
+  document
     .getElementById("eventWikiSearchFocusBtn")
     ?.addEventListener("click", () => {
       navigateToPlatformRoute("discovery");

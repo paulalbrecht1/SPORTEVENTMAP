@@ -125,6 +125,43 @@ test("Light mode keeps Home and Season Planner text readable", async ({ page }) 
   expect(homeCta.cardPadding).toBeGreaterThanOrEqual(32);
   expect(homeCta.cardRadius).toBeGreaterThanOrEqual(24);
 
+  const homePreviewMetrics = await page.evaluate(() => {
+    const averageRgb = value => {
+      const channels = value.match(/[\d.]+/g)?.slice(0, 3).map(Number) || [];
+      return channels.length === 3
+        ? channels.reduce((sum, channel) => sum + channel, 0) / 3
+        : 0;
+    };
+    const selectors = [
+      ".sem-preview-shell",
+      ".sem-preview-list",
+      ".sem-preview-map",
+      ".sem-discovery-ui",
+      ".sem-discovery-controls",
+      ".sem-result-stack",
+      ".sem-result-map",
+      ".sem-planner-ui",
+      ".sem-planner-summary"
+    ];
+
+    return {
+      noteMarginTop: parseFloat(
+        getComputedStyle(document.querySelector(".sem-hero-note")).marginTop
+      ),
+      previewBrightness: selectors.map(selector => ({
+        selector,
+        brightness: averageRgb(
+          getComputedStyle(document.querySelector(selector)).backgroundColor
+        )
+      }))
+    };
+  });
+
+  expect(homePreviewMetrics.noteMarginTop).toBeGreaterThanOrEqual(24);
+  for (const surface of homePreviewMetrics.previewBrightness) {
+    expect(surface.brightness, surface.selector).toBeGreaterThanOrEqual(215);
+  }
+
   await page.goto("/index.html#/discovery");
   await openPlanner(page);
 
@@ -155,6 +192,31 @@ test("Light mode keeps Event Wiki actions readable at phone widths", async ({ pa
   await page.evaluate(() =>
     window.SportEventMapTheme.apply("light", { persist: true })
   );
+
+  const wikiSurface = await page.evaluate(() => {
+    const hero = getComputedStyle(
+      document.querySelector("#eventWikiPage .platform-page-hero")
+    );
+    const card = getComputedStyle(
+      document.querySelector("#eventWikiPage .platform-feature-grid article")
+    );
+
+    return {
+      heroBackground: hero.backgroundImage,
+      heroRadius: parseFloat(hero.borderRadius),
+      cardBackground: card.backgroundImage,
+      cardRadius: parseFloat(card.borderRadius),
+      cardShadow: card.boxShadow
+    };
+  });
+
+  expect(wikiSurface.heroBackground).toContain("radial-gradient");
+  expect(wikiSurface.heroBackground).toContain("linear-gradient");
+  expect(wikiSurface.heroRadius).toBeGreaterThanOrEqual(20);
+  expect(wikiSurface.cardBackground).toContain("radial-gradient");
+  expect(wikiSurface.cardBackground).toContain("linear-gradient");
+  expect(wikiSurface.cardRadius).toBeGreaterThanOrEqual(16);
+  expect(wikiSurface.cardShadow).not.toBe("none");
 
   for (const width of [320, 375, 390, 430]) {
     await page.setViewportSize({ width, height: 844 });

@@ -138,7 +138,36 @@ assert.match(
   /\.platform-nav a\s*\{[\s\S]*?border:\s*1px solid rgba\(148, 163, 184, 0\.24\);[\s\S]*?border-radius:\s*999px;[\s\S]*?background:/i,
   "Platform navigation links must render as visible pills"
 );
-pass("Home and platform navigation labels render as pills");
+
+const landingNavMarkup =
+  html.match(/<nav class="sem-desktop-nav"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] || "";
+const platformNavMarkup =
+  html.match(/<nav id="platformNav"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] || "";
+const landingMobileNavMarkup =
+  html.match(/<nav class="sem-mobile-menu"[^>]*>([\s\S]*?)<\/nav>/i)?.[1] || "";
+const landingNavOrder =
+  [...landingNavMarkup.matchAll(/data-landing-route="([^"]+)"/g)].map(match => match[1]);
+const platformNavOrder =
+  [...platformNavMarkup.matchAll(/data-platform-route="([^"]+)"/g)].map(match => match[1]);
+const landingMobileNavOrder =
+  [...landingMobileNavMarkup.matchAll(/data-landing-route="([^"]+)"/g)].map(match => match[1]);
+
+assert.deepEqual(
+  landingNavOrder,
+  ["home", "discovery", "events", "planner"],
+  "Home navigation must keep Event Wiki before Season Planner"
+);
+assert.deepEqual(
+  platformNavOrder,
+  landingNavOrder,
+  "Home and platform navigation pills must use the same order"
+);
+assert.deepEqual(
+  landingMobileNavOrder.slice(0, 4),
+  landingNavOrder,
+  "Desktop and mobile Home navigation must use the same order"
+);
+pass("Home and platform navigation labels render as consistently ordered pills");
 
 assert.match(
   css,

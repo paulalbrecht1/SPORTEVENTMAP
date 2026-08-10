@@ -10836,6 +10836,10 @@ function setSeasonTab(tabName) {
 
 async function openSeasonPlanner() {
   let isSignedIn = false;
+  const plannerModal =
+    document.getElementById("seasonPlannerModal");
+  const plannerAuthRequired =
+    document.getElementById("plannerAuthRequired");
 
   try {
     isSignedIn =
@@ -10848,18 +10852,32 @@ async function openSeasonPlanner() {
   }
 
   if (!isSignedIn) {
-    if (typeof showAppMessage === "function") {
-      showAppMessage(
-        "Login required",
-        "Please log in to open your season planner and manage your saved race calendar."
+    plannerModal?.classList.remove(
+      "open",
+      "season-planner-page-mode"
+    );
+    document.body.classList.remove(
+      "season-planner-page-open"
+    );
+
+    if (plannerAuthRequired) {
+      plannerAuthRequired.hidden = false;
+      plannerAuthRequired.setAttribute(
+        "aria-hidden",
+        "false"
       );
     }
 
     return;
   }
 
-  const plannerModal =
-    document.getElementById("seasonPlannerModal");
+  if (plannerAuthRequired) {
+    plannerAuthRequired.hidden = true;
+    plannerAuthRequired.setAttribute(
+      "aria-hidden",
+      "true"
+    );
+  }
 
   if (!plannerModal) {
     console.warn(

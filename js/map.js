@@ -279,6 +279,20 @@ let mapLayoutObserver;
 let mapLayoutRefreshInitialized = false;
 let eventsRefreshToken = 0;
 let deferMarkerLayerUpdates = false;
+let discoveryMapDataReady = false;
+let discoveryMapLayoutReady = false;
+let discoveryMapReady = false;
+let discoveryMapActivated = false;
+let discoveryMapActivationToken = 0;
+const discoveryMapDiagnostics = {
+  instances: 0,
+  activations: 0,
+  readyTransitions: 0,
+  dataRefreshes: 0
+};
+
+window.__discoveryMapDiagnostics =
+  discoveryMapDiagnostics;
 
 const MAP_STYLES = {
   standard: {
@@ -354,8 +368,14 @@ function createEventMarkerPresentation(event) {
 
 // INIT MAP
 function initMap() {
+  if (map) {
+    return map;
+  }
+
   const usePhoneMapMode =
     isPhoneViewport();
+
+  discoveryMapDiagnostics.instances += 1;
 
   map = L.map("map", {
     preferCanvas: true,
@@ -392,6 +412,117 @@ function initMap() {
   map.addLayer(markerLayer);
 
   setupMapLayoutRefresh();
+
+  return map;
+}
+
+function setDiscoveryMapLoading(isLoading, message = "Loading events…") {
+  const mapElement =
+    document.getElementById("map");
+  const overlay =
+    document.getElementById("mapLoadingOverlay");
+  const messageElement =
+    document.getElementById("mapLoadingMessage");
+
+  if (messageElement) {
+    messageElement.textContent = message;
+  }
+
+  if (mapElement) {
+    mapElement.setAttribute(
+      "aria-busy",
+      isLoading ? "true" : "false"
+    );
+  }
+
+  if (overlay) {
+    overlay.hidden = !isLoading;
+  }
+
+  document.body.classList.toggle(
+    "discovery-map-loading",
+    isLoading
+  );
+}
+
+function completeDiscoveryMapReady(activationToken = discoveryMapActivationToken) {
+  if (
+    activationToken !== discoveryMapActivationToken ||
+    !map ||
+    !discoveryMapDataReady ||
+    !discoveryMapLayoutReady
+  ) {
+    return false;
+  }
+
+  window.requestAnimationFrame(() => {
+    if (
+      activationToken !== discoveryMapActivationToken ||
+      !discoveryMapDataReady ||
+      !discoveryMapLayoutReady
+    ) {
+      return;
+    }
+
+    discoveryMapReady = true;
+    discoveryMapDiagnostics.readyTransitions += 1;
+    setDiscoveryMapLoading(false);
+
+    window.dispatchEvent(
+      new CustomEvent("sport-event-map-discovery-ready")
+    );
+  });
+
+  return true;
+}
+
+function activateDiscoveryMap(options = {}) {
+  const activeMap = initMap();
+  const activationToken =
+    ++discoveryMapActivationToken;
+
+  discoveryMapDiagnostics.activations += 1;
+
+  discoveryMapLayoutReady = false;
+  setDiscoveryMapLoading(
+    true,
+    discoveryMapDataReady
+      ? "Preparing map…"
+      : "Loading events…"
+  );
+
+  // The route classes define the final map rectangle. Waiting for two frames
+  // lets layout settle before Leaflet measures it and prevents a visible pan.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (
+        activationToken !== discoveryMapActivationToken ||
+        !activeMap
+      ) {
+        return;
+      }
+
+      activeMap.invalidateSize({
+        animate: false,
+        pan: false
+      });
+
+      if (
+        options.restoreEventView &&
+        restoreDiscoveryMapViewBeforeEvent()
+      ) {
+        // The saved event view is the final route state.
+      } else if (!discoveryMapActivated) {
+        resetDiscoveryMapView();
+      }
+
+      discoveryMapActivated = true;
+      discoveryMapLayoutReady = true;
+      completeDiscoveryMapReady(activationToken);
+    });
+  });
+
+  return activeMap;
 }
 
 function refreshMapLayout(delay = 0) {
@@ -422,9 +553,6 @@ function refreshMapLayout(delay = 0) {
   mapLayoutRefreshTimer = window.setTimeout(() => {
     window.requestAnimationFrame(run);
 
-    if (!usePhoneMapMode) {
-      window.setTimeout(run, 220);
-    }
   }, refreshDelay);
 }
 
@@ -676,6 +804,11 @@ function setVisibleMapMarkers(markerItems) {
       .map(item => item && item.marker)
       .filter(Boolean);
 
+  window.__visibleDiscoveryMarkerKeys =
+    (markerItems || [])
+      .map(item => item?.data && getEventKey(item.data))
+      .filter(Boolean);
+
   markerLayer.clearLayers();
 
   if (
@@ -737,9 +870,6 @@ function focusEvent(event) {
     duration: 1.5
   });
 }
-
-// INIT
-initMap();
 
 function resetMapFilters() {
 
@@ -854,6 +984,12 @@ function refreshEvents(options = {}) {
   const refreshToken =
     ++eventsRefreshToken;
 
+  discoveryMapDiagnostics.dataRefreshes += 1;
+
+  discoveryMapDataReady = false;
+  discoveryMapReady = false;
+  setDiscoveryMapLoading(true);
+
   const list =
     document.getElementById("eventList");
 
@@ -934,6 +1070,9 @@ function refreshEvents(options = {}) {
     }
   }
 
+  discoveryMapDataReady = true;
+  completeDiscoveryMapReady();
+
   });
 
 }
@@ -953,5 +1092,12 @@ window.restoreDiscoveryMapViewBeforeEvent =
 
 window.setVisibleMapMarkers =
   setVisibleMapMarkers;
+
+window.activateDiscoveryMap =
+  activateDiscoveryMap;
+
+window.isDiscoveryMapReady = function isDiscoveryMapReady() {
+  return discoveryMapReady;
+};
 
 refreshEvents();

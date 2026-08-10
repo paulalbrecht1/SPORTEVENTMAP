@@ -498,6 +498,13 @@ function showPlatformPage(route) {
 }
 
 function resetDiscoveryMapAfterLayout(delay = 220, options = {}) {
+  if (typeof window.activateDiscoveryMap === "function") {
+    window.activateDiscoveryMap({
+      restoreEventView: Boolean(options.restoreEventView)
+    });
+    return;
+  }
+
   if (typeof refreshMapLayout === "function") {
     refreshMapLayout(delay);
   }
@@ -536,6 +543,10 @@ function openEventRoute(slug, attempt = 0) {
   setPlatformRouteClasses("discovery");
   showPlatformPage("");
   document.body.classList.remove("landing-open");
+
+  if (typeof window.activateDiscoveryMap === "function") {
+    window.activateDiscoveryMap();
+  }
 
   const found =
     findEventByPlatformSlug(slug);

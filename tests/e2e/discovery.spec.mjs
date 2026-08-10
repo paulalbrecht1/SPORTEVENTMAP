@@ -198,3 +198,85 @@ test("fullscreen custom range aligns and sport pills are not clipped", async ({ 
     expect(geometry.activePill.bottom).toBeLessThanOrEqual(geometry.filters.bottom);
   }
 });
+
+test("Discovery initializes once and only reveals its final ready state", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await prepareApp(page, {
+    route: "home",
+    openDiscoveryPanel: false
+  });
+
+  await expect.poll(() =>
+    page.evaluate(() => window.__discoveryMapDiagnostics.instances)
+  ).toBe(0);
+
+  await page.evaluate(() => {
+    window.location.hash = "/discovery";
+  });
+
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+  await expect(page.locator("#mapLoadingOverlay")).toBeHidden();
+  await expect.poll(() =>
+    page.evaluate(() => window.__discoveryMapDiagnostics.instances)
+  ).toBe(1);
+
+  await page.evaluate(() => {
+    map.setView([48.1372, 11.5756], 11, { animate: false });
+    window.location.hash = "/home";
+  });
+  await expect(page.locator("body")).toHaveClass(/landing-open/);
+
+  await page.evaluate(() => {
+    window.location.hash = "/discovery";
+  });
+  await expect(page.getByTestId("map")).toHaveAttribute("aria-busy", "false");
+
+  const lifecycle = await page.evaluate(() => ({
+    ...window.__discoveryMapDiagnostics,
+    center: [map.getCenter().lat, map.getCenter().lng],
+    zoom: map.getZoom()
+  }));
+
+  expect(lifecycle.instances).toBe(1);
+  expect(lifecycle.activations).toBe(2);
+  expect(lifecycle.center).toEqual([48.1372, 11.5756]);
+  expect(lifecycle.zoom).toBe(11);
+});
+
+test("combined filters keep marker and result state identical", async ({ page }) => {
+  await prepareApp(page);
+
+  await page.getByTestId("filter-sport-running").click();
+  await page.locator("#distanceFilterToggle").click();
+  await page.locator('[data-distance-filter="10k"]').click();
+  await page.locator("#countryFilter").selectOption("DE");
+  await page.locator("#dateFilter").selectOption("upcoming");
+
+  await expect(page.getByTestId("event-card")).toHaveCount(1);
+  await expect(page.getByTestId("event-card").first()).toContainText(
+    "SEM E2E Future Run"
+  );
+
+  const synchronizedKeys = await page.evaluate(() => ({
+    cards: [...document.querySelectorAll('[data-testid="event-card"]')]
+      .map(card => card.dataset.key)
+      .sort(),
+    markers: [...window.__visibleDiscoveryMarkerKeys].sort()
+  }));
+
+  expect(synchronizedKeys.markers).toEqual(synchronizedKeys.cards);
+
+  await page.getByTestId("filter-reset").click();
+  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await expect(page.getByTestId("filter-sport-all")).toHaveClass(/active/);
+  await expect(page.locator('[data-distance-filter="10k"]')).not.toHaveClass(/active/);
+  await expect(page.locator("#countryFilter")).toHaveValue("all");
+  await expect(page.locator("#dateFilter")).toHaveValue("all");
+
+  const resetCounts = await page.evaluate(() => ({
+    cards: document.querySelectorAll('[data-testid="event-card"]').length,
+    markers: window.__visibleDiscoveryMarkerKeys.length
+  }));
+
+  expect(resetCounts.markers).toBe(resetCounts.cards);
+});

@@ -147,6 +147,40 @@ test("Light mode keeps Home and Season Planner text readable", async ({ page }) 
   await expectReadable(page, ".season-equipment-item button");
 });
 
+test("Light mode keeps Event Wiki actions readable at phone widths", async ({ page }) => {
+  await prepareApp(page, {
+    route: "events",
+    openDiscoveryPanel: false
+  });
+  await page.evaluate(() =>
+    window.SportEventMapTheme.apply("light", { persist: true })
+  );
+
+  for (const width of [320, 375, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 });
+
+    await expect(page.locator("#eventWikiPage")).toBeVisible();
+    await expect(page.locator("#eventWikiPage .platform-page-actions a")).toHaveCount(2);
+    await expectReadable(page, "#eventWikiPage .platform-page-actions a", 4.5);
+    await expectReadable(page, "#eventWikiPage .platform-feature-grid h2", 4.5);
+
+    const layout = await page.evaluate(() => ({
+      overflow:
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+      actionsInViewport: [
+        ...document.querySelectorAll("#eventWikiPage .platform-page-actions a")
+      ].every(action => {
+        const bounds = action.getBoundingClientRect();
+        return bounds.left >= -1 && bounds.right <= window.innerWidth + 1;
+      })
+    }));
+
+    expect(layout.overflow, `${width}px`).toBeLessThanOrEqual(2);
+    expect(layout.actionsInViewport, `${width}px`).toBe(true);
+  }
+});
+
 
 test("Light mode remains readable on mobile Home and Planner views", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });

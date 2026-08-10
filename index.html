@@ -27,7 +27,7 @@
   <script src="js/theme.js?v=20260725-publish-runtime-v96"></script>
 
   <!-- DEIN CSS -->
-  <link rel="stylesheet" href="css/style.css?v=20260726-mobile-filter-sheet-v115" />
+  <link rel="stylesheet" href="css/style.css?v=20260810-uiux-hardening-v116" />
   <link rel="stylesheet" href="css/data-operations.css?v=20260728-data-operations-v1" />
 </head>
 
@@ -1086,7 +1086,23 @@
     </div>
 
     <!-- MAP -->
-    <div id="map" data-testid="map"></div>
+    <div
+      id="map"
+      data-testid="map"
+      aria-busy="true"
+      aria-describedby="mapLoadingMessage"
+    >
+      <div
+        id="mapLoadingOverlay"
+        class="map-loading-overlay"
+        role="status"
+        aria-live="polite"
+      >
+        <span class="map-loading-spinner" aria-hidden="true"></span>
+        <strong id="mapLoadingMessage">Loading events…</strong>
+        <span>Preparing the map and filters.</span>
+      </div>
+    </div>
 
     <aside
       id="eventMapLegend"
@@ -3414,10 +3430,9 @@
 
 <script defer src="js/events.js?v=20260729-map-view-restore-v112"></script>
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
-<script defer src="js/map.js?v=20260729-map-view-restore-v112"></script>
+<script defer src="js/map.js?v=20260810-uiux-hardening-v113"></script>
 <script defer src="js/search.js?v=20260726-phone-planner-fix-v70"></script>
-<script defer src="js/app.js?v=20260729-map-view-restore-v96"></script>
+<script defer src="js/app.js?v=20260810-uiux-hardening-v97"></script>
 
 </body>
 </html>
-

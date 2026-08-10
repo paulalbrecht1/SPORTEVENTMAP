@@ -17,12 +17,12 @@ const config =
 const supabaseUrl =
   config.match(/supabaseUrl\s*:\s*"([^"]+)"/)?.[1];
 
-const anonKey =
-  config.match(/supabaseAnonKey\s*:\s*"([^"]+)"/)?.[1];
+const publishableKey =
+  config.match(/supabasePublishableKey\s*:\s*"([^"]+)"/)?.[1];
 
-if (!supabaseUrl || !anonKey) {
+if (!supabaseUrl || !publishableKey) {
   throw new Error(
-    "Public Supabase URL/anon key not found in js/config.js."
+    "Public Supabase URL/publishable key not found in js/config.js."
   );
 }
 
@@ -73,8 +73,7 @@ for (const [name, query, visibility] of checks) {
       `${supabaseUrl.replace(/\/+$/, "")}/rest/v1/${query}`,
       {
         headers: {
-          apikey: anonKey,
-          Authorization: `Bearer ${anonKey}`
+          apikey: publishableKey
         }
       }
     );

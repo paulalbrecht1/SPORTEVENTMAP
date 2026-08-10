@@ -51,3 +51,13 @@ grant execute on function public.run_event_validation(bigint, uuid)
 
 comment on function public.run_event_validation(bigint, uuid) is
   'Runs validation as an admin or service worker; normal authenticated users are rejected before parameters are processed.';
+
+-- Cron-secret verification happens inside the Edge Function with its server-side
+-- client. Browser and anonymous callers no longer need a direct RPC surface.
+revoke all on function public.verify_event_source_cron_secret(text)
+  from public, anon, authenticated;
+grant execute on function public.verify_event_source_cron_secret(text)
+  to service_role;
+
+comment on function public.verify_event_source_cron_secret(text) is
+  'Server-only verification for the event-source-check Edge Function; the stored verifier remains a SHA-256 hash.';

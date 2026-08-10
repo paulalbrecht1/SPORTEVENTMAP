@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 
 const requiredEnvironment = [
   "SUPABASE_URL",
-  "SUPABASE_ANON_KEY",
+  "SUPABASE_PUBLISHABLE_KEY",
   "TEST_USER_A_EMAIL",
   "TEST_USER_A_PASSWORD",
   "TEST_USER_B_EMAIL",
@@ -24,8 +24,8 @@ if (missingEnvironment.length) {
 const baseUrl =
   process.env.SUPABASE_URL.replace(/\/+$/, "");
 
-const anonKey =
-  process.env.SUPABASE_ANON_KEY;
+const publishableKey =
+  process.env.SUPABASE_PUBLISHABLE_KEY;
 
 const runId =
   `rls-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -37,7 +37,7 @@ async function signIn(email, password) {
       {
         method: "POST",
         headers: {
-          apikey: anonKey,
+          apikey: publishableKey,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -64,8 +64,8 @@ async function signIn(email, password) {
 
 function restHeaders(token, prefer = "") {
   return {
-    apikey: anonKey,
-    Authorization: `Bearer ${token || anonKey}`,
+    apikey: publishableKey,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     "Content-Type": "application/json",
     ...(prefer ? { Prefer: prefer } : {})
   };
@@ -777,8 +777,16 @@ await test(
         body: { p_secret: `invalid-${runId}` }
       }
     );
-    assert.equal(invalidCronSecret.response.ok, true, JSON.stringify(invalidCronSecret.data));
-    assert.equal(invalidCronSecret.data, false, "Invalid cron secret was accepted.");
+    assert.equal(
+      invalidCronSecret.response.ok,
+      false,
+      "Anonymous callers retained access to cron-secret verification."
+    );
+    assert.equal(
+      invalidCronSecret.data?.code,
+      "42501",
+      JSON.stringify(invalidCronSecret.data)
+    );
   }
 );
 

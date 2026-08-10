@@ -1,81 +1,15 @@
 # SportEventMap
 
-SportEventMap hilft Läuferinnen und Läufern, Triathletinnen und Triathleten
-sowie Ultralaufenden dabei, Ausdauersportveranstaltungen in Deutschland zu
-finden, zu vergleichen, zu speichern und ihre Saison zu planen.
+SportEventMap ist eine mobile-first Plattform zum Finden, Vergleichen und Planen von Lauf-, Triathlon- und Ultramarathon-Veranstaltungen. Die Anwendung verbindet eine interaktive Karte mit einer kuratierten Event-Datenbank, Detailseiten, Favoriten und einem persönlichen Saisonplaner.
 
-## Funktionen
+## Tech Stack
 
-- interaktive Eventkarte
-- Suche und Filter
-- Eventdatenbank und Event-Detailseiten
-- Favoriten
-- Nutzerkonten mit Supabase
-- persönlicher Saisonplaner
-- Werkzeuge zur Datenprüfung und Eventpflege
+- Statisches HTML, CSS und JavaScript
+- Leaflet für die Event-Karte
+- Supabase für Datenbank, Auth, RLS und Edge Functions
+- Node.js für Datenpflege, Qualitätssicherung und den reproduzierbaren Publish-Build
+- Playwright für End-to-End- und Responsive-Tests
 
-## Lokal starten
+## Projektstatus
 
-Voraussetzungen: Node.js, pnpm und Python.
-
-```powershell
-pnpm install
-Copy-Item js/config.example.js js/config.js
-pnpm run serve
-```
-
-Danach ist die Anwendung unter `http://localhost:4173` erreichbar. Für
-Funktionen mit Supabase müssen in der ausschließlich lokalen Datei
-`js/config.js` die öffentliche Projekt-URL und der öffentliche Client-Key
-eingetragen werden. Diese Datei wird absichtlich nicht von Git erfasst.
-
-## Qualität prüfen
-
-```powershell
-pnpm run check
-pnpm run test:static
-```
-
-Weitere Prüfungen und End-to-End-Tests sind in `package.json` sowie unter
-`tests/` dokumentiert.
-
-### Eventdaten-Qualität
-
-```powershell
-pnpm run audit:quality
-pnpm run review:quality
-```
-
-Der wiederholbare Check bewertet jedes Event als `complete`,
-`review_required` oder `incomplete`. Er prüft Pflichtfelder, Datums- und
-URL-Formate, Geodaten, mögliche Dubletten sowie weitere Qualitätssignale. Die
-vollständige Prüfliste und eine Zusammenfassung werden unter
-`data/imports/review/event-quality-audit.*` erzeugt; die Eventdaten selbst
-werden nicht verändert.
-
-Die priorisierte Review-Queue enthält standardmäßig die 100 wichtigsten
-deutschen Problemfälle. Bevorstehende Events und echte Datenblocker stehen
-dabei vor vergangenen Veranstaltungen und weichen Qualitätshinweisen.
-
-## Sicherheit
-
-Zugangsdaten, private Importdateien und lokale Konfigurationen dürfen nie in
-Git eingecheckt werden. Das Repository enthält eine Beispielkonfiguration,
-umfassende Ausschlussregeln und einen Pre-Commit-Check. Weitere Hinweise
-stehen in [SECURITY.md](SECURITY.md).
-
-## Änderungen und Commits
-
-Jede umgesetzte Änderungsanfrage erhält nach erfolgreicher Prüfung einen
-eigenen, nachvollziehbaren Commit. Details stehen in
-[CONTRIBUTING.md](CONTRIBUTING.md) und [AGENTS.md](AGENTS.md).
-
-## Produktfokus
-
-Die aktuelle Priorität liegt auf Eventsuche, Datenqualität, mobiler Nutzung
-und Saisonplanung. Die vollständige Strategie steht in
-[PRODUCT_VISION.md](PRODUCT_VISION.md).
-
-Der aktuelle technische und operative Projektstand sowie das priorisierte
-weitere Vorgehen sind in
-[PROJECT_STATUS_2026-08-04.md](PROJECT_STATUS_2026-08-04.md) dokumentiert.
+Die Plattform befindet sich in aktiver Entwicklung. Der aktuelle Fokus liegt auf vollständigen, verifizierten Eventdaten, schneller mobiler Suche und einer verlässlichen Saisonplanung für Ausdauersportler.

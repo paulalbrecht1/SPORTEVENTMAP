@@ -8,7 +8,7 @@ Do not edit the CSV and Supabase independently. Normal changes go through the
 admin review workflow in Supabase. Refresh the fallback explicitly with:
 
 ```bash
-SUPABASE_URL=... SUPABASE_ANON_KEY=... npm run data:export-fallback
+SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... npm run data:export-fallback
 ```
 
 The export refuses to overwrite the file when fewer than 900 published rows are

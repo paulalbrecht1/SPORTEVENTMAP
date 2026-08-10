@@ -1,5 +1,9 @@
 # Secrets and machine-local runtime configuration
 .env
+.env.local
+.env.production
+.env.development
+.env.*.local
 .env.*
 !.env.example
 js/config.js
@@ -14,6 +18,8 @@ data/imports/private/geoapify-key.txt
 node_modules/
 .pnpm-store/
 dist/
+.wrangler/
+.tmp-supabase-init/
 
 # Local test and browser artifacts
 .playwright-browsers/
@@ -21,6 +27,18 @@ test-results/
 test-results-*/
 playwright-report/
 reports/responsive-screenshots/
+reports/event-date-audit.*
+reports/event-geo-audit.*
+reports/event-geo-fixes-proposed.json
+reports/responsive-layout-audit.*
+reports/responsive-qa-report.*
+
+# Reproducible local data-pipeline outputs
+data/events.before-dedupe.csv
+data/events.deduped.csv
+data/events.generated.csv
+data/events.*.generated.csv
+data/events.*.coordinates-fixed.csv
 
 # Local data snapshots and review artifacts
 data/backups/

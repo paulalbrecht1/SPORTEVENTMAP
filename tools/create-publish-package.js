@@ -136,6 +136,10 @@ function readExistingConfigValue(name) {
   const configPath =
     path.join(ROOT, "js", "config.js");
 
+  if (!fs.existsSync(configPath)) {
+    return "";
+  }
+
   const content =
     fs.readFileSync(configPath, "utf8");
 
@@ -154,11 +158,12 @@ function writeRuntimeConfig() {
   const config = {
     supabaseUrl:
       process.env.SPORT_EVENT_MAP_SUPABASE_URL ||
+      process.env.VITE_SUPABASE_URL ||
       readExistingConfigValue("supabaseUrl"),
-    supabaseAnonKey:
-      process.env.SPORT_EVENT_MAP_SUPABASE_PUBLIC_KEY ||
-      process.env.SPORT_EVENT_MAP_SUPABASE_ANON_KEY ||
-      readExistingConfigValue("supabaseAnonKey"),
+    supabasePublishableKey:
+      process.env.SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+      readExistingConfigValue("supabasePublishableKey"),
     siteUrl:
       process.env.SPORT_EVENT_MAP_SITE_URL ||
       readExistingConfigValue("siteUrl"),
@@ -178,7 +183,7 @@ function writeRuntimeConfig() {
 
   if (
     !config.supabaseUrl ||
-    !config.supabaseAnonKey
+    !config.supabasePublishableKey
   ) {
     throw new Error(
       "Public Supabase runtime configuration is missing."

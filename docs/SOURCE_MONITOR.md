@@ -187,7 +187,7 @@ Aktionen: sofort pruefen, Termin setzen, pausieren, reaktivieren, Historie, Quel
 
 ## Umgebungsvariablen und Secrets
 
-Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` und `SUPABASE_SECRET_KEYS` bereit. Legacy-Projekte koennen weiterhin `SUPABASE_ANON_KEY` und `SUPABASE_SERVICE_ROLE_KEY` verwenden. Secret-/Service-Keys duerfen nie im Browser oder Repository liegen.
+Supabase stellt fuer Edge Functions `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEYS` und `SUPABASE_SECRET_KEYS` bereit. Browser erhalten ausschliesslich einen Publishable Key; Secret-/Service-Keys duerfen nie im Browser oder Repository liegen.
 
 Optionale Worker-Konfiguration:
 

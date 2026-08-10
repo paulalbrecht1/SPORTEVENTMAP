@@ -12,7 +12,7 @@ npm run test:static
 
 ## Anonymous live-access audit
 
-This read-only check uses the public URL and anon key from `js/config.js`. It
+This read-only check uses the public URL and publishable key from `js/config.js`. It
 verifies that approved events remain public while pending events, profiles,
 favorites, Season Planner rows, feedback and analytics are not visible to an
 anonymous browser:
@@ -47,7 +47,7 @@ where id = 'REPLACE_WITH_ADMIN_AUTH_USER_UUID';
 
 ```powershell
 $env:SUPABASE_URL="https://YOUR_PROJECT.supabase.co"
-$env:SUPABASE_ANON_KEY="YOUR_PUBLIC_ANON_OR_PUBLISHABLE_KEY"
+$env:SUPABASE_PUBLISHABLE_KEY="YOUR_PUBLISHABLE_KEY"
 $env:TEST_USER_A_EMAIL="beta-a@example.com"
 $env:TEST_USER_A_PASSWORD="TEST_PASSWORD"
 $env:TEST_USER_B_EMAIL="beta-b@example.com"

@@ -33,6 +33,14 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS"
 };
 
+function readKeyDictionary(name: string) {
+  try {
+    return JSON.parse(Deno.env.get(name) || "{}");
+  } catch {
+    return {};
+  }
+}
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(
     JSON.stringify(body),
@@ -220,19 +228,30 @@ Deno.serve(async request => {
   const supabaseUrl =
     Deno.env.get("SUPABASE_URL");
 
-  const supabaseAnonKey =
-    Deno.env.get("SUPABASE_ANON_KEY");
+  const publishableKeys =
+    readKeyDictionary("SUPABASE_PUBLISHABLE_KEYS");
 
-  const supabaseServiceRoleKey =
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const supabasePublishableKey =
+    Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ||
+    publishableKeys.default ||
+    "";
+
+  const secretKeys =
+    readKeyDictionary("SUPABASE_SECRET_KEYS");
+
+  const supabaseSecretKey =
+    Deno.env.get("SUPABASE_SECRET_KEY") ||
+    secretKeys.default ||
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ||
+    "";
 
   const worldTriathlonApiKey =
     Deno.env.get("WORLD_TRIATHLON_API_KEY");
 
   if (
     !supabaseUrl ||
-    !supabaseAnonKey ||
-    !supabaseServiceRoleKey ||
+    !supabasePublishableKey ||
+    !supabaseSecretKey ||
     !worldTriathlonApiKey
   ) {
     return jsonResponse(
@@ -249,7 +268,7 @@ Deno.serve(async request => {
   const supabaseUserClient =
     createClient(
       supabaseUrl,
-      supabaseAnonKey,
+      supabasePublishableKey,
       {
         global: {
           headers: {
@@ -319,7 +338,7 @@ Deno.serve(async request => {
   const supabaseAdmin =
     createClient(
       supabaseUrl,
-      supabaseServiceRoleKey
+      supabaseSecretKey
     );
 
   const {

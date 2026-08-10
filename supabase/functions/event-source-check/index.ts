@@ -43,8 +43,8 @@ function runtimeKeys() {
   const publishable = readKeyDictionary("SUPABASE_PUBLISHABLE_KEYS");
   const secret = readKeyDictionary("SUPABASE_SECRET_KEYS");
   return {
-    anonKey: Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || publishable.default || "",
-    serviceKey: Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("SUPABASE_SECRET_KEY") || secret.default || ""
+    publishableKey: Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || publishable.default || "",
+    serviceKey: Deno.env.get("SUPABASE_SECRET_KEY") || secret.default || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || ""
   };
 }
 
@@ -64,7 +64,7 @@ function pinnedTransport() {
   }
 }
 
-async function authorize(request: Request, supabaseUrl: string, anonKey: string) {
+async function authorize(request: Request, supabaseUrl: string, publishableKey: string, serviceKey: string) {
   const smokeSecret = Deno.env.get("SOURCE_MONITOR_SMOKE_SECRET") || "";
   if (smokeSecret && request.headers.get("x-source-monitor-smoke-secret") === smokeSecret) {
     return { kind: "smoke", userId: null };
@@ -74,13 +74,16 @@ async function authorize(request: Request, supabaseUrl: string, anonKey: string)
   const payload = parseJwtPayload(token);
   if (payload?.role === "service_role") return { kind: "service_role", userId: null };
 
-  const userClient = createClient(supabaseUrl, anonKey, {
+  const userClient = createClient(supabaseUrl, publishableKey, {
     auth: { persistSession: false, autoRefreshToken: false },
     global: { headers: { Authorization: authorization } }
   });
   const cronSecret = request.headers.get("x-cron-secret") || "";
-  if (payload?.role === "anon" && cronSecret) {
-    const { data, error } = await userClient.rpc("verify_event_source_cron_secret", { p_secret: cronSecret });
+  if (cronSecret) {
+    const serviceClient = createClient(supabaseUrl, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
+    const { data, error } = await serviceClient.rpc("verify_event_source_cron_secret", { p_secret: cronSecret });
     if (!error && data === true) return { kind: "scheduler", userId: null };
   }
 
@@ -600,10 +603,10 @@ async function runProductionSmoke(admin: ReturnType<typeof createClient>, supaba
 Deno.serve(async request => {
   if (request.method !== "POST") return response({ error: "Method not allowed" }, 405);
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-  const { anonKey, serviceKey } = runtimeKeys();
-  if (!supabaseUrl || !anonKey || !serviceKey) return response({ error: "Missing Supabase runtime secrets" }, 500);
+  const { publishableKey, serviceKey } = runtimeKeys();
+  if (!supabaseUrl || !publishableKey || !serviceKey) return response({ error: "Missing Supabase runtime keys" }, 500);
 
-  const authorized = await authorize(request, supabaseUrl, anonKey);
+  const authorized = await authorize(request, supabaseUrl, publishableKey, serviceKey);
   if (!authorized) return response({ error: "Admin or scheduler authorization required" }, 403);
   const body = await request.json().catch(() => ({}));
   const requestedBatch = Number(body.batch_size || DEFAULT_BATCH_SIZE);

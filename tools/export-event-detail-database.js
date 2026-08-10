@@ -21,7 +21,7 @@ function readConfigFallback() {
     url:
       /supabaseUrl:\s*"([^"]+)"/.exec(text)?.[1] || "",
     key:
-      /supabaseAnonKey:\s*"([^"]+)"/.exec(text)?.[1] || ""
+      /supabasePublishableKey:\s*"([^"]+)"/.exec(text)?.[1] || ""
   };
 }
 
@@ -33,10 +33,10 @@ const SUPABASE_URL =
     .replace(/\/+$/, "");
 
 const SUPABASE_KEY =
-  clean(process.env.SUPABASE_ANON_KEY || process.env.SPORT_EVENT_MAP_SUPABASE_PUBLIC_KEY || process.env.SPORT_EVENT_MAP_SUPABASE_ANON_KEY || configFallback.key);
+  clean(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY || configFallback.key);
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error("Missing SUPABASE_URL and SUPABASE_ANON_KEY or public publishable key.");
+  throw new Error("Missing SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.");
 }
 
 async function supabaseGet(table, query = "") {
@@ -46,8 +46,7 @@ async function supabaseGet(table, query = "") {
   const response =
     await fetch(url, {
       headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`
+        apikey: SUPABASE_KEY
       }
     });
 

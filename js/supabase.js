@@ -4,10 +4,10 @@ const APP_CONFIG =
 const SUPABASE_URL =
   APP_CONFIG.supabaseUrl || "";
 
-const SUPABASE_ANON_KEY =
-  APP_CONFIG.supabaseAnonKey || "";
+const SUPABASE_PUBLISHABLE_KEY =
+  APP_CONFIG.supabasePublishableKey || "";
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
   console.warn(
     "Supabase config missing. Check js/config.js before publishing."
   );
@@ -106,10 +106,10 @@ const supabaseClient =
   supabase &&
   typeof supabase.createClient === "function" &&
   SUPABASE_URL &&
-  SUPABASE_ANON_KEY
+  SUPABASE_PUBLISHABLE_KEY
     ? supabase.createClient(
         SUPABASE_URL,
-        SUPABASE_ANON_KEY
+        SUPABASE_PUBLISHABLE_KEY
       )
     : createUnavailableSupabaseClient();
 
@@ -118,7 +118,7 @@ if (
   supabase &&
   typeof supabase.createClient === "function" &&
   SUPABASE_URL &&
-  SUPABASE_ANON_KEY
+  SUPABASE_PUBLISHABLE_KEY
 ) {
   console.log("Supabase connected");
 } else {

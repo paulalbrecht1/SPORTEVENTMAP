@@ -152,7 +152,22 @@ const [hardeningState] = queryLocal(`
       'anon',
       'private.handle_new_user()',
       'execute'
-    ) as signup_trigger_not_public
+    ) as signup_trigger_not_public,
+    not has_function_privilege(
+      'anon',
+      'public.verify_event_source_cron_secret(text)',
+      'execute'
+    ) as cron_verification_not_anon,
+    not has_function_privilege(
+      'authenticated',
+      'public.verify_event_source_cron_secret(text)',
+      'execute'
+    ) as cron_verification_not_authenticated,
+    has_function_privilege(
+      'service_role',
+      'public.verify_event_source_cron_secret(text)',
+      'execute'
+    ) as cron_verification_service_only
 `);
 
 assert.deepEqual(
@@ -162,7 +177,10 @@ assert.deepEqual(
     legacy_policies_removed: true,
     permissive_policy_overlap_removed: true,
     duplicate_analytics_index_removed: true,
-    signup_trigger_not_public: true
+    signup_trigger_not_public: true,
+    cron_verification_not_anon: true,
+    cron_verification_not_authenticated: true,
+    cron_verification_service_only: true
   },
   "Local database hardening state is incomplete."
 );
@@ -417,7 +435,7 @@ try {
       env: {
         ...process.env,
         SUPABASE_URL: local.API_URL,
-        SUPABASE_ANON_KEY: local.ANON_KEY,
+        SUPABASE_PUBLISHABLE_KEY: local.ANON_KEY,
         SUPABASE_SERVICE_ROLE_KEY: local.SERVICE_ROLE_KEY,
         TEST_USER_A_EMAIL: userA.email,
         TEST_USER_A_PASSWORD: password,

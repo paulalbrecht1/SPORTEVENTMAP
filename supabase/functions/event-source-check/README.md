@@ -45,7 +45,7 @@ Do not expose secret/service-role keys in browser code.
 Read-only production smoke test:
 
 ```bash
-SUPABASE_URL=... SUPABASE_ANON_KEY=... SOURCE_MONITOR_SMOKE_SECRET=... \
+SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... SUPABASE_EDGE_JWT=... SOURCE_MONITOR_SMOKE_SECRET=... \
   npm run smoke:source-monitor:production
 ```
 

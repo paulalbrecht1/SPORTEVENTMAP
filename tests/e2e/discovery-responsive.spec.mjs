@@ -1,8 +1,10 @@
 import {
   expect,
+  openEventDrawer,
   prepareApp,
   test
 } from "./helpers/browser.mjs";
+import { fixtureByName } from "./helpers/fixtures.mjs";
 
 const viewportMatrix = [
   [1280, 720],
@@ -259,5 +261,127 @@ test("Discovery remains usable across the responsive viewport matrix", async ({ 
     }
 
     await waitForPanelTransition(page);
+  }
+});
+
+test("event drawer stays contained and scrollable at release viewports", async ({ page }) => {
+  test.setTimeout(180_000);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  const run = fixtureByName["SEM E2E Future Run"];
+  const triathlon = fixtureByName["SEM E2E Olympic Triathlon"];
+  const releaseViewports = [
+    [1920, 1080],
+    [1440, 900],
+    [1366, 768],
+    [1024, 768],
+    [768, 1024],
+    [430, 932],
+    [390, 844],
+    [375, 812],
+    [360, 800]
+  ];
+
+  for (const [width, height] of releaseViewports) {
+    await page.setViewportSize({ width, height });
+    await prepareApp(page, { openDiscoveryPanel: false });
+    await openEventDrawer(page, run.event_name);
+    await page.waitForFunction(() => {
+      const drawer = document.querySelector("#eventDrawer.open");
+
+      return (
+        drawer?.getBoundingClientRect().width > 250 &&
+        !drawer.getAnimations().some(animation => animation.playState === "running")
+      );
+    });
+
+    const drawer = page.getByTestId("event-drawer");
+    const drawerContent = page.locator("#drawerContent");
+    const drawerLayout = await drawer.evaluate(element => {
+      const bounds = element.getBoundingClientRect();
+      const content = element.querySelector("#drawerContent");
+      const titlebar = content.querySelector(".drawer-titlebar")?.getBoundingClientRect();
+      const descendants = [...content.querySelectorAll("*")];
+      const overflowingDescendants = descendants
+        .filter(child => !child.classList.contains("drawer-titlebar"))
+        .filter(child => {
+          const childBounds = child.getBoundingClientRect();
+
+          return (
+            childBounds.left < bounds.left - 1 ||
+            childBounds.right > bounds.right + 1
+          );
+        })
+        .map(child => child.className || child.id || child.tagName)
+        .slice(0, 5);
+
+      return {
+        viewportWidth: window.innerWidth,
+        pageOverflow:
+          document.documentElement.scrollWidth -
+          document.documentElement.clientWidth,
+        drawerLeft: bounds.left,
+        drawerRight: bounds.right,
+        drawerWidth: bounds.width,
+        titlebarLeft: titlebar?.left ?? 0,
+        titlebarRight: titlebar?.right ?? 0,
+        contentClientWidth: content.clientWidth,
+        contentScrollWidth: content.scrollWidth,
+        contentClientHeight: content.clientHeight,
+        contentScrollHeight: content.scrollHeight,
+        overflowX: getComputedStyle(content).overflowX,
+        overflowY: getComputedStyle(content).overflowY,
+        overflowingDescendants
+      };
+    });
+
+    expect(drawerLayout.pageOverflow, `${width}x${height}`).toBeLessThanOrEqual(2);
+    expect(drawerLayout.drawerLeft, `${width}x${height}`).toBeGreaterThanOrEqual(-1);
+    expect(drawerLayout.drawerRight, `${width}x${height}`).toBeLessThanOrEqual(width + 1);
+    if (width <= 767) {
+      expect(drawerLayout.titlebarLeft, `${width}x${height} titlebar`).toBeGreaterThanOrEqual(
+        drawerLayout.drawerLeft - 1
+      );
+      expect(drawerLayout.titlebarRight, `${width}x${height} titlebar`).toBeLessThanOrEqual(
+        drawerLayout.drawerRight + 1
+      );
+    }
+    expect(drawerLayout.contentScrollWidth, `${width}x${height}`).toBeLessThanOrEqual(
+      drawerLayout.contentClientWidth + (width <= 767 ? 1 : 4)
+    );
+    expect(drawerLayout.overflowX, `${width}x${height}`).toMatch(/clip|hidden/);
+    expect(drawerLayout.overflowY, `${width}x${height}`).toBe("auto");
+    expect(drawerLayout.contentScrollHeight, `${width}x${height}`).toBeGreaterThanOrEqual(
+      drawerLayout.contentClientHeight
+    );
+    if (width <= 767) {
+      expect(drawerLayout.contentScrollHeight, `${width}x${height} mobile scroll`).toBeGreaterThan(
+        drawerLayout.contentClientHeight
+      );
+    }
+    expect(drawerLayout.overflowingDescendants, `${width}x${height}`).toEqual([]);
+
+    if (drawerLayout.contentScrollHeight > drawerLayout.contentClientHeight) {
+      await drawerContent.evaluate(element => {
+        element.scrollTop = element.scrollHeight;
+      });
+      await expect.poll(() => drawerContent.evaluate(element =>
+        Math.round(element.scrollTop + element.clientHeight) >= element.scrollHeight - 1
+      )).toBe(true);
+    }
+    await expect(page.locator("#eventDrawer .drawer-button")).toBeVisible();
+
+    const favorite = page.getByTestId("drawer-favorite");
+    const wasFavorite = await favorite.evaluate(element => element.classList.contains("active"));
+    await favorite.click();
+    await expect.poll(() => favorite.evaluate(element => element.classList.contains("active")))
+      .toBe(!wasFavorite);
+    await favorite.click();
+
+    await page.getByTestId("drawer-close").click();
+    await expect(drawer).not.toHaveClass(/open/);
+    await openEventDrawer(page, triathlon.event_name);
+    await expect(page.getByTestId("drawer-event-name")).toContainText(triathlon.event_name);
+    await page.getByTestId("drawer-close").click();
   }
 });

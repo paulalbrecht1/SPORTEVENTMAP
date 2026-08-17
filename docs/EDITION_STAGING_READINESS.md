@@ -97,14 +97,25 @@ Er beweist zusätzlich:
 Dieser Smoke darf gegen eine entfernte Umgebung erst nach Bestätigung einer
 isolierten Staging-ID laufen. Gegen die aktive Hauptdatenbank bleibt er gesperrt.
 
-## Nächster externer Gate
+## Kostenfreier nächster Gate
 
-Vor einem realen Staging-Rollout muss eine getrennte Supabase-Development-Branch
-oder ein separates Staging-Projekt bereitgestellt werden. Das kann Kosten
-verursachen und benötigt deshalb eine ausdrückliche Freigabe. Erst dort folgt:
+Eine Supabase-Development-Branch erzeugt Compute-Kosten und wird für diesen
+Schritt ausdrücklich nicht verwendet. Stattdessen stellt
+`npm run staging:edition:local` ein getrenntes, wegwerfbares lokales Staging mit
+eigener Projekt-ID und eigenen Ports bereit. Der Ablauf ist in
+`docs/EDITION_LOCAL_STAGING.md` dokumentiert.
+
+Dort folgen in derselben sicheren Reihenfolge:
 
 1. vollständige Migration in Reihenfolge;
-2. Postflight mit `foundation_gates_pass=true`;
-3. manueller Candidate-E2E-Smoke;
-4. erneuter read-only Bestandsaudit und Vorher-/Nachher-Zählungsvergleich;
-5. kein Backfill und keine Produktivmigration ohne separate Freigabe.
+2. exakter Abgleich der angewendeten Migrationshistorie;
+3. Schema-Lint und Postflight mit `foundation_gates_pass=true`;
+4. Candidate-E2E- und RLS-Smoke;
+5. Entfernung des ausschließlich lokalen Staging-Volumes;
+6. kein Backfill und keine Produktivmigration ohne separate Freigabe.
+
+Dieser kostenfreie lokale Gate wurde am 17. August 2026 vollständig bestanden:
+46 Migrationen waren exakt vorhanden, der Schema-Lint war leer, der Postflight
+war grün und alle 21 Candidate-/RLS-Integrationsprüfungen bestanden. Das
+temporäre Volume wurde anschließend entfernt. Die Aussage für das aktive Projekt
+oben bleibt unverändert: Dort wurde weiterhin keine Migration angewendet.

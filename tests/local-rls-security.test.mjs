@@ -7,6 +7,14 @@ const root = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   ".."
 );
+const requestedWorkdir = process.env.SPORT_EVENT_MAP_LOCAL_SUPABASE_WORKDIR;
+const localSupabaseWorkdir = path.resolve(requestedWorkdir || root);
+const temporaryWorkdirPrefix = `${path.join(root, ".tmp-")}`;
+
+assert.ok(
+  localSupabaseWorkdir === root || localSupabaseWorkdir.startsWith(temporaryWorkdirPrefix),
+  "Local RLS tests only accept the repository or an isolated .tmp-* workdir."
+);
 const supabaseCli = path.join(
   root,
   "node_modules",
@@ -19,7 +27,7 @@ const runId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 function runSupabase(args) {
   const result = spawnSync(
     process.execPath,
-    [supabaseCli, ...args],
+    [supabaseCli, "--workdir", localSupabaseWorkdir, ...args],
     {
       cwd: root,
       encoding: "utf8",
@@ -78,26 +86,31 @@ function parseStatusEnvironment(output) {
 }
 
 async function adminRequest(apiUrl, serviceRoleKey, path, options = {}) {
-  const response = await fetch(`${apiUrl}/auth/v1/admin/${path}`, {
-    ...options,
-    headers: {
-      apikey: serviceRoleKey,
-      Authorization: `Bearer ${serviceRoleKey}`,
-      "Content-Type": "application/json",
-      ...(options.headers || {})
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const response = await fetch(`${apiUrl}/auth/v1/admin/${path}`, {
+      ...options,
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      }
+    });
+
+    const text = await response.text();
+    if ([502, 503].includes(response.status) && attempt < 3) {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      continue;
     }
-  });
-
-  const text = await response.text();
-  const body = text ? JSON.parse(text) : null;
-
-  assert.equal(
-    response.ok,
-    true,
-    `Local Auth admin request failed (${response.status}): ${text}`
-  );
-
-  return body;
+    const body = text ? JSON.parse(text) : null;
+    assert.equal(
+      response.ok,
+      true,
+      `Local Auth admin request failed (${response.status}): ${text}`
+    );
+    return body;
+  }
+  throw new Error("Local Auth admin request exhausted its bounded retries.");
 }
 
 const local = parseStatusEnvironment(

@@ -20,6 +20,7 @@ node_modules/
 dist/
 .wrangler/
 .tmp-supabase-init/
+.tmp-supabase-edition-staging/
 
 # Local test and browser artifacts
 .playwright-browsers/

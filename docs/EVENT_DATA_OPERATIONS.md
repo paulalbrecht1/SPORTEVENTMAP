@@ -421,3 +421,64 @@ einzuschalten und mit bestehendem Login, Registrierung und Passwortänderung zu 
 - Leaked-Password-Protection bleibt ohne Pro-Upgrade bewusst deaktiviert
 - Nutzungsdaten der neuen Indizes nach realem Betrieb prüfen, nicht unmittelbar
   nach Erstellung wegen erwartbarer `unused_index`-Hinweise
+
+## 14. Datenqualitäts-Stabilisierung (17. August 2026)
+
+### Getrennte Review-Mengen
+
+Der lokale Fallback-Audit und die produktive Freshness-Queue messen verschiedene
+Dinge und dürfen nicht addiert werden:
+
+- Lokaler Discovery-Fallback: 520 Events, 42 ohne Audit-Hinweis und 478 mit
+  mindestens einem Review-Hinweis. Die 630 überlappenden Hinweise bestehen aus
+  468 stadtgenauen Koordinaten, 53 Koordinaten-Stack-Problemen, 52
+  Status-Widersprüchen, 49 inzwischen vergangenen Daten, 5 zu kurzen
+  Beschreibungen und 3 Blog-/News-URLs.
+- Produktives Editionsmodell: 471 aktuelle veröffentlichte Events, 292 fresh und
+  179 stale beziehungsweise reviewpflichtig. Nach der neuen Priorisierung sind
+  dies 0 P0, 142 P1 und 37 P2.
+- Produktive bestehende Inbox: 87 sichtbare Entscheidungseinträge. In den
+  darunterliegenden Source-Review-Tasks sind zusätzlich 116 weitere offene
+  `content_changed`-Aufgaben vorhanden, die der bisherige sichere Inbox-Filter
+  wegen fehlender bestätigbarer Crawl-Evidenz noch nicht als Aktion anbietet.
+
+Historische Editionen werden nicht allein für eine bessere Quote manuell
+nachbearbeitet. P0/P1 konzentrieren sich auf aktuelle deutsche Discovery-Events,
+zeitliche Nähe, kritische Felder und Quellenzustand.
+
+### Feldprüfung der ersten priorisierten Events
+
+Die folgenden read-only Prüfungen wurden am 17. August gegen Veranstalter- oder
+offizielle Registrierungsquellen durchgeführt. Wegen erkannter Abweichungen wurde
+kein Event als fresh markiert und kein Produktionswert automatisch geändert:
+
+| Event | Sichere Evidenz | Offene Abweichung / Review-Aktion |
+| --- | --- | --- |
+| 45. Bielebohlauf Oppach | 23.08.2026, Oppach; 400 m, 1,5 km, 4,9 km, 12 km und 20 km; Anmeldung bis 22.08. | Gespeichert sind „Halbmarathon, 12 km, 5 km“. Distanzen und Registrierungsstatus manuell korrigieren. |
+| Der Alstertallauf | 23.08.2026, Hamburg; Halbmarathon, 10 km, 4 km, 1.500 m und Bambini | Gespeicherte 5 km widersprechen 4 km; Ort ist als Streckenname statt Hamburg/Startadresse modelliert. |
+| 11. FlorSTADT Halbmarathon | 23.08.2026, Florstadt; Hauptläufe 21,1/10/5 km ausgebucht, online nur 1,8 km/300 m | Registrierungsstatus ist nicht einfach „offen“ oder „geschlossen“; Distanzen und Teilstatus benötigen Review. |
+| 3. Gettorfer Staffelmarathon | 23.08.2026, Sportpark Gettorf; Staffel- und Duo-Marathon; Meldeschluss 12.08., keine Nachmeldung | Gespeicherter Status ist unbekannt und die Quelle verweist nur auf die Startseite. Direkte Ausschreibungs-/Registrierungs-URL und „geschlossen“ prüfen. |
+| 7. Rosengartenlauf | 23.08.2026, Wildpark Schwarze Berge; 13 Wettbewerbe von 400 m bis 50 km; Nachmeldung bis 21.08. und vor Ort | Kerndatum/-ort stimmen; Distanzen sind nur grob zusammengefasst und Status ist unbekannt. Feldgenaue Bestätigung nach Review. |
+| Rammelsberger Steigerlauf | Produktionsquelle meldete zuletzt technisch erreichbar; unabhängiger Abruf lief in ein Timeout | Keine Content-Verifikation; bestehende Quelle erneut über den begrenzten Retry-/Review-Pfad prüfen. |
+| Gladbecker Sparkassenlauf | Produktionsquelle meldete zuletzt technisch erreichbar; unabhängiger Abruf lief in ein Timeout | Keine Content-Verifikation; nicht aufgrund früherer Erreichbarkeit fresh setzen. |
+| IRONMAN 70.3 Leipzig | Produktionsquelle meldete zuletzt technisch erreichbar; unabhängiger Abruf wurde mit HTTP 402 blockiert | Zugriff/Plattformverhalten manuell prüfen; keine Umgehung und keine fachliche Änderung. |
+
+Diese Fälle sind der praktische Grund für die feldgenaue Evidenzpflicht: HTTP 200
+und ein passender Datumsstring hätten mehrere inhaltliche Widersprüche übersehen.
+Die Belege sind über die in `event_sources` hinterlegten offiziellen URLs
+reproduzierbar.
+
+### Neue operative Sichten
+
+- `admin_current_event_quality_metrics`: Current/Fresh/Stale/Review/Source
+  Error/Complete inklusive der vier Quoten.
+- `admin_source_failure_history`: historische Fehlerklasse, Aktivzustand,
+  Retryfähigkeit und empfohlene Aktion.
+- `admin_review_inbox`: bestehende deduplizierte Inbox plus stale aktuelle
+  Editionen, P0–P3, betroffene Felder, gespeicherte/externe Werte,
+  Quellenzustand, Confidence und Aktionsempfehlung.
+
+Die Migration `20260815000000_data_quality_stabilization.sql` ist lokal mit
+vollständigem Reset und RLS-Integrationstest geprüft. Produktion blieb
+unverändert; das Deployment benötigt die separate Freigabe aus
+`docs/stage4/production-migration-plan.md`.

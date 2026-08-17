@@ -1,8 +1,10 @@
 # Production migration review and deployment plan
 
-- Review date: 2026-08-04
-- Production baseline: 27 migrations through `20260814_review_inbox_deduplication`
-- Held series: `20260815` through `20260822` (eight migrations)
+- Review date: 2026-08-17
+- Production baseline: 35 migrations through `20260814_review_inbox_deduplication`
+- Separately reviewable data-quality hotfix:
+  `20260815000000_data_quality_stabilization.sql`
+- Held Stage-4 series: `20260815` through `20260822` (eight migrations)
 - Production deployment during this review: **none**
 - Stage-4 state to preserve: `dry_run=true`, `automation_enabled=false`,
   `observation_enabled=false`, `observation_scheduler_enabled=false`
@@ -13,6 +15,24 @@ between the production baseline and this held series. It can be reviewed and
 deployed separately; it must not be used as a reason to roll out Stage 4.
 
 ## Migration-by-migration review
+
+### `20260815000000_data_quality_stabilization.sql`
+
+- Purpose: fix Source-Recovery semantics, enforce disabled Edition-Lifecycle
+  publication, expose reproducible quality/source-failure metrics, add stale
+  current editions to the existing deduplicated P0–P3 inbox and require
+  field-level evidence for content confirmation.
+- Data changes at deployment: sets `auto_publish_enabled=false` and
+  `auto_result_publish_enabled=false`; it does not alter public event facts.
+- Safety: a reachable URL can only move an edition to `needs_review`. Content
+  confirmation accepts only exact equality for all required fields and records
+  `automatic_fact_changes=false`.
+- RLS/grants: both new views use `security_invoker`; inbox output is additionally
+  guarded by `private.is_admin()`. The audit helper is in the non-exposed
+  `private` schema and checks the authenticated admin internally.
+- Dependencies: the 35 production baseline migrations through `20260814`.
+- Stage-4 risk: none; this migration precedes but does not activate the held
+  Stage-4 series. It should be deployed and observed separately.
 
 ### `20260815_source_monitor_extraction_review.sql`
 
@@ -186,8 +206,10 @@ deployed separately; it must not be used as a reason to roll out Stage 4.
 1. Obtain a separate written deployment approval. This document is not approval.
 2. Deploy and verify `20260814120000` independently first if the closed-beta
    security blocker is being removed.
-3. Confirm production still lists exactly 27 baseline migrations through
-   `20260814`; investigate any drift before continuing.
+3. Confirm production still lists exactly 35 baseline migrations through
+   `20260814`; investigate any drift before continuing. In particular preserve
+   the applied timestamped `20260812...` migration versions rather than
+   inventing replacement history.
 4. Run a fresh local reset, RLS suite, Stage-4 tests and full `test:all` from the
    exact commit to deploy.
 5. Freeze Source Monitor/admin proposal writes for the short deployment window;
@@ -220,19 +242,24 @@ never been rehearsed is evidence only, not a proven recovery path.
 
 ### 3. Deployment order
 
-1. `20260815_source_monitor_extraction_review.sql`
-2. Validate proposal columns/table/RLS/RPC denial.
-3. `20260816_stage_four_preparation.sql`
-4. Immediately assert safe flags and DE/AT/CH rollouts.
-5. `20260817_stage_four_monitoring_guards.sql`
-6. `20260818_stage_four_germany_observation.sql`
-7. Immediately assert all four flags false/true as required and no queued run.
-8. `20260819_stage_four_observation_calibration_guards.sql`
-9. `20260820_stage_four_observation_operational_alerts.sql`
-10. `20260821_stage_four_observation_lint_fixes.sql`
-11. `20260822_stage_four_observation_queue_lint.sql`
-12. Re-run all database checks before considering Edge Function v4 deployment.
-13. Deploy worker v4 only as a separately approved step; with observation
+1. After separate written approval, deploy
+   `20260815000000_data_quality_stabilization.sql` alone.
+2. Verify disabled publication flags, metrics, admin-only inbox, RLS, exact-match
+   content verification and audit logging. Observe before any Stage-4 decision.
+3. Stop here unless the held Stage-4 series has its own later approval.
+4. `20260815_source_monitor_extraction_review.sql`
+5. Validate proposal columns/table/RLS/RPC denial.
+6. `20260816_stage_four_preparation.sql`
+7. Immediately assert safe flags and DE/AT/CH rollouts.
+8. `20260817_stage_four_monitoring_guards.sql`
+9. `20260818_stage_four_germany_observation.sql`
+10. Immediately assert all four flags false/true as required and no queued run.
+11. `20260819_stage_four_observation_calibration_guards.sql`
+12. `20260820_stage_four_observation_operational_alerts.sql`
+13. `20260821_stage_four_observation_lint_fixes.sql`
+14. `20260822_stage_four_observation_queue_lint.sql`
+15. Re-run all database checks before considering Edge Function v4 deployment.
+16. Deploy worker v4 only as a separately approved step; with observation
     disabled its Stage-4 call paths must be no-ops.
 
 Use one reviewed transaction per migration where supported. Do not paste the
@@ -281,6 +308,15 @@ Function deployment. Treat missing RLS, mutable search paths, anonymous
 definer execution, or authenticated definer execution without internal role
 checks as stop conditions. Do not delete “unused” indexes based only on a young
 statistics window.
+
+Read-only baseline on 17 August 2026: seven security warnings (one anonymous
+and five authenticated SECURITY DEFINER exposure warnings plus disabled leaked
+password protection) and 60 informational performance findings (20 unindexed
+foreign keys, 40 unused indexes). The local RLS suite confirms the guarded admin
+RPCs deny normal users, but the pending
+`20260814120000_beta_security_definer_hardening.sql` and every remaining public
+definer grant must be reviewed before deployment. Index findings are not an
+authorization for bulk index creation/deletion during this data-quality change.
 
 ### 8. Edge Function compatibility
 

@@ -4620,7 +4620,7 @@ function ensureDataOpsReviewWorkspace() {
     const styles = document.createElement("link");
     styles.id = "sourceMonitorStyles";
     styles.rel = "stylesheet";
-    styles.href = "css/source-monitor.css?v=20260818-germany-observation";
+    styles.href = "css/source-monitor.css?v=20260817-data-quality-v122";
     document.head.appendChild(styles);
   }
   const operationsRoot = dataOpsElements.panel?.querySelector(".admin-data-operations");
@@ -4633,7 +4633,7 @@ function ensureDataOpsReviewWorkspace() {
     review.setAttribute("aria-labelledby", "editionLifecycleTitle");
     review.innerHTML = `
       <div class="admin-data-operations-section-heading admin-review-inbox-heading">
-        <div><span class="admin-eyebrow">Review Inbox</span><h4 id="editionLifecycleTitle">Jetzt zu pruefen</h4><p>Hier stehen nur Entscheidungen. Sichere Routinefaelle warten auf automatische Bestaetigung oder werden selbststaendig verarbeitet.</p></div>
+        <div><span class="admin-eyebrow">Review Inbox</span><h4 id="editionLifecycleTitle">Jetzt zu pruefen</h4><p>Offizielle Quellen und erkannte Aenderungen lassen sich hier mit sichtbarer Evidenz kontrolliert bestaetigen.</p></div>
         <p id="editionLifecycleStatus" class="admin-section-status" aria-live="polite"></p>
       </div>
       <div class="edition-lifecycle-kpis" aria-label="Review Inbox Kennzahlen">
@@ -4651,8 +4651,8 @@ function ensureDataOpsReviewWorkspace() {
             <option value="all">Alle Ausnahmen</option>
           </select>
         </label>
-        <button type="button" data-lifecycle-action="select-all">Freigabefaehige waehlen</button>
-        <button type="button" data-lifecycle-action="approve-selected">Auswahl freigeben</button>
+        <button type="button" data-lifecycle-action="select-all">Pruefbare waehlen</button>
+        <button type="button" data-lifecycle-action="approve-selected">Auswahl bestaetigen</button>
       </div>
       <div id="editionLifecycleList" class="edition-lifecycle-list" aria-live="polite"></div>`;
     operationsRoot.insertBefore(review, operationsRoot.querySelector(".admin-data-operations-kpis"));
@@ -4672,6 +4672,60 @@ function ensureDataOpsReviewWorkspace() {
       dataOpsElements.status,
       ...operationsRoot.querySelectorAll(":scope > .admin-data-operations-grid")
     ].filter(Boolean).forEach(node => body.appendChild(node));
+  }
+
+  if (!document.getElementById("dataFreshnessOverview")) {
+    const freshness = document.createElement("section");
+    freshness.id = "dataFreshnessOverview";
+    freshness.className = "data-freshness-overview is-loading";
+    freshness.setAttribute("aria-labelledby", "dataFreshnessTitle");
+    freshness.innerHTML = `
+      <div class="data-freshness-heading">
+        <div>
+          <span class="admin-eyebrow">Aktualitätslage</span>
+          <h4 id="dataFreshnessTitle">Was Nutzer gerade sehen</h4>
+          <p id="dataFreshnessSummary">Katalog, Prüfstände und Quellenbetrieb werden zusammengeführt.</p>
+        </div>
+        <span id="dataFreshnessState" class="data-freshness-state">Wird geprüft</span>
+      </div>
+      <div class="data-freshness-grid" aria-label="Aktualitätskennzahlen">
+        <article>
+          <span>Öffentlicher Katalog</span>
+          <strong id="dataFreshnessCatalog">–</strong>
+          <small id="dataFreshnessCatalogDetail">Quelle wird ermittelt</small>
+        </article>
+        <article>
+          <span>Aktuelle Austragungen</span>
+          <strong id="dataFreshnessRate">–</strong>
+          <small id="dataFreshnessRateDetail">Verifizierung wird berechnet</small>
+        </article>
+        <article>
+          <span>Prüfplan</span>
+          <strong id="dataFreshnessDue">–</strong>
+          <small id="dataFreshnessDueDetail">Fälligkeit wird berechnet</small>
+        </article>
+        <article>
+          <span>Betriebsprobleme</span>
+          <strong id="dataFreshnessProblems">–</strong>
+          <small id="dataFreshnessProblemsDetail">Quellen und Alarme werden geprüft</small>
+        </article>
+      </div>
+      <div class="data-freshness-priorities">
+        <strong>Nächste Prioritäten</strong>
+        <ul id="dataFreshnessPriorityList"><li>Daten werden geladen.</li></ul>
+      </div>
+      <div class="data-freshness-actions">
+        <button type="button" data-freshness-action="inventory">Eventbestand prüfen</button>
+        <button type="button" data-freshness-action="sources">Quellenbetrieb öffnen</button>
+        <button type="button" data-freshness-action="review">Alarme &amp; Vorschläge</button>
+        <button type="button" data-freshness-action="refresh">Neu berechnen</button>
+      </div>`;
+    operationsRoot.insertBefore(
+      freshness,
+      document.getElementById("editionLifecycleInbox") ||
+        document.getElementById("dataOpsInventoryDetails") ||
+        null
+    );
   }
 }
 
@@ -4777,6 +4831,20 @@ function ensureStageFourOperationsSection() {
 ensureDataOpsReviewWorkspace();
 ensureSourceMonitorSection();
 ensureStageFourOperationsSection();
+const dataFreshnessElements = {
+  section: document.getElementById("dataFreshnessOverview"),
+  summary: document.getElementById("dataFreshnessSummary"),
+  state: document.getElementById("dataFreshnessState"),
+  catalog: document.getElementById("dataFreshnessCatalog"),
+  catalogDetail: document.getElementById("dataFreshnessCatalogDetail"),
+  rate: document.getElementById("dataFreshnessRate"),
+  rateDetail: document.getElementById("dataFreshnessRateDetail"),
+  due: document.getElementById("dataFreshnessDue"),
+  dueDetail: document.getElementById("dataFreshnessDueDetail"),
+  problems: document.getElementById("dataFreshnessProblems"),
+  problemsDetail: document.getElementById("dataFreshnessProblemsDetail"),
+  priorities: document.getElementById("dataFreshnessPriorityList")
+};
 const sourceMonitorElements = {
   section: document.getElementById("sourceMonitorSection"),
   status: document.getElementById("sourceMonitorStatus"),
@@ -5263,6 +5331,170 @@ function renderDataOpsAlerts() {
       <button type="button" data-dataops-action="resolve-alert" data-alert-id="${alert.id}">Alarm schließen</button>
     </article>`).join("") || '<p class="admin-quality-empty">Keine offenen Workflow-Alarme.</p>';
 }
+
+function renderDataFreshnessOverview() {
+  if (!dataFreshnessElements.section) return;
+  if (
+    typeof DataFreshnessHealth === "undefined" ||
+    !DataFreshnessHealth ||
+    typeof DataFreshnessHealth.buildFreshnessSummary !== "function"
+  ) {
+    dataFreshnessElements.section.className =
+      "data-freshness-overview is-critical";
+    dataFreshnessElements.state.textContent = "Auswertung fehlt";
+    dataFreshnessElements.summary.textContent =
+      "Die Aktualitätsauswertung konnte nicht geladen werden.";
+    return;
+  }
+
+  const summary = DataFreshnessHealth.buildFreshnessSummary({
+    catalogDiagnostics: window.eventCatalogDiagnostics || {
+      source: window.eventCatalogSource || "unknown"
+    },
+    editions: dataOpsEditions,
+    sources: dataOpsSources,
+    jobs: sourceMonitorJobs,
+    proposals: dataOpsProposals,
+    alerts: dataOpsAlerts
+  });
+  window.dataFreshnessDiagnostics = summary;
+
+  const stateLabels = {
+    healthy: "Betrieb stabil",
+    attention: "Prüfung erforderlich",
+    critical: "Sofort handeln"
+  };
+  dataFreshnessElements.section.className =
+    `data-freshness-overview is-${summary.status}`;
+  dataFreshnessElements.state.textContent = stateLabels[summary.status];
+
+  if (summary.catalog.complete) {
+    dataFreshnessElements.catalog.textContent =
+      `${summary.catalog.rowCount} / ${summary.catalog.expectedRowCount}`;
+    dataFreshnessElements.catalogDetail.textContent =
+      "Supabase vollständig geladen";
+  } else if (summary.catalog.fallback) {
+    dataFreshnessElements.catalog.textContent =
+      `${summary.catalog.rowCount ?? "–"} CSV`;
+    dataFreshnessElements.catalogDetail.textContent =
+      "Fallback aktiv – Supabase prüfen";
+  } else if (summary.catalog.incomplete) {
+    dataFreshnessElements.catalog.textContent =
+      `${summary.catalog.rowCount} / ${summary.catalog.expectedRowCount}`;
+    dataFreshnessElements.catalogDetail.textContent =
+      "Supabase-Antwort unvollständig";
+  } else {
+    dataFreshnessElements.catalog.textContent = "Unbekannt";
+    dataFreshnessElements.catalogDetail.textContent =
+      "Öffentlichen Ladepfad prüfen";
+  }
+
+  dataFreshnessElements.rate.textContent =
+    `${summary.editions.freshnessRate.toLocaleString("de-DE")} %`;
+  dataFreshnessElements.rateDetail.textContent =
+    `${summary.editions.fresh} von ${summary.editions.current} aktuell verifiziert`;
+  dataFreshnessElements.due.textContent = String(
+    summary.editions.overdue + summary.editions.unscheduled
+  );
+  dataFreshnessElements.dueDetail.textContent =
+    `${summary.editions.overdue} überfällig · ${summary.editions.unscheduled} ohne Termin`;
+
+  const problemCount = summary.sources.failed +
+    summary.sources.overdue +
+    summary.sources.deadLetters +
+    summary.review.criticalAlerts;
+  dataFreshnessElements.problems.textContent = String(problemCount);
+  dataFreshnessElements.problemsDetail.textContent =
+    `${summary.sources.overdue} überfällig · ${summary.sources.failed} fehlerhaft · ${summary.sources.deadLetters} Dead Letter · ${summary.review.criticalAlerts} Alarme`;
+
+  const priorities = [];
+  if (!summary.catalog.complete) {
+    priorities.push("Öffentlichen Katalogpfad und Vollständigkeit prüfen.");
+  }
+  if (summary.review.criticalAlerts) {
+    priorities.push(`${summary.review.criticalAlerts} kritische Workflow-Alarme bearbeiten.`);
+  }
+  if (summary.sources.deadLetters || summary.sources.failed) {
+    priorities.push(
+      `${summary.sources.deadLetters} Dead-Letter-Jobs und ${summary.sources.failed} fehlerhafte Quellen prüfen.`
+    );
+  }
+  if (summary.sources.overdue) {
+    priorities.push(
+      `${summary.sources.overdue} Quellen liegen mehr als 30 Minuten hinter ihrem Prüfplan.`
+    );
+  }
+  if (summary.editions.overdue || summary.editions.unscheduled) {
+    priorities.push(
+      `${summary.editions.overdue} überfällige und ${summary.editions.unscheduled} ungeplante Austragungen priorisieren.`
+    );
+  }
+  if (summary.editions.needsReview) {
+    priorities.push(
+      `${summary.editions.needsReview} aktive Austragungen mit Prüfbedarf entscheiden.`
+    );
+  }
+  if (summary.review.pendingProposals) {
+    priorities.push(
+      `${summary.review.pendingProposals} offene Änderungsvorschläge sichten.`
+    );
+  }
+  if (!priorities.length) {
+    priorities.push(
+      "Keine unmittelbare Aktion. Prüfplan und Quellenbetrieb laufen planmäßig."
+    );
+  }
+  dataFreshnessElements.priorities.innerHTML = priorities
+    .slice(0, 5)
+    .map(priority => `<li>${priority}</li>`)
+    .join("");
+
+  if (summary.status === "healthy") {
+    dataFreshnessElements.summary.textContent =
+      "Der öffentliche Katalog ist vollständig und alle aktiven Austragungen liegen im Prüfplan.";
+  } else if (summary.status === "critical") {
+    dataFreshnessElements.summary.textContent =
+      "Mindestens ein Signal gefährdet Vollständigkeit oder Aktualität. Die Liste unten ist nach Risiko priorisiert.";
+  } else {
+    dataFreshnessElements.summary.textContent =
+      "Der Katalog bleibt nutzbar, aber einzelne Prüf- oder Review-Aufgaben sind offen.";
+  }
+}
+
+function openDataFreshnessTarget(detailsId, targetSelector) {
+  const details = document.getElementById(detailsId);
+  if (details && "open" in details) details.open = true;
+  const target = document.querySelector(targetSelector);
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+async function handleDataFreshnessAction(button) {
+  const action = button.dataset.freshnessAction;
+  if (action === "inventory") {
+    openDataFreshnessTarget(
+      "dataOpsInventoryDetails",
+      "#dataOpsInventoryDetails .admin-data-operations-kpis"
+    );
+  }
+  if (action === "sources") {
+    openDataFreshnessTarget("sourceMonitorSection", "#sourceMonitorSection");
+  }
+  if (action === "review") {
+    openDataFreshnessTarget(
+      "dataOpsInventoryDetails",
+      "#dataOpsInventoryDetails .admin-data-operations-review-grid"
+    );
+  }
+  if (action === "refresh") {
+    setButtonLoading(button, true, "Wird berechnet …");
+    try {
+      await loadDataOperations();
+    } finally {
+      setButtonLoading(button, false);
+    }
+  }
+}
+
 function renderDataOperations() {
   const today = new Date().toISOString().slice(0, 10);
   const openIssues = dataOpsIssues.filter(issue => issue.status === "open");
@@ -5289,6 +5521,7 @@ function renderDataOperations() {
   renderDataOpsIssues();
   renderDataOpsProposals();
   renderDataOpsAlerts();
+  renderDataFreshnessOverview();
   renderSourceMonitor();
 }
 
@@ -5331,16 +5564,115 @@ function renderReviewInboxDiff(row) {
   `).join("")}</div>`;
 }
 
+function renderContentVerificationEvidence(row) {
+  if (row.item_type !== "content_verification") return "";
+  const metadata = row.metadata || {};
+  const confidenceLabels = { high: "deutlich", medium: "mittel", low: "gering" };
+  const reasonLabels = {
+    semantic_event_signals_changed: "Event-Signale geaendert",
+    content_changed_semantic_signals_equal: "Seiteninhalt geaendert, Event-Signale gleich"
+  };
+  const reasons = Array.isArray(metadata.change_reasons) ? metadata.change_reasons : [];
+  const reasonText = reasons.length
+    ? reasons.map(reason => reasonLabels[reason] || String(reason).replaceAll("_", " ")).join("; ")
+    : "Aenderungsgrund nicht klassifiziert";
+  const changeConfidence = confidenceLabels[metadata.change_confidence] || metadata.change_confidence || "unbekannt";
+  return `<div class="admin-review-evidence" aria-label="Quellen-Evidenz">
+    <span><strong>Abruf</strong>${escapeAdminHTML(formatDataOpsDate(metadata.fetched_at, true))}</span>
+    <span><strong>HTTP</strong>${escapeAdminHTML(metadata.http_status || "—")}</span>
+    <span><strong>Aenderung</strong>${escapeAdminHTML(changeConfidence)}</span>
+    <span class="is-wide"><strong>Signal</strong>${escapeAdminHTML(reasonText)}</span>
+    <span class="is-wide"><strong>Zu bestätigen</strong>${escapeAdminHTML(Object.keys(metadata.stored_values || {}).join(", ") || "Keine Feldwerte verfügbar")}</span>
+  </div>`;
+}
+
+function renderReviewPriorityContext(row) {
+  const metadata = row.metadata || {};
+  const tier = metadata.review_tier;
+  const score = Number(metadata.priority_score);
+  const affectedFields = Array.isArray(metadata.affected_fields) ? metadata.affected_fields : [];
+  const recommendation = metadata.recommended_action;
+  if (!tier && !affectedFields.length && !recommendation) return "";
+  return `<div class="admin-review-priority-context" aria-label="Review-Priorisierung">
+    ${tier ? `<span><strong>${escapeAdminHTML(tier)}</strong>${Number.isFinite(score) ? ` · Score ${score}` : ""}</span>` : ""}
+    ${affectedFields.length ? `<span>Felder: ${escapeAdminHTML(affectedFields.join(", "))}</span>` : ""}
+    ${recommendation ? `<span class="is-wide">${escapeAdminHTML(recommendation)}</span>` : ""}
+  </div>`;
+}
+
+function collectContentVerificationEvidence(row) {
+  const metadata = row.metadata || {};
+  const sourceUrl = String(metadata.source_url || "").trim();
+  const storedValues = metadata.stored_values || {};
+  const requiredFields = [
+    "event_name", "edition_year", "date", "city", "country", "sport",
+    "distances", "registration_status", "official_event_page", "registration_link"
+  ];
+  if (!sourceUrl || requiredFields.some(field => !Object.prototype.hasOwnProperty.call(storedValues, field))) {
+    throw new Error("Die strukturierte Feld-Evidenz ist unvollständig. Dieser Fall bleibt im Review.");
+  }
+  if (!window.confirm("Offizielle Quelle geöffnet und alle zehn zentralen Felder einzeln verglichen?")) return null;
+
+  const observedInput = window.prompt(
+    "Extern beobachtete Werte als JSON. Abweichungen nicht überschreiben, sondern exakt eintragen; sie bleiben dann im Review:",
+    JSON.stringify(storedValues, null, 2)
+  );
+  if (observedInput == null) return null;
+  let observedValues;
+  try {
+    observedValues = JSON.parse(observedInput);
+  } catch {
+    throw new Error("Die extern beobachteten Werte sind kein gültiges JSON.");
+  }
+  if (!observedValues || typeof observedValues !== "object" || Array.isArray(observedValues)) {
+    throw new Error("Die extern beobachteten Werte müssen ein JSON-Objekt sein.");
+  }
+  const uncertainInput = window.prompt(
+    "Unsichere Felder, kommagetrennt. Leer lassen nur wenn wirklich alle Felder eindeutig sind:",
+    ""
+  );
+  if (uncertainInput == null) return null;
+  const uncertainFields = [...new Set(uncertainInput.split(",").map(value => value.trim()).filter(Boolean))];
+  if (uncertainFields.length) {
+    throw new Error(`Unsichere Felder (${uncertainFields.join(", ")}) bleiben bewusst im menschlichen Review.`);
+  }
+  const confidenceInput = window.prompt("Confidence zwischen 0,80 und 1,00:", "0.95");
+  if (confidenceInput == null) return null;
+  const confidence = Number(String(confidenceInput).replace(",", "."));
+  if (!Number.isFinite(confidence) || confidence < 0.8 || confidence > 1) {
+    throw new Error("Confidence muss zwischen 0,80 und 1,00 liegen.");
+  }
+  const notes = window.prompt(
+    "Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen):",
+    "Offizielle Quelle feldweise geprüft; gespeicherter Datenstand stimmt überein."
+  );
+  if (notes == null) return null;
+  if (notes.trim().length < 12) throw new Error("Die Prüfnotiz ist zu kurz.");
+
+  return {
+    notes: notes.trim(),
+    evidence: {
+      source_url: sourceUrl,
+      source_checked_at: new Date().toISOString(),
+      confidence,
+      confirmed_fields: requiredFields,
+      uncertain_fields: [],
+      observed_values: observedValues
+    }
+  };
+}
+
 function renderEditionLifecycleInbox() {
   if (!editionLifecycleElements.list) return;
   const rows = editionLifecycleInbox.slice().sort((left, right) => {
     const weights = { critical: 0, high: 1, medium: 2 };
     return (weights[left.priority] ?? 3) - (weights[right.priority] ?? 3) ||
+      Number(right.metadata?.priority_score || 0) - Number(left.metadata?.priority_score || 0) ||
       String(left.created_at || "").localeCompare(String(right.created_at || ""));
   });
   const actionable = rows.filter(row => getReviewInboxCategory(row) !== "waiting");
   const waiting = rows.filter(row => getReviewInboxCategory(row) === "waiting");
-  const batch = rows.filter(row => ["approve_successor", "approve_result"].includes(row.batch_action));
+  const batch = rows.filter(row => ["approve_successor", "approve_result", "verify_content"].includes(row.batch_action));
   const blocked = rows.filter(row => getReviewInboxCategory(row) === "blocked");
   if (editionLifecycleElements.decisions) editionLifecycleElements.decisions.textContent = String(actionable.length);
   if (editionLifecycleElements.waiting) editionLifecycleElements.waiting.textContent = String(waiting.length);
@@ -5367,11 +5699,13 @@ function renderEditionLifecycleInbox() {
 
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
   const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
-  const typeLabels = { new_edition: "Neuer Jahrgang", result: "Ergebnisse", proposal: "Datenaenderung", source: "Quelle", validation: "Datenfehler", workflow: "Systemfehler" };
+  const typeLabels = { new_edition: "Neuer Jahrgang", result: "Ergebnisse", proposal: "Datenaenderung", content_verification: "Quellenpruefung", freshness_review: "Freshness", source: "Quelle", validation: "Datenfehler", workflow: "Systemfehler" };
   editionLifecycleElements.list.innerHTML = visibleRows.slice(0, 300).map(row => {
     const event = eventById.get(String(row.event_id));
     const edition = editionById.get(String(row.edition_id));
-    const canApprove = ["approve_successor", "approve_result"].includes(row.batch_action);
+    const canPublish = ["approve_successor", "approve_result"].includes(row.batch_action);
+    const canVerifyContent = row.batch_action === "verify_content";
+    const canApprove = canPublish || canVerifyContent;
     const canApproveProposal = row.batch_action === "approve_proposal";
     const isWaiting = row.batch_action === "wait_automation";
     const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : "";
@@ -5380,10 +5714,11 @@ function renderEditionLifecycleInbox() {
     const requiredConfirmations = Number(row.metadata?.required_confirmations || 0);
     return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
       ${canApprove ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
-      <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewInboxDiff(row)}</div>
+      <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${row.metadata?.review_tier ? `<span class="admin-review-tier">${escapeAdminHTML(row.metadata.review_tier)}</span>` : ""}${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewPriorityContext(row)}${renderReviewInboxDiff(row)}${renderContentVerificationEvidence(row)}</div>
       <dl><div><dt>Status</dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt>Bestaetigungen</dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
       <div class="source-monitor-actions">
-        ${canApprove ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
+        ${canPublish ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
+        ${canVerifyContent ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="content_verification">Feldweise bestaetigen</button>` : ""}
         ${canApproveProposal ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Aenderung uebernehmen</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Ablehnen</button>` : ""}
         ${["source", "validation", "workflow"].includes(row.item_type) ? `<button type="button" data-lifecycle-action="resolve-exception" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Als erledigt markieren</button>` : ""}
         ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
@@ -5396,19 +5731,31 @@ function renderEditionLifecycleInbox() {
 async function approveEditionLifecycleItems(items) {
   const successorIds = items.filter(item => item.item_type === "new_edition").map(item => item.item_id);
   const resultIds = items.filter(item => item.item_type === "result").map(item => item.item_id);
+  const verificationIds = items.filter(item => item.item_type === "content_verification").map(item => item.item_id);
+  if (verificationIds.length > 1) throw new Error("Quellenpruefungen müssen wegen der Feld-Evidenz einzeln bestaetigt werden.");
   const responses = [];
   if (successorIds.length) responses.push(await supabaseClient.rpc("approve_edition_succession_candidates", { p_candidate_ids: successorIds, p_limit: successorIds.length }));
   if (resultIds.length) responses.push(await supabaseClient.rpc("approve_edition_result_candidates", { p_result_ids: resultIds, p_limit: resultIds.length }));
+  if (verificationIds.length) responses.push(await supabaseClient.rpc("verify_content_change_tasks", {
+    p_task_ids: verificationIds,
+    p_notes: items.find(item => item.item_type === "content_verification")?._verificationNotes,
+    p_evidence: Object.fromEntries(items
+      .filter(item => item.item_type === "content_verification")
+      .map(item => [String(item.item_id), item._verificationEvidence]))
+  }));
   const failed = responses.find(result => result.error);
   if (failed) throw failed.error;
-  return responses.reduce((count, result) => count + Number(result.data?.approved_count || 0), 0);
+  return responses.reduce((count, result) => count + Number(result.data?.approved_count ?? result.data?.verified_count ?? 0), 0);
 }
 
 async function handleEditionLifecycleAction(button) {
   const action = button.dataset.lifecycleAction;
   if (action === "select-all") {
-    editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]").forEach(input => { input.checked = true; });
-    setEditionLifecycleStatus("Alle freigabefaehigen Ausnahmen wurden ausgewaehlt.", "success");
+    const selectable = [...(editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]") || [])];
+    selectable.forEach((input, index) => { input.checked = index < 50; });
+    setEditionLifecycleStatus(selectable.length > 50
+      ? "Die ersten 50 pruefbaren Eintraege wurden ausgewaehlt."
+      : "Alle pruefbaren Eintraege wurden ausgewaehlt.", "success");
     return;
   }
   let items = [];
@@ -5420,7 +5767,24 @@ async function handleEditionLifecycleAction(button) {
     items = editionLifecycleInbox.filter(item => String(item.item_id) === String(button.dataset.itemId));
   }
 
-  setButtonLoading(button, true, action === "reject" ? "Ablehnen ..." : "Freigeben ...");
+  const contentVerificationItems = items.filter(item => item.item_type === "content_verification");
+  if (contentVerificationItems.length) {
+    if (items.length !== 1) {
+      setEditionLifecycleStatus("Quellenpruefungen müssen mit eigener Feld-Evidenz einzeln bearbeitet werden.", "error");
+      return;
+    }
+    try {
+      const verification = collectContentVerificationEvidence(contentVerificationItems[0]);
+      if (!verification) return;
+      contentVerificationItems[0]._verificationNotes = verification.notes;
+      contentVerificationItems[0]._verificationEvidence = verification.evidence;
+    } catch (error) {
+      setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Feld-Evidenz ist unvollständig."), "error");
+      return;
+    }
+  }
+
+  setButtonLoading(button, true, action === "reject" ? "Ablehnen ..." : "Bestaetigen ...");
   try {
     if (action === "resolve-exception") {
       const item = items[0];
@@ -5453,7 +5817,7 @@ async function handleEditionLifecycleAction(button) {
       setEditionLifecycleStatus("Die konkrete Datenaenderung wurde uebernommen und protokolliert.", "success");
     } else {
       const approvedCount = await approveEditionLifecycleItems(items);
-      setEditionLifecycleStatus(`${approvedCount} Eintraege wurden kontrolliert veroeffentlicht.`, "success");
+      setEditionLifecycleStatus(`${approvedCount} Eintraege wurden kontrolliert bestaetigt.`, "success");
     }
     await loadDataOperations();
   } catch (error) {
@@ -5485,27 +5849,51 @@ function sourceMonitorLatestBy(rows, key) {
 function renderSourceMonitor() {
   if (!sourceMonitorElements.tableBody) return;
   renderEditionLifecycleInbox();
+  const healthApi = typeof DataFreshnessHealth === "undefined"
+    ? null
+    : DataFreshnessHealth;
   const nowIso = new Date().toISOString();
   const today = nowIso.slice(0, 10);
   const todayResults = sourceMonitorResults.filter(row => String(row.fetched_at || "").slice(0, 10) === today);
   const timed = todayResults.map(row => Number(row.response_time_ms)).filter(Number.isFinite);
+  const activeDeadLetterJobs = healthApi?.selectActiveDeadLetterJobs
+    ? healthApi.selectActiveDeadLetterJobs(sourceMonitorJobs, dataOpsSources)
+    : sourceMonitorJobs.filter(row => row.status === "dead_letter");
+  const failedSources = healthApi?.isActiveSourceFailure
+    ? dataOpsSources.filter(healthApi.isActiveSourceFailure)
+    : dataOpsSources.filter(row => row.is_active && Number(row.consecutive_failures || 0) > 0);
+  const technicalProblemKeys = new Set(
+    failedSources.map(source => `source:${source.id}`)
+  );
+  activeDeadLetterJobs.forEach(job => technicalProblemKeys.add(
+    job.source_id == null ? `job:${job.id}` : `source:${job.source_id}`
+  ));
   setSourceMonitorKpi("checkedToday", todayResults.length);
   setSourceMonitorKpi("unchanged", todayResults.filter(row => row.change_status === "unchanged").length);
   setSourceMonitorKpi("changed", todayResults.filter(row => row.change_status === "changed").length);
   setSourceMonitorKpi("unreachable", todayResults.filter(row => row.change_status === "unreachable").length);
   setSourceMonitorKpi("failed", todayResults.filter(row => row.processing_status !== "completed").length);
   setSourceMonitorKpi("retries", sourceMonitorJobs.filter(row => row.status === "retry_scheduled").length);
-  setSourceMonitorKpi("deadLetter", sourceMonitorJobs.filter(row => row.status === "dead_letter").length);
+  setSourceMonitorKpi("deadLetter", activeDeadLetterJobs.length);
   setSourceMonitorKpi("averageTime", timed.length ? `${Math.round(timed.reduce((sum, value) => sum + value, 0) / timed.length)} ms` : "--");
   setSourceMonitorKpi("overdue", dataOpsSources.filter(row => row.is_active && row.next_fetch_at && row.next_fetch_at <= nowIso).length);
   setSourceMonitorKpi("noSchedule", dataOpsSources.filter(row => row.is_active && !row.next_fetch_at).length);
-  const technicalProblemCount = sourceMonitorJobs.filter(row => ["failed", "dead_letter"].includes(row.status)).length;
+  const technicalProblemCount = technicalProblemKeys.size;
   const sourceSummary = document.getElementById("sourceMonitorSummaryStatus");
   if (sourceSummary) sourceSummary.textContent = technicalProblemCount ? `${technicalProblemCount} technische Probleme` : `${todayResults.length} heute geprueft`;
 
   const resultBySource = sourceMonitorLatestBy(sourceMonitorResults, "source_id");
   const jobBySource = sourceMonitorLatestBy(sourceMonitorJobs, "source_id");
-  const reviewBySource = sourceMonitorLatestBy(sourceMonitorReviews.filter(row => row.status === "open"), "source_id");
+  const sourceById = new Map(dataOpsSources.map(source => [String(source.id), source]));
+  const technicalReviewTypes = new Set(["dead_letter", "source_unreachable", "content_invalid"]);
+  const operationalReviews = sourceMonitorReviews.filter(row => {
+    if (row.status !== "open" || !technicalReviewTypes.has(row.task_type)) {
+      return row.status === "open";
+    }
+    const source = sourceById.get(String(row.source_id));
+    return !source || !healthApi?.isActiveSourceFailure || healthApi.isActiveSourceFailure(source);
+  });
+  const reviewBySource = sourceMonitorLatestBy(operationalReviews, "source_id");
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
   const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
 
@@ -6070,6 +6458,10 @@ dataOpsElements.closeHistory?.addEventListener("click", () => { dataOpsElements.
 dataOpsElements.panel?.addEventListener("click", event => {
   const button = event.target.closest("[data-dataops-action]");
   if (button) handleDataOpsAction(button);
+});
+dataFreshnessElements.section?.addEventListener("click", event => {
+  const button = event.target.closest("[data-freshness-action]");
+  if (button) handleDataFreshnessAction(button);
 });
 sourceMonitorElements.section?.addEventListener("click", event => {
   const button = event.target.closest("[data-source-action]");

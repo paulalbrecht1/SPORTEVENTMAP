@@ -1,8 +1,10 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
 import {
+  classifySourceFailure,
   extractLifecycleSignals,
   evaluateRobots,
+  resolveHttpAllowance,
   SourceFetchError,
   fetchSource,
   validateSourceUrl
@@ -11,7 +13,7 @@ import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.0-phase-a-shadow";
+const WORKER_VERSION = "source-monitor-4.1.2-phase-a-shadow";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
@@ -135,7 +137,7 @@ function toFetchPolicy(policy: Record<string, unknown>) {
     maxResponseBytes: Number(policy.max_response_bytes || 1500000),
     maxRedirects: Number(policy.max_redirects || 5),
     allowedContentTypes: Array.isArray(policy.allowed_content_types) ? policy.allowed_content_types : defaultPolicy().allowed_content_types,
-    allowHttp: allowHttpOverride == null ? policy.allow_http !== false : allowHttpOverride.toLowerCase() === "true",
+    allowHttp: resolveHttpAllowance(policy.allow_http, allowHttpOverride),
     userAgent: configuredUserAgent()
   };
 }
@@ -164,8 +166,9 @@ async function checkRobots(admin: ReturnType<typeof createClient>, claim: Record
     const robots = await fetchSource(`${sourceUrl.origin}/robots.txt`, {
       policy: {
         ...fetchPolicy,
-        maxResponseBytes: Math.min(Number(fetchPolicy.maxResponseBytes), 250000),
+        maxResponseBytes: Math.min(Number(fetchPolicy.maxResponseBytes), 512000),
         allowedContentTypes: ["text/plain", "text/html"],
+        allowEmptyContent: true,
         accept: "text/plain,*/*;q=0.1"
       },
       blockedHostnames,
@@ -527,7 +530,22 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     } catch (shadowError) {
       phaseAObservation.error = cleanError(shadowError);
     }
-    return { source_id: claim.source_id, job_id: claim.job_id, status: transaction?.status || "failed", error_type: failure.code, transaction, observation, phase_a_observation: phaseAObservation };
+    const failureClassification = classifySourceFailure(
+      failure.code,
+      failure.httpStatus ?? metadata.httpStatus ?? null
+    );
+    return {
+      source_id: claim.source_id,
+      job_id: claim.job_id,
+      status: transaction?.status || "failed",
+      error_type: failure.code,
+      error_category: failureClassification.category,
+      error_temporality: failureClassification.temporality,
+      retryable: failure.retriable,
+      transaction,
+      observation,
+      phase_a_observation: phaseAObservation
+    };
   }
 }
 

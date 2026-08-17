@@ -1004,7 +1004,7 @@ function refreshEvents(options = {}) {
 
   clearMarkers();
 
-  loadEvents((events) => {
+  loadEvents((events, discoveryEvents) => {
   if (refreshToken !== eventsRefreshToken) {
     return;
   }
@@ -1012,7 +1012,7 @@ function refreshEvents(options = {}) {
   console.log("Loaded events:", events);
 
   const mapEvents =
-    applyDisplayCoordinateOffsets(events);
+    applyDisplayCoordinateOffsets(discoveryEvents);
 
   deferMarkerLayerUpdates = true;
 
@@ -1057,7 +1057,7 @@ function refreshEvents(options = {}) {
 
     }
     else {
-      renderEventList(events);
+      renderEventList(discoveryEvents);
     }
   } catch (error) {
     console.error(

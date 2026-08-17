@@ -1441,7 +1441,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   );
 
   await test(
-    "17. First successor detection stays private and an admin can publish it before auto-confirmation",
+    "17. First successor detection stays private and requires explicit admin review",
     async () => {
       const sources = await serviceRequest(
         `event_sources?select=id,event_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&limit=1`
@@ -1494,7 +1494,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         { token: admin.token }
       );
       assert.equal(adminInbox.response.ok, true, JSON.stringify(adminInbox.data));
-      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["wait_automation"]);
+      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["review"]);
 
       const approved = await restRequest("rpc/approve_edition_succession_candidates", {
         token: admin.token,
@@ -1510,6 +1510,223 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.equal(publicArchive.response.ok, true, JSON.stringify(publicArchive.data));
       assert.deepEqual(publicArchive.data.map(row => row.edition_year), [2028]);
       assert.deepEqual(publicArchive.data.map(row => row.discovery_status), ["active"]);
+    }
+  );
+
+  await test(
+    "18. Content verification requires complete matching evidence and writes an audit record",
+    async () => {
+      const sourceUrl = `https://example.com/content-verification-${runId}`;
+      const insertedEvent = await restRequest("events", {
+        token: admin.token,
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_name: `[CONTENT VERIFY TEST] ${runId}`,
+          sport: "Running",
+          date: "15.10.2027",
+          city: "Berlin",
+          country: "Germany",
+          address: "Verification venue",
+          latitude: 52.52,
+          longitude: 13.405,
+          distance: "10 km",
+          description: "A complete verification fixture with enough descriptive content for the strict quality metric and audit workflow.",
+          event_url: sourceUrl,
+          status: "pending",
+          created_by: admin.user.id
+        }
+      });
+      assert.equal(insertedEvent.response.ok, true, JSON.stringify(insertedEvent.data));
+      const eventId = insertedEvent.data[0].id;
+
+      const approvedEvent = await restRequest(`events?id=eq.${encodeURIComponent(eventId)}`, {
+        token: admin.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { status: "approved" }
+      });
+      assert.equal(approvedEvent.response.ok, true, JSON.stringify(approvedEvent.data));
+
+      const editions = await serviceRequest(
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(eventId)}&limit=1`
+      );
+      assert.equal(editions.response.ok, true, JSON.stringify(editions.data));
+      const editionId = editions.data[0].id;
+      const updatedEdition = await serviceRequest(`event_editions?id=eq.${encodeURIComponent(editionId)}`, {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: {
+          edition_year: 2027,
+          start_date: "2027-10-15",
+          end_date: "2027-10-15",
+          publication_status: "published",
+          discovery_status: "active",
+          edition_status: "scheduled",
+          verification_status: "stale",
+          needs_review: true,
+          registration_status: "registration_open",
+          registration_url: `${sourceUrl}/register`,
+          race_formats: [{ distance: "10 km" }],
+          next_check_at: new Date(Date.now() - 86400000).toISOString()
+        }
+      });
+      assert.equal(updatedEdition.response.ok, true, JSON.stringify(updatedEdition.data));
+
+      const insertedSource = await serviceRequest("event_sources", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: eventId,
+          edition_id: editionId,
+          source_type: "official_event_website",
+          source_url: sourceUrl,
+          parser_type: "html",
+          is_active: true,
+          crawl_status: "success",
+          consecutive_failures: 0,
+          last_fetched_at: new Date().toISOString(),
+          next_fetch_at: new Date(Date.now() + 86400000).toISOString()
+        }
+      });
+      assert.equal(insertedSource.response.ok, true, JSON.stringify(insertedSource.data));
+      const sourceId = insertedSource.data[0].id;
+
+      const insertedJob = await serviceRequest("source_crawl_jobs", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          source_id: sourceId,
+          event_id: eventId,
+          edition_id: editionId,
+          status: "completed",
+          attempt_count: 1,
+          idempotency_key: `content-verify-${runId}`,
+          trigger_source: "test",
+          completed_at: new Date().toISOString()
+        }
+      });
+      assert.equal(insertedJob.response.ok, true, JSON.stringify(insertedJob.data));
+
+      const fetchedAt = new Date().toISOString();
+      const insertedResult = await serviceRequest("source_crawl_results", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          job_id: insertedJob.data[0].id,
+          source_id: sourceId,
+          event_id: eventId,
+          edition_id: editionId,
+          attempt_number: 1,
+          fetched_at: fetchedAt,
+          http_status: 200,
+          final_url: sourceUrl,
+          redirect_count: 0,
+          content_hash: `new-${runId}`,
+          previous_content_hash: `old-${runId}`,
+          change_status: "changed",
+          change_detected: true,
+          worker_version: "rls-content-verification",
+          processing_status: "completed"
+        }
+      });
+      assert.equal(insertedResult.response.ok, true, JSON.stringify(insertedResult.data));
+
+      const insertedTask = await serviceRequest("source_review_tasks", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          source_id: sourceId,
+          event_id: eventId,
+          edition_id: editionId,
+          crawl_result_id: insertedResult.data[0].id,
+          task_type: "content_changed",
+          status: "open",
+          priority: "low",
+          title: "Structured verification fixture",
+          description: "Official source changed and needs field verification.",
+          fingerprint: `content-verify-${runId}`
+        }
+      });
+      assert.equal(insertedTask.response.ok, true, JSON.stringify(insertedTask.data));
+      const taskId = insertedTask.data[0].id;
+
+      const inbox = await restRequest(
+        `admin_review_inbox?select=item_id,item_type,batch_action,metadata&item_id=eq.${encodeURIComponent(taskId)}`,
+        { token: admin.token }
+      );
+      assert.equal(inbox.response.ok, true, JSON.stringify(inbox.data));
+      assert.equal(inbox.data.length, 1, JSON.stringify(inbox.data));
+      assert.equal(inbox.data[0].item_type, "content_verification");
+      const storedValues = inbox.data[0].metadata.stored_values;
+      const requiredFields = [
+        "event_name", "edition_year", "date", "city", "country", "sport",
+        "distances", "registration_status", "official_event_page", "registration_link"
+      ];
+      const evidence = {
+        source_url: sourceUrl,
+        source_checked_at: new Date().toISOString(),
+        confidence: 0.95,
+        confirmed_fields: requiredFields,
+        uncertain_fields: [],
+        observed_values: storedValues
+      };
+
+      const normalVerification = await restRequest("rpc/verify_content_change_tasks", {
+        token: userA.token,
+        method: "POST",
+        body: { p_task_ids: [taskId], p_notes: "Normal user must be denied.", p_evidence: { [taskId]: evidence } }
+      });
+      assert.equal(normalVerification.response.ok, false);
+
+      const mismatchVerification = await restRequest("rpc/verify_content_change_tasks", {
+        token: admin.token,
+        method: "POST",
+        body: {
+          p_task_ids: [taskId],
+          p_notes: "Mismatch must remain in review.",
+          p_evidence: { [taskId]: { ...evidence, observed_values: { ...storedValues, city: "Hamburg" } } }
+        }
+      });
+      assert.equal(mismatchVerification.response.ok, false, JSON.stringify(mismatchVerification.data));
+
+      const stillOpen = await serviceRequest(
+        `source_review_tasks?select=status&id=eq.${encodeURIComponent(taskId)}`
+      );
+      assert.deepEqual(stillOpen.data.map(row => row.status), ["open"]);
+
+      const verified = await restRequest("rpc/verify_content_change_tasks", {
+        token: admin.token,
+        method: "POST",
+        body: {
+          p_task_ids: [taskId],
+          p_notes: "Official source checked field by field.",
+          p_evidence: { [taskId]: { ...evidence, source_checked_at: new Date().toISOString() } }
+        }
+      });
+      assert.equal(verified.response.ok, true, JSON.stringify(verified.data));
+      assert.equal(Number(verified.data.verified_count), 1);
+      assert.equal(verified.data.automatic_fact_changes, false);
+
+      const verifiedEdition = await serviceRequest(
+        `event_editions?select=verification_status,needs_review,last_verified_at,next_check_at&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.deepEqual(verifiedEdition.data.map(row => row.verification_status), ["verified"]);
+      assert.deepEqual(verifiedEdition.data.map(row => row.needs_review), [false]);
+
+      const audit = await serviceRequest(
+        `event_audit_log?select=field_name,new_value,change_source&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(editionId)}&field_name=eq.__content_verification__`
+      );
+      assert.equal(audit.response.ok, true, JSON.stringify(audit.data));
+      assert.equal(audit.data.length, 1);
+      assert.equal(audit.data[0].change_source, "manual_admin");
+      assert.equal(audit.data[0].new_value.automatic_fact_changes, false);
+
+      const cleanup = await restRequest(`events?id=eq.${encodeURIComponent(eventId)}`, {
+        token: admin.token,
+        method: "DELETE"
+      });
+      assert.equal(cleanup.response.ok, true, JSON.stringify(cleanup.data));
     }
   );
 }

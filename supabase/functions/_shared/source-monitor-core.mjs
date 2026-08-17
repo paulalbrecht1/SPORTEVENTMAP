@@ -6,15 +6,60 @@ export const DEFAULT_ALLOWED_CONTENT_TYPES = [
 
 export const NORMALIZATION_VERSION = "sem-v2";
 
+export function classifySourceFailure(code, httpStatus = null) {
+  const normalized = String(code || "technical_other").toLowerCase();
+  const status = Number.isFinite(Number(httpStatus)) ? Number(httpStatus) : null;
+  const serverError = /^http_5\d\d$/.test(normalized) || (status >= 500 && status <= 599);
+  const temporary = new Set([
+    "timeout", "network_error", "connect_error", "pinned_connect_error",
+    "dns_error", "tls_error", "http_408", "http_425", "http_429",
+    "robots_unavailable", "empty_content", "worker_error"
+  ]);
+
+  if (["http_404", "http_410"].includes(normalized)) {
+    return { category: "page_removed_or_changed", temporality: "possibly_permanent", defaultRetriable: false, requiresReview: true };
+  }
+  if (["invalid_redirect", "too_many_redirects", "redirect_error", "redirect_limit"].includes(normalized)) {
+    return { category: "redirect", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  if (["http_401", "http_403", "robots_denied"].includes(normalized)) {
+    return { category: "access_or_bot_protection", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  if (["invalid_url", "unsupported_protocol", "unsupported_port", "embedded_credentials"].includes(normalized)) {
+    return { category: "invalid_source_url", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  if (["unsupported_content_type", "unsupported_content_encoding", "response_too_large"].includes(normalized)) {
+    return { category: "content_or_parser", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  if (normalized === "source_replaced") {
+    return { category: "source_replaced", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  if (temporary.has(normalized) || serverError) {
+    const category = normalized === "http_429" ? "rate_limit"
+      : normalized === "dns_error" ? "dns"
+        : normalized === "tls_error" ? "tls"
+          : normalized === "robots_unavailable" ? "robots_temporarily_unavailable"
+            : normalized === "empty_content" ? "content_or_parser"
+              : serverError ? "upstream_server_error" : "timeout_or_connection";
+    return { category, temporality: "temporary", defaultRetriable: true, requiresReview: false };
+  }
+  if (/^http_4\d\d$/.test(normalized) || (status >= 400 && status <= 499)) {
+    return { category: "http_other", temporality: "permanent_until_review", defaultRetriable: false, requiresReview: true };
+  }
+  return { category: "technical_other", temporality: "unknown", defaultRetriable: true, requiresReview: false };
+}
+
 export class SourceFetchError extends Error {
   constructor(code, message, options = {}) {
     super(message);
+    const classification = classifySourceFailure(code, options.httpStatus);
     this.name = "SourceFetchError";
     this.code = code;
     this.httpStatus = options.httpStatus ?? null;
-    this.retriable = options.retriable ?? true;
+    this.retriable = options.retriable ?? classification.defaultRetriable;
     this.retryAfterSeconds = options.retryAfterSeconds ?? null;
     this.metadata = options.metadata || {};
+    this.classification = classification;
   }
 }
 
@@ -127,6 +172,10 @@ export async function resolveSourceTarget(rawUrl, options = {}) {
 
 export async function validateSourceUrl(rawUrl, options = {}) {
   return (await resolveSourceTarget(rawUrl, options)).url;
+}
+
+export function resolveHttpAllowance(policyAllowsHttp, environmentOverride) {
+  return policyAllowsHttp === true || String(environmentOverride || "").toLowerCase() === "true";
 }
 
 function stableJson(value) {
@@ -378,6 +427,7 @@ export async function fetchSource(rawUrl, options = {}) {
     maxRedirects: 5,
     allowedContentTypes: DEFAULT_ALLOWED_CONTENT_TYPES,
     allowHttp: true,
+    allowEmptyContent: false,
     userAgent: "SportEventMapSourceMonitor/2.0",
     ...options.policy
   };
@@ -432,9 +482,10 @@ export async function fetchSource(rawUrl, options = {}) {
       };
       if (response.status === 304) return { ...metadata, notModified: true, contentHash: options.previousHash || null, normalized: "", rawText: "" };
       if (response.status !== 200) {
+        const failureClassification = classifySourceFailure(`http_${response.status}`, response.status);
         throw new SourceFetchError(`http_${response.status}`, `HTTP ${response.status}`, {
           httpStatus: response.status,
-          retriable: response.status !== 410,
+          retriable: failureClassification.defaultRetriable,
           retryAfterSeconds: parseRetryAfter(response.headers.get("retry-after")),
           metadata
         });
@@ -446,12 +497,14 @@ export async function fetchSource(rawUrl, options = {}) {
       const bytes = await readLimitedBody(response, policy.maxResponseBytes);
       const rawText = new TextDecoder("utf-8", { fatal: false }).decode(bytes);
       const normalized = normalizeRelevantContent(rawText, metadata.contentType);
-      if (!normalized) throw new SourceFetchError("empty_content", "Die Antwort enthaelt keinen relevanten Inhalt.", { retriable: true, metadata });
+      if (!normalized && !policy.allowEmptyContent) {
+        throw new SourceFetchError("empty_content", "Die Antwort enthaelt keinen relevanten Inhalt.", { retriable: true, metadata });
+      }
       const semanticSignals = extractSemanticSignals(rawText, metadata.contentType);
       return {
         ...metadata,
         contentLength: bytes.byteLength,
-        contentHash: await sha256Hex(normalized),
+        contentHash: await sha256Hex(normalized || rawText),
         semanticHash: await sha256Hex(semanticSignals),
         normalizationVersion: NORMALIZATION_VERSION,
         semanticSignals,

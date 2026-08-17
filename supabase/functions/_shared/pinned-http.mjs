@@ -9,12 +9,23 @@ async function writeAll(connection, bytes) {
   while (offset < bytes.byteLength) offset += await connection.write(bytes.subarray(offset));
 }
 
+function isUncleanTlsEof(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  return /close_notify|unexpected[ -]?eof|peer closed connection/i.test(message);
+}
+
 async function readAll(connection, limit) {
   const chunks = [];
   let total = 0;
   const buffer = new Uint8Array(16384);
   while (true) {
-    const count = await connection.read(buffer);
+    let count;
+    try {
+      count = await connection.read(buffer);
+    } catch (error) {
+      if (total > 0 && isUncleanTlsEof(error)) break;
+      throw error;
+    }
     if (count === null) break;
     total += count;
     if (total > limit) throw new SourceFetchError("response_too_large", `Gepinnte Antwort ueberschreitet ${limit} Bytes.`, { retriable: false });
@@ -76,8 +87,20 @@ function parseHttpResponse(bytes, pinnedIp) {
   const encoding = (headers.get("content-encoding") || "identity").toLowerCase();
   if (!["", "identity"].includes(encoding)) throw new SourceFetchError("unsupported_content_encoding", `Content-Encoding ${encoding} wird im gepinnten Transport nicht akzeptiert.`, { retriable: false });
   let body = bytes.slice(headerEnd + separator.byteLength);
-  if (/\bchunked\b/i.test(headers.get("transfer-encoding") || "")) body = decodeChunked(body);
   const status = Number(statusMatch[1]);
+  if (/\bchunked\b/i.test(headers.get("transfer-encoding") || "")) {
+    body = decodeChunked(body);
+  } else if (![204, 205, 304].includes(status) && headers.has("content-length")) {
+    const rawLength = headers.get("content-length")?.trim() || "";
+    if (!/^\d+$/.test(rawLength)) {
+      throw new SourceFetchError("invalid_http_response", "Ungueltiger Content-Length-Header.", { retriable: true });
+    }
+    const expectedLength = Number(rawLength);
+    if (!Number.isSafeInteger(expectedLength) || body.byteLength < expectedLength) {
+      throw new SourceFetchError("invalid_http_response", "Unvollstaendige HTTP-Antwort.", { retriable: true });
+    }
+    if (body.byteLength > expectedLength) body = body.slice(0, expectedLength);
+  }
   return new Response([204, 205, 304].includes(status) ? null : body, { status, headers });
 }
 
@@ -112,7 +135,12 @@ export function createPinnedHttpFetch(runtime) {
         if (init.signal?.aborted) throw new DOMException("aborted", "AbortError");
         init.signal?.addEventListener("abort", abort, { once: true });
         connection = await runtime.connect({ transport: "tcp", hostname: address, port });
-        if (url.protocol === "https:") connection = await runtime.startTls(connection, { hostname: url.hostname });
+        if (url.protocol === "https:") {
+          connection = await runtime.startTls(connection, {
+            hostname: url.hostname,
+            alpnProtocols: ["http/1.1"]
+          });
+        }
         await writeAll(connection, encoder.encode(lines.join("\r\n")));
         const maximum = Number(target.maxResponseBytes || 1500000) + 65536;
         return parseHttpResponse(await readAll(connection, maximum), address);

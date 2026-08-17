@@ -1705,56 +1705,149 @@ async function loadCsvEvents() {
 
 // Supabase is the source of truth after the controlled catalog import. The
 // versioned CSV remains a read-only export/fallback during rollout or outages.
-const MIN_SUPABASE_CATALOG_ROWS = 1;
+const SUPABASE_CATALOG_PAGE_SIZE = 500;
+
+function isMissingDiscoveryViewError(error) {
+  const sourceError =
+    error && error.cause
+      ? error.cause
+      : error;
+  const code =
+    String(sourceError && sourceError.code || "");
+  const message =
+    String(sourceError && sourceError.message || "");
+
+  return (
+    code === "42P01" ||
+    code === "PGRST205" ||
+    /(?:could not find|relation).*public_event_discovery.*(?:schema cache|does not exist)/i.test(message)
+  );
+}
+
+async function loadCompleteSupabaseCatalog() {
+  if (
+    typeof EventCatalogLoader === "undefined" ||
+    !EventCatalogLoader ||
+    typeof EventCatalogLoader.fetchCompleteCatalog !== "function"
+  ) {
+    throw new Error(
+      "The complete event catalog loader is unavailable."
+    );
+  }
+
+  try {
+    return await EventCatalogLoader.fetchCompleteCatalog({
+      client: supabaseClient,
+      table: "public_event_discovery",
+      orderColumn: "edition_id",
+      pageSize: SUPABASE_CATALOG_PAGE_SIZE
+    });
+  } catch (error) {
+    if (!isMissingDiscoveryViewError(error)) {
+      throw error;
+    }
+
+    // Compatibility fallback for environments that have not received the
+    // event-edition view yet. It is paginated as well so legacy deployments
+    // cannot silently truncate the public catalog.
+    return EventCatalogLoader.fetchCompleteCatalog({
+      client: supabaseClient,
+      table: "events",
+      orderColumn: "id",
+      pageSize: SUPABASE_CATALOG_PAGE_SIZE,
+      applyFilters(query) {
+        return query.eq("status", "approved");
+      }
+    });
+  }
+}
 
 async function loadEvents(callback) {
   let loadedEvents = [];
+  let discoveryEvents = [];
   let dbEvents = [];
   let dbReady = false;
+  let catalogLoadError = null;
 
   try {
     if (typeof supabaseClient !== "undefined" && supabaseClient) {
-      let { data, error } = await supabaseClient
-        .from("public_event_discovery")
-        .select("*");
+      const catalog =
+        await loadCompleteSupabaseCatalog();
 
-      // Compatibility fallback for environments that have not received the
-      // event-edition view yet. It does not activate source-of-truth mode.
-      if (error && /public_event_discovery/i.test(String(error.message || ""))) {
-        ({ data, error } = await supabaseClient
-          .from("events")
-          .select("*")
-          .eq("status", "approved"));
-      }
+      dbEvents = catalog.rows;
+      dbReady = catalog.count > 0;
 
-      if (error) throw error;
-      dbEvents = data || [];
-      dbReady = dbEvents.length >= MIN_SUPABASE_CATALOG_ROWS;
+      window.eventCatalogDiagnostics = {
+        source: "supabase",
+        rowCount: dbEvents.length,
+        expectedRowCount: catalog.count,
+        pages: catalog.pages,
+        orderColumn: catalog.orderColumn,
+        loadedAt: new Date().toISOString()
+      };
+
       if (!dbReady) {
-        console.warn(`Supabase catalog has ${dbEvents.length} rows; keeping the CSV fallback until the controlled import is complete.`);
+        console.warn(
+          "Supabase catalog is empty; using the versioned CSV fallback."
+        );
       }
     }
   } catch (error) {
+    catalogLoadError = error;
     // A reachable CSV export is the intentional outage fallback, so this is
     // operationally noteworthy but not an application error.
     console.warn("Supabase event catalog request failed; using CSV fallback:", error);
   }
 
   try {
-    const sourceEvents = dbReady ? dbEvents : await loadCsvEvents();
+    const fallbackEvents = dbReady
+      ? []
+      : await loadCsvEvents();
+    const sourceEvents = dbReady
+      ? dbEvents
+      : fallbackEvents;
     events = normalizeEvents(sourceEvents);
+    discoveryEvents = dbReady
+      ? events
+      : EventCatalogLoader.filterCurrentCatalogRows(events);
     window.eventCatalogSource = dbReady ? "supabase" : "csv-fallback";
+
+    if (!dbReady) {
+      window.eventCatalogDiagnostics = {
+        source: "csv-fallback",
+        rowCount: discoveryEvents.length,
+        expectedRowCount: discoveryEvents.length,
+        fallbackTotalRows: events.length,
+        excludedPastOrInvalidRows:
+          events.length - discoveryEvents.length,
+        pages: 1,
+        orderColumn: null,
+        fallbackReason: catalogLoadError
+          ? "supabase-error"
+          : "supabase-empty",
+        supabaseErrorCode: catalogLoadError
+          ? String(
+            catalogLoadError.code ||
+            catalogLoadError.cause && catalogLoadError.cause.code ||
+            "CATALOG_LOAD_FAILED"
+          )
+          : null,
+        loadedAt: new Date().toISOString()
+      };
+    }
+
     migrateLocalPlanningKeys(events);
     loadedEvents = events;
 
     if (typeof window.updateLandingEventCount === "function") {
-      window.updateLandingEventCount(loadedEvents);
+      window.updateLandingEventCount(discoveryEvents);
     }
     processPendingSeasonAdd();
   } catch (error) {
     console.error("Event catalog loading failed:", error);
     events = [];
     loadedEvents = events;
+    discoveryEvents = events;
     if (typeof showAppMessage === "function") {
       showAppMessage(
         "Events unavailable",
@@ -1764,7 +1857,7 @@ async function loadEvents(callback) {
   }
 
   try {
-    callback(loadedEvents);
+    callback(loadedEvents, discoveryEvents);
   } catch (error) {
     console.error("Event render callback failed:", error);
   }

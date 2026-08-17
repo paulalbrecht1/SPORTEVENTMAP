@@ -13,6 +13,7 @@ const scheduler = read("supabase/migrations/20260805_source_worker_schedule.sql"
 const securityHardening = read("supabase/migrations/20260814120000_beta_security_definer_hardening.sql");
 const sourceMonitor = read("supabase/migrations/20260808_source_monitor_queue_worker.sql");
 const worker = read("supabase/functions/event-source-check/index.ts");
+const catalogLoader = read("js/event-catalog-loader.js");
 const eventsClient = read("js/events.js");
 const adminClient = read("js/supabase.js");
 
@@ -53,7 +54,9 @@ assert.ok(securityHardening.includes("from public, anon, authenticated"));
 assert.doesNotMatch(worker, /\.from\(["']events["']\)\.update/);
 assert.doesNotMatch(worker, /\.from\(["']event_editions["']\)\.update/);
 
-assert.ok(eventsClient.includes("MIN_SUPABASE_CATALOG_ROWS = 1"));
+assert.ok(eventsClient.includes("dbReady = catalog.count > 0"));
+assert.ok(eventsClient.includes("EventCatalogLoader.fetchCompleteCatalog"));
+assert.ok(catalogLoader.includes('"CATALOG_INCOMPLETE"'));
 assert.ok(eventsClient.includes('"csv-fallback"'));
 assert.ok(adminClient.includes('data-dataops-action="approve-proposal"'));
 assert.ok(adminClient.includes('data-dataops-action="resolve-alert"'));

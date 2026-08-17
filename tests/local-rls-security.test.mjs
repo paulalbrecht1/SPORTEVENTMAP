@@ -259,9 +259,7 @@ runSupabase([
   begin
     perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
     update public.edition_lifecycle_settings
-    set auto_publish_enabled = true,
-        auto_result_publish_enabled = true,
-        min_confirmation_interval_hours = 0,
+    set min_confirmation_interval_hours = 0,
         auto_publish_threshold = 0.995,
         auto_result_publish_threshold = 0.980
     where singleton;
@@ -361,26 +359,27 @@ const [automationState] = queryLocal(`
       select 1 from public.edition_succession_candidates candidate
       join public.events event on event.id = candidate.event_id
       where event.event_name = '${automationFixture}' and candidate.confirmation_count = 2
-        and candidate.confirmed_confidence >= 0.995 and candidate.auto_published_at is not null
+        and candidate.confirmed_confidence >= 0.995 and candidate.auto_published_at is null
     ) as successor_confirmed,
-    exists (
+    not exists (
       select 1 from public.edition_results result
       join public.events event on event.id = result.event_id
       where event.event_name = '${automationFixture}' and result.confirmation_count = 2
         and result.confirmed_confidence >= 0.980 and result.publication_status = 'published'
         and result.auto_published_at is not null
-    ) as result_auto_published,
-    not exists (
-      select 1 from public.admin_review_inbox inbox
-      join public.events event on event.id = inbox.event_id
-      where event.event_name = '${automationFixture}'
-    ) as inbox_cleared
+    ) as result_not_auto_published,
+    exists (
+      select 1 from public.edition_lifecycle_settings settings
+      where settings.singleton
+        and settings.auto_publish_enabled is false
+        and settings.auto_result_publish_enabled is false
+    ) as automation_disabled
 `);
 assert.deepEqual(automationState, {
-  successor_auto_published: true,
+  successor_auto_published: false,
   successor_confirmed: true,
-  result_auto_published: true,
-  inbox_cleared: true
+  result_not_auto_published: true,
+  automation_disabled: true
 });
 runSupabase([
   "db", "query", "--local",
@@ -389,7 +388,7 @@ runSupabase([
      update public.edition_lifecycle_settings set min_confirmation_interval_hours = 24 where singleton;
    end $cleanup$;`
 ]);
-console.log("Confirmation-gated successor and result auto-publication assertions passed.");
+console.log("Successor and result confirmations remain review-gated with publication automation disabled.");
 
 const password = `Local-RLS-${runId}-Aa1!`;
 const users = [];

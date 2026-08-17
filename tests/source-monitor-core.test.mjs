@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  classifySourceFailure,
   evaluateRobots,
   extractSemanticSignals,
   extractLifecycleSignals,
@@ -11,6 +12,7 @@ import {
   fetchSource,
   isBlockedIp,
   normalizeRelevantContent,
+  resolveHttpAllowance,
   robotsAllows,
   sha256Hex,
   validateSourceUrl
@@ -34,6 +36,30 @@ assert.equal(isBlockedIp("fc00::1"), true);
 assert.equal(isBlockedIp("fe80::1"), true);
 assert.equal(isBlockedIp("fec0::1"), true);
 assert.equal(isBlockedIp("93.184.216.34"), false);
+assert.equal(resolveHttpAllowance(true, "false"), true, "An explicit domain policy must allow HTTP even when the global opt-in is false.");
+assert.equal(resolveHttpAllowance(false, "true"), true, "The global opt-in may allow HTTP for a domain without an override.");
+assert.equal(resolveHttpAllowance(false, "false"), false);
+
+assert.deepEqual(classifySourceFailure("timeout"), {
+  category: "timeout_or_connection",
+  temporality: "temporary",
+  defaultRetriable: true,
+  requiresReview: false
+});
+assert.deepEqual(classifySourceFailure("http_410"), {
+  category: "page_removed_or_changed",
+  temporality: "possibly_permanent",
+  defaultRetriable: false,
+  requiresReview: true
+});
+assert.equal(classifySourceFailure("http_429").category, "rate_limit");
+assert.equal(classifySourceFailure("http_404").defaultRetriable, false);
+assert.equal(classifySourceFailure("http_403").defaultRetriable, false);
+assert.equal(classifySourceFailure("http_402").category, "http_other");
+assert.equal(classifySourceFailure("http_402").requiresReview, true);
+assert.equal(classifySourceFailure("http_503").defaultRetriable, true);
+assert.equal(classifySourceFailure("robots_denied").requiresReview, true);
+assert.equal(classifySourceFailure("response_too_large").defaultRetriable, false);
 
 for (const unsafe of ["file:///etc/passwd", "http://user:pass@example.com", "http://localhost/a", "https://127.0.0.1/a", "https://[::1]/a", "https://example.com:8443/a"]) {
   await assert.rejects(() => validateSourceUrl(unsafe, { allowHttp: true, resolveDns: publicDns }), SourceFetchError);
@@ -94,10 +120,13 @@ assert.equal(unsafeFetchCount, 1, "Unsafe redirect target must be rejected befor
 
 await assert.rejects(() => fetchSource("https://example.com/missing", {
   resolveDns: publicDns, fetchImpl: async () => response("missing", { status: 404 })
-}), error => error.code === "http_404" && error.retriable === true);
+}), error => error.code === "http_404" && error.retriable === false);
+await assert.rejects(() => fetchSource("https://example.com/blocked", {
+  resolveDns: publicDns, fetchImpl: async () => response("blocked", { status: 403 })
+}), error => error.code === "http_403" && error.retriable === false && error.classification.requiresReview);
 await assert.rejects(() => fetchSource("https://example.com/rate", {
   resolveDns: publicDns, fetchImpl: async () => response("later", { status: 429, headers: { "retry-after": "120" } })
-}), error => error.code === "http_429" && error.retryAfterSeconds === 120);
+}), error => error.code === "http_429" && error.retriable === true && error.retryAfterSeconds === 120);
 await assert.rejects(() => fetchSource("https://example.com/image", {
   resolveDns: publicDns, fetchImpl: async () => response("png", { status: 200, headers: { "content-type": "image/png" } })
 }), error => error.code === "unsupported_content_type" && error.retriable === false);
@@ -109,6 +138,19 @@ await assert.rejects(() => fetchSource("https://example.com/timeout", {
   resolveDns: publicDns, policy: { requestTimeoutMs: 5 },
   fetchImpl: async (_url, options) => await new Promise((_resolve, reject) => options.signal.addEventListener("abort", () => reject(new DOMException("aborted", "AbortError"))))
 }), error => error.code === "timeout");
+
+await assert.rejects(() => fetchSource("https://example.com/empty", {
+  resolveDns: publicDns,
+  policy: { allowedContentTypes: ["text/plain"] },
+  fetchImpl: async () => response("", { status: 200, headers: { "content-type": "text/plain" } })
+}), error => error.code === "empty_content");
+const emptyRobots = await fetchSource("https://example.com/robots.txt", {
+  resolveDns: publicDns,
+  policy: { allowedContentTypes: ["text/plain"], allowEmptyContent: true },
+  fetchImpl: async () => response("", { status: 200, headers: { "content-type": "text/plain" } })
+});
+assert.equal(emptyRobots.rawText, "");
+assert.equal(emptyRobots.normalized, "");
 
 const notModified = await fetchSource("https://example.com/cached", {
   resolveDns: publicDns, previousHash: "abc123",

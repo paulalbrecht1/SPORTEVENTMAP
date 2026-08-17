@@ -64,7 +64,7 @@ assert.match(calibrationMigration, /\('country','CH',true,true/);
 for (const signal of ["observation_reliability_drop", "observation_source_volume", "observation_html_structure_change", "observation_policy_version_change", "observation_cache_anomaly"]) assert.ok(monitoringMigration.includes(signal));
 
 const worker = read("supabase/functions/event-source-check/index.ts");
-assert.match(worker, /source-monitor-4\.1\.0-phase-a-shadow/);
+assert.match(worker, /source-monitor-4\.1\.\d+-phase-a-shadow/);
 assert.match(worker, /record_stage_four_shadow_observations/);
 assert.match(worker, /public_event_changes: 0/);
 

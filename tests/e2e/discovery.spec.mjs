@@ -9,6 +9,11 @@ import {
 } from "./helpers/browser.mjs";
 import { fixtureByName } from "./helpers/fixtures.mjs";
 
+// Discovery mirrors public_event_discovery and excludes completed/past rows,
+// including when the versioned CSV fallback is active.
+const DISCOVERY_EVENT_COUNT = 3;
+const RUNNING_DISCOVERY_EVENT_COUNT = 2;
+
 test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];
   const tri = fixtureByName["SEM E2E Olympic Triathlon"];
@@ -26,7 +31,9 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
     "true"
   );
   await expect(page.getByTestId("event-list")).toBeVisible();
-  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await expect(page.getByTestId("event-card")).toHaveCount(
+    DISCOVERY_EVENT_COUNT
+  );
 
   await openEventDrawer(page, run.event_name);
   await expect(page.getByTestId("drawer-event-name")).toContainText(run.event_name);
@@ -42,8 +49,11 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   await expect(page.getByTestId("event-list")).toContainText(/No|Keine|events/i);
 
   await page.getByTestId("event-search").fill("");
-  await page.waitForFunction(() =>
-    document.querySelectorAll("[data-testid='event-card']").length === 4
+  await page.waitForFunction(
+    expectedCount =>
+      document.querySelectorAll("[data-testid='event-card']").length ===
+        expectedCount,
+    DISCOVERY_EVENT_COUNT
   );
 
   if (await page.getByTestId("discovery-panel-toggle").getAttribute("aria-expanded") === "false") {
@@ -51,7 +61,9 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   }
   await page.locator("#countryFilter").selectOption("DE");
   await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
-  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await expect(page.getByTestId("event-card")).toHaveCount(
+    DISCOVERY_EVENT_COUNT
+  );
   await page.locator("#countryFilter").selectOption("AT");
   await expect(page.getByTestId("event-card")).toHaveCount(0);
   await page.getByTestId("filter-reset").click();
@@ -66,8 +78,11 @@ test("Discovery search, drawer and filters remain usable", async ({ page }) => {
 
   await page.getByTestId("filter-reset").click();
   await expect(page.locator("#discoveryFilterCount")).toBeHidden();
-  await page.waitForFunction(() =>
-    document.querySelectorAll("[data-testid='event-card']").length === 4
+  await page.waitForFunction(
+    expectedCount =>
+      document.querySelectorAll("[data-testid='event-card']").length ===
+        expectedCount,
+    DISCOVERY_EVENT_COUNT
   );
 
   await searchForEvent(page, run.event_name);
@@ -96,7 +111,9 @@ test("Mobile Discovery filters stay tappable", async ({ page }) => {
 
   await expect(runningFilter).toHaveClass(/active/);
   await expect(page.locator("#discoveryFilterCount")).toHaveText("1");
-  await expect(page.getByTestId("event-card")).toHaveCount(3);
+  await expect(page.getByTestId("event-card")).toHaveCount(
+    RUNNING_DISCOVERY_EVENT_COUNT
+  );
   await expect(
     page.getByTestId("event-card").filter({ hasText: run.event_name })
   ).toHaveCount(1);
@@ -411,7 +428,9 @@ test("combined filters keep marker and result state identical", async ({ page })
   expect(synchronizedKeys.markers).toEqual(synchronizedKeys.cards);
 
   await page.getByTestId("filter-reset").click();
-  await expect(page.getByTestId("event-card")).toHaveCount(4);
+  await expect(page.getByTestId("event-card")).toHaveCount(
+    DISCOVERY_EVENT_COUNT
+  );
   await expect(page.getByTestId("filter-sport-all")).toHaveClass(/active/);
   await expect(page.locator('[data-distance-filter="10k"]')).not.toHaveClass(/active/);
   await expect(page.locator("#countryFilter")).toHaveValue("all");

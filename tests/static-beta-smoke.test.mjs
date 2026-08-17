@@ -281,6 +281,8 @@ const requiredScripts = [
   "js/config.js",
   "js/i18n.js",
   "js/supabase.js",
+  "js/data-freshness-health.js",
+  "js/event-catalog-loader.js",
   "js/events.js",
   "js/event-marker-types.js",
   "js/map.js",
@@ -314,6 +316,8 @@ const publishEntriesSource =
 
 [
   "js/theme.js",
+  "js/data-freshness-health.js",
+  "js/event-catalog-loader.js",
   "js/event-marker-types.js",
   "js/event-detail.js",
   "js/event-detail-supabase.js"
@@ -329,6 +333,8 @@ const frontendSource =
   [
     "js/config.js",
     "js/supabase.js",
+    "js/data-freshness-health.js",
+    "js/event-catalog-loader.js",
     "js/events.js",
     "js/event-marker-types.js",
     "js/map.js",

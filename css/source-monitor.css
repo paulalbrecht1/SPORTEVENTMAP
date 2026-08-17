@@ -45,11 +45,19 @@ body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-colo
 #adminModal .admin-review-inbox-toolbar select { min-height: 38px; padding: 7px 30px 7px 10px; border: 1px solid rgba(148, 163, 184, .35); border-radius: 8px; background: #0f172a; color: #f8fafc; }
 #adminModal .admin-review-card-badges { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 #adminModal .admin-review-automation-badge { display: inline-flex; padding: 4px 8px; border: 1px solid rgba(56, 189, 248, .35); border-radius: 999px; background: rgba(14, 116, 144, .22); color: #bae6fd; font-size: .65rem; font-weight: 700; }
+#adminModal .admin-review-tier { display: inline-flex; padding: 4px 8px; border: 1px solid rgba(251, 191, 36, .4); border-radius: 999px; background: rgba(146, 64, 14, .2); color: #fde68a; font-size: .65rem; font-weight: 800; }
+#adminModal .admin-review-priority-context { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 9px; }
+#adminModal .admin-review-priority-context > span { min-width: 0; padding: 6px 8px; border-radius: 7px; background: rgba(120, 53, 15, .16); color: #fde68a; font-size: .68rem; overflow-wrap: anywhere; }
+#adminModal .admin-review-priority-context > span.is-wide { grid-column: 1 / -1; }
 #adminModal .admin-review-diff { display: grid; gap: 5px; margin-top: 10px; }
 #adminModal .admin-review-diff > div { display: grid; grid-template-columns: minmax(110px, .55fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px; align-items: start; padding: 7px 8px; border-radius: 7px; background: rgba(15, 23, 42, .55); }
 #adminModal .admin-review-diff span { color: var(--text-muted, #aeb8c7); font-size: .66rem; text-transform: capitalize; }
 #adminModal .admin-review-diff del { color: #fca5a5; font-size: .72rem; overflow-wrap: anywhere; }
 #adminModal .admin-review-diff strong { color: #86efac; font-size: .72rem; overflow-wrap: anywhere; }
+#adminModal .admin-review-evidence { display: grid; grid-template-columns: repeat(3, minmax(110px, 1fr)); gap: 6px; margin-top: 10px; }
+#adminModal .admin-review-evidence > span { display: grid; gap: 2px; min-width: 0; padding: 7px 8px; border: 1px solid rgba(56, 189, 248, .2); border-radius: 7px; background: rgba(8, 47, 73, .28); color: #dbeafe; font-size: .7rem; overflow-wrap: anywhere; }
+#adminModal .admin-review-evidence > span.is-wide { grid-column: 1 / -1; }
+#adminModal .admin-review-evidence strong { color: #7dd3fc; font-size: .62rem; letter-spacing: .04em; text-transform: uppercase; }
 #adminModal .admin-review-inbox-empty { padding: 24px 16px; border: 1px dashed rgba(52, 211, 153, .38); border-radius: 10px; text-align: center; }
 #adminModal .admin-review-inbox-empty strong { display: block; margin-bottom: 5px; color: #86efac; }
 #adminModal .admin-review-inbox-empty p { margin: 0; color: var(--text-muted, #aeb8c7); }
@@ -145,9 +153,12 @@ body[data-theme="light"] #adminModal .edition-lifecycle-kpis > div { border-colo
 body[data-theme="light"] #adminModal .admin-review-inbox { border-color: #86cfae; background: linear-gradient(145deg, #f0fdf4, #fff); }
 body[data-theme="light"] #adminModal .admin-review-inbox-toolbar select { border-color: #cbd5e1; background: #fff; color: #172033; }
 body[data-theme="light"] #adminModal .admin-review-automation-badge { border-color: #7dd3fc; background: #e0f2fe; color: #075985; }
+body[data-theme="light"] #adminModal .admin-review-tier, body[data-theme="light"] #adminModal .admin-review-priority-context > span { border-color: #fcd34d; background: #fffbeb; color: #92400e; }
 body[data-theme="light"] #adminModal .admin-review-diff > div { background: #f8fafc; }
 body[data-theme="light"] #adminModal .admin-review-diff del { color: #b91c1c; }
 body[data-theme="light"] #adminModal .admin-review-diff strong { color: #166534; }
+body[data-theme="light"] #adminModal .admin-review-evidence > span { border-color: #bae6fd; background: #f0f9ff; color: #172033; }
+body[data-theme="light"] #adminModal .admin-review-evidence strong { color: #0369a1; }
 body[data-theme="light"] #adminModal .admin-secondary-details { border-color: #d5dce6; background: #f8fafc; }
 body[data-theme="light"] #adminModal .admin-secondary-details-body { border-color: #e2e8f0; }
 body[data-theme="light"] #adminModal .proposal-review-filters select { border-color: #cbd5e1; background: #fff; color: #172033; }
@@ -178,6 +189,10 @@ body[data-theme="light"] #adminModal .stage-four-inline-field select, body[data-
   #adminModal .admin-review-inbox { padding: 13px; }
   #adminModal .admin-review-inbox-toolbar label { width: 100%; min-width: 0; }
   #adminModal .admin-review-diff > div { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+  #adminModal .admin-review-evidence { grid-template-columns: minmax(0, 1fr); }
+  #adminModal .admin-review-evidence > span.is-wide { grid-column: auto; }
+  #adminModal .admin-review-priority-context { grid-template-columns: minmax(0, 1fr); }
+  #adminModal .admin-review-priority-context > span.is-wide { grid-column: auto; }
   #adminModal .admin-secondary-details > summary { align-items: flex-start; }
   #adminModal .admin-secondary-details > summary > span:last-of-type { display: none; }
   #adminModal .admin-secondary-details-body { padding: 4px 10px 12px; }

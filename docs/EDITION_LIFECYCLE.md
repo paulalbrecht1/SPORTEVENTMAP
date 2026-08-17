@@ -4,7 +4,14 @@
 
 `events` beschreibt die dauerhafte Veranstaltung, `event_editions` eine konkrete Austragung. Vergangene Austragungen verschwinden automatisch aus Discovery und Karte, bleiben aber als veröffentlichte historische Jahresseite erhalten. Ergebnisse werden editionsbezogen gespeichert. Der Source Monitor darf neue Jahrgänge und Ergebnislinks erkennen und erzeugt zunächst nicht öffentliche Entwürfe.
 
-Seit Migration `20260813_review_inbox_safe_automation.sql` ist eine eng begrenzte automatische Veröffentlichung aktiv. Sie gilt ausschließlich für neue Editionsentwürfe und offizielle Ergebnislinks. Bestehende öffentliche Eventfelder wie Name, Ort, Geodaten, Absage oder Datumsänderung werden weiterhin niemals ungeprüft überschrieben.
+Migration `20260813_review_inbox_safe_automation.sql` hatte eine eng begrenzte
+automatische Veröffentlichung für neue Editionsentwürfe und offizielle
+Ergebnislinks vorbereitet. Im aktuellen Stabilisierungszustand ist auch diese
+Automation deaktiviert. `20260815000000_data_quality_stabilization.sql` setzt
+`auto_publish_enabled=false` und `auto_result_publish_enabled=false` und
+verhindert ein Aktivieren per bloßem Konfigurationsupdate. Bestehende öffentliche
+Eventfelder wie Name, Ort, Geodaten, Absage oder Datumsänderung werden weiterhin
+niemals ungeprüft überschrieben.
 
 ## Zustände
 
@@ -40,9 +47,12 @@ Der Worker extrahiert ausschließlich beobachtbare Signale:
 
 Ein Kandidat muss ein späteres Jahr und ein späteres Datum als die letzte etablierte Edition besitzen. Ab `auto_draft_threshold` entsteht idempotent eine Edition mit `publication_status=draft` und `discovery_status=suppressed`. Ein erneuter Crawl bestätigt denselben Fingerprint statt Duplikate anzulegen; der automatisch erzeugte Entwurf wird dabei bewusst nicht als bereits etablierter Jahrgang gewertet. Abweichende Daten für dasselbe Jahr werden als Konflikt markiert.
 
-## Bestätigungsbasierte Auto-Freigabe
+## Vorbereitete, derzeit deaktivierte Auto-Freigabe
 
-Ein neuer Jahrgang wird nur automatisch veröffentlicht, wenn alle Bedingungen erfüllt sind:
+Die folgenden Regeln beschreiben den vorbereiteten Pfad. Solange die beiden
+Publication-Flags deaktiviert sind, veröffentlicht er nichts; Kandidaten bleiben
+im Review. Ein später separat genehmigter Jahrgang dürfte nur automatisch
+veröffentlicht werden, wenn alle Bedingungen erfüllt wären:
 
 - bekannte Quelle vom Typ `official_event_website` oder `official_registration_platform`
 - ausschließlich HTTPS
@@ -54,11 +64,11 @@ Ein neuer Jahrgang wird nur automatisch veröffentlicht, wenn alle Bedingungen e
 - keine offenen Validation-Issues der Stufe `error` oder `critical`
 - aktive Quelle ohne aktuelle Fehlerfolge
 
-Ergebnislinks benötigen ebenfalls zwei zeitversetzte Bestätigungen einer offiziellen HTTPS-Quelle und eine bestätigte Konfidenz von mindestens `0.980`. Alle automatischen Veröffentlichungen setzen `auto_published_at`, speichern einen maschinenlesbaren Grund und laufen durch das Audit-Log. Die zentralen Schalter und Schwellen liegen in `edition_lifecycle_settings`; ein Abschalten erfordert kein neues Deployment.
+Ergebnislinks benötigen ebenfalls zwei zeitversetzte Bestätigungen einer offiziellen HTTPS-Quelle und eine bestätigte Konfidenz von mindestens `0.980`. Ein späterer automatischer Pfad müsste `auto_published_at` setzen, einen maschinenlesbaren Grund speichern und durch das Audit-Log laufen. Aktuell bleibt jede Veröffentlichung eine Admin-Entscheidung.
 
 ## Exception-only Admin-Workflow
 
-`admin_exception_inbox` sammelt die Roh-Ausnahmen. Die darauf aufbauende `admin_review_inbox` ist ebenfalls eine `security_invoker`-View und speist die oben platzierte „Jetzt zu prüfen“-Inbox. Sie bündelt technische Fehler zu genau einem Eintrag pro Quelle und enthält nur:
+`admin_exception_inbox` sammelt die Roh-Ausnahmen. Die darauf aufbauende `admin_review_inbox` ist ebenfalls eine `security_invoker`-View und speist die oben platzierte „Jetzt zu prüfen“-Inbox. Sie bündelt technische Fehler zu genau einem Eintrag pro Quelle, priorisiert P0–P3 und ergänzt dedupliziert aktuelle stale Discovery-Editionen. Sie enthält:
 
 - neue Jahrgänge und Konflikte,
 - Ergebnislinks im Entwurf,
@@ -92,7 +102,9 @@ Der Seitengenerator kombiniert beide Datenquellen, nutzt stabile `edition_slug`-
 - Kandidaten-RPCs sind ausschließlich für `service_role` freigegeben.
 - Sammelfreigaben verlangen `private.is_admin()`.
 - Views laufen mit den Rechten des Aufrufers (`security_invoker`).
-- Kein Source-Monitor-Pfad überschreibt bestehende Event-Fakten direkt. Die einzigen automatischen öffentlichen Änderungen sind die kontrollierte Veröffentlichung neuer Editionsentwürfe und bestätigter Ergebnislinks.
+- Kein Source-Monitor-Pfad überschreibt bestehende Event-Fakten direkt. Auch neue
+  Editionsentwürfe und Ergebnislinks werden im aktuellen Stabilisierungszustand
+  nicht automatisch öffentlich.
 
 ## Tests und Deployment
 

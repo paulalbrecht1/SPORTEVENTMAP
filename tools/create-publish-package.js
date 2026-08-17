@@ -34,6 +34,8 @@ const COPY_ENTRIES = [
   "js/app.js",
   "js/i18n.js",
   "js/supabase-loader.js",
+  "js/data-freshness-health.js",
+  "js/event-catalog-loader.js",
   "js/events.js",
   "js/event-marker-types.js",
   "js/event-detail.js",

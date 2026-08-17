@@ -18,6 +18,7 @@ test("Data Operations stays usable across themes and required viewports", async 
   await page.waitForSelector("#sourceMonitorSection", { state: "attached" });
   await page.waitForSelector("#editionLifecycleInbox", { state: "attached" });
   await page.waitForSelector("#stageFourOperationsCenter", { state: "attached" });
+  await page.waitForSelector("#dataFreshnessOverview", { state: "attached" });
 
   for (const theme of ["light", "dark"]) {
     for (const viewport of viewports) {
@@ -65,6 +66,10 @@ test("Data Operations stays usable across themes and required viewports", async 
       await expect(page.locator("#adminDataOperationsPanel select")).toHaveCount(17);
       await expect(page.locator("#adminDataOperationsPanel input[type=\"date\"]")).toHaveCount(2);
       await expect(page.locator("#runDataValidationBtn")).toBeVisible();
+      await expect(page.locator("#dataFreshnessOverview")).toBeVisible();
+      await expect(page.locator("#dataFreshnessOverview .data-freshness-grid > article")).toHaveCount(4);
+      await expect(page.locator("#dataFreshnessOverview [data-freshness-action]")).toHaveCount(4);
+      await expect(page.locator("#dataFreshnessState")).not.toBeEmpty();
       await expect(page.locator("#editionLifecycleInbox")).toBeVisible();
       await expect(page.locator("#editionLifecycleInbox .edition-lifecycle-kpis > div")).toHaveCount(4);
       await expect(page.locator("#editionLifecycleList .edition-lifecycle-card")).toBeVisible();

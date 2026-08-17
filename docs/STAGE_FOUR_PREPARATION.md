@@ -18,6 +18,21 @@ Die Phase-A-Ausführung protokolliert, was eine spätere Automatik entschieden
 hätte. Sie veröffentlicht keine Discovery-Kandidaten, legt keine neue Edition an,
 ändert keine Renndaten und führt keine Sammeländerungen an öffentlichen Daten aus.
 
+Stand 17. August 2026 sind die Stage-4-Migrationen `20260816` bis `20260822`
+weiterhin nur im Repository vorhanden. Sie wurden bei der
+Datenqualitätsstabilisierung weder produktiv migriert noch aktiviert. Die davor
+einsortierte Migration `20260815000000_data_quality_stabilization.sql` ist ein
+separat ausrollbarer Sicherheits-Hotfix und keine Freigabe für Stage 4. Sie
+erzwingt zusätzlich
+`edition_lifecycle_settings.auto_publish_enabled=false` und
+`auto_result_publish_enabled=false`.
+
+Die produktive read-only Prüfung fand beide älteren Edition-Lifecycle-Flags noch
+auf `true`. Bis zum separat genehmigten Hotfix-Deployment dürfen deshalb weder
+der alte Bestätigungs-RPC für Content-Änderungen noch automatische Editions- oder
+Ergebnisfreigaben für Produktionsbereinigungen verwendet werden. Es wurden in
+dieser Arbeit keine Produktionsdaten verändert.
+
 ## Policy Engine
 
 `automation_policies` enthält alle zentralen Regeln. Worker verteilen keine
@@ -60,6 +75,11 @@ nahezu fehlerfreie Reviews.
 - unsichere Zusammenführung von Dubletten
 
 Diese Vorgänge bleiben sichtbar, aber immer im Review beziehungsweise blockiert.
+
+Die feldgenaue Content-Verifikation der Stabilisierungsmigration ist ebenfalls
+kein Änderungsweg: Sie darf ausschließlich bestätigen, dass alle zehn zentralen
+gespeicherten Werte mit aktueller strukturierter Evidenz unverändert
+übereinstimmen. Bei Abweichung oder Unsicherheit bleibt die Aufgabe offen.
 
 ## Quellenzuverlässigkeit
 

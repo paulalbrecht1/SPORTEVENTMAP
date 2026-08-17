@@ -113,9 +113,36 @@ Die deterministische Streuung verteilt Last, ohne bei jedem Lauf neue Zufallswer
 
 Standardmaessig sind maximal 5 automatische Versuche erlaubt. Die Domain-Policy liefert die Backoff-Minuten, standardmaessig `15, 60, 360, 1440, 10080`. `Retry-After` bei `429` hat Vorrang und wird auf maximal 7 Tage begrenzt.
 
-Nicht automatisch behebbaren Sicherheits- oder Inhaltsfehlern wie private Zieladresse, nicht erlaubtes Protokoll, eingebettete Zugangsdaten, nicht erlaubter Port, zu viele Redirects, zu grosse Antwort und nicht erlaubter Content-Type wird direkt der Dead-Letter-Pfad zugeordnet. `404`, `403`, `429`, `5xx`, Timeout, DNS-, TLS- und allgemeine Netzwerkfehler koennen entsprechend der Policy erneut versucht werden. `410` wird als dauerhaft behandelt, ohne das Event zu entfernen.
+Nicht automatisch behebbaren Sicherheits- oder Inhaltsfehlern wie private
+Zieladresse, nicht erlaubtes Protokoll, eingebettete Zugangsdaten, nicht
+erlaubter Port, zu viele Redirects, zu grosse Antwort und nicht erlaubter
+Content-Type wird direkt der Dead-Letter-/Review-Pfad zugeordnet. Das gilt auch
+für `404`/`410`, `401`/`403` und sonstige nicht ausdrücklich temporäre
+4xx-Antworten. `408`, `425`, `429`, `5xx`, Timeout, DNS-, TLS- und
+allgemeine Netzwerkfehler können entsprechend der Policy erneut versucht
+werden. Kein permanenter Fehler entfernt das Event.
 
 Ein Ergebnis ist pro `job_id + attempt_number` eindeutig. Der Abschluss, das Ergebnis, der Quellenstatus, Retry und Review werden in `record_source_crawl_result()` transaktional gespeichert. Ein wiederholter Abschluss desselben Versuchs liefert das bestehende Resultat statt Duplikate zu erzeugen.
+
+Die gemeinsame Worker-Funktion `classifySourceFailure()` und die Admin-View
+`admin_source_failure_history` ordnen Fehler reproduzierbar ein:
+
+| Kategorie | Beispiele | Behandlung |
+| --- | --- | --- |
+| Seite entfernt/geändert | 404, 410 | Review; niemals Event automatisch absagen oder löschen |
+| Redirect | ungültiges Ziel, Redirect-Limit | Ziel und Domain manuell prüfen |
+| Temporäre Verbindung | Timeout, Netzwerk, DNS, TLS | begrenzter Retry nach bestehender Domain-Policy |
+| Rate Limit / Upstream | 429, 5xx | `Retry-After` beziehungsweise Backoff, danach Review |
+| Zugriff/Bot-Schutz | 401, 403, `robots_denied` | Review; Schutz nicht umgehen |
+| Robots temporär | `robots_unavailable` | begrenzter Retry |
+| Inhalt/Parser | leer, Typ/Encoding, zu groß | nur geeignete Fälle retryen, sonst Review |
+| Quelle ungültig/ersetzt | URL/Protokoll/Port/Credentials, `source_replaced` | manuelle Quellenentscheidung |
+
+Der Worker liefert bei einem Fehler zusätzlich `error_category`,
+`error_temporality` und `retryable`. Diese Metadaten ändern die bestehende
+Queue nicht und erzeugen keinen zweiten Retry-Mechanismus. Nach `max_attempts`
+endet ein Job nachvollziehbar im Dead-Letter-Status; ein manueller Retry erzeugt
+einen neuen, auditierbaren Versuch statt einer Endlosschleife.
 
 ## HTTP- und SSRF-Schutz
 
@@ -182,6 +209,7 @@ Der technische Bereich liegt weiterhin in "Event Data Operations" und zeigt:
 - durchschnittliche Antwortzeit
 - ueberfaellige Quellen und Quellen ohne naechsten Termin
 - Event, Austragung, Quelle, Domain, HTTP-/Hash-Status, Fehlerzahl, Prioritaet und Review
+- historische Fehlerklasse, verbleibendes Retry-Budget und empfohlene Aktion
 
 Aktionen: sofort pruefen, Termin setzen, pausieren, reaktivieren, Historie, Quelle, Event, Review abschliessen, Fehler zuruecksetzen und Dead-Letter-Crawl erneut starten. Alle Aktionen besitzen Lade-, Erfolgs- und Fehlerstatus. Unter 760 px wird die Tabelle in mobile Karten umgewandelt.
 
@@ -320,3 +348,11 @@ Pilotbetrieb, Stop/Resume, Review, Reliability, Monitoring, Golden Dataset und R
 ## Edition Lifecycle
 
 Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Monitor extrahiert Jahrgangs- und Ergebnis-Signale und erstellt zunächst nicht öffentliche Editionsentwürfe. Wiederholt bestätigte, konfliktfreie Signale aus offiziellen HTTPS-Quellen dürfen neue Editionen und Ergebnislinks kontrolliert veröffentlichen. Bestehende öffentliche Eventfelder werden weiterhin nicht automatisch überschrieben.
+
+Für die aktuelle Stabilisierung sind auch diese kontrollierten Publikationspfade
+gesperrt: `auto_publish_enabled=false` und
+`auto_result_publish_enabled=false`. Die Migration
+`20260815000000_data_quality_stabilization.sql` erzwingt beide Werte per
+Constraint. Neue Editionen, Ergebnislinks und alle fachlichen Abweichungen bleiben
+Review-Fälle; Source Recovery bestätigt ausschließlich technische Erreichbarkeit
+und setzt keine Event-Verifikation.

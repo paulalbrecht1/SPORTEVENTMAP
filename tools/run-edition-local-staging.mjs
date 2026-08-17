@@ -288,6 +288,21 @@ function verifyPostflight() {
   console.log("Edition staging postflight passed; deployment and backfill remain unauthorized.");
 }
 
+function verifyProductionPreflight() {
+  const [row] = queryJson(path.join(root, "tools", "edition-production-preflight.sql"), true);
+  const report = row.edition_production_rollout_preflight_report;
+  assert.equal(report.migration_history.state, "expected_full_history");
+  assert.equal(report.migration_history.exact_full_history, true);
+  assert.equal(report.data_integrity_gates_pass, true);
+  assert.equal(report.automation_gates_pass, true);
+  assert.equal(report.deployment_authorized, false);
+  assert.equal(report.backfill_authorized, false);
+  assert.equal(report.worker_deployment_authorized, false);
+  assert.equal(report.automatic_publication_authorized, false);
+  assert.equal(report.ready_for_schema_deployment, false);
+  console.log("Production manifest recognizes the exact full local history and grants no authority.");
+}
+
 function runRlsAndCandidateSmoke() {
   const result = spawnSync(process.execPath, ["tests/local-rls-security.test.mjs"], {
     cwd: root,
@@ -316,6 +331,7 @@ try {
     "--level", "error", "--fail-on", "error"
   ]);
   verifyPostflight();
+  verifyProductionPreflight();
   await waitForLocalAuth();
   runRlsAndCandidateSmoke();
   console.log("Disposable, cost-free edition staging completed successfully.");

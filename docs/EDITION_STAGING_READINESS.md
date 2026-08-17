@@ -119,3 +119,7 @@ Dieser kostenfreie lokale Gate wurde am 17. August 2026 vollständig bestanden:
 war grün und alle 21 Candidate-/RLS-Integrationsprüfungen bestanden. Das
 temporäre Volume wurde anschließend entfernt. Die Aussage für das aktive Projekt
 oben bleibt unverändert: Dort wurde weiterhin keine Migration angewendet.
+
+Der anschließende read-only Produktions-Preflight und seine weiterhin
+gesperrten Rollout-Gates sind in `docs/EDITION_PRODUCTION_PREFLIGHT.md`
+dokumentiert.

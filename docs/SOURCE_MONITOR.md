@@ -352,7 +352,7 @@ Stufe 3 ist in [EDITION_LIFECYCLE.md](EDITION_LIFECYCLE.md) dokumentiert. Der Mo
 Für die aktuelle Stabilisierung sind auch diese kontrollierten Publikationspfade
 gesperrt: `auto_publish_enabled=false` und
 `auto_result_publish_enabled=false`. Die Migration
-`20260815000000_data_quality_stabilization.sql` erzwingt beide Werte per
+`20260817121601_data_quality_stabilization.sql` erzwingt beide Werte per
 Constraint. Neue Editionen, Ergebnislinks und alle fachlichen Abweichungen bleiben
 Review-Fälle; Source Recovery bestätigt ausschließlich technische Erreichbarkeit
 und setzt keine Event-Verifikation.

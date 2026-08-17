@@ -7,7 +7,7 @@
 Migration `20260813_review_inbox_safe_automation.sql` hatte eine eng begrenzte
 automatische Veröffentlichung für neue Editionsentwürfe und offizielle
 Ergebnislinks vorbereitet. Im aktuellen Stabilisierungszustand ist auch diese
-Automation deaktiviert. `20260815000000_data_quality_stabilization.sql` setzt
+Automation deaktiviert. `20260817121601_data_quality_stabilization.sql` setzt
 `auto_publish_enabled=false` und `auto_result_publish_enabled=false` und
 verhindert ein Aktivieren per bloßem Konfigurationsupdate. Bestehende öffentliche
 Eventfelder wie Name, Ort, Geodaten, Absage oder Datumsänderung werden weiterhin

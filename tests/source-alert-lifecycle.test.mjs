@@ -10,7 +10,7 @@ const migration = fs.readFileSync(path.join(
 ), "utf8");
 const stabilization = fs.readFileSync(path.join(
   root,
-  "supabase/migrations/20260815000000_data_quality_stabilization.sql"
+  "supabase/migrations/20260817121601_data_quality_stabilization.sql"
 ), "utf8");
 
 assert.match(migration, /create or replace function private\.resolve_source_failure_alerts/i);

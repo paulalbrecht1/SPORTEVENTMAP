@@ -1,7 +1,7 @@
 # Datenaktualität, Verifikation und Alarmierung
 
 Stand: 17. August 2026. Produktionsabfragen in diesem Dokument sind read-only.
-Die Stabilisierungsmigration `20260815000000_data_quality_stabilization.sql`
+Die Stabilisierungsmigration `20260817121601_data_quality_stabilization.sql`
 ist lokal verifiziert, aber noch nicht in Produktion ausgerollt.
 
 ## Produktive Baselines

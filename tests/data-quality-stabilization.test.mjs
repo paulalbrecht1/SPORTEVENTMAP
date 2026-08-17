@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
-const migration = read("supabase/migrations/20260815000000_data_quality_stabilization.sql");
+const migration = read("supabase/migrations/20260817121601_data_quality_stabilization.sql");
 const admin = read("js/supabase.js");
 
 for (const marker of [

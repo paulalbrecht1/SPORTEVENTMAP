@@ -3,7 +3,7 @@
 - Review date: 2026-08-17
 - Production baseline: 35 migrations through `20260814_review_inbox_deduplication`
 - Separately reviewable data-quality hotfix:
-  `20260815000000_data_quality_stabilization.sql`
+  `20260817121601_data_quality_stabilization.sql`
 - Held Stage-4 series: `20260815` through `20260822` (eight migrations)
 - Production deployment during this review: **none**
 - Stage-4 state to preserve: `dry_run=true`, `automation_enabled=false`,
@@ -16,7 +16,7 @@ deployed separately; it must not be used as a reason to roll out Stage 4.
 
 ## Migration-by-migration review
 
-### `20260815000000_data_quality_stabilization.sql`
+### `20260817121601_data_quality_stabilization.sql`
 
 - Purpose: fix Source-Recovery semantics, enforce disabled Edition-Lifecycle
   publication, expose reproducible quality/source-failure metrics, add stale
@@ -243,7 +243,7 @@ never been rehearsed is evidence only, not a proven recovery path.
 ### 3. Deployment order
 
 1. After separate written approval, deploy
-   `20260815000000_data_quality_stabilization.sql` alone.
+   `20260817121601_data_quality_stabilization.sql` alone.
 2. Verify disabled publication flags, metrics, admin-only inbox, RLS, exact-match
    content verification and audit logging. Observe before any Stage-4 decision.
 3. Stop here unless the held Stage-4 series has its own later approval.

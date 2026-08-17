@@ -478,7 +478,7 @@ reproduzierbar.
   Editionen, P0–P3, betroffene Felder, gespeicherte/externe Werte,
   Quellenzustand, Confidence und Aktionsempfehlung.
 
-Die Migration `20260815000000_data_quality_stabilization.sql` ist lokal mit
+Die Migration `20260817121601_data_quality_stabilization.sql` ist lokal mit
 vollständigem Reset und RLS-Integrationstest geprüft. Produktion blieb
 unverändert; das Deployment benötigt die separate Freigabe aus
 `docs/stage4/production-migration-plan.md`.

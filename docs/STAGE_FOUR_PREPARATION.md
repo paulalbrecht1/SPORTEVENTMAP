@@ -21,7 +21,7 @@ hätte. Sie veröffentlicht keine Discovery-Kandidaten, legt keine neue Edition 
 Stand 17. August 2026 sind die Stage-4-Migrationen `20260816` bis `20260822`
 weiterhin nur im Repository vorhanden. Sie wurden bei der
 Datenqualitätsstabilisierung weder produktiv migriert noch aktiviert. Die davor
-einsortierte Migration `20260815000000_data_quality_stabilization.sql` ist ein
+einsortierte Migration `20260817121601_data_quality_stabilization.sql` ist ein
 separat ausrollbarer Sicherheits-Hotfix und keine Freigabe für Stage 4. Sie
 erzwingt zusätzlich
 `edition_lifecycle_settings.auto_publish_enabled=false` und

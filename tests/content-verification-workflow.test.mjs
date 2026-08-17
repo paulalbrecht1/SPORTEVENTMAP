@@ -7,7 +7,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = relative => fs.readFileSync(path.join(root, relative), "utf8");
 const migration = read("supabase/migrations/20260812200435_content_change_verification_queue.sql");
 const invokerMigration = read("supabase/migrations/20260812200627_content_change_verification_rpc_invoker.sql");
-const stabilization = read("supabase/migrations/20260815000000_data_quality_stabilization.sql");
+const stabilization = read("supabase/migrations/20260817121601_data_quality_stabilization.sql");
 const admin = read("js/supabase.js");
 const styles = read("css/source-monitor.css");
 const page = read("index.html");

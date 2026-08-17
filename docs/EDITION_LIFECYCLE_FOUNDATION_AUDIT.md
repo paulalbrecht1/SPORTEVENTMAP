@@ -180,3 +180,6 @@ Diese Stufe fuehrt keinen Backfill und keine produktive Freigabeautomation aus.
 Die nachgelagerte, weiterhin rein lesende Bestandsklassifikation ist in
 `EDITION_BACKFILL_READINESS.md` beschrieben. Sie erzeugt nur einen Preview und
 setzt fuer jeden Einzelfall `safe_to_auto_backfill=false`.
+
+Die getrennten Staging-/Postflight-Gates und der aktuell fehlende isolierte
+Supabase-Zielstand sind in `EDITION_STAGING_READINESS.md` dokumentiert.

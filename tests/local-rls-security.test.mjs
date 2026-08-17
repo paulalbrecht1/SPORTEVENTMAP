@@ -206,6 +206,15 @@ assert.deepEqual(
 );
 console.log("Local Supabase hardening assertions passed.");
 
+const [stagingPostflightRow] = queryLocalFile("tools/edition-staging-postflight.sql");
+const stagingPostflight = stagingPostflightRow.edition_staging_postflight_report;
+assert.equal(stagingPostflight.foundation_gates_pass, true);
+assert.equal(stagingPostflight.ready_for_manual_candidate_smoke, true);
+assert.equal(stagingPostflight.deployment_authorized, false);
+assert.equal(stagingPostflight.backfill_authorized, false);
+assert.equal(stagingPostflight.target_confirmation_required, true);
+console.log("Edition staging postflight passed locally without authorizing deployment or backfill.");
+
 const backfillAuditFixture = `[BACKFILL AUDIT TEST] ${runId}`;
 runSupabase([
   "db",

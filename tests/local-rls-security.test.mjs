@@ -54,6 +54,19 @@ function queryLocal(sql) {
   return JSON.parse(output).rows;
 }
 
+function queryLocalFile(relativePath) {
+  const output = runSupabase([
+    "db",
+    "query",
+    "--local",
+    "--output",
+    "json",
+    "--file",
+    path.join(root, relativePath)
+  ]);
+  return JSON.parse(output).rows;
+}
+
 function parseStatusEnvironment(output) {
   return Object.fromEntries(
     output
@@ -192,6 +205,174 @@ assert.deepEqual(
   "Local database hardening state is incomplete."
 );
 console.log("Local Supabase hardening assertions passed.");
+
+const backfillAuditFixture = `[BACKFILL AUDIT TEST] ${runId}`;
+runSupabase([
+  "db",
+  "query",
+  "--local",
+  `do $backfill_audit_fixture$
+  declare
+    fixture_event_id bigint;
+    predecessor_id uuid;
+    fixture_source_id uuid;
+    fixture_job_id uuid;
+    fixture_crawl_id bigint;
+    candidate_2028_id uuid;
+    candidate_2029_id uuid;
+    candidate_2030_a_id uuid;
+    candidate_2030_b_id uuid;
+    register_result jsonb;
+  begin
+    perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
+
+    insert into public.events (
+      event_name, sport, date, city, country, distance, event_url, status,
+      publication_status, event_status, verification_status
+    ) values (
+      '${backfillAuditFixture}', 'Running', '01.01.2026', 'Hamburg', 'Germany',
+      'Legacy Marathon', 'https://example.com/backfill-audit-${runId}', 'approved',
+      'published', 'active', 'verified'
+    ) returning id into fixture_event_id;
+
+    select id into predecessor_id from public.event_editions
+    where event_id = fixture_event_id order by edition_year limit 1;
+    update public.event_editions
+    set edition_year = 2026, start_date = date '2026-01-02', end_date = date '2026-01-02',
+        edition_status = 'completed', publication_status = 'published',
+        discovery_status = 'detail_only', legacy_distance = 'Edition Marathon'
+    where id = predecessor_id;
+    delete from public.validation_issues where event_id = fixture_event_id;
+
+    insert into public.event_sources (
+      event_id, edition_id, source_type, source_url, parser_type, is_active,
+      crawl_status, consecutive_failures
+    ) values (
+      fixture_event_id, predecessor_id, 'official_event_website',
+      'https://example.com/backfill-audit-${runId}', 'json_ld', true,
+      'success', 0
+    ) returning id into fixture_source_id;
+    insert into public.source_crawl_jobs (
+      source_id, event_id, status, idempotency_key, trigger_source
+    ) values (
+      fixture_source_id, fixture_event_id, 'completed',
+      'backfill-audit-${runId}', 'test'
+    ) returning id into fixture_job_id;
+    insert into public.source_crawl_results (
+      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      change_status, worker_version, processing_status
+    ) values (
+      fixture_job_id, fixture_source_id, fixture_event_id, 1, 200,
+      'https://example.com/backfill-audit-${runId}', 'changed',
+      'backfill-audit-test', 'completed'
+    ) returning id into fixture_crawl_id;
+
+    register_result := public.register_edition_successor_candidate(
+      fixture_source_id,
+      fixture_crawl_id,
+      jsonb_build_object(
+        'year', 2028,
+        'start_date', '2028-06-04',
+        'name', '${backfillAuditFixture} 2028',
+        'confidence', 0.97,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')
+      ),
+      'backfill-audit-test'
+    );
+    candidate_2028_id := (register_result->>'candidate_id')::uuid;
+    if register_result->>'validation_status' <> 'validated' then
+      raise exception 'Expected validated 2028 audit candidate: %', register_result;
+    end if;
+
+    register_result := public.register_edition_successor_candidate(
+      fixture_source_id,
+      fixture_crawl_id,
+      jsonb_build_object(
+        'year', 2029,
+        'start_date', '2029-06-03',
+        'name', '${backfillAuditFixture} 2029',
+        'confidence', 0.96,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')
+      ),
+      'backfill-audit-test'
+    );
+    candidate_2029_id := (register_result->>'candidate_id')::uuid;
+    if register_result->>'validation_status' <> 'validated' then
+      raise exception 'Expected validated 2029 audit candidate: %', register_result;
+    end if;
+
+    register_result := public.register_edition_successor_candidate(
+      fixture_source_id,
+      fixture_crawl_id,
+      jsonb_build_object(
+        'year', 2030,
+        'start_date', '2030-06-02',
+        'name', '${backfillAuditFixture} 2030',
+        'confidence', 0.95,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')
+      ),
+      'backfill-audit-test'
+    );
+    candidate_2030_a_id := (register_result->>'candidate_id')::uuid;
+    register_result := public.register_edition_successor_candidate(
+      fixture_source_id,
+      fixture_crawl_id,
+      jsonb_build_object(
+        'year', 2030,
+        'start_date', '2030-06-09',
+        'name', '${backfillAuditFixture} 2030',
+        'confidence', 0.95,
+        'evidence', jsonb_build_object('evidence_type', 'json_ld')
+      ),
+      'backfill-audit-test'
+    );
+    candidate_2030_b_id := (register_result->>'candidate_id')::uuid;
+    update public.edition_succession_candidates
+    set candidate_status = 'detected', validation_status = 'pending',
+        validation_reasons = '{}'::text[]
+    where id in (candidate_2030_a_id, candidate_2030_b_id);
+
+    insert into public.event_editions (
+      event_id, edition_year, edition_slug, legacy_event_key, start_date, end_date,
+      edition_status, publication_status, source_url, verification_status,
+      data_confidence, needs_review, review_priority, discovery_status,
+      generated_from_candidate_id
+    ) values (
+      fixture_event_id, 2029, 'backfill-audit-${runId}-2029',
+      lower('${backfillAuditFixture}|03.06.2029|Hamburg|Germany'),
+      date '2029-06-03', date '2029-06-03', 'scheduled', 'draft',
+      'https://example.com/backfill-audit-${runId}', 'unverified',
+      0.96, true, 'high', 'suppressed', candidate_2029_id
+    );
+  end
+  $backfill_audit_fixture$;`
+]);
+
+const [backfillAuditRow] = queryLocalFile("tools/edition-backfill-readiness.sql");
+const backfillAudit = backfillAuditRow.edition_backfill_readiness_report;
+assert.equal(backfillAudit.mode, "read_only_preview");
+assert.equal(backfillAudit.writes_attempted, 0);
+assert.equal(backfillAudit.automation_safety.automatic_backfill_allowed, false);
+assert.ok(backfillAudit.identity_integrity.next_edition_unknown_watching >= 1);
+assert.ok(backfillAudit.legacy_event_fields.legacy_date_differs_from_latest_edition >= 1);
+assert.ok(backfillAudit.legacy_event_fields.legacy_distance_differs_from_latest_edition >= 1);
+assert.ok(backfillAudit.candidate_action_counts.eligible_for_explicit_admin_review >= 1);
+assert.ok(backfillAudit.candidate_action_counts.reconcile_legacy_draft_manually >= 1);
+assert.ok(backfillAudit.candidate_action_counts.conflict_manual_review >= 2);
+const auditFixtureRows = backfillAudit.candidate_preview.filter(
+  row => row.event_name === backfillAuditFixture
+);
+assert.equal(auditFixtureRows.length, 4);
+assert.ok(auditFixtureRows.every(row => row.safe_to_auto_backfill === false));
+assert.equal(auditFixtureRows.filter(row => row.has_peer_date_conflict).length, 2);
+
+runSupabase([
+  "db",
+  "query",
+  "--local",
+  `delete from public.events where event_name = '${backfillAuditFixture}';`
+]);
+console.log("Read-only edition backfill inventory classified validated and legacy-draft fixtures safely.");
 
 runSupabase([
   "db",

@@ -176,3 +176,7 @@ gesperrt.
    alte Drafts, Legacy-Felder und editionlose Detaildaten.
 
 Diese Stufe fuehrt keinen Backfill und keine produktive Freigabeautomation aus.
+
+Die nachgelagerte, weiterhin rein lesende Bestandsklassifikation ist in
+`EDITION_BACKFILL_READINESS.md` beschrieben. Sie erzeugt nur einen Preview und
+setzt fuer jeden Einzelfall `safe_to_auto_backfill=false`.

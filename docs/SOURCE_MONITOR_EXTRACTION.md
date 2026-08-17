@@ -94,7 +94,12 @@ Migration `20260815_source_monitor_extraction_review.sql` ergänzt `event_change
 
 Ein Fingerprint aus Event, Edition, Feld und normalisiertem Wert verhindert identische Vorschläge. Offene und akzeptierte Vorschläge werden nicht erneut erzeugt. Identisch abgelehnte Vorschläge bleiben 30 Tage unterdrückt; danach darf neue Evidenz denselben Datensatz wieder auf `pending` setzen. Reine Formatunterschiede und bereits vorhandene Editionen werden verworfen.
 
-Eine zukünftige Jahreszahl wird nur als `new_edition` vorgeschlagen, wenn sie nach der letzten Edition liegt, in der Zukunft liegt und noch keine Edition dieses Jahres existiert. Die bestehende Lifecycle-Engine legt weiterhin kontrollierte Kandidaten/Entwürfe an. Eine Veröffentlichung erfolgt ausschließlich durch Adminfreigabe.
+Eine zukünftige Jahreszahl wird intern weiterhin als `new_edition` erkannt, wenn
+sie nach der letzten Edition liegt, in der Zukunft liegt und noch keine Edition
+dieses Jahres existiert. Der Worker speichert dafür jedoch kein paralleles
+`event_change_proposal`: Die Succession-Engine ist der kanonische Pfad und legt
+ausschließlich einen validierten oder blockierten Candidate an. Eine Edition
+entsteht ausschließlich durch Adminfreigabe; Detection erzeugt keinen Draft.
 
 ## Manuelle Overrides und Feldsperren
 

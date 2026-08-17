@@ -5,6 +5,7 @@ import {
   extractLifecycleSignals,
   evaluateRobots,
   resolveHttpAllowance,
+  selectLifecycleSuccessors,
   SourceFetchError,
   fetchSource,
   validateSourceUrl
@@ -299,20 +300,22 @@ async function recordLifecycleSignals(
   );
   const { data: latestEdition, error: editionError } = await admin
     .from("event_editions")
-    .select("id,edition_year,start_date")
+    .select("id,edition_year,start_date,edition_status,publication_status")
     .eq("event_id", claim.event_id)
+    .eq("publication_status", "published")
     .order("edition_year", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (editionError) throw new Error(`Lifecycle edition context failed: ${cleanError(editionError)}`);
 
   let editionCount = 0;
-  const successor = signals.editions.find(candidate =>
-    Number(candidate.year) > Number(latestEdition?.edition_year || 0) &&
-    (!latestEdition?.start_date || candidate.start_date > latestEdition.start_date)
-  );
-  if (successor) {
-    const { error } = await admin.rpc("register_edition_successor_candidate", {
+  const successors = selectLifecycleSuccessors(signals, latestEdition);
+  for (const successor of successors) {
+    const combinedRiskSignals = [...new Set([
+      ...(signals.risk_signals || []),
+      ...(successor.risk_signals || [])
+    ])].sort();
+    const { data, error } = await admin.rpc("register_edition_successor_candidate", {
       p_source_id: claim.source_id,
       p_crawl_result_id: crawlResultId,
       p_candidate: {
@@ -322,13 +325,15 @@ async function recordLifecycleSignals(
         evidence: {
           evidence_type: successor.evidence_type || "unknown",
           final_url: fetched.finalUrl,
-          crawl_result_id: crawlResultId
+          crawl_result_id: crawlResultId,
+          risk_signals: combinedRiskSignals,
+          alternative_dates: successor.alternative_dates || []
         }
       },
       p_worker_version: WORKER_VERSION
     });
     if (error) throw new Error(`Successor candidate registration failed: ${cleanError(error)}`);
-    editionCount = 1;
+    if (data?.accepted) editionCount += 1;
   }
 
   let resultCount = 0;
@@ -388,13 +393,14 @@ async function recordExtractionSignals(
     fieldControls: (controlsResult.data || []).filter(control => !control.edition_id || String(control.edition_id) === String(targetEdition?.id)),
     source: { source_type: claim.source_type, source_url: claim.source_url }
   });
-  if (!extraction.proposals.length) {
+  const reviewProposals = extraction.proposals.filter(proposal => proposal.change_type !== "new_edition");
+  if (!reviewProposals.length) {
     return { candidates: extraction.candidates.length, proposals: 0, adapters: extraction.adapters, diagnostics: extraction.diagnostics };
   }
   const { data, error } = await admin.rpc("record_extraction_proposals", {
     p_source_id: claim.source_id,
     p_crawl_result_id: crawlResultId,
-    p_proposals: extraction.proposals,
+    p_proposals: reviewProposals,
     p_worker_version: WORKER_VERSION
   });
   if (error) throw new Error(`Extraction proposal transaction failed: ${cleanError(error)}`);
@@ -402,7 +408,7 @@ async function recordExtractionSignals(
     p_crawl_result_id: crawlResultId
   });
   if (automationError) throw new Error(`Stage-4 simulation failed: ${cleanError(automationError)}`);
-  return { candidates: extraction.candidates.length, proposals: extraction.proposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data, automation };
+  return { candidates: extraction.candidates.length, proposals: reviewProposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data, automation };
 }
 async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
   const startedAt = Date.now();

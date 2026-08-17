@@ -2,7 +2,7 @@
 
 ## Ziel und Sicherheitsgrenze
 
-`events` beschreibt die dauerhafte Veranstaltung, `event_editions` eine konkrete Austragung. Vergangene Austragungen verschwinden automatisch aus Discovery und Karte, bleiben aber als veröffentlichte historische Jahresseite erhalten. Ergebnisse werden editionsbezogen gespeichert. Der Source Monitor darf neue Jahrgänge und Ergebnislinks erkennen und erzeugt zunächst nicht öffentliche Entwürfe.
+`events` beschreibt die dauerhafte Veranstaltung, `event_editions` eine konkrete Austragung. Vergangene Austragungen verschwinden automatisch aus Discovery und Karte, bleiben aber als veröffentlichte historische Jahresseite erhalten. Ergebnisse werden editionsbezogen gespeichert. Der Source Monitor darf neue Jahrgänge und Ergebnislinks erkennen, erzeugt bei einem neuen Jahrgang aber ausschließlich einen privaten `edition_succession_candidate`.
 
 Migration `20260813_review_inbox_safe_automation.sql` hatte eine eng begrenzte
 automatische Veröffentlichung für neue Editionsentwürfe und offizielle
@@ -21,6 +21,12 @@ niemals ungeprüft überschrieben.
 - `publication_status=draft`: niemals anonym lesbar.
 - `publication_status=published`: über die öffentliche Archivschicht lesbar.
 - `results_status=not_expected|expected|candidate|available|unavailable`: Ergebnis-Lifecycle der Austragung.
+- `edition_status=scheduled` entspricht fachlich `upcoming`; `completed`, `cancelled` und `postponed` bleiben eigenständige, minimale Lifecycle-Zustände.
+
+`admin_event_edition_lifecycle_state` leitet den Serienzustand ohne redundante
+Speicherung ab. Nach einer regulär abgeschlossenen Edition ohne veröffentlichte
+Folgeedition lautet er `next_edition_unknown_watching`; ein privater Candidate
+führt zu `candidate_under_review` und beendet das Watching nicht.
 
 `public_event_discovery` liefert je Event-Serie nur die nächste aktive veröffentlichte Austragung. `public_event_archive` liefert alle veröffentlichten Jahrgänge samt freigegebenen Ergebnislinks.
 
@@ -28,14 +34,17 @@ niemals ungeprüft überschrieben.
 
 Der pg_cron-Job `sem-edition-lifecycle-daily` ruft täglich um 02:17 UTC `private.run_edition_lifecycle(current_date)` auf:
 
-1. Nach Ablauf der konfigurierten Karenz wird die Austragung `completed` und `detail_only`.
+1. Nach Ablauf der konfigurierten Karenz wird eine regulär `scheduled`e Austragung `completed` und `detail_only`. `postponed` wird niemals anhand des alten Datums automatisch abgeschlossen.
 2. Die historischen Daten bleiben unverändert erhalten; nur der Discovery-Status wechselt.
 3. Ergebnisstatus wird auf `expected` gesetzt.
 4. Quellen von Event-Serien ohne bekannte Folgeedition werden früher erneut geprüft.
 5. Künftige veröffentlichte Editionen werden wieder `active`.
 6. Routinemeldungen ohne unmittelbaren Handlungswert werden automatisch geschlossen.
 
-Die zentralen Werte liegen in `edition_lifecycle_settings`: Karenz, Nachfolgeprüfung, Draft-/Batch-Schwellen, Batchlimit und spätere Auto-Publish-Schwelle.
+Die zentralen Werte liegen in `edition_lifecycle_settings`: Karenz,
+Nachfolgeprüfung, Batchlimit und die derzeit hart deaktivierten späteren
+Auto-Publish-Grenzen. Die ältere `auto_draft_threshold`-Spalte bleibt nur als
+Kompatibilitätsfeld bestehen und erzeugt keine Editions-Drafts mehr.
 
 ## Erkennung neuer Jahrgänge
 
@@ -45,14 +54,28 @@ Der Worker extrahiert ausschließlich beobachtbare Signale:
 - sichtbare ISO- und deutsche Datumsformate als schwächeres Signal.
 - offizielle Ergebnis-, Timing- und Urkundenlinks.
 
-Ein Kandidat muss ein späteres Jahr und ein späteres Datum als die letzte etablierte Edition besitzen. Ab `auto_draft_threshold` entsteht idempotent eine Edition mit `publication_status=draft` und `discovery_status=suppressed`. Ein erneuter Crawl bestätigt denselben Fingerprint statt Duplikate anzulegen; der automatisch erzeugte Entwurf wird dabei bewusst nicht als bereits etablierter Jahrgang gewertet. Abweichende Daten für dasselbe Jahr werden als Konflikt markiert.
+Ein Kandidat muss ein späteres Jahr und ein späteres Datum als die letzte
+veröffentlichte Edition besitzen. Crawl, Source und Event werden hart
+zusammengebunden; Quellenvertrauen, Source-Gesundheit, HTTPS, Feldsperren,
+kritische Validation-Issues sowie Absage-/Verschiebungssignale werden vor einer
+Freigabe geprüft. Ein erneuter Crawl bestätigt denselben Fingerprint statt
+Duplikate anzulegen. Abweichende Daten für dasselbe Jahr werden als Konflikt
+markiert. Detection erzeugt ausdrücklich keinen Editions-Draft.
+
+Erst eine explizite Adminfreigabe materialisiert einen `validated` Candidate als
+neue Edition. Dabei werden ausschließlich belegte Candidate-Daten übernommen;
+Race Formats, Distanz, Preise oder andere editionsspezifische Werte der
+Vorgängeredition werden nicht kopiert. Eine editionsgebundene Evidence-Quelle
+wird für die neue Edition neu registriert und mit technischem Status `pending`
+sofort wieder dem Source Monitor übergeben.
 
 ## Vorbereitete, derzeit deaktivierte Auto-Freigabe
 
 Die folgenden Regeln beschreiben den vorbereiteten Pfad. Solange die beiden
 Publication-Flags deaktiviert sind, veröffentlicht er nichts; Kandidaten bleiben
-im Review. Ein später separat genehmigter Jahrgang dürfte nur automatisch
-veröffentlicht werden, wenn alle Bedingungen erfüllt wären:
+im Review. Ein später separat genehmigter Jahrgang dürfte den gleichen
+Materialisierungspfad nur automatisch verwenden, wenn alle Bedingungen erfüllt
+wären:
 
 - bekannte Quelle vom Typ `official_event_website` oder `official_registration_platform`
 - ausschließlich HTTPS
@@ -76,12 +99,12 @@ Ergebnislinks benötigen ebenfalls zwei zeitversetzte Bestätigungen einer offiz
 - kritische Quellenfehler,
 - Validation- und Workflowfehler mit Schweregrad `error` oder `critical`.
 
-Routinefälle, die lediglich auf ihre zweite automatische Bestätigung warten, stehen in einer getrennten Ansicht und zählen nicht als aktuelle Entscheidung. Hash-only-Änderungen ohne erkannten Feldunterschied werden als technische Information protokolliert, aber nicht mehr als menschliche Aufgabe geführt. Mehrere Dead-Letter-, Unerreichbarkeits- und Workflow-Meldungen derselben Quelle erscheinen als ein Bündel und werden über `resolve_source_exception_bundle` gemeinsam geschlossen. Admins können verbleibende Entwürfe einzeln oder gesammelt über `approve_edition_succession_candidates` beziehungsweise `approve_edition_result_candidates` veröffentlichen. Ablehnungen bleiben nachvollziehbar gespeichert.
+Routinefälle, die lediglich auf ihre zweite automatische Bestätigung warten, stehen in einer getrennten Ansicht und zählen nicht als aktuelle Entscheidung. Hash-only-Änderungen ohne erkannten Feldunterschied werden als technische Information protokolliert, aber nicht mehr als menschliche Aufgabe geführt. Mehrere Dead-Letter-, Unerreichbarkeits- und Workflow-Meldungen derselben Quelle erscheinen als ein Bündel und werden über `resolve_source_exception_bundle` gemeinsam geschlossen. Admins können ausschließlich validierte, explizit ausgewählte Editions-Candidates über `approve_edition_succession_candidates` materialisieren. Ergebnisentwürfe verwenden weiterhin `approve_edition_result_candidates`. Ablehnungen bleiben nachvollziehbar gespeichert.
 
 ## Favoriten und Saisonplaner
 
 - `favorites.event_ref` referenziert die dauerhafte Event-Serie. Ein Event-Favorit überlebt den Jahreswechsel.
-- `season_planner_events.edition_id` referenziert die konkrete Austragung. Resultat, Priorität und Notizen bleiben dem richtigen Jahr zugeordnet.
+- `season_planner_events.edition_id` referenziert die konkrete Austragung. Resultat, Priorität und Notizen bleiben dem richtigen Jahr zugeordnet; `ON DELETE RESTRICT` schützt die Edition, solange ein User-Eintrag darauf verweist.
 - Die historischen Textschlüssel bleiben vorerst als Kompatibilitätsschicht erhalten und wurden auf die neuen Fremdschlüssel zurückgefüllt.
 
 Die Detailseitenaktion „Zur Saison hinzufügen“ schreibt ausschließlich in `season_planner_events`, nicht zusätzlich in `favorites`.

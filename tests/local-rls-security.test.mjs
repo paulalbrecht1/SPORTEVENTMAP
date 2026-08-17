@@ -167,7 +167,13 @@ const [hardeningState] = queryLocal(`
       'service_role',
       'public.verify_event_source_cron_secret(text)',
       'execute'
-    ) as cron_verification_service_only
+    ) as cron_verification_service_only,
+    exists (
+      select 1 from pg_constraint constraint_row
+      where constraint_row.conrelid = 'public.season_planner_events'::regclass
+        and constraint_row.conname = 'season_planner_events_edition_id_fkey'
+        and constraint_row.confdeltype = 'r'
+    ) as planner_edition_delete_restricted
 `);
 
 assert.deepEqual(
@@ -180,7 +186,8 @@ assert.deepEqual(
     signup_trigger_not_public: true,
     cron_verification_not_anon: true,
     cron_verification_not_authenticated: true,
-    cron_verification_service_only: true
+    cron_verification_service_only: true,
+    planner_edition_delete_restricted: true
   },
   "Local database hardening state is incomplete."
 );
@@ -194,6 +201,8 @@ runSupabase([
   declare
     fixture_event_id bigint;
     fixture_edition_id uuid;
+    postponed_event_id bigint;
+    postponed_edition_id uuid;
     lifecycle_result jsonb;
   begin
     insert into public.events (
@@ -217,6 +226,22 @@ runSupabase([
         discovery_status = 'active'
     where id = fixture_edition_id;
 
+    insert into public.events (
+      event_name, sport, date, city, country, event_url, status,
+      publication_status, event_status, verification_status
+    ) values (
+      '[LIFECYCLE TEST] postponed fixture', 'Running', '02.01.2020',
+      'Berlin', 'Germany', 'https://example.com/lifecycle-postponed', 'approved',
+      'published', 'active', 'verified'
+    ) returning id into postponed_event_id;
+    select id into postponed_edition_id from public.event_editions
+    where event_id = postponed_event_id order by edition_year limit 1;
+    update public.event_editions
+    set start_date = date '2020-01-02', end_date = date '2020-01-02',
+        edition_status = 'postponed', publication_status = 'published',
+        discovery_status = 'active'
+    where id = postponed_edition_id;
+
     lifecycle_result := private.run_edition_lifecycle(date '2026-01-01');
     if (lifecycle_result->>'archived_editions')::integer < 1 then
       raise exception 'Lifecycle did not archive the past fixture';
@@ -230,13 +255,22 @@ runSupabase([
     ) then
       raise exception 'Archived fixture disappeared from public history';
     end if;
+    if not exists (
+      select 1 from public.event_editions
+      where id = postponed_edition_id
+        and edition_status = 'postponed'
+        and discovery_status = 'active'
+    ) then
+      raise exception 'Postponed edition was auto-completed or archived from its old date';
+    end if;
 
     delete from public.events where id = fixture_event_id;
+    delete from public.events where id = postponed_event_id;
     delete from public.data_workflow_runs where id = (lifecycle_result->>'run_id')::bigint;
   end
   $lifecycle$;`
 ]);
-console.log("Edition lifecycle archival and public history assertions passed.");
+console.log("Edition lifecycle archival, public history and postponed-state assertions passed.");
 
 const automationFixture = `[AUTO CONFIRM TEST] ${runId}`;
 runSupabase([
@@ -349,6 +383,11 @@ runSupabase([
 
 const [automationState] = queryLocal(`
   select
+    not exists (
+      select 1 from public.event_editions edition
+      join public.events event on event.id = edition.event_id
+      where event.event_name = '${automationFixture}' and edition.edition_year = 2027
+    ) as successor_not_materialized,
     exists (
       select 1 from public.event_editions edition
       join public.events event on event.id = edition.event_id
@@ -376,6 +415,7 @@ const [automationState] = queryLocal(`
     ) as automation_disabled
 `);
 assert.deepEqual(automationState, {
+  successor_not_materialized: true,
   successor_auto_published: false,
   successor_confirmed: true,
   result_not_auto_published: true,
@@ -423,6 +463,166 @@ try {
     "--local",
     `update public.profiles set role = 'admin' where id = '${admin.id}';`
   ]);
+
+  const candidateFirstFixture = `[CANDIDATE FIRST TEST] ${runId}`;
+  runSupabase([
+    "db",
+    "query",
+    "--local",
+    `do $candidate_first$
+    declare
+      fixture_event_id bigint;
+      predecessor_id uuid;
+      fixture_source_id uuid;
+      fixture_job_id uuid;
+      fixture_crawl_id bigint;
+      candidate_id uuid;
+      register_result jsonb;
+      approval_result jsonb;
+    begin
+      perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
+
+      insert into public.events (
+        event_name, sport, date, city, country, event_url, status,
+        publication_status, event_status, verification_status
+      ) values (
+        '${candidateFirstFixture}', 'Running', '01.01.2026', 'Hamburg', 'Germany',
+        'https://example.com/candidate-first-${runId}', 'approved',
+        'published', 'active', 'verified'
+      ) returning id into fixture_event_id;
+
+      select id into predecessor_id from public.event_editions
+      where event_id = fixture_event_id order by edition_year limit 1;
+      update public.event_editions
+      set edition_year = 2026, start_date = date '2026-01-01', end_date = date '2026-01-01',
+          edition_status = 'completed', publication_status = 'published',
+          discovery_status = 'detail_only',
+          race_formats = '[{"distance_km":42.195}]'::jsonb,
+          legacy_distance = 'Marathon'
+      where id = predecessor_id;
+      delete from public.validation_issues where event_id = fixture_event_id;
+
+      insert into public.event_sources (
+        event_id, edition_id, source_type, source_url, parser_type, is_active,
+        crawl_status, consecutive_failures
+      ) values (
+        fixture_event_id, predecessor_id, 'official_event_website',
+        'https://example.com/candidate-first-${runId}', 'json_ld', true,
+        'success', 0
+      ) returning id into fixture_source_id;
+      insert into public.source_crawl_jobs (
+        source_id, event_id, status, idempotency_key, trigger_source
+      ) values (
+        fixture_source_id, fixture_event_id, 'completed',
+        'candidate-first-${runId}', 'test'
+      ) returning id into fixture_job_id;
+      insert into public.source_crawl_results (
+        job_id, source_id, event_id, attempt_number, http_status, final_url,
+        change_status, worker_version, processing_status
+      ) values (
+        fixture_job_id, fixture_source_id, fixture_event_id, 1, 200,
+        'https://example.com/candidate-first-${runId}', 'changed',
+        'candidate-first-test', 'completed'
+      ) returning id into fixture_crawl_id;
+
+      if not exists (
+        select 1 from public.admin_event_edition_lifecycle_state state
+        where state.event_id = fixture_event_id
+          and state.lifecycle_state = 'next_edition_unknown_watching'
+      ) then
+        raise exception 'Completed event did not enter next-edition watching';
+      end if;
+
+      register_result := public.register_edition_successor_candidate(
+        fixture_source_id,
+        fixture_crawl_id,
+        jsonb_build_object(
+          'year', 2028,
+          'start_date', '2028-06-04',
+          'end_date', '2028-06-04',
+          'name', '${candidateFirstFixture} 2028',
+          'confidence', 0.97,
+          'evidence', jsonb_build_object(
+            'evidence_type', 'json_ld',
+            'risk_signals', '[]'::jsonb
+          )
+        ),
+        'candidate-first-test'
+      );
+      candidate_id := (register_result->>'candidate_id')::uuid;
+      if register_result->>'validation_status' <> 'validated' then
+        raise exception 'Expected validated candidate, got %', register_result;
+      end if;
+      if exists (
+        select 1 from public.event_editions
+        where event_id = fixture_event_id and edition_year = 2028
+      ) then
+        raise exception 'Detection created an edition before approval';
+      end if;
+      if not exists (
+        select 1 from public.admin_event_edition_lifecycle_state state
+        where state.event_id = fixture_event_id
+          and state.lifecycle_state = 'candidate_under_review'
+      ) then
+        raise exception 'Validated candidate did not enter review state';
+      end if;
+
+      perform set_config(
+        'request.jwt.claims',
+        '{"role":"authenticated","sub":"${admin.id}"}',
+        true
+      );
+      approval_result := public.approve_edition_succession_candidates(
+        array[candidate_id], 1
+      );
+      if (approval_result->>'approved_count')::integer <> 1 then
+        raise exception 'Explicit candidate approval failed: %', approval_result;
+      end if;
+      if not exists (
+        select 1 from public.event_editions edition
+        where edition.event_id = fixture_event_id
+          and edition.edition_year = 2028
+          and edition.start_date = date '2028-06-04'
+          and edition.edition_status = 'scheduled'
+          and edition.publication_status = 'published'
+          and edition.race_formats = '[]'::jsonb
+          and edition.legacy_distance is null
+          and edition.generated_from_candidate_id = candidate_id
+      ) then
+        raise exception 'Approved edition missing or predecessor facts were copied';
+      end if;
+      if not exists (
+        select 1 from public.event_sources source
+        join public.event_editions edition on edition.id = source.edition_id
+        where edition.event_id = fixture_event_id
+          and edition.edition_year = 2028
+          and source.source_url = 'https://example.com/candidate-first-${runId}'
+          and source.crawl_status = 'pending'
+          and source.last_fetched_at is null
+      ) then
+        raise exception 'Edition-bound evidence source was not re-registered for the new edition';
+      end if;
+      if not exists (
+        select 1 from public.event_editions
+        where id = predecessor_id
+          and edition_status = 'completed'
+          and race_formats = '[{"distance_km":42.195}]'::jsonb
+          and legacy_distance = 'Marathon'
+      ) then
+        raise exception 'Approval changed the historical predecessor edition';
+      end if;
+      if not exists (
+        select 1 from public.edition_succession_candidates
+        where id = candidate_id and candidate_status = 'approved'
+      ) then
+        raise exception 'Approved candidate did not close';
+      end if;
+
+      delete from public.events where id = fixture_event_id;
+    end
+    $candidate_first$;`
+  ]);
+  console.log("Candidate-first detection, watching, explicit approval and immutable predecessor assertions passed.");
 
   const test = spawnSync(
     process.execPath,

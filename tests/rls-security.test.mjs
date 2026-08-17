@@ -1443,28 +1443,70 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   await test(
     "17. First successor detection stays private and requires explicit admin review",
     async () => {
-      const sources = await serviceRequest(
-        `event_sources?select=id,event_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&limit=1`
+      const editions = await serviceRequest(
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&order=edition_year.desc&limit=1`
       );
-      assert.equal(sources.response.ok, true, JSON.stringify(sources.data));
-      assert.equal(sources.data.length, 1);
-      const source = sources.data[0];
-      const crawlResults = await serviceRequest(
-        `source_crawl_results?select=id&source_id=eq.${encodeURIComponent(source.id)}&order=fetched_at.desc&limit=1`
-      );
-      assert.equal(crawlResults.response.ok, true, JSON.stringify(crawlResults.data));
-      assert.equal(crawlResults.data.length, 1);
+      assert.equal(editions.response.ok, true, JSON.stringify(editions.data));
+      assert.equal(editions.data.length, 1);
+      const insertedSource = await serviceRequest("event_sources", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: publicFixtureEventId,
+          edition_id: editions.data[0].id,
+          source_type: "official_event_website",
+          source_url: `https://successor-${runId}.example.com/event`,
+          parser_type: "json_ld",
+          is_active: true,
+          crawl_status: "success",
+          consecutive_failures: 0,
+          last_http_status: 200,
+          last_fetched_at: new Date().toISOString()
+        }
+      });
+      assert.equal(insertedSource.response.ok, true, JSON.stringify(insertedSource.data));
+      const source = insertedSource.data[0];
+      const insertedJob = await serviceRequest("source_crawl_jobs", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          source_id: source.id,
+          event_id: publicFixtureEventId,
+          edition_id: editions.data[0].id,
+          status: "completed",
+          idempotency_key: `successor-${runId}`,
+          trigger_source: "test"
+        }
+      });
+      assert.equal(insertedJob.response.ok, true, JSON.stringify(insertedJob.data));
+      const insertedCrawl = await serviceRequest("source_crawl_results", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          job_id: insertedJob.data[0].id,
+          source_id: source.id,
+          event_id: publicFixtureEventId,
+          edition_id: editions.data[0].id,
+          attempt_number: 1,
+          http_status: 200,
+          final_url: source.source_url,
+          change_status: "changed",
+          worker_version: "rls-lifecycle-test",
+          processing_status: "completed"
+        }
+      });
+      assert.equal(insertedCrawl.response.ok, true, JSON.stringify(insertedCrawl.data));
 
       const detected = await serviceRequest("rpc/register_edition_successor_candidate", {
         method: "POST",
         body: {
           p_source_id: source.id,
-          p_crawl_result_id: crawlResults.data[0].id,
+          p_crawl_result_id: insertedCrawl.data[0].id,
           p_candidate: {
             year: 2028,
             start_date: "2028-12-30",
             end_date: "2028-12-30",
-            name: `Lifecycle ${runId}`,
+            name: `[RLS TEST] public ${runId} 2028`,
             registration_url: `https://example.com/${runId}/register-2028`,
             confidence: 0.97,
             evidence: { type: "json_ld" }
@@ -1473,14 +1515,21 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         }
       });
       assert.equal(detected.response.ok, true, JSON.stringify(detected.data));
-      assert.equal(detected.data.status, "draft_created");
-      assert.ok(detected.data.draft_edition_id);
+      assert.equal(detected.data.status, "detected");
+      assert.equal(detected.data.validation_status, "validated", JSON.stringify(detected.data));
+      assert.equal(detected.data.draft_edition_id, null);
 
       const anonymousDraft = await restRequest(
-        `event_editions?select=id&id=eq.${encodeURIComponent(detected.data.draft_edition_id)}`
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
       );
       assert.equal(anonymousDraft.response.ok, true);
       assert.deepEqual(anonymousDraft.data, []);
+
+      const serviceDraft = await serviceRequest(
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
+      );
+      assert.equal(serviceDraft.response.ok, true);
+      assert.deepEqual(serviceDraft.data, [], "Detection created a hidden edition draft.");
 
       const normalInbox = await restRequest(
         `admin_review_inbox?select=item_id&item_id=eq.${encodeURIComponent(detected.data.candidate_id)}`,
@@ -1494,7 +1543,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         { token: admin.token }
       );
       assert.equal(adminInbox.response.ok, true, JSON.stringify(adminInbox.data));
-      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["review"]);
+      assert.deepEqual(adminInbox.data.map(row => row.batch_action), ["approve_successor"]);
 
       const approved = await restRequest("rpc/approve_edition_succession_candidates", {
         token: admin.token,
@@ -1505,11 +1554,26 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.equal(approved.data.approved_count, 1);
 
       const publicArchive = await restRequest(
-        `public_event_archive?select=edition_id,edition_year,discovery_status&edition_id=eq.${encodeURIComponent(detected.data.draft_edition_id)}`
+        `public_event_archive?select=edition_id,edition_year,discovery_status&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
       );
       assert.equal(publicArchive.response.ok, true, JSON.stringify(publicArchive.data));
       assert.deepEqual(publicArchive.data.map(row => row.edition_year), [2028]);
       assert.deepEqual(publicArchive.data.map(row => row.discovery_status), ["active"]);
+
+      const materializedEdition = await serviceRequest(
+        `event_editions?select=race_formats,legacy_distance,generated_from_candidate_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
+      );
+      assert.equal(materializedEdition.response.ok, true, JSON.stringify(materializedEdition.data));
+      assert.deepEqual(materializedEdition.data.map(row => row.race_formats), [[]]);
+      assert.deepEqual(materializedEdition.data.map(row => row.legacy_distance), [null]);
+      assert.deepEqual(materializedEdition.data.map(row => row.generated_from_candidate_id), [detected.data.candidate_id]);
+
+      const successorSources = await serviceRequest(
+        `event_sources?select=source_url,crawl_status,last_fetched_at&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_id=eq.${encodeURIComponent(publicArchive.data[0].edition_id)}&source_url=eq.${encodeURIComponent(source.source_url)}`
+      );
+      assert.equal(successorSources.response.ok, true, JSON.stringify(successorSources.data));
+      assert.deepEqual(successorSources.data.map(row => row.crawl_status), ["pending"]);
+      assert.deepEqual(successorSources.data.map(row => row.last_fetched_at), [null]);
     }
   );
 

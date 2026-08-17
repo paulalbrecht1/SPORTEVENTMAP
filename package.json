@@ -46,7 +46,7 @@
     "test:event-automation": "node tests/event-automation-workflow.test.mjs",
     "test:source-monitor": "node tests/source-monitor-core.test.mjs && node tests/source-monitor-pinned-http.test.mjs && node tests/source-monitor-workflow.test.mjs && node tests/source-monitor-extraction.test.mjs",
     "test:stage-four": "node tests/stage-four-preparation.test.mjs && node tests/stage-four-observation.test.mjs",
-    "test:edition-lifecycle": "node tests/edition-lifecycle-workflow.test.mjs && node tests/content-verification-workflow.test.mjs && node tests/event-detail-toggle.test.mjs",
+    "test:edition-lifecycle": "node tests/edition-lifecycle-workflow.test.mjs && node tests/edition-candidate-first.test.mjs && node tests/content-verification-workflow.test.mjs && node tests/event-detail-toggle.test.mjs",
     "smoke:source-monitor:production": "node tools/source-monitor-production-smoke.mjs",
     "data:migrate:dry": "node tools/migrate-events-to-editions.js",
     "data:export-fallback": "node tools/export-supabase-event-catalog.js --write",

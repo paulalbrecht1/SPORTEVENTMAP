@@ -305,12 +305,18 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
   const raw = String(content || "").normalize("NFKC");
   const editionMap = new Map();
   const resultMap = new Map();
+  const riskSignals = new Set();
   const rememberEdition = candidate => {
     const startDate = normalizeLifecycleDate(candidate.start_date);
     if (!startDate) return;
     const key = startDate;
     const normalized = { ...candidate, start_date: startDate, year: Number(startDate.slice(0, 4)) };
     if (candidate.end_date) normalized.end_date = normalizeLifecycleDate(candidate.end_date);
+    if (Array.isArray(candidate.risk_signals) && candidate.risk_signals.length) {
+      normalized.risk_signals = [...new Set(candidate.risk_signals)].sort();
+    } else {
+      delete normalized.risk_signals;
+    }
     const previous = editionMap.get(key);
     if (!previous || normalized.confidence > previous.confidence) editionMap.set(key, normalized);
   };
@@ -330,13 +336,18 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
         const type = String(entry?.["@type"] || "").toLowerCase();
         if (!/(event|sports?event)/.test(type)) continue;
         const offer = Array.isArray(entry.offers) ? entry.offers[0] : entry.offers;
+        const eventStatus = String(entry.eventStatus || "").toLowerCase();
+        const entryRiskSignals = [];
+        if (/(cancel|abgesagt)/i.test(eventStatus)) entryRiskSignals.push("cancellation");
+        if (/(postpon|verschob)/i.test(eventStatus)) entryRiskSignals.push("postponement");
         rememberEdition({
           start_date: entry.startDate,
           end_date: entry.endDate,
           name: entry.name || null,
           registration_url: absoluteHttpUrl(offer?.url, baseUrl),
           confidence: 0.97,
-          evidence_type: "json_ld"
+          evidence_type: "json_ld",
+          risk_signals: entryRiskSignals
         });
       }
     } catch { /* malformed structured data is ignored */ }
@@ -347,6 +358,8 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
       .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
       .replace(/<[^>]+>/g, " "))
       .replace(/\s+/g, " ");
+    if (/\b(cancelled|canceled|abgesagt|annulliert)\b/i.test(visible)) riskSignals.add("cancellation");
+    if (/\b(postponed|verschoben|verlegt)\b/i.test(visible)) riskSignals.add("postponement");
     for (const match of visible.matchAll(/\b(?:19|20)\d{2}-\d{2}-\d{2}\b|\b\d{1,2}[./]\d{1,2}[./](?:19|20)\d{2}\b/g)) {
       rememberEdition({ start_date: match[0], end_date: null, name: null, registration_url: null, confidence: 0.72, evidence_type: "visible_date" });
     }
@@ -365,8 +378,28 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
 
   return {
     editions: [...editionMap.values()].sort((left, right) => left.start_date.localeCompare(right.start_date)),
-    results: [...resultMap.values()].sort((left, right) => right.confidence - left.confidence || left.url.localeCompare(right.url))
+    results: [...resultMap.values()].sort((left, right) => right.confidence - left.confidence || left.url.localeCompare(right.url)),
+    risk_signals: [...riskSignals].sort()
   };
+}
+
+export function selectLifecycleSuccessors(signals, latestEdition = null, referenceDate = new Date().toISOString().slice(0, 10)) {
+  const latestYear = Number(latestEdition?.edition_year || 0);
+  const latestDate = String(latestEdition?.start_date || "");
+  const candidates = (signals?.editions || []).filter(candidate =>
+    Number(candidate.year) > latestYear &&
+    String(candidate.start_date || "") > referenceDate &&
+    (!latestDate || String(candidate.start_date) > latestDate)
+  );
+  const structured = candidates.filter(candidate => candidate.evidence_type === "json_ld");
+  const selected = structured.length ? structured : candidates.length === 1 ? candidates : [];
+  return selected.slice(0, 4).map(candidate => ({
+    ...candidate,
+    alternative_dates: selected
+      .filter(alternative => alternative.start_date !== candidate.start_date)
+      .map(alternative => alternative.start_date)
+      .sort()
+  }));
 }
 export async function sha256Hex(value) {
   const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;

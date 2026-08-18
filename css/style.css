@@ -44917,3 +44917,862 @@ html[data-theme="light"] .sem-home .sem-season-events em {
   background: rgba(34, 197, 94, 0.13);
   color: #166534;
 }
+
+/* Cross-page visual alignment ---------------------------------------------
+   Home is the product reference. These shared presentation tokens keep the
+   Discovery workspace and generated event guides on the same quiet system
+   without changing their layout, content order or interaction model. */
+:root {
+  --product-font-family: Inter, Arial, sans-serif;
+  --product-radius-surface: 20px;
+  --product-radius-card: 16px;
+  --product-radius-control: 12px;
+  --product-shadow-surface: 0 18px 44px rgba(0, 0, 0, 0.22);
+  --product-shadow-control: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+html[data-theme="light"] {
+  --product-shadow-surface: 0 18px 44px rgba(15, 23, 42, 0.1);
+  --product-shadow-control: 0 8px 20px rgba(15, 23, 42, 0.065);
+}
+
+/* Discovery header: retain the existing three-zone geometry while matching
+   the Home wordmark, typography, control radii and restrained elevation. */
+body.platform-route-discovery:not(.landing-open),
+body.platform-route-discovery:not(.landing-open) :is(button, input, select, textarea) {
+  font-family: var(--product-font-family);
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar {
+  border-color: var(--discovery-border) !important;
+  background: rgba(13, 29, 25, 0.98) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #topbar {
+  background: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-left .brand {
+  gap: 11px !important;
+  color: var(--discovery-text) !important;
+  line-height: 1 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-left .brand-icon {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-left .brand-name {
+  color: var(--discovery-text) !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.018em !important;
+  white-space: nowrap;
+}
+
+@media (min-width: 1180px) {
+  body.platform-route-discovery:not(.landing-open) #topbar-left .brand {
+    width: auto !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #topbar-left .brand-name {
+    display: inline-block !important;
+  }
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav a {
+  min-height: 40px !important;
+  padding-inline: 17px !important;
+  border-radius: var(--radius-pill) !important;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.012em !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .platform-nav a:is(:hover, :focus-visible, .active) {
+  transform: none !important;
+  box-shadow: inset 0 0 0 1px rgba(69, 212, 117, 0.06) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #topbar-search input {
+  min-height: 46px !important;
+  border-radius: var(--product-radius-control) !important;
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  box-shadow: var(--product-shadow-control) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  #toggleSidebar,
+  #platformMenuBtn,
+  #topbarProductActions button,
+  #authArea button:not(.global-theme-toggle)
+) {
+  border-radius: var(--product-radius-control) !important;
+  font-size: 0.81rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #toggleSidebar {
+  box-shadow: var(--product-shadow-control) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #authArea #loginBtn {
+  border-color: transparent !important;
+  background: transparent !important;
+  color: var(--discovery-text) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #authArea #registerBtn {
+  border-color: var(--discovery-accent-strong) !important;
+  border-radius: var(--product-radius-control) !important;
+  background: var(--button-primary-bg) !important;
+  color: #04150b !important;
+  box-shadow: 0 10px 22px rgba(22, 163, 74, 0.16) !important;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #authArea #registerBtn {
+  color: #ffffff !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #authArea #feedbackBtn {
+  border-color: var(--discovery-border) !important;
+  border-radius: var(--product-radius-control) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-text) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  #authArea #loginBtn,
+  #authArea #registerBtn,
+  #authArea #feedbackBtn
+):is(:hover, :focus-visible) {
+  transform: none !important;
+  border-color: rgba(69, 212, 117, 0.4) !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+@media (max-width: 1400px) and (min-width: 901px) {
+  body.platform-route-discovery:not(.landing-open) .platform-nav a {
+    padding-inline: 13px !important;
+    font-size: 0.82rem !important;
+  }
+}
+
+/* Discovery workspace, filters and result cards. The established split-view
+   dimensions stay intact; only surface treatment and type hierarchy change. */
+body.platform-route-discovery:not(.landing-open) :is(#sidebar, #map) {
+  border-radius: var(--product-radius-surface) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar {
+  box-shadow: var(--product-shadow-surface) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #map {
+  box-shadow: var(--product-shadow-surface) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-select-card,
+  .filter-accordion,
+  .filter-actions-row
+) {
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.07) !important;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-select-card,
+  .filter-accordion,
+  .filter-actions-row
+) {
+  box-shadow: 0 7px 18px rgba(15, 23, 42, 0.045) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(label, .date-range-title),
+body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-accordion-toggle > span,
+body.platform-route-discovery:not(.landing-open) .drawer-label {
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.075em !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(input, select) {
+  border-radius: var(--product-radius-control) !important;
+  font-size: 0.86rem !important;
+  font-weight: 600 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #sidebar-header :is(
+  .filter-chip,
+  .distance-filter-chip,
+  .date-range-actions button,
+  #resetFiltersBtn
+) {
+  border-radius: var(--product-radius-control) !important;
+  font-size: 0.76rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card {
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card .event-name {
+  font-weight: 700 !important;
+  letter-spacing: -0.018em !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card :is(.event-meta-label, .event-status-text) {
+  font-weight: 700 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-card :is(.favorite-button, .event-favorite-button) {
+  font-size: 1rem !important;
+  box-shadow: var(--product-shadow-control) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .event-map-legend,
+  #mapToolsMenu,
+  .leaflet-popup-content-wrapper
+) {
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: var(--product-shadow-control) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) .event-map-legend strong,
+body.platform-route-discovery:not(.landing-open) #mapToolsMenu strong {
+  font-size: 0.7rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+
+body.platform-route-discovery:not(.landing-open) :is(
+  .leaflet-control-zoom a,
+  #mapToolsToggle,
+  #mapStyleBtn,
+  #locationBtn,
+  #favoritesBtn
+) {
+  border-radius: var(--product-radius-control) !important;
+  box-shadow: var(--product-shadow-control) !important;
+}
+
+/* Event preview drawer: smaller icon containers and calmer type prevent the
+   utility-heavy preview from visually competing with the event information. */
+body.platform-route-discovery:not(.landing-open) #eventDrawer {
+  border-radius: var(--product-radius-surface) 0 0 var(--product-radius-surface) !important;
+  box-shadow: -18px 0 44px rgba(0, 0, 0, 0.22) !important;
+}
+
+html[data-theme="light"] body.platform-route-discovery:not(.landing-open) #eventDrawer {
+  box-shadow: -18px 0 44px rgba(15, 23, 42, 0.12) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-titlebar {
+  gap: 12px !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.065) !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-title-icon {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: var(--product-radius-control) !important;
+  font-size: 1.18rem !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-title-copy h2 {
+  font-size: 1.42rem !important;
+  font-weight: 800 !important;
+  line-height: 1.12 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  .drawer-title-kicker,
+  .drawer-title-meta
+) {
+  font-weight: 700 !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  #closeDrawer,
+  .drawer-favorite-btn
+) {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: var(--product-radius-control) !important;
+  font-size: 1.05rem !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer .drawer-section {
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  .drawer-overview-grid div,
+  .event-stats-list div,
+  .event-stat-item,
+  .drawer-trust-note
+) {
+  border-radius: var(--product-radius-control) !important;
+  box-shadow: none !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  .drawer-overview-grid span,
+  .event-stats-list span,
+  .event-stat-item span
+) {
+  font-weight: 700 !important;
+  letter-spacing: 0.055em !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  .drawer-overview-grid strong,
+  .event-stats-list strong,
+  .event-stat-item strong,
+  .drawer-section h3,
+  .drawer-action-row button
+) {
+  font-weight: 700 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+body.platform-route-discovery:not(.landing-open) #eventDrawer :is(
+  .drawer-season-btn,
+  .drawer-copy-btn,
+  .drawer-share-btn,
+  .drawer-detail-button,
+  .drawer-button
+) {
+  border-radius: var(--product-radius-control) !important;
+  font-weight: 700 !important;
+}
+
+/* Event detail pages -------------------------------------------------------
+   Existing templates are shared by all generated event pages, so this single
+   layer aligns their hero, metadata, cards, tables and actions consistently. */
+body.event-detail-page {
+  --detail-surface: var(--theme-surface, #0e1d19);
+  --detail-surface-raised: var(--theme-surface-raised, #12241e);
+  --detail-surface-soft: #172c25;
+  --detail-text: var(--theme-text, #f7faf8);
+  --detail-muted: #b7c5be;
+  --detail-subtle: #82938a;
+  --detail-border: rgba(183, 197, 190, 0.18);
+  --detail-border-strong: rgba(183, 197, 190, 0.28);
+  --detail-accent: #45d475;
+  --detail-accent-soft: rgba(69, 212, 117, 0.12);
+  --detail-warning-surface: #3a2b0f;
+  --detail-warning-text: #fde68a;
+  font-family: var(--product-font-family) !important;
+}
+
+html[data-theme="light"] body.event-detail-page {
+  --detail-surface: #ffffff;
+  --detail-surface-raised: #ffffff;
+  --detail-surface-soft: #f3f7f4;
+  --detail-text: #122019;
+  --detail-muted: #4d6257;
+  --detail-subtle: #718278;
+  --detail-border: rgba(15, 23, 42, 0.12);
+  --detail-border-strong: rgba(15, 23, 42, 0.2);
+  --detail-accent: #15803d;
+  --detail-accent-soft: rgba(34, 197, 94, 0.1);
+  --detail-warning-surface: #fff8e7;
+  --detail-warning-text: #713f12;
+}
+
+.event-detail-page :is(
+  .event-detail-shell,
+  button,
+  input,
+  select,
+  textarea
+) {
+  font-family: var(--product-font-family) !important;
+}
+
+.event-detail-page .event-detail-header {
+  border-color: var(--detail-border) !important;
+  border-radius: var(--product-radius-surface) !important;
+  background: var(--detail-surface) !important;
+  color: var(--detail-text) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18) !important;
+}
+
+html[data-theme="light"] .event-detail-page .event-detail-header {
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05) !important;
+}
+
+.event-detail-page .event-detail-brand {
+  gap: 11px !important;
+  color: var(--detail-text) !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+  letter-spacing: -0.018em !important;
+}
+
+.event-detail-page .event-detail-brand .brand-icon {
+  width: 34px !important;
+  height: 34px !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page .event-detail-brand .brand-name {
+  color: var(--detail-text) !important;
+  font-size: 1rem !important;
+  font-weight: 400 !important;
+}
+
+.event-detail-page .event-detail-back,
+.event-detail-page .event-detail-language-control {
+  min-height: 40px !important;
+  border-color: var(--detail-border) !important;
+  border-radius: var(--radius-pill) !important;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-text) !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page .event-detail-language-control select {
+  color: var(--detail-text) !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+}
+
+.event-detail-page :is(.event-detail-hero, .event-detail-card) {
+  border-color: var(--detail-border) !important;
+  border-radius: var(--product-radius-surface) !important;
+  background: var(--detail-surface) !important;
+  color: var(--detail-text) !important;
+  box-shadow: var(--product-shadow-surface) !important;
+}
+
+.event-detail-page .event-detail-hero-main h1 {
+  max-width: 15ch;
+  color: var(--detail-text) !important;
+  font-family: var(--product-font-family) !important;
+  font-size: clamp(2.75rem, 4.7vw, 3.75rem) !important;
+  font-weight: 900 !important;
+  line-height: 0.99 !important;
+  letter-spacing: -0.048em !important;
+  text-wrap: balance;
+}
+
+.event-detail-page .event-detail-hero-main p {
+  color: var(--detail-muted) !important;
+  font-size: 1rem !important;
+  line-height: 1.68 !important;
+}
+
+.event-detail-page :is(.event-detail-kicker, .race-guide-section-heading > span, .event-guide-section-heading > span) {
+  color: var(--detail-accent) !important;
+  font-size: 0.7rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.09em !important;
+}
+
+.event-detail-page .event-detail-cta-card {
+  border-color: var(--detail-border) !important;
+  border-radius: var(--product-radius-card) !important;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-text) !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page .event-detail-tabs a {
+  min-height: 40px !important;
+  padding: 0 13px !important;
+  border-color: var(--detail-border) !important;
+  border-radius: var(--radius-pill) !important;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-muted) !important;
+  font-size: 0.84rem !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page .event-detail-tabs .event-detail-icon {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.event-detail-page .event-detail-tabs a:is(:hover, :focus-visible, .is-active) {
+  transform: none !important;
+  border-color: rgba(69, 212, 117, 0.38) !important;
+  background: var(--detail-accent-soft) !important;
+  color: var(--detail-text) !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+.event-detail-page :is(.race-guide-section-heading h2, .event-guide-section-heading h2) {
+  color: var(--detail-text) !important;
+  font-size: clamp(1.35rem, 2vw, 1.75rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.026em !important;
+}
+
+.event-detail-page :is(.race-guide-subsection h3, .race-guide-info-box h3) {
+  color: var(--detail-text) !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+}
+
+.event-detail-page :is(.race-guide-section-heading p, .event-guide-section-heading p) {
+  color: var(--detail-muted) !important;
+}
+
+.event-detail-page :is(
+  .race-guide-fact-card,
+  .event-guide-key-fact,
+  .event-guide-metric,
+  .event-detail-facts > div,
+  .event-category-card,
+  .event-category-detail-grid > div
+) {
+  min-height: 96px !important;
+  border-color: var(--detail-border) !important;
+  border-radius: var(--product-radius-card) !important;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-text) !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page :is(
+  .race-guide-fact-card,
+  .event-guide-key-fact,
+  .event-guide-metric
+) .event-detail-icon {
+  width: 28px !important;
+  height: 28px !important;
+  border-color: rgba(69, 212, 117, 0.24) !important;
+  border-radius: 9px !important;
+  background: var(--detail-accent-soft) !important;
+  color: var(--detail-accent) !important;
+}
+
+.event-detail-page :is(
+  .race-guide-fact-card,
+  .event-guide-key-fact,
+  .event-guide-metric,
+  .event-detail-facts > div,
+  .event-category-detail-grid > div
+) > span:not(.event-detail-icon) {
+  color: var(--detail-muted) !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.065em !important;
+}
+
+.event-detail-page :is(
+  .race-guide-fact-card,
+  .event-guide-key-fact,
+  .event-guide-metric,
+  .event-detail-facts > div,
+  .event-category-detail-grid > div
+) > strong {
+  color: var(--detail-text) !important;
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+}
+
+.event-detail-page :is(.race-guide-fact-card.is-highlight, .race-guide-highlight) {
+  border-color: rgba(69, 212, 117, 0.32) !important;
+  background: var(--detail-accent-soft) !important;
+}
+
+.event-detail-page :is(
+  .race-guide-registration-status,
+  .race-guide-registration-link,
+  .race-guide-info-box,
+  .race-guide-highlight,
+  .race-guide-table-wrap,
+  .race-guide-timeline,
+  .race-guide-accordion,
+  .event-sources-section.is-subtle
+) {
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page .race-guide-registration-status {
+  border-color: rgba(217, 119, 6, 0.28) !important;
+  background: var(--detail-warning-surface) !important;
+  color: var(--detail-warning-text) !important;
+}
+
+.event-detail-page .race-guide-registration-status :is(span, strong, small) {
+  color: var(--detail-warning-text) !important;
+}
+
+.event-detail-page .race-guide-registration-status :is(span, strong) {
+  font-weight: 700 !important;
+}
+
+.event-detail-page .race-guide-registration-status .event-detail-icon,
+.event-detail-page .race-guide-info-box .event-detail-icon {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 9px !important;
+}
+
+.event-detail-page .race-guide-registration-link,
+.event-detail-page .event-detail-primary {
+  border-color: var(--theme-action, #22c55e) !important;
+  border-radius: var(--product-radius-control) !important;
+  background: var(--theme-action, #22c55e) !important;
+  color: #052e16 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 12px 26px rgba(34, 197, 94, 0.14) !important;
+}
+
+.event-detail-page .event-detail-secondary {
+  border-color: var(--detail-border-strong) !important;
+  border-radius: var(--product-radius-control) !important;
+  background: var(--detail-surface-raised) !important;
+  color: var(--detail-text) !important;
+  font-weight: 700 !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page :is(
+  .race-guide-registration-link,
+  .event-detail-primary,
+  .event-detail-secondary,
+  .race-guide-inline-action
+):is(:hover, :focus-visible) {
+  transform: none !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+.event-detail-page .race-guide-chip {
+  min-height: 28px !important;
+  border-color: rgba(69, 212, 117, 0.24) !important;
+  background: var(--detail-accent-soft) !important;
+  color: var(--detail-text) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+}
+
+.event-detail-page :is(
+  .race-guide-info-box,
+  .race-guide-table-wrap,
+  .race-guide-timeline,
+  .race-guide-accordion,
+  .event-sources-section.is-subtle
+) {
+  border-color: var(--detail-border) !important;
+  background: var(--detail-surface-soft) !important;
+  color: var(--detail-text) !important;
+}
+
+.event-detail-page .race-guide-table :is(th, td) {
+  border-color: var(--detail-border) !important;
+}
+
+.event-detail-page .race-guide-table th {
+  color: var(--detail-muted) !important;
+  font-size: 0.66rem !important;
+  font-weight: 800 !important;
+}
+
+.event-detail-page .race-guide-table td {
+  color: var(--detail-text) !important;
+  font-size: 0.86rem !important;
+}
+
+.event-detail-page .race-guide-timeline article {
+  border-color: var(--detail-border) !important;
+}
+
+.event-detail-page .race-guide-timeline :is(span, strong) {
+  font-weight: 700 !important;
+}
+
+.event-detail-page .race-guide-accordion summary {
+  min-height: 44px !important;
+  color: var(--detail-text) !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+}
+
+.event-detail-page .race-guide-accordion summary::after {
+  width: 22px !important;
+  height: 22px !important;
+  flex-basis: 22px !important;
+  border-color: var(--detail-border-strong) !important;
+  color: var(--detail-accent) !important;
+  font-weight: 700 !important;
+}
+
+.event-detail-page .event-detail-map {
+  border: 1px solid var(--detail-border) !important;
+  border-radius: var(--product-radius-card) !important;
+  box-shadow: none !important;
+}
+
+.event-detail-page :is(a, button, select):focus-visible {
+  outline: none !important;
+  box-shadow: var(--focus-ring) !important;
+}
+
+@media (max-width: 767px) {
+  .event-detail-page .event-detail-hero,
+  .event-detail-page .event-detail-card {
+    border-radius: var(--product-radius-card) !important;
+  }
+
+  .event-detail-page .event-detail-hero-main h1 {
+    max-width: 100%;
+    font-size: clamp(2.25rem, 12vw, 3.15rem) !important;
+    line-height: 1.02 !important;
+  }
+
+  .event-detail-page .event-detail-tabs a {
+    min-height: 38px !important;
+    padding-inline: 12px !important;
+    font-size: 0.79rem !important;
+  }
+
+  .event-detail-page :is(
+    .race-guide-fact-card,
+    .event-guide-key-fact,
+    .event-guide-metric,
+    .event-detail-facts > div,
+    .event-category-detail-grid > div
+  ) {
+    min-height: 0 !important;
+    border-radius: var(--product-radius-control) !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #eventDrawer.open .drawer-title-icon {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 1.05rem !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #eventDrawer.open .drawer-title-copy h2 {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Specificity locks for legacy theme rules that intentionally use IDs and
+   important declarations. Keep this tiny and presentation-only. */
+body.platform-route-discovery:not(.landing-open) #topbar #authArea #feedbackBtn {
+  border-color: var(--discovery-border) !important;
+  background: var(--discovery-surface-soft) !important;
+  color: var(--discovery-text) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] body.event-detail-page :is(
+  .event-detail-hero,
+  .event-detail-card
+) {
+  border-color: var(--detail-border) !important;
+  background: var(--detail-surface) !important;
+  box-shadow: var(--product-shadow-surface) !important;
+}
+
+html[data-theme="dark"] body.event-detail-page :is(
+  .event-detail-hero,
+  .event-detail-card
+) {
+  border-color: var(--detail-border) !important;
+  background: var(--detail-surface) !important;
+  box-shadow: var(--product-shadow-surface) !important;
+}
+
+body.event-detail-page .race-guide-status-panel > .event-detail-badge,
+body.event-detail-page .event-detail-status-note {
+  font-weight: 700 !important;
+  line-height: 1.5 !important;
+}
+
+/* Preserve the established semantic contrast contracts for status content,
+   dates, chips and accordion toggles in both appearance modes. */
+body.event-detail-page #registration :is(
+  .race-guide-fact-card.is-registration-period,
+  .race-guide-fact-card.is-registration-deadline
+) > strong {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  overflow-wrap: normal !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+}
+
+html[data-theme="dark"] body.event-detail-page
+  .race-guide-status-panel > .event-detail-badge.pending {
+  border-left-color: #f59e0b !important;
+  background: #172c25 !important;
+  color: #f8fafc !important;
+}
+
+html[data-theme="light"] body.event-detail-page
+  .race-guide-status-panel > .event-detail-badge.pending {
+  border-left-color: #b7791f !important;
+  background: #f2f7f4 !important;
+  color: #122019 !important;
+}
+
+html[data-theme="dark"] body.event-detail-page
+  .race-guide-accordion[open] > div {
+  background: #12251f !important;
+  color: #d4ded8 !important;
+}
+
+html[data-theme="light"] body.event-detail-page
+  .race-guide-accordion[open] > div {
+  background: #ffffff !important;
+  color: #40564a !important;
+}
+
+html[data-theme="dark"] body.event-detail-page .race-guide-chip {
+  border-color: rgba(134, 239, 172, 0.28) !important;
+  background: #173d2a !important;
+  color: #dcfce7 !important;
+}
+
+html[data-theme="light"] body.event-detail-page .race-guide-chip {
+  border-color: #a7d8b7 !important;
+  background: #e7f8ed !important;
+  color: #14532d !important;
+}
+
+html[data-theme="dark"] body.event-detail-page
+  .race-guide-accordion summary::after {
+  background: #19372a !important;
+  color: #bbf7d0 !important;
+}
+
+html[data-theme="light"] body.event-detail-page
+  .race-guide-accordion summary::after {
+  border-color: #9bd4ad !important;
+  background: #e9f8ee !important;
+  color: #166534 !important;
+}

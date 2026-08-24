@@ -32,7 +32,10 @@ const deploymentSequenceMatch = sql.match(
 assert.ok(deploymentSequenceMatch, "Missing ordered production deployment sequence.");
 const pending = [...deploymentSequenceMatch[1].matchAll(/\((\d+),\s*'(\d+)',\s*'([^']+)'\)/g)]
   .map(([, ordinal, version, name]) => ({ ordinal: Number(ordinal), version, name }));
-assert.deepEqual(pending.map(row => row.ordinal), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+assert.deepEqual(pending.map(row => row.ordinal), Array.from(
+  { length: pending.length },
+  (_value, index) => index + 1
+));
 const migrationFiles = fs.readdirSync(path.join(root, "supabase", "migrations"))
   .map(file => file.match(/^(\d+)_([^/]+)\.sql$/))
   .filter(Boolean)
@@ -42,7 +45,7 @@ const manifested = [...applied, ...pending.map(({ version, name }) => ({ version
   .sort((left, right) => left.version.localeCompare(right.version));
 
 assert.equal(applied.length, 36, "Expected active predeployment baseline changed.");
-assert.equal(pending.length, 10, "Expected pending rollout set changed.");
+assert.equal(pending.length, 11, "Expected pending rollout set changed.");
 assert.deepEqual(manifested, migrationFiles,
   "Production preflight manifest must match every local migration exactly.");
 assert.ok(applied.some(row => row.version === "20260817121601"));

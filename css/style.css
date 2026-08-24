@@ -28446,6 +28446,17 @@ body:not(.event-list-fullscreen) .filter-distance-card.open .filter-accordion-to
   overflow-wrap: anywhere;
 }
 
+.event-detail-page .race-guide-fact-card strong a {
+  color: inherit;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.18em;
+}
+
+.event-detail-page .race-guide-fact-card strong a:hover,
+.event-detail-page .race-guide-fact-card strong a:focus-visible {
+  color: #86efac;
+}
+
 .race-guide-fact-card.is-highlight,
 .race-guide-highlight {
   border-color: rgba(134, 239, 172, 0.36);

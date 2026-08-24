@@ -35,10 +35,6 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   clean(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY || configFallback.key);
 
-if (!SUPABASE_URL || !SUPABASE_KEY) {
-  throw new Error("Missing SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.");
-}
-
 async function supabaseGet(table, query = "") {
   const url =
     `${SUPABASE_URL}/rest/v1/${table}${query}`;
@@ -98,7 +94,54 @@ function byDetailId(rows = []) {
   }, new Map());
 }
 
+function buildExportRecord(detail, groups) {
+  const id = detail.id;
+  const knowledgeScope = clean(detail.knowledge_scope) || "edition";
+  const scopedVerification = {
+    status: detail.verification_status,
+    last_verified_at: detail.last_checked
+  };
+  const row = {
+    event_slug: detail.event_slug,
+    event_brand_id: detail.event_brand_id || undefined,
+    edition_id: detail.edition_id || undefined,
+    knowledge_scope: knowledgeScope,
+    verification_status: detail.verification_status,
+    last_checked: detail.last_checked,
+    verification: {
+      brand: knowledgeScope === "brand" ? scopedVerification : undefined,
+      edition: knowledgeScope === "edition" ? scopedVerification : undefined
+    },
+    basis: stripSystemFields(detail),
+    registration: stripSystemFields(groups.registration.get(id)?.[0]),
+    course: stripSystemFields(groups.course.get(id)?.[0]),
+    race_day: stripSystemFields(groups.race_day.get(id)?.[0]),
+    travel: stripSystemFields(groups.travel.get(id)?.[0]),
+    weather: stripSystemFields(groups.weather.get(id)?.[0]),
+    statistics: stripSystemFields(groups.statistics.get(id)?.[0]),
+    editorial: stripSystemFields(groups.editorial.get(id)?.[0]),
+    sources: (groups.sources.get(id) || []).map(stripSystemFields),
+    faq: (groups.faq.get(id) || []).map(stripSystemFields)
+  };
+
+  delete row.basis.event_slug;
+  delete row.basis.event_brand_id;
+  delete row.basis.edition_id;
+  delete row.basis.knowledge_scope;
+  delete row.basis.verification_status;
+  delete row.basis.last_checked;
+  // Organizer is a canonical event-brand fact. It is exported through
+  // public_event_discovery/public_event_archive and not duplicated in Wiki data.
+  delete row.basis.organizer;
+
+  return row;
+}
+
 async function main() {
+  if (!SUPABASE_URL || !SUPABASE_KEY) {
+    throw new Error("Missing SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.");
+  }
+
   const details =
     await supabaseGet(
       "event_details",
@@ -139,33 +182,7 @@ async function main() {
     faq: byDetailId(faq)
   };
 
-  const exported =
-    details.map(detail => {
-      const id =
-        detail.id;
-
-      const row = {
-        event_slug: detail.event_slug,
-        verification_status: detail.verification_status,
-        last_checked: detail.last_checked,
-        basis: stripSystemFields(detail),
-        registration: stripSystemFields(groups.registration.get(id)?.[0]),
-        course: stripSystemFields(groups.course.get(id)?.[0]),
-        race_day: stripSystemFields(groups.race_day.get(id)?.[0]),
-        travel: stripSystemFields(groups.travel.get(id)?.[0]),
-        weather: stripSystemFields(groups.weather.get(id)?.[0]),
-        statistics: stripSystemFields(groups.statistics.get(id)?.[0]),
-        editorial: stripSystemFields(groups.editorial.get(id)?.[0]),
-        sources: (groups.sources.get(id) || []).map(stripSystemFields),
-        faq: (groups.faq.get(id) || []).map(stripSystemFields)
-      };
-
-      delete row.basis.event_slug;
-      delete row.basis.verification_status;
-      delete row.basis.last_checked;
-
-      return row;
-    });
+  const exported = details.map(detail => buildExportRecord(detail, groups));
 
   if (!exported.length && fs.existsSync(OUTPUT_PATH)) {
     const existing =
@@ -191,7 +208,16 @@ async function main() {
   console.log(`Exported ${exported.length} public Event Knowledge record(s) to ${path.relative(ROOT, OUTPUT_PATH)}.`);
 }
 
-main().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  buildExportRecord,
+  byDetailId,
+  main,
+  stripSystemFields
+};

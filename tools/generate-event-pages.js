@@ -1582,8 +1582,9 @@ function mapScript(event) {
   </script>`;
 }
 
-function buildSchema(event, canonicalUrl, detailRows = []) {
-  const website = safeWebsite(event.event_url);
+function buildSchema(event, canonicalUrl, detailRows = [], richDetails = null) {
+  const website = getOfficialEventWebsite(event, richDetails);
+  const organizer = resolveOrganizer(event, richDetails);
   const offers =
     detailRows
       .map(row => {
@@ -1625,11 +1626,11 @@ function buildSchema(event, canonicalUrl, detailRows = []) {
         addressCountry: clean(event.country)
       }
     },
-    organizer: website
+    organizer: organizer
       ? {
           "@type": "Organization",
-          name: clean(event.event_name),
-          url: website
+          name: organizer.name,
+          url: organizer.url || undefined
         }
       : undefined,
     offers: offers.length
@@ -1655,6 +1656,162 @@ function firstUsefulValue(...values) {
   }
 
   return "";
+}
+
+function getBrandDetails(richDetails = null) {
+  if (richDetails && richDetails.brand) {
+    return richDetails.brand;
+  }
+
+  // Compatibility for the ten pre-foundation pilot records. New exports use
+  // events.* for brand facts and must not add further organizer copies here.
+  return getRichDetailsSection(richDetails, "basis");
+}
+
+function resolveOrganizer(event, richDetails = null) {
+  const brand = getBrandDetails(richDetails);
+  const name = firstUsefulValue(
+    event.organizer_name,
+    brand.organizer_name,
+    brand.organizer
+  );
+
+  if (!name) {
+    return null;
+  }
+
+  return {
+    name: clean(name),
+    url: safeWebsite(firstUsefulValue(event.organizer_url, brand.organizer_url))
+  };
+}
+
+function getOfficialEventWebsite(event, richDetails = null) {
+  const brand = getBrandDetails(richDetails);
+  return safeWebsite(firstUsefulValue(
+    event.official_url,
+    brand.official_website,
+    event.event_url
+  ));
+}
+
+function getVerificationContext(event, richDetails = null) {
+  const detailsVerification =
+    richDetails && richDetails.verification && typeof richDetails.verification === "object"
+      ? richDetails.verification
+      : {};
+  const brand = detailsVerification.brand || {};
+  const edition = detailsVerification.edition || {};
+
+  return {
+    brand: {
+      status: clean(firstUsefulValue(
+        event.brand_verification_status,
+        brand.status,
+        brand.verification_status
+      )),
+      lastVerifiedAt: clean(firstUsefulValue(
+        event.brand_last_verified_at,
+        brand.last_verified_at,
+        brand.last_checked
+      ))
+    },
+    edition: {
+      status: clean(firstUsefulValue(
+        event.edition_verification_status,
+        edition.status,
+        edition.verification_status,
+        richDetails && richDetails.verification_status
+      )),
+      lastVerifiedAt: clean(firstUsefulValue(
+        event.edition_last_verified_at,
+        edition.last_verified_at,
+        edition.last_checked,
+        richDetails && richDetails.last_checked,
+        event.last_checked
+      ))
+    }
+  };
+}
+
+function parseEventDate(value) {
+  const text = clean(value);
+  const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
+  const german = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+
+  if (iso) {
+    return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  }
+
+  if (german) {
+    return `${german[3]}-${german[2]}-${german[1]}`;
+  }
+
+  return "";
+}
+
+function formatVerificationDate(value, language = "en") {
+  const isoDate = parseEventDate(value);
+  if (!isoDate) {
+    return clean(value);
+  }
+
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function renderVerificationDate(value) {
+  const isoDate = parseEventDate(value);
+  if (!isoDate) {
+    return escapeHtml(clean(value));
+  }
+
+  return `<time datetime="${isoDate}" data-detail-verification-date="${isoDate}">${escapeHtml(formatVerificationDate(isoDate))}</time>`;
+}
+
+function isFutureEdition(event, now = new Date()) {
+  const isoDate = parseEventDate(event.date);
+  if (isoDate) {
+    const eventTime = Date.parse(`${isoDate}T00:00:00Z`);
+    if (Number.isFinite(eventTime)) {
+      return eventTime > now.getTime();
+    }
+  }
+
+  const year = Number(event.edition_year || getEventYear(event));
+  return Number.isInteger(year) && year > now.getUTCFullYear();
+}
+
+function editionFallbackKey(event) {
+  return isFutureEdition(event)
+    ? "detail.notOfficiallyConfirmed"
+    : "detail.tba";
+}
+
+function getRegistrationStatus(event, richDetails = null, detailRows = []) {
+  const registration = getRichDetailsSection(richDetails, "registration");
+  const rawStatus = firstUsefulValue(
+    registration.registration_status,
+    detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "),
+    event.registration_status,
+    event.verification_status
+  );
+  const normalized = clean(rawStatus).toLowerCase().replace(/\s+/g, "_");
+
+  if (!rawStatus || normalized === "unknown" || normalized === "unclear" || normalized === "unverified") {
+    return isFutureEdition(event)
+      ? detailTranslation("detail.notOfficiallyConfirmed")
+      : detailTranslation("detail.unknown");
+  }
+
+  return /^[a-z_]+$/i.test(clean(rawStatus))
+    ? normalizeStatus(rawStatus)
+    : clean(rawStatus);
 }
 
 function detailText(value, fallback = "Not yet verified") {
@@ -2191,7 +2348,10 @@ const DETAIL_TRANSLATIONS = {
     "detail.saveUnavailable": "Could not save this event right now.",
     "detail.removeUnavailable": "Could not remove this event right now.",
     "detail.officialWebsite": "Official website",
+    "detail.openOfficialWebsite": "Open official website",
     "detail.verifyOrganizer": "Verify final race details on the official organizer website before booking or registering.",
+    "detail.event": "Event",
+    "detail.edition": "Edition",
     "detail.overview": "Overview",
     "detail.keyFacts": "Key Facts",
     "detail.registration": "Registration",
@@ -2218,6 +2378,8 @@ const DETAIL_TRANSLATIONS = {
     "detail.participants": "Participants",
     "detail.organizer": "Organizer",
     "detail.lastChecked": "Last checked",
+    "detail.brandLastChecked": "Brand facts checked",
+    "detail.editionLastChecked": "Edition checked",
     "detail.registrationPeriod": "Registration period",
     "detail.deadline": "Deadline",
     "detail.feeTiers": "Fee tiers",
@@ -2278,6 +2440,8 @@ const DETAIL_TRANSLATIONS = {
     "detail.sourceType": "Source type",
     "detail.needsReview": "Needs review",
     "detail.notVerified": "Not verified",
+    "detail.notOfficiallyConfirmed": "Not yet officially confirmed",
+    "detail.unknown": "Unknown",
     "detail.tba": "TBA"
   },
   de: {
@@ -2294,7 +2458,10 @@ const DETAIL_TRANSLATIONS = {
     "detail.saveUnavailable": "Dieses Event konnte gerade nicht gespeichert werden.",
     "detail.removeUnavailable": "Dieses Event konnte gerade nicht entfernt werden.",
     "detail.officialWebsite": "Offizielle Website",
+    "detail.openOfficialWebsite": "Offizielle Website \u00f6ffnen",
     "detail.verifyOrganizer": "Pr\u00fcfe finale Renndetails vor Buchung oder Anmeldung immer auf der offiziellen Veranstalterseite.",
+    "detail.event": "Veranstaltung",
+    "detail.edition": "Ausgabe",
     "detail.overview": "\u00dcbersicht",
     "detail.keyFacts": "Key Facts",
     "detail.registration": "Anmeldung",
@@ -2321,6 +2488,8 @@ const DETAIL_TRANSLATIONS = {
     "detail.participants": "Teilnehmende",
     "detail.organizer": "Veranstalter",
     "detail.lastChecked": "Zuletzt gepr\u00fcft",
+    "detail.brandLastChecked": "Brand-Daten gepr\u00fcft",
+    "detail.editionLastChecked": "Ausgabe gepr\u00fcft",
     "detail.registrationPeriod": "Anmeldezeitraum",
     "detail.deadline": "Deadline",
     "detail.feeTiers": "Preisphasen",
@@ -2381,6 +2550,8 @@ const DETAIL_TRANSLATIONS = {
     "detail.sourceType": "Quellentyp",
     "detail.needsReview": "Zu pr\u00fcfen",
     "detail.notVerified": "Nicht best\u00e4tigt",
+    "detail.notOfficiallyConfirmed": "Noch nicht offiziell best\u00e4tigt",
+    "detail.unknown": "Unbekannt",
     "detail.tba": "TBA"
   }
 };
@@ -2462,6 +2633,19 @@ function buildDetailI18nScript() {
           var key = element.getAttribute("data-detail-i18n-label");
           if (labels[key]) {
             element.setAttribute("data-label", labels[key]);
+          }
+        });
+
+        document.querySelectorAll("[data-detail-verification-date]").forEach(function (element) {
+          var value = element.getAttribute("data-detail-verification-date");
+          var parts = value ? value.split("-").map(Number) : [];
+          if (parts.length === 3 && parts.every(Number.isFinite)) {
+            element.textContent = new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC"
+            }).format(new Date(Date.UTC(parts[0], parts[1] - 1, parts[2])));
           }
         });
 
@@ -2670,7 +2854,7 @@ function renderFactCard(iconName, labelKey, value, options = {}) {
         <article class="race-guide-fact-card ${options.tone ? `is-${options.tone}` : ""}">
           ${detailIcon(iconName)}
           <span>${detailLabel(labelKey)}</span>
-          <strong ${fullText && display !== fullText ? `title="${escapeHtml(fullText)}"` : ""}>${useful ? escapeHtml(display) : detailFallback(options.fallbackKey)}</strong>
+          <strong ${fullText && display !== fullText ? `title="${escapeHtml(fullText)}"` : ""}>${useful ? options.html || escapeHtml(display) : detailFallback(options.fallbackKey)}</strong>
         </article>`;
 }
 
@@ -2789,17 +2973,6 @@ function renderTable(headers, rows, className = "") {
           </tbody>
         </table>
       </div>`;
-}
-
-function getRegistrationStatus(event, richDetails = null, detailRows = []) {
-  const registration =
-    getRichDetailsSection(richDetails, "registration");
-
-  return firstUsefulValue(
-    registration.registration_status,
-    detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "),
-    normalizeStatus(event.verification_status)
-  );
 }
 
 function parseStartWaves(raceDay = {}) {
@@ -3245,9 +3418,45 @@ function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website
     </section>`;
 }
 
+function buildRaceGuideEventBrand(event, richDetails = null) {
+  const organizer = resolveOrganizer(event, richDetails);
+  const officialWebsite = getOfficialEventWebsite(event, richDetails);
+  const cards = [
+    organizer
+      ? renderFactCard("check", "detail.organizer", organizer.name, {
+          html: organizer.url
+            ? `<a href="${organizer.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(organizer.name)}</a>`
+            : escapeHtml(organizer.name)
+        })
+      : "",
+    officialWebsite
+      ? renderFactCard("external", "detail.officialWebsite", officialWebsite, {
+          html: `<a href="${officialWebsite}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr("detail.openOfficialWebsite")}>${escapeHtml(detailTranslation("detail.openOfficialWebsite"))}</a>`
+        })
+      : ""
+  ].filter(Boolean).join("");
+
+  if (!cards) {
+    return "";
+  }
+
+  return `
+    <section id="event-brand" class="event-detail-card race-guide-section event-brand-section">
+      ${sectionHeading("detail.event", "detail.event")}
+      <div class="race-guide-fact-grid is-tight">${cards}</div>
+    </section>`;
+}
+
+function buildEditionSectionHeading(event) {
+  const year = clean(event.edition_year || getEventYear(event));
+  return `
+      <div class="race-guide-section-heading">
+        <span ${detailI18nAttr("detail.overview")}>${escapeHtml(detailTranslation("detail.overview"))}</span>
+        <h2><span ${detailI18nAttr("detail.edition")}>${escapeHtml(detailTranslation("detail.edition"))}</span>${year ? ` ${escapeHtml(year)}` : ""}</h2>
+      </div>`;
+}
+
 function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, statusLabel = "") {
-  const basis =
-    getRichDetailsSection(richDetails, "basis");
   const registration =
     getRichDetailsSection(richDetails, "registration");
   const course =
@@ -3273,45 +3482,48 @@ function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, stat
       raceDay.start_time,
       detailRows.map(row => clean(row.start_time)).filter(hasUsefulValue).join(" / ")
     );
+  const verification = getVerificationContext(event, richDetails);
+  const lastChecked = verification.edition.lastVerifiedAt;
+  const fallbackKey = editionFallbackKey(event);
+  const date = clean(event.event_status).toLowerCase() === "date_unconfirmed"
+    ? ""
+    : event.date;
+  const distance = firstUsefulValue(
+    course.main_distance,
+    course.distances,
+    formatDistanceSummary(event.distance)
+  );
 
   return `
     <section id="key-facts" class="event-detail-card race-guide-section race-guide-key-facts-section">
-      ${sectionHeading("detail.overview", "detail.keyFacts")}
+      ${buildEditionSectionHeading(event)}
       <div class="race-guide-fact-grid">
-        ${renderFactCard("calendar", "detail.date", event.date, { always: true })}
+        ${renderFactCard("calendar", "detail.date", date, { always: true, fallbackKey })}
         ${renderFactCard("location", "detail.location", `${clean(event.city)}, ${clean(event.country)}`, { always: true })}
         ${renderFactCard("sport", "detail.sport", event.sport, { always: true })}
-        ${renderFactCard("distance", "detail.distance", firstUsefulValue(course.main_distance, course.distances, formatDistanceSummary(event.distance)), { always: true })}
+        ${renderFactCard("distance", "detail.distance", distance, { always: true, fallbackKey })}
         ${renderFactCard("clock", "detail.startTime", startTime)}
         ${renderFactCard("clock", "detail.cutoff", cutoff, { kind: "cutoff" })}
         ${renderFactCard("mountain", "detail.elevation", elevation, { kind: "elevation" })}
         ${renderFactCard("fee", "detail.entryFee", getPriceSummary(registration, detailRows))}
         ${renderFactCard("sport", "detail.participants", firstUsefulValue(statistics.participant_count, statistics.finisher_count), { kind: "participants" })}
         ${renderFactCard("status", "detail.status", firstUsefulValue(registration.registration_status, statusLabel), { kind: "status" })}
-        ${renderFactCard("check", "detail.organizer", firstUsefulValue(basis.organizer, event.data_source))}
-        ${renderFactCard("check", "detail.lastChecked", formatLastChecked(firstUsefulValue(richDetails && richDetails.last_checked, event.last_checked)))}
+        ${renderFactCard("check", "detail.lastChecked", lastChecked, {
+          html: lastChecked ? renderVerificationDate(lastChecked) : ""
+        })}
       </div>
     </section>`;
 }
 
 function formatLastChecked(value) {
-  const text =
-    clean(value);
-  const iso =
-    text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-
-  if (iso) {
-    return `${iso[3]}.${iso[2]}.${iso[1]}`;
-  }
-
-  return text;
+  return formatVerificationDate(value);
 }
 
 function buildRaceGuideRegistration(event, detailRows = [], richDetails = null, website = "") {
   const registration =
     getRichDetailsSection(richDetails, "registration");
   const registrationUrl =
-    safeWebsite(registration.official_registration_url || registration.registration_url || event.source_url || event.event_url || website);
+    safeWebsite(registration.official_registration_url || registration.registration_url || event.registration_url);
   const feeRows =
     getFeeRows(registration, detailRows);
   const period =
@@ -3320,7 +3532,11 @@ function buildRaceGuideRegistration(event, detailRows = [], richDetails = null, 
       registration.registration_close_date
     ].filter(hasUsefulValue).map(formatDetailDate).join(" – ");
   const blocks = [
-    renderRegistrationStatusCard(firstUsefulValue(registration.registration_status, detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "))),
+    renderRegistrationStatusCard(firstUsefulValue(
+      registration.registration_status,
+      detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "),
+      getRegistrationStatus(event, richDetails, detailRows)
+    )),
     renderFactCard("calendar", "detail.registrationPeriod", period, { tone: "registration-period" }),
     renderFactCard("calendar", "detail.deadline", formatDetailDate(firstUsefulValue(registration.registration_close_date, registration.registration_deadline)), { kind: "date", tone: "registration-deadline" }),
     renderFactCard("fee", "detail.entryFee", getPriceSummary(registration, detailRows)),
@@ -3651,22 +3867,24 @@ function buildRaceGuideSources(event, richDetails = null) {
       ? richDetails.sources.filter(source => safeWebsite(source.source_url || source.url))
       : [];
   const website =
-    safeWebsite(event.event_url);
+    getOfficialEventWebsite(event, richDetails);
   const fallbackSources =
     website && !sources.length
       ? [{
           source_url: website,
           source_type: "official",
-          source_label: "Official event website",
-          last_verified: event.last_checked || ""
+          source_label: "Official event website"
         }]
       : sources;
-  const status =
-    clean((richDetails && richDetails.verification_status) || event.verification_status);
-  const lastChecked =
-    formatLastChecked((richDetails && richDetails.last_checked) || event.last_checked);
+  const verification = getVerificationContext(event, richDetails);
+  const status = verification.edition.status;
+  const lastChecked = verification.edition.lastVerifiedAt;
+  const brandLastChecked = verification.brand.lastVerifiedAt;
   const verificationBadges = [
-    lastChecked ? `<span class="event-detail-badge verified">${detailLabel("detail.lastChecked")}: ${escapeHtml(lastChecked)}</span>` : "",
+    lastChecked ? `<span class="event-detail-badge verified">${detailLabel("detail.lastChecked")}: ${renderVerificationDate(lastChecked)}</span>` : "",
+    brandLastChecked && parseEventDate(brandLastChecked) !== parseEventDate(lastChecked)
+      ? `<span class="event-detail-badge reference">${detailLabel("detail.brandLastChecked")}: ${renderVerificationDate(brandLastChecked)}</span>`
+      : "",
     status ? `<span class="event-detail-badge reference">${detailLabel("detail.verification")}: ${escapeHtml(status.replace(/_/g, " "))}</span>` : ""
   ].join("");
 
@@ -3683,7 +3901,7 @@ function buildRaceGuideSources(event, richDetails = null) {
           ${fallbackSources.map(source => `
             <a href="${safeWebsite(source.source_url || source.url)}" target="_blank" rel="noopener noreferrer">
               <strong>${escapeHtml(source.source_label || source.source_type || "Official source")}</strong>
-              <span>${escapeHtml(source.source_type || "source")}${source.last_verified ? ` &middot; ${escapeHtml(formatLastChecked(source.last_verified))}` : ""}</span>
+              <span>${escapeHtml(source.source_type || "source")}${source.last_verified ? ` &middot; ${renderVerificationDate(source.last_verified)}` : ""}</span>
               ${source.verification_note ? `<em>${escapeHtml(source.verification_note)}</em>` : ""}
             </a>`).join("")}
         </div>` : ""}
@@ -3701,7 +3919,7 @@ function buildRaceGuideNavigation(sections) {
 function buildEventPage(event, slug, detailRows = [], knowledge = null, richDetails = null) {
   const year = getEventYear(event);
   const canonicalUrl = `${SITE_URL}/event/${slug}/`;
-  const website = safeWebsite(event.event_url);
+  const website = getOfficialEventWebsite(event, richDetails);
   const eventKey = [
     event.event_name,
     event.date,
@@ -3711,11 +3929,17 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   const metaDescription =
     clean(richDetails && richDetails.editorial && richDetails.editorial.seo_summary) ||
     `${clean(event.event_name)} in ${clean(event.city)}, ${clean(event.country)}. View date, distance, registration status and official organizer link.`;
-  const statusLabel = normalizeStatus(event.verification_status);
+  const statusLabel = getRegistrationStatus(event, richDetails, detailRows);
   const hero =
     buildRaceGuideHero(event, richDetails, statusLabel, website);
   const sections =
     [
+      {
+        id: "event-brand",
+        icon: "check",
+        labelKey: "detail.event",
+        html: buildRaceGuideEventBrand(event, richDetails)
+      },
       {
         id: "key-facts",
         icon: "info",
@@ -3802,7 +4026,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260725-detail-content-v90" />
+  <link rel="stylesheet" href="../../css/style.css?v=20260824-detail-verification-v97" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,
@@ -3813,7 +4037,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
       overflow-y: auto !important;
     }
   </style>
-  <script type="application/ld+json">${buildSchema(event, canonicalUrl, detailRows)}</script>
+  <script type="application/ld+json">${buildSchema(event, canonicalUrl, detailRows, richDetails)}</script>
 </head>
 <body class="event-detail-page">
   <main class="event-detail-shell">
@@ -3914,9 +4138,16 @@ function main() {
       richEventDetails.get(slug) || null;
     const pageDir = path.join(EVENT_DIR, slug);
     fs.mkdirSync(pageDir, { recursive: true });
+    const pageHtml = buildEventPage(
+      event,
+      slug,
+      eventCategoryDetails,
+      knowledge,
+      richDetails
+    ).replace(/[ \t]+$/gm, "");
     fs.writeFileSync(
       path.join(pageDir, "index.html"),
-      buildEventPage(event, slug, eventCategoryDetails, knowledge, richDetails),
+      pageHtml,
       "utf8"
     );
 
@@ -3944,7 +4175,28 @@ function main() {
   console.log(`Generated ${manifest.length} event detail page(s).`);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  buildEventPage,
+  buildRaceGuideEventBrand,
+  buildRaceGuideKeyFacts,
+  buildRaceGuideRegistration,
+  buildRaceGuideSources,
+  buildSchema,
+  createSlug,
+  editionFallbackKey,
+  formatVerificationDate,
+  getOfficialEventWebsite,
+  getRegistrationStatus,
+  getVerificationContext,
+  isFutureEdition,
+  main,
+  parseEventDate,
+  resolveOrganizer
+};
 
 
 

@@ -104,6 +104,7 @@ Die bereits dokumentierte fachliche Zuordnung bleibt unverändert:
 8. `20260820_stage_four_observation_operational_alerts`
 9. `20260821_stage_four_observation_lint_fixes`
 10. `20260822_stage_four_observation_queue_lint`
+11. `20260824_event_detail_verification_foundation`
 
 Die bereits aktive Migration
 `20260817121601_data_quality_stabilization` bleibt in der Historie erhalten und

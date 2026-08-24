@@ -6,7 +6,11 @@ const ROOT = path.resolve(__dirname, "..");
 const COLUMNS = [
   "event_name", "sport", "date", "city", "country", "address", "latitude", "longitude",
   "distance", "description", "event_url", "data_source", "source_url", "verification_status",
-  "priority", "check_frequency", "last_checked", "next_check", "source_note", "image"
+  "priority", "check_frequency", "last_checked", "next_check", "source_note", "image",
+  "event_id", "edition_id", "edition_year", "edition_slug", "brand_slug", "organizer_name",
+  "organizer_url", "official_url", "registration_url", "registration_status", "event_status",
+  "brand_verification_status", "brand_last_verified_at", "edition_verification_status",
+  "edition_last_verified_at", "race_formats"
 ];
 
 function clean(value) {
@@ -108,6 +112,62 @@ function sha256(content) {
   return crypto.createHash("sha256").update(content).digest("hex");
 }
 
+function jsonCell(value) {
+  if (value === null || value === undefined || value === "") return "";
+  return typeof value === "string" ? value : JSON.stringify(value);
+}
+
+function mapDiscoveryRow(row, exportedAt) {
+  const editionLastVerifiedAt =
+    row.edition_last_verified_at || row.last_checked || null;
+
+  return {
+    event_name: row.event_name,
+    sport: row.sport,
+    date: row.date,
+    city: row.city,
+    country: row.country,
+    address: row.address,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    distance: row.distance,
+    description: row.description,
+    event_url: row.event_url,
+    data_source: "Supabase public_event_discovery export",
+    source_url: row.source_url,
+    // Legacy CSV readers use this column for the public registration state.
+    // The explicit columns below preserve verification and registration as
+    // separate concepts for detail pages and future clients.
+    verification_status: row.registration_status === "unknown"
+      ? "unclear"
+      : (row.registration_status || "unclear"),
+    priority: row.priority,
+    check_frequency: "",
+    // This is an edition verification time from the database. It must never be
+    // populated from exportedAt, updated_at or the static-page build time.
+    last_checked: editionLastVerifiedAt,
+    next_check: row.next_check,
+    source_note: `Generated fallback export ${exportedAt}`,
+    image: row.image,
+    event_id: row.event_id,
+    edition_id: row.edition_id,
+    edition_year: row.edition_year,
+    edition_slug: row.edition_slug,
+    brand_slug: row.slug,
+    organizer_name: row.organizer_name,
+    organizer_url: row.organizer_url,
+    official_url: row.official_url,
+    registration_url: row.registration_url,
+    registration_status: row.registration_status,
+    event_status: row.event_status,
+    brand_verification_status: row.brand_verification_status,
+    brand_last_verified_at: row.brand_last_verified_at,
+    edition_verification_status: row.edition_verification_status || row.verification_status,
+    edition_last_verified_at: editionLastVerifiedAt,
+    race_formats: jsonCell(row.race_formats)
+  };
+}
+
 async function requestPage(url, key, view, offset, limit) {
   const response = await fetch(`${url}/rest/v1/${view}?select=*&order=edition_slug.asc&offset=${offset}&limit=${limit}`, {
     headers: { apikey: key }
@@ -144,32 +204,7 @@ async function main() {
   if (archiveRows.length < 900) throw new Error(`Refusing to replace the archive with only ${archiveRows.length} public editions.`);
 
   const exportedAt = new Date().toISOString();
-  const mapped = rows.map(row => ({
-    event_name: row.event_name,
-    sport: row.sport,
-    date: row.date,
-    city: row.city,
-    country: row.country,
-    address: row.address,
-    latitude: row.latitude,
-    longitude: row.longitude,
-    distance: row.distance,
-    description: row.description,
-    event_url: row.event_url,
-    data_source: "Supabase public_event_discovery export",
-    source_url: row.source_url,
-    // Legacy CSV readers use this column for the public registration state.
-    // The JSON archive preserves registration_status and verification_status separately.
-    verification_status: row.registration_status === "unknown"
-      ? "unclear"
-      : (row.registration_status || "unclear"),
-    priority: row.priority,
-    check_frequency: "",
-    last_checked: row.last_checked,
-    next_check: row.next_check,
-    source_note: `Generated fallback export ${exportedAt}`,
-    image: row.image
-  }));
+  const mapped = rows.map(row => mapDiscoveryRow(row, exportedAt));
   const output = [COLUMNS.join(";"), ...mapped.map(row => COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
   const archiveOutput = `${JSON.stringify({ exported_at: exportedAt, editions: archiveRows }, null, 2)}\n`;
   const metrics = buildExportMetrics(rows, archiveRows, exportedAt);
@@ -205,6 +240,7 @@ module.exports = {
   buildExportMetrics,
   isCompleteDiscoveryRow,
   isFreshDiscoveryRow,
+  mapDiscoveryRow,
   main,
   percentage,
   readPublicRuntimeConfig,

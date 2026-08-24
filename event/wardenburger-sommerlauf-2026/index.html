@@ -17,7 +17,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260725-detail-content-v90" />
+  <link rel="stylesheet" href="../../css/style.css?v=20260824-detail-verification-v97" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,
@@ -44,11 +44,6 @@
       "addressLocality": "Wardenburg",
       "addressCountry": "Germany"
     }
-  },
-  "organizer": {
-    "@type": "Organization",
-    "name": "Wardenburger Sommerlauf",
-    "url": "http://www.wardenburger-sommerlauf.de/"
   }
 }</script>
 </head>
@@ -60,7 +55,7 @@
         <img class="brand-icon" src="../../assets/brand/sport-event-map-icon.svg" alt="" aria-hidden="true" />
         <span class="brand-name">Sport Event Map</span>
       </a>
-      
+
       <label class="event-detail-language-control">
         <span data-detail-i18n="detail.language">Language</span>
         <select id="eventDetailLanguageSelect" aria-label="Language">
@@ -70,7 +65,7 @@
       </label>
     </header>
 
-    
+
     <section class="event-detail-hero race-guide-hero">
       <div class="event-detail-hero-main">
         <span class="event-detail-kicker">Running</span>
@@ -90,9 +85,10 @@
       </div>
     </section>
 
-    
+
     <nav class="event-detail-tabs race-guide-tabs" aria-label="Event detail sections">
-      
+
+        <a href="#event-brand" data-detail-section="event-brand"><span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m4 12 5 5L20 6"/></svg></span><span data-detail-i18n="detail.event">Event</span></a>
         <a href="#key-facts" data-detail-section="key-facts"><span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="M12 11v5M12 8h.01"/></svg></span><span data-detail-i18n="detail.keyFacts">Key Facts</span></a>
         <a href="#registration" data-detail-section="registration"><span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 7h8M8 12h7M8 17h5"/><path d="M17 4H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/></svg></span><span data-detail-i18n="detail.registration">Registration</span></a>
         <a href="#course" data-detail-section="course"><span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 17c3-8 13 0 16-8"/><path d="M4 17h4M16 9h4"/></svg></span><span data-detail-i18n="detail.course">Course</span></a>
@@ -100,81 +96,94 @@
         <a href="#sources" data-detail-section="sources"><span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m4 12 5 5L20 6"/></svg></span><span data-detail-i18n="detail.sources">Sources</span></a>
     </nav>
 
-    
+
+    <section id="event-brand" class="event-detail-card race-guide-section event-brand-section">
+
+      <div class="race-guide-section-heading">
+        <span data-detail-i18n="detail.event">Event</span>
+        <h2 data-detail-i18n="detail.event">Event</h2>
+
+      </div>
+      <div class="race-guide-fact-grid is-tight">
+        <article class="race-guide-fact-card ">
+          <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M14 5h5v5M19 5l-8 8"/><path d="M17 13v5a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1h5"/></svg></span>
+          <span><span data-detail-i18n="detail.officialWebsite">Official website</span></span>
+          <strong ><a href="http://www.wardenburger-sommerlauf.de/" target="_blank" rel="noopener noreferrer" data-detail-i18n="detail.openOfficialWebsite">Open official website</a></strong>
+        </article></div>
+    </section>
     <section id="key-facts" class="event-detail-card race-guide-section race-guide-key-facts-section">
-      
+
       <div class="race-guide-section-heading">
         <span data-detail-i18n="detail.overview">Overview</span>
-        <h2 data-detail-i18n="detail.keyFacts">Key Facts</h2>
-        
+        <h2><span data-detail-i18n="detail.edition">Edition</span> 2026</h2>
       </div>
       <div class="race-guide-fact-grid">
-        
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M7 2v3M17 2v3M3.5 9h17M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v13A1.5 1.5 0 0 1 19 20.5H5A1.5 1.5 0 0 1 3.5 19V6A1.5 1.5 0 0 1 5 4.5Z"/></svg></span>
           <span><span data-detail-i18n="detail.date">Date</span></span>
           <strong >06.09.2026</strong>
         </article>
-        
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"/><circle cx="12" cy="10" r="2.2"/></svg></span>
           <span><span data-detail-i18n="detail.location">Location</span></span>
           <strong >Wardenburg, Germany</strong>
         </article>
-        
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M8 20 11 4l5 16M9 14h6"/></svg></span>
           <span><span data-detail-i18n="detail.sport">Sport</span></span>
           <strong >Running</strong>
         </article>
-        
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 17c3-8 13 0 16-8"/><path d="M4 17h4M16 9h4"/></svg></span>
           <span><span data-detail-i18n="detail.distance">Distance</span></span>
           <strong >5 km / 10 km</strong>
         </article>
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="m9 12 2 2 4-5"/></svg></span>
           <span><span data-detail-i18n="detail.status">Status</span></span>
           <strong >Verified</strong>
         </article>
-        
-        <article class="race-guide-fact-card ">
-          <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m4 12 5 5L20 6"/></svg></span>
-          <span><span data-detail-i18n="detail.organizer">Organizer</span></span>
-          <strong >Supabase public_event_discovery export</strong>
-        </article>
-        
+
         <article class="race-guide-fact-card ">
           <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="m4 12 5 5L20 6"/></svg></span>
           <span><span data-detail-i18n="detail.lastChecked">Last checked</span></span>
-          <strong >2026-06-17T00:00:00+00:00</strong>
+          <strong ><time datetime="2026-06-17" data-detail-verification-date="2026-06-17">17 June 2026</time></strong>
         </article>
       </div>
     </section>
     <section id="registration" class="event-detail-card race-guide-section">
-      
+
       <div class="race-guide-section-heading">
         <span data-detail-i18n="detail.registration">Registration</span>
         <h2 data-detail-i18n="detail.registration">Registration</h2>
-        
+
       </div>
-      <div class="race-guide-action-grid"><a class="race-guide-registration-link" href="http://www.wardenburger-sommerlauf.de/" target="_blank" rel="noopener noreferrer"><span data-detail-i18n="detail.openRegistration">Open registration</span></a></div>
-      
-      
+      <div class="race-guide-action-grid">
+        <article class="race-guide-registration-status">
+          <span class="event-detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="8"/><path d="m9 12 2 2 4-5"/></svg></span>
+          <span><span data-detail-i18n="detail.status">Status</span></span>
+          <strong>Verified</strong>
+
+        </article></div>
+
+
     </section>
     <section id="course" class="event-detail-card race-guide-section">
-      
+
       <div class="race-guide-section-heading">
         <span data-detail-i18n="detail.course">Course</span>
         <h2 data-detail-i18n="detail.course">Course</h2>
-        
+
       </div>
       <div class="race-guide-fact-grid is-tight">
         <article class="race-guide-fact-card ">
@@ -182,20 +191,20 @@
           <span><span data-detail-i18n="detail.distance">Distance</span></span>
           <strong >5 km / 10 km</strong>
         </article></div>
-      
-      
-      
+
+
+
     </section>
     <section id="logistics" class="event-detail-card race-guide-section">
-      
+
       <div class="race-guide-section-heading">
         <span data-detail-i18n="detail.logistics">Logistics</span>
         <h2 data-detail-i18n="detail.logistics">Logistics</h2>
-        
+
       </div>
-      
-      
-      
+
+
+
         <div class="race-guide-subsection">
           <h3><span data-detail-i18n="detail.eventLocation">Event location</span></h3>
           <div id="eventDetailMap" class="event-detail-map"></div>
@@ -203,29 +212,29 @@
         </div>
     </section>
     <section id="sources" class="event-detail-card race-guide-section event-sources-section is-subtle">
-      
+
       <div class="race-guide-section-heading">
         <span data-detail-i18n="detail.sources">Sources</span>
         <h2 data-detail-i18n="detail.sources">Sources</h2>
-        
+
       </div>
-      <div class="event-verification-strip"><span class="event-detail-badge verified"><span data-detail-i18n="detail.lastChecked">Last checked</span>: 2026-06-17T00:00:00+00:00</span><span class="event-detail-badge reference"><span data-detail-i18n="detail.verification">Verification</span>: verified</span></div>
-      
+      <div class="event-verification-strip"><span class="event-detail-badge verified"><span data-detail-i18n="detail.lastChecked">Last checked</span>: <time datetime="2026-06-17" data-detail-verification-date="2026-06-17">17 June 2026</time></span></div>
+
         <div class="event-source-list">
-          
+
             <a href="http://www.wardenburger-sommerlauf.de/" target="_blank" rel="noopener noreferrer">
               <strong>Official event website</strong>
-              <span>official &middot; 2026-06-17T00:00:00+00:00</span>
-              
+              <span>official</span>
+
             </a>
         </div>
     </section>
   </main>
-  
+
   <script>
     (function () {
       var storageKey = "sportEventMapLanguage";
-      var dictionary = {"en":{"detail.backToMap":"Back to map","detail.language":"Language","detail.favorite":"Save Favorite","detail.addSeason":"+ Add to Season","detail.addingSeason":"Adding…","detail.savedSeason":"✓ Added to Season","detail.removeSeason":"Remove from Season","detail.removingSeason":"Removing…","detail.addedSeason":"Added to your Season Planner.","detail.removedSeason":"Removed from your Season Planner.","detail.saveUnavailable":"Could not save this event right now.","detail.removeUnavailable":"Could not remove this event right now.","detail.officialWebsite":"Official website","detail.verifyOrganizer":"Verify final race details on the official organizer website before booking or registering.","detail.overview":"Overview","detail.keyFacts":"Key Facts","detail.registration":"Registration","detail.course":"Course","detail.raceDay":"Race Day","detail.performance":"Performance","detail.logistics":"Logistics","detail.weather":"Weather","detail.rules":"Rules","detail.faq":"FAQ","detail.sources":"Sources","detail.date":"Date","detail.location":"Location","detail.country":"Country","detail.city":"City","detail.sport":"Sport","detail.distance":"Distance","detail.eventType":"Event type","detail.status":"Status","detail.startTime":"Start time","detail.cutoff":"Cutoff","detail.elevation":"Elevation","detail.entryFee":"Entry fee","detail.participants":"Participants","detail.organizer":"Organizer","detail.lastChecked":"Last checked","detail.registrationPeriod":"Registration period","detail.deadline":"Deadline","detail.feeTiers":"Fee tiers","detail.tier":"Tier","detail.price":"Price","detail.until":"Until","detail.openRegistration":"Open registration","detail.courseProfile":"Course profile","detail.surface":"Surface","detail.routeType":"Route type","detail.mapGpx":"Map / GPX","detail.start":"Start","detail.finish":"Finish","detail.startWaves":"Start Waves","detail.wave":"Wave","detail.blocks":"Blocks / corral","detail.time":"Time","detail.cutoffTimes":"Cutoff Times","detail.point":"Point","detail.deadlineTime":"Deadline","detail.overallCutoff":"Overall Cutoff","detail.aidStations":"Aid Stations","detail.stationCount":"Stations","detail.supplies":"Supplies","detail.kilometer":"km","detail.details":"Details","detail.bibPickup":"Bib pickup","detail.expo":"Expo","detail.bagDrop":"Bag drop","detail.toilets":"Toilets","detail.medical":"Medical","detail.pacers":"Pacers","detail.records":"Records","detail.category":"Category","detail.name":"Name","detail.timeResult":"Time","detail.year":"Year","detail.finishers":"Finishers","detail.avgFinish":"Average finish","detail.dnfRate":"DNF rate","detail.winners":"Recent winners","detail.train":"Train","detail.airport":"Airport","detail.publicTransport":"Public transport","detail.parking":"Parking","detail.accommodation":"Accommodation","detail.travelNotes":"Travel notes","detail.eventLocation":"Event location","detail.approxLocation":"Approximate event location. Use organizer information for the exact start and access areas.","detail.minimumAge":"Minimum age","detail.qualification":"Qualification","detail.refundPolicy":"Refund policy","detail.transferPolicy":"Transfer policy","detail.mandatoryGear":"Mandatory gear","detail.medicalCertificate":"Medical certificate","detail.athleteGuide":"Athlete guide notes","detail.verification":"Verification","detail.sourceType":"Source type","detail.needsReview":"Needs review","detail.notVerified":"Not verified","detail.tba":"TBA"},"de":{"detail.backToMap":"Zurück zur Karte","detail.language":"Sprache","detail.favorite":"Favorit speichern","detail.addSeason":"+ Zur Saison hinzufügen","detail.addingSeason":"Wird hinzugefügt…","detail.savedSeason":"✓ Zur Saison hinzugefügt","detail.removeSeason":"Aus Saison entfernen","detail.removingSeason":"Wird entfernt…","detail.addedSeason":"Event wurde deinem Saisonplaner hinzugefügt.","detail.removedSeason":"Event wurde aus deinem Saisonplaner entfernt.","detail.saveUnavailable":"Dieses Event konnte gerade nicht gespeichert werden.","detail.removeUnavailable":"Dieses Event konnte gerade nicht entfernt werden.","detail.officialWebsite":"Offizielle Website","detail.verifyOrganizer":"Prüfe finale Renndetails vor Buchung oder Anmeldung immer auf der offiziellen Veranstalterseite.","detail.overview":"Übersicht","detail.keyFacts":"Key Facts","detail.registration":"Anmeldung","detail.course":"Strecke","detail.raceDay":"Renntag","detail.performance":"Performance","detail.logistics":"Logistik","detail.weather":"Wetter","detail.rules":"Regeln","detail.faq":"FAQ","detail.sources":"Quellen","detail.date":"Datum","detail.location":"Ort","detail.country":"Land","detail.city":"Stadt","detail.sport":"Sportart","detail.distance":"Distanz","detail.eventType":"Eventtyp","detail.status":"Status","detail.startTime":"Startzeit","detail.cutoff":"Cutoff","detail.elevation":"Höhenmeter","detail.entryFee":"Startgeld","detail.participants":"Teilnehmende","detail.organizer":"Veranstalter","detail.lastChecked":"Zuletzt geprüft","detail.registrationPeriod":"Anmeldezeitraum","detail.deadline":"Deadline","detail.feeTiers":"Preisphasen","detail.tier":"Phase","detail.price":"Preis","detail.until":"Bis","detail.openRegistration":"Anmeldung öffnen","detail.courseProfile":"Streckenprofil","detail.surface":"Untergrund","detail.routeType":"Streckentyp","detail.mapGpx":"Karte / GPX","detail.start":"Start","detail.finish":"Ziel","detail.startWaves":"Startwellen","detail.wave":"Welle","detail.blocks":"Blöcke / Corral","detail.time":"Zeit","detail.cutoffTimes":"Cutoff-Zeiten","detail.point":"Punkt","detail.deadlineTime":"Zeitlimit","detail.overallCutoff":"Gesamt-Cutoff","detail.aidStations":"Verpflegung","detail.stationCount":"Stationen","detail.supplies":"Angebot","detail.kilometer":"km","detail.details":"Details","detail.bibPickup":"Startunterlagen","detail.expo":"Expo","detail.bagDrop":"Kleiderbeutel","detail.toilets":"Toiletten","detail.medical":"Medical","detail.pacers":"Pacemaker","detail.records":"Rekorde","detail.category":"Kategorie","detail.name":"Name","detail.timeResult":"Zeit","detail.year":"Jahr","detail.finishers":"Finisher","detail.avgFinish":"Durchschnittszeit","detail.dnfRate":"DNF-Rate","detail.winners":"Letzte Sieger","detail.train":"Bahnhof","detail.airport":"Flughafen","detail.publicTransport":"ÖPNV","detail.parking":"Parken","detail.accommodation":"Unterkunft","detail.travelNotes":"Reisehinweise","detail.eventLocation":"Eventort","detail.approxLocation":"Ungefährer Eventort. Nutze Veranstalterinfos für genaue Start- und Zugangsbereiche.","detail.minimumAge":"Mindestalter","detail.qualification":"Qualifikation","detail.refundPolicy":"Erstattung","detail.transferPolicy":"Übertragung","detail.mandatoryGear":"Pflichtausrüstung","detail.medicalCertificate":"Ärztliches Attest","detail.athleteGuide":"Athlete-Guide-Hinweise","detail.verification":"Verifizierung","detail.sourceType":"Quellentyp","detail.needsReview":"Zu prüfen","detail.notVerified":"Nicht bestätigt","detail.tba":"TBA"}};
+      var dictionary = {"en":{"detail.backToMap":"Back to map","detail.language":"Language","detail.favorite":"Save Favorite","detail.addSeason":"+ Add to Season","detail.addingSeason":"Adding…","detail.savedSeason":"✓ Added to Season","detail.removeSeason":"Remove from Season","detail.removingSeason":"Removing…","detail.addedSeason":"Added to your Season Planner.","detail.removedSeason":"Removed from your Season Planner.","detail.saveUnavailable":"Could not save this event right now.","detail.removeUnavailable":"Could not remove this event right now.","detail.officialWebsite":"Official website","detail.openOfficialWebsite":"Open official website","detail.verifyOrganizer":"Verify final race details on the official organizer website before booking or registering.","detail.event":"Event","detail.edition":"Edition","detail.overview":"Overview","detail.keyFacts":"Key Facts","detail.registration":"Registration","detail.course":"Course","detail.raceDay":"Race Day","detail.performance":"Performance","detail.logistics":"Logistics","detail.weather":"Weather","detail.rules":"Rules","detail.faq":"FAQ","detail.sources":"Sources","detail.date":"Date","detail.location":"Location","detail.country":"Country","detail.city":"City","detail.sport":"Sport","detail.distance":"Distance","detail.eventType":"Event type","detail.status":"Status","detail.startTime":"Start time","detail.cutoff":"Cutoff","detail.elevation":"Elevation","detail.entryFee":"Entry fee","detail.participants":"Participants","detail.organizer":"Organizer","detail.lastChecked":"Last checked","detail.brandLastChecked":"Brand facts checked","detail.editionLastChecked":"Edition checked","detail.registrationPeriod":"Registration period","detail.deadline":"Deadline","detail.feeTiers":"Fee tiers","detail.tier":"Tier","detail.price":"Price","detail.until":"Until","detail.openRegistration":"Open registration","detail.courseProfile":"Course profile","detail.surface":"Surface","detail.routeType":"Route type","detail.mapGpx":"Map / GPX","detail.start":"Start","detail.finish":"Finish","detail.startWaves":"Start Waves","detail.wave":"Wave","detail.blocks":"Blocks / corral","detail.time":"Time","detail.cutoffTimes":"Cutoff Times","detail.point":"Point","detail.deadlineTime":"Deadline","detail.overallCutoff":"Overall Cutoff","detail.aidStations":"Aid Stations","detail.stationCount":"Stations","detail.supplies":"Supplies","detail.kilometer":"km","detail.details":"Details","detail.bibPickup":"Bib pickup","detail.expo":"Expo","detail.bagDrop":"Bag drop","detail.toilets":"Toilets","detail.medical":"Medical","detail.pacers":"Pacers","detail.records":"Records","detail.category":"Category","detail.name":"Name","detail.timeResult":"Time","detail.year":"Year","detail.finishers":"Finishers","detail.avgFinish":"Average finish","detail.dnfRate":"DNF rate","detail.winners":"Recent winners","detail.train":"Train","detail.airport":"Airport","detail.publicTransport":"Public transport","detail.parking":"Parking","detail.accommodation":"Accommodation","detail.travelNotes":"Travel notes","detail.eventLocation":"Event location","detail.approxLocation":"Approximate event location. Use organizer information for the exact start and access areas.","detail.minimumAge":"Minimum age","detail.qualification":"Qualification","detail.refundPolicy":"Refund policy","detail.transferPolicy":"Transfer policy","detail.mandatoryGear":"Mandatory gear","detail.medicalCertificate":"Medical certificate","detail.athleteGuide":"Athlete guide notes","detail.verification":"Verification","detail.sourceType":"Source type","detail.needsReview":"Needs review","detail.notVerified":"Not verified","detail.notOfficiallyConfirmed":"Not yet officially confirmed","detail.unknown":"Unknown","detail.tba":"TBA"},"de":{"detail.backToMap":"Zurück zur Karte","detail.language":"Sprache","detail.favorite":"Favorit speichern","detail.addSeason":"+ Zur Saison hinzufügen","detail.addingSeason":"Wird hinzugefügt…","detail.savedSeason":"✓ Zur Saison hinzugefügt","detail.removeSeason":"Aus Saison entfernen","detail.removingSeason":"Wird entfernt…","detail.addedSeason":"Event wurde deinem Saisonplaner hinzugefügt.","detail.removedSeason":"Event wurde aus deinem Saisonplaner entfernt.","detail.saveUnavailable":"Dieses Event konnte gerade nicht gespeichert werden.","detail.removeUnavailable":"Dieses Event konnte gerade nicht entfernt werden.","detail.officialWebsite":"Offizielle Website","detail.openOfficialWebsite":"Offizielle Website öffnen","detail.verifyOrganizer":"Prüfe finale Renndetails vor Buchung oder Anmeldung immer auf der offiziellen Veranstalterseite.","detail.event":"Veranstaltung","detail.edition":"Ausgabe","detail.overview":"Übersicht","detail.keyFacts":"Key Facts","detail.registration":"Anmeldung","detail.course":"Strecke","detail.raceDay":"Renntag","detail.performance":"Performance","detail.logistics":"Logistik","detail.weather":"Wetter","detail.rules":"Regeln","detail.faq":"FAQ","detail.sources":"Quellen","detail.date":"Datum","detail.location":"Ort","detail.country":"Land","detail.city":"Stadt","detail.sport":"Sportart","detail.distance":"Distanz","detail.eventType":"Eventtyp","detail.status":"Status","detail.startTime":"Startzeit","detail.cutoff":"Cutoff","detail.elevation":"Höhenmeter","detail.entryFee":"Startgeld","detail.participants":"Teilnehmende","detail.organizer":"Veranstalter","detail.lastChecked":"Zuletzt geprüft","detail.brandLastChecked":"Brand-Daten geprüft","detail.editionLastChecked":"Ausgabe geprüft","detail.registrationPeriod":"Anmeldezeitraum","detail.deadline":"Deadline","detail.feeTiers":"Preisphasen","detail.tier":"Phase","detail.price":"Preis","detail.until":"Bis","detail.openRegistration":"Anmeldung öffnen","detail.courseProfile":"Streckenprofil","detail.surface":"Untergrund","detail.routeType":"Streckentyp","detail.mapGpx":"Karte / GPX","detail.start":"Start","detail.finish":"Ziel","detail.startWaves":"Startwellen","detail.wave":"Welle","detail.blocks":"Blöcke / Corral","detail.time":"Zeit","detail.cutoffTimes":"Cutoff-Zeiten","detail.point":"Punkt","detail.deadlineTime":"Zeitlimit","detail.overallCutoff":"Gesamt-Cutoff","detail.aidStations":"Verpflegung","detail.stationCount":"Stationen","detail.supplies":"Angebot","detail.kilometer":"km","detail.details":"Details","detail.bibPickup":"Startunterlagen","detail.expo":"Expo","detail.bagDrop":"Kleiderbeutel","detail.toilets":"Toiletten","detail.medical":"Medical","detail.pacers":"Pacemaker","detail.records":"Rekorde","detail.category":"Kategorie","detail.name":"Name","detail.timeResult":"Zeit","detail.year":"Jahr","detail.finishers":"Finisher","detail.avgFinish":"Durchschnittszeit","detail.dnfRate":"DNF-Rate","detail.winners":"Letzte Sieger","detail.train":"Bahnhof","detail.airport":"Flughafen","detail.publicTransport":"ÖPNV","detail.parking":"Parken","detail.accommodation":"Unterkunft","detail.travelNotes":"Reisehinweise","detail.eventLocation":"Eventort","detail.approxLocation":"Ungefährer Eventort. Nutze Veranstalterinfos für genaue Start- und Zugangsbereiche.","detail.minimumAge":"Mindestalter","detail.qualification":"Qualifikation","detail.refundPolicy":"Erstattung","detail.transferPolicy":"Übertragung","detail.mandatoryGear":"Pflichtausrüstung","detail.medicalCertificate":"Ärztliches Attest","detail.athleteGuide":"Athlete-Guide-Hinweise","detail.verification":"Verifizierung","detail.sourceType":"Quellentyp","detail.needsReview":"Zu prüfen","detail.notVerified":"Nicht bestätigt","detail.notOfficiallyConfirmed":"Noch nicht offiziell bestätigt","detail.unknown":"Unbekannt","detail.tba":"TBA"}};
 
       function getLanguage() {
         try {
@@ -266,6 +275,19 @@
           }
         });
 
+        document.querySelectorAll("[data-detail-verification-date]").forEach(function (element) {
+          var value = element.getAttribute("data-detail-verification-date");
+          var parts = value ? value.split("-").map(Number) : [];
+          if (parts.length === 3 && parts.every(Number.isFinite)) {
+            element.textContent = new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              timeZone: "UTC"
+            }).format(new Date(Date.UTC(parts[0], parts[1] - 1, parts[2])));
+          }
+        });
+
         var select = document.getElementById("eventDetailLanguageSelect");
         if (select) {
           select.value = language;
@@ -303,7 +325,7 @@
   <script src="../../js/config.js"></script>
   <script defer src="../../js/supabase-loader.js" data-supabase-src="../../js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
   <script defer src="../../js/event-detail.js?v=20260725-publish-runtime-v96"></script>
-  
+
   <script>
     window.addEventListener("DOMContentLoaded", function () {
       var target = document.getElementById("eventDetailMap");

@@ -30,6 +30,8 @@
     "batch:validate": "node tools/validate-event-batch.js",
     "review:beta": "node tools/create-beta-review-queue.js",
     "review:quality": "node tools/create-event-review-queue.js",
+    "review:germany-expansion": "node tools/create-germany-expansion-review.js",
+    "data:prepare-germany-review": "npm run build-events && npm run review:germany-expansion",
     "audit:anon": "node tests/live-anon-access-audit.mjs",
     "backup:production": "pwsh.exe -NoProfile -File tools/backup-production.ps1",
     "backup:restore-drill": "pwsh.exe -NoProfile -File tools/restore-production-backup-drill.ps1",
@@ -50,6 +52,7 @@
     "test:rls": "node tests/rls-security.test.mjs",
     "test:quality": "node tests/event-quality-audit.test.mjs",
     "test:quality-review": "node tests/event-quality-review-queue.test.mjs",
+    "test:germany-expansion": "node tests/germany-expansion-review.test.mjs",
     "test:data-workflow": "node tests/event-data-workflow.test.mjs",
     "test:event-automation": "node tests/event-automation-workflow.test.mjs",
     "test:source-monitor": "node tests/source-monitor-core.test.mjs && node tests/source-monitor-pinned-http.test.mjs && node tests/source-monitor-workflow.test.mjs && node tests/source-monitor-extraction.test.mjs",
@@ -65,7 +68,7 @@
     "test:e2e:headed": "node tests/e2e/run-playwright.mjs --headed",
     "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
     "test:catalog-release": "node tests/catalog-release-gate.test.mjs",
-    "test:all": "npm run check && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
+    "test:all": "npm run check && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:germany-expansion && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
     "test:gate": "npm run check && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run audit:layout && npm run test:e2e && npm run test:rls:local && npm run audit:anon"
   },
   "devDependencies": {

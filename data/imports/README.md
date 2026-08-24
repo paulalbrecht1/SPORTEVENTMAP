@@ -1,8 +1,9 @@
 # Event Data Import Workflow
 
-The app stays CSV-first. `data/events.csv` is the final source that Leaflet loads.
-New data should not be copied into `data/events.csv` directly. Use the controlled
-batch workflow first, then approve events through Admin review.
+The production catalog is Supabase-first. `data/events.csv` is a versioned,
+read-only fallback export for the browser and static generators. New data uses
+the controlled batch workflow and Admin review before it enters Supabase; the
+fallback is refreshed afterward with `npm run data:export-fallback`.
 
 ## Folder Layout
 
@@ -10,7 +11,7 @@ batch workflow first, then approve events through Admin review.
 - `data/imports/staging/`: validated batch files that are not public yet.
 - `data/imports/normalized/`: provider data converted into the app CSV format.
 - `data/imports/review/`: rows that need manual cleanup before publishing.
-- `data/events.csv`: final published event table used by the map.
+- `data/events.csv`: generated, versioned fallback of the published Supabase catalog.
 
 ## Controlled Batch Workflow
 
@@ -37,7 +38,7 @@ event_name;sport;distance;distance_category;date;city;country;latitude;longitude
 Only admin-approved events should be copied or synced into the public event
 database. Keep `pending`, `staging` and `needs_review` rows out of the public map.
 
-See `EVENT_IMPORT_WORKFLOW.md` for the step-by-step launch workflow.
+See `../../docs/EVENT_IMPORT_WORKFLOW.md` for the step-by-step launch workflow.
 
 ## App CSV Format
 
@@ -128,9 +129,10 @@ node tools/build-event-table.js --no-default-imports data/events.csv data/import
 node tools/review-official-urls.js data/events.local-running.generated.csv --out data/imports/review/events-local-running-url-review.csv
 ```
 
-Only copy `data/events.local-running.generated.csv` to `data/events.csv` when
+Use `data/events.local-running.generated.csv` as review/import input only when
 the report has `review_events: 0`, `missing_coordinates: 0` and the URL review
-has no rows.
+has no rows. Approved rows enter Supabase; do not maintain the fallback as a
+second database.
 
 ## Build The Final Event Table
 
@@ -162,7 +164,7 @@ You can also turn the latest JSON report into a small local HTML dashboard:
 node tools/create-import-report-html.js data/imports/review/events-report.json --out data/imports/review/events-report.html
 ```
 
-Publish directly to the app CSV:
+Legacy/local CSV-only output (not the normal production publishing path):
 
 ```powershell
 node tools/build-event-table.js --publish
@@ -191,5 +193,18 @@ node tools/geocode-geoapify-batch.js --input data/events.csv --out data/events.g
 The Geoapify helper also reads `data/imports/private/geoapify-key.txt`, which
 is ignored by Git. Put only the raw key into that file when working locally.
 
-Review the generated file first, then copy it to `data/events.csv` if the
-coordinates look correct.
+Review the generated file first. Promote approved changes through Supabase and
+then refresh the fallback export.
+
+## Prepare The Next Germany Review Batch
+
+Create a bounded Supabase-first queue from all normalized imports:
+
+```powershell
+npm run data:prepare-germany-review
+```
+
+This writes only ignored files under `data/imports/review/`. It separates new
+event series from possible new editions, marks every row `needs_review` and
+never writes to Supabase or `data/events.csv`. See
+`../../docs/GERMANY_EXPANSION_REVIEW.md` for the review and routing rules.

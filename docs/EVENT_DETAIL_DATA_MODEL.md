@@ -127,10 +127,10 @@ Die bisherigen Gruppen werden wie folgt behandelt:
 | Statistics | Brand oder Edition | Geschichte/Serienrekorde auf Brand; konkrete Ergebnisse/Teilnehmerzahlen auf Edition |
 | FAQ | wie beantwortetes Feld | `field_path`/Quelle muss den Scope nachvollziehbar machen |
 
-## Technischer Pilot
+## Technischer und redaktioneller Pilot
 
-Die Darstellung wird an den zehn bereits vorhandenen Rich-Detail-Datensätzen
-verifiziert, ohne neue externe Recherche:
+Die Darstellung wurde zunächst an den zehn vorhandenen Rich-Detail-Datensätzen
+technisch verifiziert:
 
 1. BMW Berlin Marathon 2026
 2. Mainova Frankfurt Marathon 2026
@@ -143,7 +143,12 @@ verifiziert, ohne neue externe Recherche:
 9. IRONMAN Frankfurt 2026
 10. DATEV Challenge Roth 2027
 
-Der nächste fachliche Schritt ist ein kleiner, geprüfter Content-/Wiki-Pilot,
-der diese Legacy-Mischdatensätze mit echten `event_brand_id`-/`edition_id`-
-Verknüpfungen in Brand- und Editionswissen trennt. Eine Massenmigration ist
-ausdrücklich nicht Teil dieser Grundlage.
+Sechs dieser Datensätze sind seit dem 24. August 2026 redaktionell anhand
+offizieller Quellen in je einen Brand- und Editionsdatensatz mit echten
+`event_brand_id`-/`edition_id`-Verknüpfungen getrennt: Berlin, Frankfurt, Köln,
+Hamburg, Hannover und Challenge Roth. Auswahl, Quellenbefunde und
+Feldempfehlungen stehen in `docs/EVENT_DETAIL_CONTENT_PILOT.md`.
+
+Die vier übrigen Datensätze München, Düsseldorf, IRONMAN Hamburg und IRONMAN
+Frankfurt bleiben vorerst `legacy_mixed`. Eine Massenmigration ist ausdrücklich
+nicht Teil dieses Piloten.

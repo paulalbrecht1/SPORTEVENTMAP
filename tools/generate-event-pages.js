@@ -327,11 +327,87 @@ function loadEventDetailDatabase() {
   const rows =
     JSON.parse(fs.readFileSync(EVENT_DETAIL_DATABASE_PATH, "utf8"));
 
+  const rowsBySlug = rows
+    .filter(row => clean(row.event_slug))
+    .reduce((map, row) => {
+      const slug = clean(row.event_slug);
+      if (!map.has(slug)) {
+        map.set(slug, []);
+      }
+      map.get(slug).push(row);
+      return map;
+    }, new Map());
+
   return new Map(
-    rows
-      .filter(row => clean(row.event_slug))
-      .map(row => [clean(row.event_slug), row])
+    [...rowsBySlug.entries()].map(([slug, slugRows]) => [
+      slug,
+      composeRichDetailRecords(slugRows)
+    ])
   );
+}
+
+function mergeDetailObjects(base = {}, overlay = {}) {
+  return {
+    ...(base && typeof base === "object" ? base : {}),
+    ...(overlay && typeof overlay === "object" ? overlay : {})
+  };
+}
+
+function composeRichDetailRecords(rows = []) {
+  const usableRows = rows.filter(Boolean);
+  if (!usableRows.length) {
+    return null;
+  }
+
+  const brandRecord = usableRows.find(row => clean(row.knowledge_scope) === "brand");
+  const editionRecord = usableRows.find(row => clean(row.knowledge_scope) === "edition");
+
+  if (!brandRecord && !editionRecord) {
+    return usableRows.at(-1);
+  }
+
+  const brand = brandRecord || {};
+  const edition = editionRecord || {};
+  const mergeSection = sectionName => mergeDetailObjects(
+    brand[sectionName],
+    edition[sectionName]
+  );
+
+  return {
+    event_slug: clean(edition.event_slug || brand.event_slug),
+    event_brand_id: edition.event_brand_id || brand.event_brand_id,
+    edition_id: edition.edition_id,
+    knowledge_scope: "resolved",
+    brand: mergeDetailObjects(brand.basis, brand.brand),
+    edition: mergeDetailObjects(edition.basis, edition.edition),
+    verification_status: edition.verification_status,
+    last_checked: edition.last_checked,
+    verification: {
+      brand: brandRecord ? {
+        status: brand.verification_status,
+        last_verified_at: brand.last_checked
+      } : undefined,
+      edition: editionRecord ? {
+        status: edition.verification_status,
+        last_verified_at: edition.last_checked
+      } : undefined
+    },
+    registration: mergeSection("registration"),
+    course: mergeSection("course"),
+    race_day: mergeSection("race_day"),
+    travel: mergeSection("travel"),
+    weather: mergeSection("weather"),
+    statistics: mergeSection("statistics"),
+    editorial: mergeSection("editorial"),
+    sources: [
+      ...(Array.isArray(brand.sources) ? brand.sources : []),
+      ...(Array.isArray(edition.sources) ? edition.sources : [])
+    ],
+    faq: [
+      ...(Array.isArray(brand.faq) ? brand.faq : []),
+      ...(Array.isArray(edition.faq) ? edition.faq : [])
+    ]
+  };
 }
 
 function findPriorityEvents(events, priorityNames) {
@@ -3649,7 +3725,9 @@ function buildRaceGuideRaceDay(richDetails = null, detailRows = []) {
   const details = [
     renderStartWaves(raceDay),
     renderCutoffTimes(raceDay),
-    !parseCutoffRows(raceDay).length && hasUsefulValue(cutoff) ? `
+    !parseCutoffRows(raceDay).length &&
+    !hasUsefulValue(firstUsefulValue(raceDay.total_cutoff, raceDay.overall_cutoff)) &&
+    hasUsefulValue(cutoff) ? `
       <div class="race-guide-subsection">
         <h3>${detailLabel("detail.cutoffTimes")}</h3>
         <div class="race-guide-highlight">
@@ -4186,6 +4264,7 @@ module.exports = {
   buildRaceGuideRegistration,
   buildRaceGuideSources,
   buildSchema,
+  composeRichDetailRecords,
   createSlug,
   editionFallbackKey,
   formatVerificationDate,

@@ -145,7 +145,7 @@ async function main() {
   const details =
     await supabaseGet(
       "event_details",
-      "?select=*&is_public=eq.true&verification_status=in.(verified_official_source,partially_verified)&order=event_slug.asc"
+      "?select=*&is_public=eq.true&verification_status=in.(verified_official_source,partially_verified)&order=event_slug.asc,knowledge_scope.asc"
     );
 
   const [

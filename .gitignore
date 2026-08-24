@@ -44,6 +44,7 @@ data/events.*.generated.csv
 data/events.*.coordinates-fixed.csv
 
 # Local data snapshots and review artifacts
+/backups/
 data/backups/
 data/imports/raw/
 data/imports/review/

@@ -20,7 +20,7 @@ const FILES_TO_SCAN = [
   "css",
   "data/imports/README.md",
   "supabase",
-  "LOCAL_PUBLISH.md",
+  "docs/LOCAL_PUBLISH.md",
   "SECURITY.md"
 ];
 

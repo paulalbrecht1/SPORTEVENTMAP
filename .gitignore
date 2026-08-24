@@ -19,6 +19,10 @@ node_modules/
 .pnpm-store/
 dist/
 .wrangler/
+.codex-deploy-discovery-*/
+.cache/
+coverage/
+.nyc_output/
 .tmp-supabase-init/
 .tmp-supabase-edition-staging/
 
@@ -33,8 +37,7 @@ reports/event-geo-audit.*
 reports/event-geo-fixes-proposed.json
 reports/responsive-layout-audit.*
 reports/responsive-qa-report.*
-exports/event-url-list.csv
-exports/event-url-list.md
+/exports/
 
 # Reproducible local data-pipeline outputs
 data/events.before-dedupe.csv
@@ -45,6 +48,9 @@ data/events.*.coordinates-fixed.csv
 
 # Local data snapshots and review artifacts
 /backups/
+*.sembackup
+*.dump
+*.dump.gz
 data/backups/
 data/imports/raw/
 data/imports/review/

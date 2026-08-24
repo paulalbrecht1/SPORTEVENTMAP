@@ -14,8 +14,9 @@ slow:
 - more admin review work
 - more traffic from search engines or ads
 
-For now, the safest way to scale event data is still CSV-first: collect data in
-a spreadsheet, review it, then publish only the clean final CSV.
+The safe workflow starts with a spreadsheet, validates it locally and publishes
+only reviewed rows to Supabase. The repository CSV is then refreshed as a
+versioned fallback; it is not edited as a second production database.
 
 ## The Table Format
 
@@ -86,10 +87,14 @@ For larger Germany/Europe imports, use this simple handoff:
 3. Codex normalizes the file into `data/imports/normalized/`.
 4. Codex geocodes missing coordinates with Geoapify in small cached batches.
 5. Codex builds a generated table and writes a report into `data/imports/review/`.
-6. Only rows that pass validation, deduplication and coordinate checks are copied into `data/events.csv`.
+6. Only rows that pass validation, deduplication and coordinate checks enter
+   the Supabase admin review and approval flow.
+7. After approval, Codex refreshes `data/events.csv` and
+   `data/event-editions-public.json` from Supabase.
 
-The app should only use `data/events.csv` as the final published event table.
-Do not paste unreviewed provider data directly into that file.
+The live app reads the published Supabase catalog and falls back to
+`data/events.csv` if necessary. Do not paste provider data directly into the
+fallback file.
 
 ## What To Review Manually
 
@@ -99,8 +104,8 @@ Before publishing a bigger batch, check:
 - `data/imports/review/events-local-running-expanded-url-review.csv`
 - `data/imports/review/events.local-running-expanded.review.csv`
 
-If the review CSV is empty and the publish check passes, the file is ready for
-the map.
+If the review CSV is empty and the publish check passes, the batch is ready for
+Supabase Admin review.
 
 ## Quality Rules
 
@@ -118,6 +123,10 @@ Exclude:
 - training programs
 - donation pages
 - spectator tickets
+- pacer-only signups
+- kids-only races
+- pure walks
+- virtual-only events unless you intentionally want them
 
 ## Recurring Status Checks
 
@@ -141,11 +150,7 @@ report first, especially rows marked as:
 - `missing_registration_signal`
 - `unreachable_url`
 
-Only copy reviewed rows into `data/events.csv`.
-- pacer-only signups
-- kids-only races
-- pure walks
-- virtual-only events unless you intentionally want them
+Only promote reviewed rows through Supabase; then refresh the fallback export.
 
 ## Best Next Data Goal
 
@@ -173,7 +178,7 @@ Current priority order:
 The current local running workflow uses `tools/import-kilometerliebe.js` for a
 controlled Germany-first batch. It imports only rows with official external
 event URLs, then geocodes, deduplicates and validates them before anything is
-copied into `data/events.csv`.
+submitted for approval.
 
 Avoid importing US provider data into the main CSV. The product focus is
 Germany first, then Europe.

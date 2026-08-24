@@ -52,7 +52,8 @@ const COPY_ENTRIES = [
   "data/event-knowledge.json",
   "data/event-knowledge-audit.json",
   "data/event-knowledge-review.json",
-  "data/event-knowledge-research-status.json"
+  "data/event-knowledge-research-status.json",
+  "docs/NO_CODE_DATA_IMPORT.md"
 ];
 
 const COPY_DIRECTORIES = [
@@ -393,7 +394,7 @@ function validateDist() {
     "supabase",
     path.join("data", "imports"),
     "SECURITY.md",
-    "LOCAL_PUBLISH.md",
+    path.join("docs", "LOCAL_PUBLISH.md"),
     "DEPLOYMENT.md",
     "netlify.toml"
   ];

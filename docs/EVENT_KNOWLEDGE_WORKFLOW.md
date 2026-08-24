@@ -5,7 +5,8 @@ Sport Event Map now supports a richer event-detail data layer for SEO event guid
 ## Current Data Flow
 
 1. `data/events.csv`
-   - Public base event data for map, search, filters and basic detail pages.
+   - Versioned public fallback exported from Supabase and used as a generator
+     input for map, search, filters and basic detail pages.
 
 2. `data/event-category-details.json`
    - Category-level data such as fees, registration status, start time, cutoff and elevation.

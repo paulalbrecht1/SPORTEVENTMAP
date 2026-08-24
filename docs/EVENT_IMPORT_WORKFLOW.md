@@ -85,16 +85,20 @@ Use the Admin Dashboard:
 Approved events become public.
 Pending, staging and needs-review events remain admin-only.
 
-## 5. CSV Publishing Rule
+## 5. Publishing Rule
 
-Do not copy staging rows directly into `data/events.csv`.
+Do not copy staging rows directly into `data/events.csv` or into public
+Supabase tables.
 
 Only after review:
 
-1. Update existing events instead of duplicating annual races.
-2. Add only approved rows to the final CSV.
-3. Keep `event_url` as the official organizer website.
+1. Update existing event series instead of duplicating annual races.
+2. Import only approved rows into Supabase `events` and `event_editions`.
+3. Keep the official organizer and registration URLs separate and current.
 4. Keep `last_checked`, source and review notes up to date.
+5. Refresh the versioned CSV/JSON fallbacks with
+   `npm run data:export-fallback`; never edit Supabase and the exports
+   independently.
 
 ## 6. Launch Target
 

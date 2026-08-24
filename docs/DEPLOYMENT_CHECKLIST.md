@@ -26,7 +26,7 @@ only the public Supabase URL and publishable key.
 ## 3. Backend Compatibility
 
 - Review pending Supabase migrations and Edge Function changes separately.
-- Follow `docs/stage4/production-migration-plan.md` when Stage-4 changes are included.
+- Follow `stage4/production-migration-plan.md` when Stage-4 changes are included.
 - Preserve RLS, admin checks and server-side secret verification.
 - Run the local RLS suite and the read-only live anonymous audit.
 - Do not publish a frontend that depends on an undeployed backend change.

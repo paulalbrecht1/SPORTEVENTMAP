@@ -1,3 +1,5 @@
+begin;
+
 -- Closed-beta security gate: only admins and the service worker may run the
 -- validation RPC. The previous definition was SECURITY DEFINER and granted to
 -- authenticated without an internal authorization check.
@@ -61,3 +63,5 @@ grant execute on function public.verify_event_source_cron_secret(text)
 
 comment on function public.verify_event_source_cron_secret(text) is
   'Server-only verification for the event-source-check Edge Function; the stored verifier remains a SHA-256 hash.';
+
+commit;

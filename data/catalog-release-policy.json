@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "maximum_export_age_hours": 24,
+  "maximum_future_clock_skew_minutes": 5,
+  "minimum_discovery_rows": 400,
+  "reference_discovery_rows": 471,
+  "maximum_discovery_drop_percent": 15,
+  "minimum_archive_rows": 950,
+  "reference_archive_rows": 994,
+  "maximum_archive_drop_percent": 2,
+  "minimum_freshness_rate": 55,
+  "minimum_completeness_rate": 45
+}

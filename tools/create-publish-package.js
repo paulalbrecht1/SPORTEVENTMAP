@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
+const { execFileSync } = require("child_process");
 
 const ROOT =
   path.resolve(__dirname, "..");
@@ -44,6 +46,7 @@ const COPY_ENTRIES = [
   "js/search.js",
   "js/supabase.js",
   "data/events.csv",
+  "data/catalog-export-manifest.json",
   "data/event-editions-public.json",
   "data/event-category-details.json",
   "data/event-knowledge.json",
@@ -237,6 +240,113 @@ function walk(directory, files = []) {
   return files;
 }
 
+function gitOutput(args) {
+  return execFileSync("git", args, {
+    cwd: ROOT,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "pipe"]
+  }).trim();
+}
+
+function assertCleanSource() {
+  const status = gitOutput([
+    "status",
+    "--porcelain=v1",
+    "--untracked-files=all"
+  ]);
+
+  if (status) {
+    throw new Error(
+      "Refusing to build a release from a dirty working tree."
+    );
+  }
+}
+
+function sha256File(filePath) {
+  return crypto
+    .createHash("sha256")
+    .update(fs.readFileSync(filePath))
+    .digest("hex");
+}
+
+function releaseVersion() {
+  const content = fs.readFileSync(
+    path.join(ROOT, "RELEASE_VERSION.txt"),
+    "utf8"
+  );
+  const match = /^Version:\s*(\S+)\s*$/m.exec(content);
+  if (!match) throw new Error("RELEASE_VERSION.txt has no Version field.");
+  return match[1];
+}
+
+function injectReleaseMeta(identity) {
+  const indexPath = path.join(DIST, "index.html");
+  const html = fs.readFileSync(indexPath, "utf8");
+  const marker = [
+    `  <meta name="sport-event-map-release" content="${identity.version}" />`,
+    `  <meta name="sport-event-map-git-commit" content="${identity.git_commit}" />`,
+    `  <meta name="sport-event-map-build-time" content="${identity.built_at}" />`
+  ].join("\n");
+  if (!html.includes("</head>")) throw new Error("index.html has no closing head tag.");
+  fs.writeFileSync(indexPath, html.replace("</head>", `${marker}\n</head>`), "utf8");
+}
+
+function inventoryDigest(entries) {
+  const hash = crypto.createHash("sha256");
+  entries.forEach(entry => hash.update(`${entry.path}\0${entry.sha256}\n`));
+  return hash.digest("hex");
+}
+
+function writeReleaseMetadata(identity) {
+  injectReleaseMeta(identity);
+
+  const entries = walk(DIST)
+    .filter(filePath => path.basename(filePath) !== "release.json")
+    .map(filePath => ({
+      path: path.relative(DIST, filePath).replaceAll("\\", "/"),
+      sha256: sha256File(filePath)
+    }))
+    .sort((left, right) => left.path.localeCompare(right.path));
+  const eventPages = entries.filter(entry => /^event\/[^/]+\/index\.html$/.test(entry.path));
+  const criticalPaths = [
+    "index.html",
+    "css/style.css",
+    "js/app.js",
+    "js/supabase.js",
+    "data/events.csv",
+    "data/event-editions-public.json",
+    "data/catalog-export-manifest.json",
+    "sitemap.xml"
+  ];
+  const byPath = new Map(entries.map(entry => [entry.path, entry.sha256]));
+
+  const release = {
+    schema_version: 1,
+    ...identity,
+    source_dirty: false,
+    critical_files: Object.fromEntries(
+      criticalPaths.map(relativePath => {
+        if (!byPath.has(relativePath)) throw new Error(`Missing release artifact: ${relativePath}`);
+        return [relativePath, byPath.get(relativePath)];
+      })
+    ),
+    event_pages: {
+      count: eventPages.length,
+      aggregate_sha256: inventoryDigest(eventPages)
+    },
+    artifacts: {
+      count: entries.length,
+      aggregate_sha256: inventoryDigest(entries)
+    }
+  };
+
+  fs.writeFileSync(
+    path.join(DIST, "release.json"),
+    `${JSON.stringify(release, null, 2)}\n`,
+    "utf8"
+  );
+}
+
 function validateDist() {
   const files =
     walk(DIST);
@@ -301,14 +411,23 @@ function validateDist() {
 }
 
 function main() {
+  assertCleanSource();
+  const identity = {
+    version: releaseVersion(),
+    git_commit: gitOutput(["rev-parse", "HEAD"]),
+    built_at: new Date().toISOString()
+  };
+
   require("./generate-event-pages.js");
   require("./generate-sitemap.js");
+  assertCleanSource();
 
   removeDirectory(DIST);
 
   COPY_ENTRIES.forEach(copyFile);
   COPY_DIRECTORIES.forEach(copyDirectory);
   writeRuntimeConfig();
+  writeReleaseMetadata(identity);
 
   validateDist();
 
@@ -319,6 +438,17 @@ function main() {
   console.log(
     `Copied files: ${COPY_ENTRIES.length + 1}; directories: ${COPY_DIRECTORIES.length}`
   );
+
+  console.log(
+    `Release ${identity.version} from ${identity.git_commit} built at ${identity.built_at}`
+  );
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = {
+  inventoryDigest,
+  main,
+  releaseVersion,
+  sha256File
+};

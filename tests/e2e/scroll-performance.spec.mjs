@@ -78,7 +78,10 @@ test("fast Home scrolling uses a stable, paint-efficient scroll surface", async 
   expect(result.maxScrollTop).toBeGreaterThan(1500);
   expect(result.bottomScrollTop).toBeGreaterThanOrEqual(result.maxScrollTop - 2);
   expect(result.finalScrollTop).toBeLessThanOrEqual(2);
-  expect(result.p95FrameGap).toBeLessThan(80);
+  // Windows runners can quantize a busy rAF interval to five 60 Hz frames
+  // (about 83.3 ms). Keep the budget below 90 ms so that scheduling jitter
+  // does not masquerade as a UI regression while sustained stalls still fail.
+  expect(result.p95FrameGap).toBeLessThan(90);
 });
 
 test("shared full-page scroll surfaces keep native scrolling enabled", async ({ page }) => {

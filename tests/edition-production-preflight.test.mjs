@@ -60,6 +60,9 @@ assert.ok(
 
 for (const marker of [
   "exact_predeployment_history",
+  "exact_security_baseline_history",
+  "expected_security_baseline_history",
+  "security_baseline_active_keep_remaining_migrations_blocked",
   "exact_full_history",
   "planned_application_order",
   "drift_or_partial_rollout",

@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "python -m http.server 4173",
-    "check": "node tools/check-publish-readiness.js",
+    "check": "node tools/check-publish-readiness.js && node tools/check-catalog-release.js",
     "sitemap": "node tools/generate-sitemap.js",
     "prepare-package": "node tools/create-publish-package.js",
+    "verify-package": "node tools/verify-release-package.js",
+    "verify-deployment": "node tools/verify-deployed-release.js",
     "dedupe": "node tools/dedupe-events-csv.js --input data/events.csv --out data/events.deduped.csv",
     "duplicates:review": "node tools/find-duplicate-candidates.js",
     "build-events": "node tools/build-event-table.js",
@@ -53,16 +55,18 @@
     "smoke:source-monitor:production": "node tools/source-monitor-production-smoke.mjs",
     "data:migrate:dry": "node tools/migrate-events-to-editions.js",
     "data:export-fallback": "node tools/export-supabase-event-catalog.js --write",
+    "data:refresh-public": "node tools/export-supabase-event-catalog.js --write && node tools/generate-event-pages.js && node tools/generate-sitemap.js && node tools/check-catalog-release.js",
     "data:migrate": "node tools/migrate-events-to-editions.js --apply",
     "test:e2e:install": "node tests/e2e/install-browsers.mjs",
     "test:e2e": "node tests/e2e/run-playwright.mjs",
     "test:e2e:headed": "node tests/e2e/run-playwright.mjs --headed",
     "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
-    "test:all": "npm run check && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
+    "test:catalog-release": "node tests/catalog-release-gate.test.mjs",
+    "test:all": "npm run check && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
     "test:gate": "npm run check && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run audit:layout && npm run test:e2e && npm run test:rls:local && npm run audit:anon"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "1.61.1",
     "supabase": "2.109.1"
   }
 }

@@ -2,6 +2,22 @@
 -- Run after 20260608_closed_beta_security.sql.
 
 select
+  procedure.oid::regprocedure::text as function_signature,
+  procedure.prosecdef as security_definer,
+  has_function_privilege('public', procedure.oid, 'execute') as public_can_execute,
+  has_function_privilege('anon', procedure.oid, 'execute') as anon_can_execute,
+  has_function_privilege('authenticated', procedure.oid, 'execute') as authenticated_can_execute,
+  has_function_privilege('service_role', procedure.oid, 'execute') as service_role_can_execute
+from pg_proc procedure
+join pg_namespace namespace on namespace.oid = procedure.pronamespace
+where namespace.nspname = 'public'
+  and procedure.proname in (
+    'run_event_validation',
+    'verify_event_source_cron_secret'
+  )
+order by function_signature;
+
+select
   n.nspname as schema_name,
   c.relname as table_name,
   c.relrowsecurity as rls_enabled,

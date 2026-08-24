@@ -72,7 +72,7 @@ function proposalPriority(type, field, score, locked) {
 }
 
 function alreadyHandled(field, normalizedValue, context) {
-  const now = Date.now();
+  const now = new Date(context.now || Date.now()).getTime();
   return (context.previousProposals || []).some(proposal => {
     if (proposal.field_name !== field || JSON.stringify(proposal.normalized_value) !== JSON.stringify(normalizedValue)) return false;
     if (["pending", "accepted", "edited_and_accepted"].includes(proposal.proposal_status)) return true;

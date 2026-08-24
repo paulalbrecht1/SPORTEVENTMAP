@@ -1,31 +1,5 @@
 [
   {
-    "slug": "1-hannover-backyard-ultra-2026",
-    "url": "/event/1-hannover-backyard-ultra-2026/",
-    "event_name": "1. Hannover Backyard Ultra",
-    "date": "08.08.2026",
-    "city": "Hannover",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "6.7 km, Backyard Ultra",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "1-laufchallenge-mellendorfer-tv-2026",
-    "url": "/event/1-laufchallenge-mellendorfer-tv-2026/",
-    "event_name": "1. Laufchallenge Mellendorfer TV",
-    "date": "23.08.2026",
-    "city": "Hanover",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "1-volkslauf-seelze-2026",
     "url": "/event/1-volkslauf-seelze-2026/",
     "event_name": "1. Volkslauf Seelze",
@@ -78,45 +52,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "100-meilen-berlin-mauerweglauf-2026",
-    "url": "/event/100-meilen-berlin-mauerweglauf-2026/",
-    "event_name": "100 Meilen Berlin — Mauerweglauf",
-    "date": "15.08.2026",
-    "city": "Berlin",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "100 Miles / 161 km",
-    "has_category_details": true,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "11-lichterlauf-tangermunde-2026",
-    "url": "/event/11-lichterlauf-tangermunde-2026/",
-    "event_name": "11. Lichterlauf Tangermünde",
-    "date": "21.08.2026",
-    "city": "Saxony-Anhalt",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "12-altwarmbuchener-triathlon-am-15-16-8-2026-2026",
-    "url": "/event/12-altwarmbuchener-triathlon-am-15-16-8-2026-2026/",
-    "event_name": "12. Altwarmbüchener Triathlon am 15./16.8.2026",
-    "date": "15.08.2026",
-    "city": "Hannover",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "12-cross-against-cancer-2026",
     "url": "/event/12-cross-against-cancer-2026/",
     "event_name": "12. Cross against Cancer",
@@ -135,19 +70,6 @@
     "event_name": "13. Wanzleber Sparkassen Triathlon",
     "date": "04.07.2027",
     "city": "Wanzleben-Börde",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "14-gewoba-city-triathlon-bremen-2026",
-    "url": "/event/14-gewoba-city-triathlon-bremen-2026/",
-    "event_name": "14. GEWOBA City Triathlon Bremen",
-    "date": "09.08.2026",
-    "city": "Bremen",
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
@@ -177,32 +99,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "12.3 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "17-vsb-dresdner-nachtlauf-2026",
-    "url": "/event/17-vsb-dresdner-nachtlauf-2026/",
-    "event_name": "17. VSB Dresdner Nachtlauf",
-    "date": "14.08.2026",
-    "city": "Dresden",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "11.5 km, 6.2 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "19-licher-triathlon-2026",
-    "url": "/event/19-licher-triathlon-2026/",
-    "event_name": "19. Licher Triathlon",
-    "date": "08.08.2026",
-    "city": "Lich",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -242,19 +138,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "23-rodgau-triathlon-2026",
-    "url": "/event/23-rodgau-triathlon-2026/",
-    "event_name": "23. Rodgau Triathlon",
-    "date": "16.08.2026",
-    "city": "Rodgau",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -312,19 +195,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "26-pohler-triathlon-2026",
-    "url": "/event/26-pohler-triathlon-2026/",
-    "event_name": "26. Pöhler-Triathlon",
-    "date": "09.08.2026",
-    "city": "Pöhl",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "28-hiddestorfer-rubenlauf-2026",
     "url": "/event/28-hiddestorfer-rubenlauf-2026/",
     "event_name": "28. Hiddestorfer Rübenlauf",
@@ -351,19 +221,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "3-edermunder-triathlon-2026",
-    "url": "/event/3-edermunder-triathlon-2026/",
-    "event_name": "3. Edermünder Triathlon",
-    "date": "16.08.2026",
-    "city": "Edermünde",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "30-lauf-um-den-arendsee-2026",
     "url": "/event/30-lauf-um-den-arendsee-2026/",
     "event_name": "30. Lauf um den Arendsee",
@@ -385,19 +242,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, Half Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "31-ilmenauer-teamtriathlon-2026-2026",
-    "url": "/event/31-ilmenauer-teamtriathlon-2026-2026/",
-    "event_name": "31. Ilmenauer Teamtriathlon",
-    "date": "19.08.2026",
-    "city": "Ilmenau",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -481,45 +325,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "35-maibacher-triathlon-2026",
-    "url": "/event/35-maibacher-triathlon-2026/",
-    "event_name": "35. Maibacher Triathlon",
-    "date": "09.08.2026",
-    "city": "Butzbach",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "35-speller-sparkassen-sommernachtslauf-2026",
-    "url": "/event/35-speller-sparkassen-sommernachtslauf-2026/",
-    "event_name": "35. Speller Sparkassen-Sommernachtslauf",
-    "date": "14.08.2026",
-    "city": "Spelle",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "36-elm-lappwald-triathlon-2026",
-    "url": "/event/36-elm-lappwald-triathlon-2026/",
-    "event_name": "36. Elm-Lappwald Triathlon",
-    "date": "22.08.2026",
-    "city": "Helmstedt",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "36-ratzeburger-adventslauf-2026",
     "url": "/event/36-ratzeburger-adventslauf-2026/",
     "event_name": "36. Ratzeburger Adventslauf",
@@ -528,19 +333,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, Half Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "37-bergsee-triathlon-2026",
-    "url": "/event/37-bergsee-triathlon-2026/",
-    "event_name": "37. Bergsee Triathlon",
-    "date": "08.08.2026",
-    "city": "Schleusingen",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -559,19 +351,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "37-kn-forde-triathlon-2026-2026",
-    "url": "/event/37-kn-forde-triathlon-2026-2026/",
-    "event_name": "37. KN Förde Triathlon",
-    "date": "16.08.2026",
-    "city": "Kiel",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "38-volkslauf-des-tsv-breuna-2026",
     "url": "/event/38-volkslauf-des-tsv-breuna-2026/",
     "event_name": "38. Volkslauf des TSV Breuna",
@@ -585,19 +364,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "4-rammelsberger-steigerlauf-2026",
-    "url": "/event/4-rammelsberger-steigerlauf-2026/",
-    "event_name": "4. Rammelsberger Steigerlauf",
-    "date": "22.08.2026",
-    "city": "Goslar",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Marathon, Halbmarathon, 14 km, 10 km, 6.5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "40-braunschweiger-nachtlauf-2027",
     "url": "/event/40-braunschweiger-nachtlauf-2027/",
     "event_name": "40. Braunschweiger Nachtlauf",
@@ -606,19 +372,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 6.5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "42-viernheimer-v-card-triathlon-2026",
-    "url": "/event/42-viernheimer-v-card-triathlon-2026/",
-    "event_name": "42. Viernheimer V-Card-Triathlon",
-    "date": "22.08.2026",
-    "city": "Viernheim",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -819,19 +572,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "ahnepark-lauf-der-laufgemeinschaft-vellmar-2026",
-    "url": "/event/ahnepark-lauf-der-laufgemeinschaft-vellmar-2026/",
-    "event_name": "Ahnepark-Lauf der Laufgemeinschaft Vellmar",
-    "date": "21.08.2026",
-    "city": "Vellmar",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "ahrathon-erlebnislauf-2027",
     "url": "/event/ahrathon-erlebnislauf-2027/",
     "event_name": "Ahrathon Erlebnislauf",
@@ -866,19 +606,6 @@
     "country": "Germany",
     "sport": "Ultramarathon",
     "distance": "64 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "allgau-panorama-marathon-2026",
-    "url": "/event/allgau-panorama-marathon-2026/",
-    "event_name": "Allgäu-Panorama-Marathon",
-    "date": "09.08.2026",
-    "city": "Sonthofen",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Half Marathon, Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1235,19 +962,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "barenkopplauf-waldbreitbach-2026",
-    "url": "/event/barenkopplauf-waldbreitbach-2026/",
-    "event_name": "Bärenkopplauf - Waldbreitbach",
-    "date": "07.08.2026",
-    "city": "Waldbreitbach",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "barmer-currex-alsterlauf-hamburg-2026",
     "url": "/event/barmer-currex-alsterlauf-hamburg-2026/",
     "event_name": "BARMER CURREX Alsterlauf Hamburg",
@@ -1365,19 +1079,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "berliner-strassenlauf-die-generalprobe-2026",
-    "url": "/event/berliner-strassenlauf-die-generalprobe-2026/",
-    "event_name": "Berliner Straßenlauf - Die Generalprobe",
-    "date": "23.08.2026",
-    "city": "Berlin",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "bertlicher-strassenlaufe-2026",
     "url": "/event/bertlicher-strassenlaufe-2026/",
     "event_name": "Bertlicher Strassenläufe",
@@ -1412,19 +1113,6 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "bielebohlauf-2026",
-    "url": "/event/bielebohlauf-2026/",
-    "event_name": "Bielebohlauf",
-    "date": "23.08.2026",
-    "city": "Oppach",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Halbmarathon, 12 km, 5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1599,19 +1287,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "bornsdorf-triathlon-2026-2026",
-    "url": "/event/bornsdorf-triathlon-2026-2026/",
-    "event_name": "Bornsdorf-Triathlon",
-    "date": "15.08.2026",
-    "city": "Heideblick-Bornsdorf",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "borsig-halbmarathon-2026",
     "url": "/event/borsig-halbmarathon-2026/",
     "event_name": "BORSIG Halbmarathon",
@@ -1698,32 +1373,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "7.2 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "breisgau-triathlon-malterdingen-2026",
-    "url": "/event/breisgau-triathlon-malterdingen-2026/",
-    "event_name": "Breisgau Triathlon - Malterdingen",
-    "date": "23.08.2026",
-    "city": "Malterdingen",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "breitunger-plesslauf-breitungen-werra-2026",
-    "url": "/event/breitunger-plesslauf-breitungen-werra-2026/",
-    "event_name": "Breitunger Pleßlauf - Breitungen/Werra",
-    "date": "23.08.2026",
-    "city": "Breitungen/Werra",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "30 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1911,19 +1560,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "bwm-sommerlochlauf-2026",
-    "url": "/event/bwm-sommerlochlauf-2026/",
-    "event_name": "BWM Sommerlochlauf",
-    "date": "04.08.2026",
-    "city": "Steinheim an der Murr",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "canyon-run-muhlheim-2026",
     "url": "/event/canyon-run-muhlheim-2026/",
     "event_name": "Canyon Run Mühlheim",
@@ -2000,19 +1636,6 @@
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": true
-  },
-  {
-    "slug": "charity-mega-run-2026",
-    "url": "/event/charity-mega-run-2026/",
-    "event_name": "Charity Mega Run",
-    "date": "15.08.2026",
-    "city": "Bingen am Rhein",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "50 km, 26 km, 10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
   },
   {
     "slug": "chiemgau-trail-run-2026",
@@ -2145,19 +1768,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "datagroup-triathlon-nurnberg-2026",
-    "url": "/event/datagroup-triathlon-nurnberg-2026/",
-    "event_name": "DATAGROUP Triathlon Nürnberg",
-    "date": "09.08.2026",
-    "city": "Nürnberg",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "deistercrossing-springe-2026",
     "url": "/event/deistercrossing-springe-2026/",
     "event_name": "DeisterCrossing Springe",
@@ -2184,37 +1794,11 @@
     "has_rich_details": false
   },
   {
-    "slug": "der-alstertallauf-2026",
-    "url": "/event/der-alstertallauf-2026/",
-    "event_name": "Der Alstertallauf",
-    "date": "23.08.2026",
-    "city": "Alsterwanderweg",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "dessauer-rathaus-center-city-run-2026",
     "url": "/event/dessauer-rathaus-center-city-run-2026/",
     "event_name": "Dessauer Rathaus-Center City RUN",
     "date": "13.09.2026",
     "city": "Dessau",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "detmolder-residenzlauf-2026",
-    "url": "/event/detmolder-residenzlauf-2026/",
-    "event_name": "Detmolder Residenzlauf",
-    "date": "15.08.2026",
-    "city": "Detmold",
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km",
@@ -2574,19 +2158,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "emder-vielfaltslauf-emden-2026",
-    "url": "/event/emder-vielfaltslauf-emden-2026/",
-    "event_name": "Emder Vielfaltslauf - Emden",
-    "date": "22.08.2026",
-    "city": "Emden",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "enni-triathlon-moers-2027",
     "url": "/event/enni-triathlon-moers-2027/",
     "event_name": "Enni Triathlon Moers",
@@ -2652,19 +2223,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "eschweiler-citylauf-2026-2026",
-    "url": "/event/eschweiler-citylauf-2026-2026/",
-    "event_name": "Eschweiler Citylauf",
-    "date": "23.08.2026",
-    "city": "Eschweiler",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "estra-firenze-marathon-2026",
     "url": "/event/estra-firenze-marathon-2026/",
     "event_name": "Estra Firenze Marathon",
@@ -2673,19 +2231,6 @@
     "country": "Italy",
     "sport": "Running",
     "distance": "Marathon / 42.195 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "exter-flexrun-vlotho-2026",
-    "url": "/event/exter-flexrun-vlotho-2026/",
-    "event_name": "Exter FlexRun - Vlotho",
-    "date": "22.08.2026",
-    "city": "Vlotho",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km, Half Marathon, Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -2803,32 +2348,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "florstadt-halbmarathon-2026",
-    "url": "/event/florstadt-halbmarathon-2026/",
-    "event_name": "FlorSTADT Halbmarathon",
-    "date": "23.08.2026",
-    "city": "Florstadt",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km / 10 km / 21 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "fockbeker-dorflauf-2026",
-    "url": "/event/fockbeker-dorflauf-2026/",
-    "event_name": "Fockbeker Dorflauf",
-    "date": "07.08.2026",
-    "city": "Fockbek",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3029,32 +2548,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "gapa-everesting-festival-garmisch-partenkirchen-2026",
-    "url": "/event/gapa-everesting-festival-garmisch-partenkirchen-2026/",
-    "event_name": "GaPa Everesting-Festival - Garmisch-Partenkirchen",
-    "date": "15.08.2026",
-    "city": "Garmisch-Partenkirchen",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "59 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "gebirgsmarathon-immenstadt-immenstadt-im-allgau-2026",
-    "url": "/event/gebirgsmarathon-immenstadt-immenstadt-im-allgau-2026/",
-    "event_name": "Gebirgsmarathon Immenstadt - Immenstadt im Allgäu",
-    "date": "22.08.2026",
-    "city": "Immenstadt im Allgäu",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "generali-berlin-half-marathon-2027",
     "url": "/event/generali-berlin-half-marathon-2027/",
     "event_name": "Generali Berlin Half Marathon",
@@ -3133,32 +2626,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "gettorfer-staffelmarathon-2026",
-    "url": "/event/gettorfer-staffelmarathon-2026/",
-    "event_name": "Gettorfer Staffelmarathon",
-    "date": "23.08.2026",
-    "city": "Gettorf",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "gladbecker-sparkassenlauf-2026",
-    "url": "/event/gladbecker-sparkassenlauf-2026/",
-    "event_name": "Gladbecker Sparkassenlauf",
-    "date": "23.08.2026",
-    "city": "Gladbeck",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "gochness-triathlon-2026",
     "url": "/event/gochness-triathlon-2026/",
     "event_name": "GochNESS-TRIathlon",
@@ -3180,19 +2647,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "17.1 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "gondo-marathon-2026",
-    "url": "/event/gondo-marathon-2026/",
-    "event_name": "Gondo Marathon",
-    "date": "08.08.2026",
-    "city": "Gondo",
-    "country": "Switzerland",
-    "sport": "Ultramarathon",
-    "distance": "28 km / 42 km / 84 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3289,19 +2743,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "hachede-triathlon-geesthacht-2026",
-    "url": "/event/hachede-triathlon-geesthacht-2026/",
-    "event_name": "Hachede-Triathlon - Geesthacht",
-    "date": "23.08.2026",
-    "city": "Geesthacht",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Olympic Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "hachenburg-lowen-marathon-2026",
     "url": "/event/hachenburg-lowen-marathon-2026/",
     "event_name": "Hachenburg Löwen Marathon",
@@ -3393,19 +2834,6 @@
     "has_rich_details": true
   },
   {
-    "slug": "heidekoniginnenpokal-2026",
-    "url": "/event/heidekoniginnenpokal-2026/",
-    "event_name": "Heideköniginnenpokal",
-    "date": "22.08.2026",
-    "city": "Amelinghausen",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "heidener-teufelslauf-2026",
     "url": "/event/heidener-teufelslauf-2026/",
     "event_name": "Heidener Teufelslauf",
@@ -3427,19 +2855,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km / 10 km / 21 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "helsinki-marathon-2026",
-    "url": "/event/helsinki-marathon-2026/",
-    "event_name": "Helsinki Marathon",
-    "date": "22.08.2026",
-    "city": "Helsinki",
-    "country": "Finland",
-    "sport": "Running",
-    "distance": "10 km / 21 km / 42 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3544,32 +2959,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "Marathon, Halbmarathon, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "herxheimer-abendstrassenlauf-mit-pfalzmeisterschaften-10k-herxheim-bei-landau-pfalz-2026",
-    "url": "/event/herxheimer-abendstrassenlauf-mit-pfalzmeisterschaften-10k-herxheim-bei-landau-pfalz-2026/",
-    "event_name": "Herxheimer Abendstraßenlauf mit Pfalzmeisterschaften 10k - Herxheim bei Landau (Pfalz)",
-    "date": "21.08.2026",
-    "city": "Herxheim bei Landau (Pfalz)",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "hiltruper-halbmarathon-2026",
-    "url": "/event/hiltruper-halbmarathon-2026/",
-    "event_name": "Hiltruper Halbmarathon",
-    "date": "23.08.2026",
-    "city": "Münster",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3731,19 +3120,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "hunsbuckeltrail-hubut-laubach-hunsruck-2026",
-    "url": "/event/hunsbuckeltrail-hubut-laubach-hunsruck-2026/",
-    "event_name": "Hunsbuckeltrail (HuBuT) - Laubach, Hunsrück",
-    "date": "16.08.2026",
-    "city": "Laubach",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "47 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "ibbenburener-aaseelauf-2026",
     "url": "/event/ibbenburener-aaseelauf-2026/",
     "event_name": "Ibbenbürener Aaseelauf",
@@ -3783,19 +3159,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "ironman-70-3-duisburg-2026",
-    "url": "/event/ironman-70-3-duisburg-2026/",
-    "event_name": "IRONMAN 70.3 Duisburg",
-    "date": "16.08.2026",
-    "city": "Duisburg",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Middle",
-    "has_category_details": true,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "ironman-70-3-erkner-2026",
     "url": "/event/ironman-70-3-erkner-2026/",
     "event_name": "IRONMAN 70.3 Erkner",
@@ -3830,58 +3193,6 @@
     "country": "Sweden",
     "sport": "Triathlon",
     "distance": "Middle",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "ironman-70-3-leipzig-2026",
-    "url": "/event/ironman-70-3-leipzig-2026/",
-    "event_name": "IRONMAN 70.3 Leipzig",
-    "date": "23.08.2026",
-    "city": "Leipzig",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Middle",
-    "has_category_details": true,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "ironman-copenhagen-2026",
-    "url": "/event/ironman-copenhagen-2026/",
-    "event_name": "IRONMAN Copenhagen",
-    "date": "16.08.2026",
-    "city": "Copenhagen",
-    "country": "Denmark",
-    "sport": "Triathlon",
-    "distance": "Full / 3.8 km swim / 180 km bike / 42.2 km run",
-    "has_category_details": true,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "jedermanntriathlon-neustrelitz-2026",
-    "url": "/event/jedermanntriathlon-neustrelitz-2026/",
-    "event_name": "Jedermanntriathlon - Neustrelitz",
-    "date": "22.08.2026",
-    "city": "Neustrelitz",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Sprint Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "josef-kaderhandt-waldlauf-menden-sauerland-2026",
-    "url": "/event/josef-kaderhandt-waldlauf-menden-sauerland-2026/",
-    "event_name": "Josef-Kaderhandt Waldlauf - Menden (Sauerland)",
-    "date": "15.08.2026",
-    "city": "Menden (Sauerland)",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "Half Marathon, Marathon, 50 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3986,32 +3297,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "kelheimer-volksfestlauf-2026",
-    "url": "/event/kelheimer-volksfestlauf-2026/",
-    "event_name": "Kelheimer Volksfestlauf",
-    "date": "15.08.2026",
-    "city": "Kelheim",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "kerwelauf-huttenfeld-lampertheim-2026",
-    "url": "/event/kerwelauf-huttenfeld-lampertheim-2026/",
-    "event_name": "Kerwelauf Hüttenfeld - Lampertheim",
-    "date": "15.08.2026",
-    "city": "Lampertheim",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -4168,19 +3453,6 @@
     "country": "Denmark",
     "sport": "Running",
     "distance": "42 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "kraichgau-energie-summertime-triathlon-2026",
-    "url": "/event/kraichgau-energie-summertime-triathlon-2026/",
-    "event_name": "Kraichgau Energie Summertime Triathlon",
-    "date": "09.08.2026",
-    "city": "Karlsdorf-Neuthard",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -4376,32 +3648,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km / 21 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "lemgoer-hanselauf-2026",
-    "url": "/event/lemgoer-hanselauf-2026/",
-    "event_name": "Lemgoer Hanselauf",
-    "date": "21.08.2026",
-    "city": "Lemgo",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "licher-cross-triathlon-2026",
-    "url": "/event/licher-cross-triathlon-2026/",
-    "event_name": "Licher Cross-Triathlon",
-    "date": "08.08.2026",
-    "city": "Lich",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -4628,19 +3874,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "michelsmarktlauf-reichelsheim-odenwald-2026",
-    "url": "/event/michelsmarktlauf-reichelsheim-odenwald-2026/",
-    "event_name": "Michelsmarktlauf - Reichelsheim (Odenwald)",
-    "date": "22.08.2026",
-    "city": "Reichelsheim (Odenwald)",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "miltenberger-landkreis-lauftag-2026",
     "url": "/event/miltenberger-landkreis-lauftag-2026/",
     "event_name": "Miltenberger Landkreis-Lauftag",
@@ -4732,19 +3965,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "muldental-triathlon-grimma-2026",
-    "url": "/event/muldental-triathlon-grimma-2026/",
-    "event_name": "Muldental-Triathlon - Grimma",
-    "date": "23.08.2026",
-    "city": "Grimma",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Olympic Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "mulheimer-firmenlauf-2026",
     "url": "/event/mulheimer-firmenlauf-2026/",
     "event_name": "Mülheimer Firmenlauf",
@@ -4771,19 +3991,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "nacht-der-zehner-hamburg-2026",
-    "url": "/event/nacht-der-zehner-hamburg-2026/",
-    "event_name": "Nacht der Zehner - Hamburg",
-    "date": "08.08.2026",
-    "city": "Hamburg",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "nordhorner-meile-2026",
     "url": "/event/nordhorner-meile-2026/",
     "event_name": "Nordhorner Meile",
@@ -4793,32 +4000,6 @@
     "sport": "Running",
     "distance": "5 km, 10 km",
     "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "nordschwarzwald-triathlon-2026",
-    "url": "/event/nordschwarzwald-triathlon-2026/",
-    "event_name": "Nordschwarzwald Triathlon",
-    "date": "15.08.2026",
-    "city": "Nagold",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "o-see-challenge-dm-cross-triathlon-xterra-2026",
-    "url": "/event/o-see-challenge-dm-cross-triathlon-xterra-2026/",
-    "event_name": "O-SEE Challenge/DM Cross Triathlon/XTERRA",
-    "date": "15.08.2026",
-    "city": "Olbersdorf",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": true,
     "has_knowledge_details": false,
     "has_rich_details": false
   },
@@ -5005,19 +4186,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "rag-hartfussler-trail-saarbrucken-2026",
-    "url": "/event/rag-hartfussler-trail-saarbrucken-2026/",
-    "event_name": "Rag Hartfüssler Trail - Saarbrücken",
-    "date": "23.08.2026",
-    "city": "Saarbrücken",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "Marathon, 58 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "rats-run-sulzbach-rosenberg-2027",
     "url": "/event/rats-run-sulzbach-rosenberg-2027/",
     "event_name": "Rats-Run Sulzbach-Rosenberg",
@@ -5052,32 +4220,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km / 10 km / 21 km / 42 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "reykjavik-marathon-2026",
-    "url": "/event/reykjavik-marathon-2026/",
-    "event_name": "Reykjavik Marathon",
-    "date": "22.08.2026",
-    "city": "Reykjavik",
-    "country": "Iceland",
-    "sport": "Running",
-    "distance": "10 km / 21 km / 42 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "rheiner-channel-triathlon-2026",
-    "url": "/event/rheiner-channel-triathlon-2026/",
-    "event_name": "Rheiner Channel Triathlon",
-    "date": "09.08.2026",
-    "city": "Rheine",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -5143,19 +4285,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km, Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "rosengartenlauf-2026",
-    "url": "/event/rosengartenlauf-2026/",
-    "event_name": "Rosengartenlauf",
-    "date": "23.08.2026",
-    "city": "Rosengarten-Vahrendorf",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "5 km / 10 km / 21 km / 50 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -5343,19 +4472,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "schierker-sommerlauf-wernigerode-2026",
-    "url": "/event/schierker-sommerlauf-wernigerode-2026/",
-    "event_name": "Schierker Sommerlauf - Wernigerode",
-    "date": "08.08.2026",
-    "city": "Wernigerode",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "16 km, 8 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "schloss-marienburg-marathon-2026",
     "url": "/event/schloss-marienburg-marathon-2026/",
     "event_name": "Schloss Marienburg Marathon",
@@ -5434,32 +4550,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "sengbach-talsperrenlauf-leichlingen-rheinland-2026",
-    "url": "/event/sengbach-talsperrenlauf-leichlingen-rheinland-2026/",
-    "event_name": "Sengbach-Talsperrenlauf - Leichlingen (Rheinland)",
-    "date": "16.08.2026",
-    "city": "Leichlingen (Rheinland)",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "seven-summits-siegen-2026",
-    "url": "/event/seven-summits-siegen-2026/",
-    "event_name": "Seven Summits Siegen",
-    "date": "22.08.2026",
-    "city": "Siegen",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "50 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "sevilla-marathon-2027",
     "url": "/event/sevilla-marathon-2027/",
     "event_name": "Sevilla Marathon",
@@ -5468,19 +4558,6 @@
     "country": "Spain",
     "sport": "Running",
     "distance": "42 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "shoe-workers-hard-trail-run-hauenstein-2026",
-    "url": "/event/shoe-workers-hard-trail-run-hauenstein-2026/",
-    "event_name": "Shoe Workers Hard Trail-Run - Hauenstein",
-    "date": "08.08.2026",
-    "city": "Hauenstein",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -5733,19 +4810,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "stadtlauf-in-gedern-2026",
-    "url": "/event/stadtlauf-in-gedern-2026/",
-    "event_name": "Stadtlauf in Gedern",
-    "date": "15.08.2026",
-    "city": "Gedern",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "stadtparklauf-sondershausen-2026",
     "url": "/event/stadtparklauf-sondershausen-2026/",
     "event_name": "Stadtparklauf Sondershausen",
@@ -5785,45 +4849,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "stadtwerke-borken-triathlon-2026",
-    "url": "/event/stadtwerke-borken-triathlon-2026/",
-    "event_name": "Stadtwerke Borken Triathlon",
-    "date": "08.08.2026",
-    "city": "Borken",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "stadtwerke-europalauf-2026",
-    "url": "/event/stadtwerke-europalauf-2026/",
-    "event_name": "Stadtwerke-Europalauf",
-    "date": "09.08.2026",
-    "city": "Neustadt in Holstein",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km, Half Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "stadtwerke-halle-triathlon-halle-saale-2026",
-    "url": "/event/stadtwerke-halle-triathlon-halle-saale-2026/",
-    "event_name": "Stadtwerke Halle Triathlon - Halle (Saale)",
-    "date": "16.08.2026",
-    "city": "Halle (Saale)",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Sprint Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "stadtwerke-lubeck-marathon-2026",
     "url": "/event/stadtwerke-lubeck-marathon-2026/",
     "event_name": "Stadtwerke Lübeck Marathon",
@@ -5832,45 +4857,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "2 km, 5 km, 10 km, Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "stadtwerkelauf-delitzsch-2026",
-    "url": "/event/stadtwerkelauf-delitzsch-2026/",
-    "event_name": "Stadtwerkelauf Delitzsch",
-    "date": "22.08.2026",
-    "city": "Delitzsch",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "stauseelauf-bad-worishofer-bad-worishofen-2026",
-    "url": "/event/stauseelauf-bad-worishofer-bad-worishofen-2026/",
-    "event_name": "Stauseelauf Bad Wörishofer - Bad Wörishofen",
-    "date": "07.08.2026",
-    "city": "Bad Wörishofen",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "stefan-andres-freundschaftslauf-schweich-2026",
-    "url": "/event/stefan-andres-freundschaftslauf-schweich-2026/",
-    "event_name": "Stefan Andres Freundschaftslauf - Schweich",
-    "date": "09.08.2026",
-    "city": "Schweich",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "12 km, 18 km, 26 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -6097,19 +5083,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "the-last-light-backyard-ultra-frankfurt-oder-2026",
-    "url": "/event/the-last-light-backyard-ultra-frankfurt-oder-2026/",
-    "event_name": "The Last Light Backyard Ultra - Frankfurt (Oder)",
-    "date": "14.08.2026",
-    "city": "Frankfurt (Oder)",
-    "country": "Germany",
-    "sport": "Ultramarathon",
-    "distance": "6.7 km, 25 km, 7 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "top-race-germany-bostalsee-2026",
     "url": "/event/top-race-germany-bostalsee-2026/",
     "event_name": "Top Race Germany - Bostalsee",
@@ -6170,19 +5143,6 @@
     "country": "Austria",
     "sport": "Running",
     "distance": "Half Marathon, Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "triathlon-festival-rheinhessen-2026",
-    "url": "/event/triathlon-festival-rheinhessen-2026/",
-    "event_name": "Triathlon Festival Rheinhessen",
-    "date": "16.08.2026",
-    "city": "Wörrstadt",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -6331,19 +5291,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "viernheimer-triathlon-2026",
-    "url": "/event/viernheimer-triathlon-2026/",
-    "event_name": "Viernheimer Triathlon",
-    "date": "23.08.2026",
-    "city": "Viernheim",
-    "country": "Germany",
-    "sport": "Triathlon",
-    "distance": "Olympic Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "viking-triathlon-schleswig-2027",
     "url": "/event/viking-triathlon-schleswig-2027/",
     "event_name": "Viking Triathlon Schleswig",
@@ -6352,19 +5299,6 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "volkslauf-rund-um-zehnhausen-landau-in-der-pfalz-2026",
-    "url": "/event/volkslauf-rund-um-zehnhausen-landau-in-der-pfalz-2026/",
-    "event_name": "Volkslauf rund um Zehnhausen - Landau in der Pfalz",
-    "date": "21.08.2026",
-    "city": "Landau in der Pfalz",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -6604,32 +5538,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "wohldenberger-waldlauf-holle-2026",
-    "url": "/event/wohldenberger-waldlauf-holle-2026/",
-    "event_name": "Wohldenberger Waldlauf - Holle",
-    "date": "16.08.2026",
-    "city": "Holle",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "10 km, Half Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "wohler-lauf-rund-um-die-aabachtalsperre-bad-wunnenberg-2026",
-    "url": "/event/wohler-lauf-rund-um-die-aabachtalsperre-bad-wunnenberg-2026/",
-    "event_name": "Wöhler-Lauf \"Rund um die Aabachtalsperre\" - Bad Wünnenberg",
-    "date": "16.08.2026",
-    "city": "Bad Wünnenberg",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km, 10 km, Half Marathon",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "womens-run-siegen-2026",
     "url": "/event/womens-run-siegen-2026/",
     "event_name": "Womens-Run-Siegen",
@@ -6651,19 +5559,6 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km / 10 km / 21 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
-    "slug": "wossner-halbmarathon-unterwossen-2026",
-    "url": "/event/wossner-halbmarathon-unterwossen-2026/",
-    "event_name": "Wössner Halbmarathon - Unterwössen",
-    "date": "16.08.2026",
-    "city": "Unterwössen",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -6773,6 +5668,32 @@
     "has_rich_details": false
   },
   {
+    "slug": "1-hannover-backyard-ultra-2026",
+    "url": "/event/1-hannover-backyard-ultra-2026/",
+    "event_name": "1. Hannover Backyard Ultra",
+    "date": "08.08.2026",
+    "city": "Hannover",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "6.7 km, Backyard Ultra",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "1-laufchallenge-mellendorfer-tv-2026",
+    "url": "/event/1-laufchallenge-mellendorfer-tv-2026/",
+    "event_name": "1. Laufchallenge Mellendorfer TV",
+    "date": "23.08.2026",
+    "city": "Hanover",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "1-westerwalder-backyard-ultra-2026",
     "url": "/event/1-westerwalder-backyard-ultra-2026/",
     "event_name": "1. Westerwälder Backyard Ultra",
@@ -6812,11 +5733,50 @@
     "has_rich_details": false
   },
   {
+    "slug": "100-meilen-berlin-mauerweglauf-2026",
+    "url": "/event/100-meilen-berlin-mauerweglauf-2026/",
+    "event_name": "100 Meilen Berlin — Mauerweglauf",
+    "date": "15.08.2026",
+    "city": "Berlin",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "100 Miles / 161 km",
+    "has_category_details": true,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "11-lichterlauf-tangermunde-2026",
+    "url": "/event/11-lichterlauf-tangermunde-2026/",
+    "event_name": "11. Lichterlauf Tangermünde",
+    "date": "21.08.2026",
+    "city": "Saxony-Anhalt",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "11-wuggi-triathlon-2026",
     "url": "/event/11-wuggi-triathlon-2026/",
     "event_name": "11. Wuggi-Triathlon",
     "date": "11.07.2026",
     "city": "Prackenbach",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "12-altwarmbuchener-triathlon-am-15-16-8-2026-2026",
+    "url": "/event/12-altwarmbuchener-triathlon-am-15-16-8-2026-2026/",
+    "event_name": "12. Altwarmbüchener Triathlon am 15./16.8.2026",
+    "date": "15.08.2026",
+    "city": "Hannover",
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
@@ -6885,6 +5845,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "14-gewoba-city-triathlon-bremen-2026",
+    "url": "/event/14-gewoba-city-triathlon-bremen-2026/",
+    "event_name": "14. GEWOBA City Triathlon Bremen",
+    "date": "09.08.2026",
+    "city": "Bremen",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7033,6 +6006,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "17-vsb-dresdner-nachtlauf-2026",
+    "url": "/event/17-vsb-dresdner-nachtlauf-2026/",
+    "event_name": "17. VSB Dresdner Nachtlauf",
+    "date": "14.08.2026",
+    "city": "Dresden",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "11.5 km, 6.2 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "18-mitteldeutscher-firmenteam-triathlon-2026",
     "url": "/event/18-mitteldeutscher-firmenteam-triathlon-2026/",
     "event_name": "18. Mitteldeutscher Firmenteam Triathlon",
@@ -7051,6 +6037,19 @@
     "event_name": "19. DTU Triathlon Schultour",
     "date": "01.07.2026",
     "city": "Neubrandenburg",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "19-licher-triathlon-2026",
+    "url": "/event/19-licher-triathlon-2026/",
+    "event_name": "19. Licher Triathlon",
+    "date": "08.08.2026",
+    "city": "Lich",
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
@@ -7150,6 +6149,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "23-rodgau-triathlon-2026",
+    "url": "/event/23-rodgau-triathlon-2026/",
+    "event_name": "23. Rodgau Triathlon",
+    "date": "16.08.2026",
+    "city": "Rodgau",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "23-sparkassen-triathlon-dortmund-2026-2026",
     "url": "/event/23-sparkassen-triathlon-dortmund-2026-2026/",
     "event_name": "23. Sparkassen-Triathlon Dortmund",
@@ -7241,6 +6253,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "26-pohler-triathlon-2026",
+    "url": "/event/26-pohler-triathlon-2026/",
+    "event_name": "26. Pöhler-Triathlon",
+    "date": "09.08.2026",
+    "city": "Pöhl",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "27-midsummer-triathlon-2026",
     "url": "/event/27-midsummer-triathlon-2026/",
     "event_name": "27. Midsummer-Triathlon",
@@ -7306,6 +6331,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "3-edermunder-triathlon-2026",
+    "url": "/event/3-edermunder-triathlon-2026/",
+    "event_name": "3. Edermünder Triathlon",
+    "date": "16.08.2026",
+    "city": "Edermünde",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "3-oste-triathlon-bremervorde-2026",
     "url": "/event/3-oste-triathlon-bremervorde-2026/",
     "event_name": "3. Oste-Triathlon Bremervörde",
@@ -7337,6 +6375,19 @@
     "event_name": "31. Fümmelsee-Triathlon",
     "date": "28.06.2026",
     "city": "Wolfenbüttel",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "31-ilmenauer-teamtriathlon-2026-2026",
+    "url": "/event/31-ilmenauer-teamtriathlon-2026-2026/",
+    "event_name": "31. Ilmenauer Teamtriathlon",
+    "date": "19.08.2026",
+    "city": "Ilmenau",
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
@@ -7475,6 +6526,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "35-maibacher-triathlon-2026",
+    "url": "/event/35-maibacher-triathlon-2026/",
+    "event_name": "35. Maibacher Triathlon",
+    "date": "09.08.2026",
+    "city": "Butzbach",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "35-regensburger-triathlon-2026",
     "url": "/event/35-regensburger-triathlon-2026/",
     "event_name": "35. Regensburger Triathlon",
@@ -7496,6 +6560,19 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "35-speller-sparkassen-sommernachtslauf-2026",
+    "url": "/event/35-speller-sparkassen-sommernachtslauf-2026/",
+    "event_name": "35. Speller Sparkassen-Sommernachtslauf",
+    "date": "14.08.2026",
+    "city": "Spelle",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Halbmarathon, 10 km, 5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7527,6 +6604,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "36-elm-lappwald-triathlon-2026",
+    "url": "/event/36-elm-lappwald-triathlon-2026/",
+    "event_name": "36. Elm-Lappwald Triathlon",
+    "date": "22.08.2026",
+    "city": "Helmstedt",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "36-gottinger-altstadtlauf-2026",
     "url": "/event/36-gottinger-altstadtlauf-2026/",
     "event_name": "36. Göttinger Altstadtlauf",
@@ -7535,6 +6625,32 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "37-bergsee-triathlon-2026",
+    "url": "/event/37-bergsee-triathlon-2026/",
+    "event_name": "37. Bergsee Triathlon",
+    "date": "08.08.2026",
+    "city": "Schleusingen",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "37-kn-forde-triathlon-2026-2026",
+    "url": "/event/37-kn-forde-triathlon-2026-2026/",
+    "event_name": "37. KN Förde Triathlon",
+    "date": "16.08.2026",
+    "city": "Kiel",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7639,6 +6755,19 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "4-rammelsberger-steigerlauf-2026",
+    "url": "/event/4-rammelsberger-steigerlauf-2026/",
+    "event_name": "4. Rammelsberger Steigerlauf",
+    "date": "22.08.2026",
+    "city": "Goslar",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Marathon, Halbmarathon, 14 km, 10 km, 6.5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7782,6 +6911,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "19 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "42-viernheimer-v-card-triathlon-2026",
+    "url": "/event/42-viernheimer-v-card-triathlon-2026/",
+    "event_name": "42. Viernheimer V-Card-Triathlon",
+    "date": "22.08.2026",
+    "city": "Viernheim",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7995,6 +7137,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "ahnepark-lauf-der-laufgemeinschaft-vellmar-2026",
+    "url": "/event/ahnepark-lauf-der-laufgemeinschaft-vellmar-2026/",
+    "event_name": "Ahnepark-Lauf der Laufgemeinschaft Vellmar",
+    "date": "21.08.2026",
+    "city": "Vellmar",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "alb-run-heroldstatt-2026",
     "url": "/event/alb-run-heroldstatt-2026/",
     "event_name": "Alb-Run Heroldstatt",
@@ -8029,6 +7184,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "allgau-panorama-marathon-2026",
+    "url": "/event/allgau-panorama-marathon-2026/",
+    "event_name": "Allgäu-Panorama-Marathon",
+    "date": "09.08.2026",
+    "city": "Sonthofen",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Half Marathon, Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -8450,6 +7618,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "barenkopplauf-waldbreitbach-2026",
+    "url": "/event/barenkopplauf-waldbreitbach-2026/",
+    "event_name": "Bärenkopplauf - Waldbreitbach",
+    "date": "07.08.2026",
+    "city": "Waldbreitbach",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "bargstedter-mittsommernachtslauf-2026",
     "url": "/event/bargstedter-mittsommernachtslauf-2026/",
     "event_name": "Bargstedter Mittsommernachtslauf",
@@ -8541,6 +7722,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "berliner-strassenlauf-die-generalprobe-2026",
+    "url": "/event/berliner-strassenlauf-die-generalprobe-2026/",
+    "event_name": "Berliner Straßenlauf - Die Generalprobe",
+    "date": "23.08.2026",
+    "city": "Berlin",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, Half Marathon, Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "berliner-volkstriathlon-2026",
     "url": "/event/berliner-volkstriathlon-2026/",
     "event_name": "Berliner Volkstriathlon",
@@ -8614,6 +7808,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "bielebohlauf-2026",
+    "url": "/event/bielebohlauf-2026/",
+    "event_name": "Bielebohlauf",
+    "date": "23.08.2026",
+    "city": "Oppach",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Halbmarathon, 12 km, 5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -8723,6 +7930,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "bornsdorf-triathlon-2026-2026",
+    "url": "/event/bornsdorf-triathlon-2026-2026/",
+    "event_name": "Bornsdorf-Triathlon",
+    "date": "15.08.2026",
+    "city": "Heideblick-Bornsdorf",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "brauerschwender-basaltlauf-2026",
     "url": "/event/brauerschwender-basaltlauf-2026/",
     "event_name": "Brauerschwender Basaltlauf",
@@ -8744,6 +7964,32 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "breisgau-triathlon-malterdingen-2026",
+    "url": "/event/breisgau-triathlon-malterdingen-2026/",
+    "event_name": "Breisgau Triathlon - Malterdingen",
+    "date": "23.08.2026",
+    "city": "Malterdingen",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "breitunger-plesslauf-breitungen-werra-2026",
+    "url": "/event/breitunger-plesslauf-breitungen-werra-2026/",
+    "event_name": "Breitunger Pleßlauf - Breitungen/Werra",
+    "date": "23.08.2026",
+    "city": "Breitungen/Werra",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "30 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -8879,6 +8125,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "bwm-sommerlochlauf-2026",
+    "url": "/event/bwm-sommerlochlauf-2026/",
+    "event_name": "BWM Sommerlochlauf",
+    "date": "04.08.2026",
+    "city": "Steinheim an der Murr",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "campus-run-berlin-2026",
     "url": "/event/campus-run-berlin-2026/",
     "event_name": "Campus Run Berlin",
@@ -8927,6 +8186,19 @@
     "sport": "Triathlon",
     "distance": "Middle Distance / Aquabike / Swim and Run",
     "has_category_details": true,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "charity-mega-run-2026",
+    "url": "/event/charity-mega-run-2026/",
+    "event_name": "Charity Mega Run",
+    "date": "15.08.2026",
+    "city": "Bingen am Rhein",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "50 km, 26 km, 10 km, 5 km",
+    "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
   },
@@ -9061,6 +8333,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "datagroup-triathlon-nurnberg-2026",
+    "url": "/event/datagroup-triathlon-nurnberg-2026/",
+    "event_name": "DATAGROUP Triathlon Nürnberg",
+    "date": "09.08.2026",
+    "city": "Nürnberg",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "davos-x-trails-2026",
     "url": "/event/davos-x-trails-2026/",
     "event_name": "Davos X-Trails",
@@ -9100,6 +8385,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "der-alstertallauf-2026",
+    "url": "/event/der-alstertallauf-2026/",
+    "event_name": "Der Alstertallauf",
+    "date": "23.08.2026",
+    "city": "Alsterwanderweg",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Halbmarathon, 10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "der-rigolator-riegel-am-kaiserstuhl-2026",
     "url": "/event/der-rigolator-riegel-am-kaiserstuhl-2026/",
     "event_name": "Der Rigolator - Riegel am Kaiserstuhl",
@@ -9108,6 +8406,19 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Sprint Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "detmolder-residenzlauf-2026",
+    "url": "/event/detmolder-residenzlauf-2026/",
+    "event_name": "Detmolder Residenzlauf",
+    "date": "15.08.2026",
+    "city": "Detmold",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -9321,6 +8632,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "emder-vielfaltslauf-emden-2026",
+    "url": "/event/emder-vielfaltslauf-emden-2026/",
+    "event_name": "Emder Vielfaltslauf - Emden",
+    "date": "22.08.2026",
+    "city": "Emden",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "empor-lauf-dahme-mark-2026",
     "url": "/event/empor-lauf-dahme-mark-2026/",
     "event_name": "Empor Lauf - Dahme/Mark",
@@ -9399,6 +8723,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "eschweiler-citylauf-2026-2026",
+    "url": "/event/eschweiler-citylauf-2026-2026/",
+    "event_name": "Eschweiler Citylauf",
+    "date": "23.08.2026",
+    "city": "Eschweiler",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "eselsburger-tal-lauf-2026",
     "url": "/event/eselsburger-tal-lauf-2026/",
     "event_name": "Eselsburger-Tal-Lauf",
@@ -9459,6 +8796,19 @@
     "country": "Germany",
     "sport": "Ultramarathon",
     "distance": "45.3 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "exter-flexrun-vlotho-2026",
+    "url": "/event/exter-flexrun-vlotho-2026/",
+    "event_name": "Exter FlexRun - Vlotho",
+    "date": "22.08.2026",
+    "city": "Vlotho",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km, Half Marathon, Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -9550,6 +8900,32 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km / 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "florstadt-halbmarathon-2026",
+    "url": "/event/florstadt-halbmarathon-2026/",
+    "event_name": "FlorSTADT Halbmarathon",
+    "date": "23.08.2026",
+    "city": "Florstadt",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km / 10 km / 21 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "fockbeker-dorflauf-2026",
+    "url": "/event/fockbeker-dorflauf-2026/",
+    "event_name": "Fockbeker Dorflauf",
+    "date": "07.08.2026",
+    "city": "Fockbek",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -9698,6 +9074,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "gapa-everesting-festival-garmisch-partenkirchen-2026",
+    "url": "/event/gapa-everesting-festival-garmisch-partenkirchen-2026/",
+    "event_name": "GaPa Everesting-Festival - Garmisch-Partenkirchen",
+    "date": "15.08.2026",
+    "city": "Garmisch-Partenkirchen",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "59 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "gaulauf-2026",
     "url": "/event/gaulauf-2026/",
     "event_name": "Gäulauf",
@@ -9706,6 +9095,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "Halbmarathon, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "gebirgsmarathon-immenstadt-immenstadt-im-allgau-2026",
+    "url": "/event/gebirgsmarathon-immenstadt-immenstadt-im-allgau-2026/",
+    "event_name": "Gebirgsmarathon Immenstadt - Immenstadt im Allgäu",
+    "date": "22.08.2026",
+    "city": "Immenstadt im Allgäu",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -9737,6 +9139,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "gettorfer-staffelmarathon-2026",
+    "url": "/event/gettorfer-staffelmarathon-2026/",
+    "event_name": "Gettorfer Staffelmarathon",
+    "date": "23.08.2026",
+    "city": "Gettorf",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "gibacht-berglauf-furth-im-wald-2026",
     "url": "/event/gibacht-berglauf-furth-im-wald-2026/",
     "event_name": "Gibacht Berglauf Furth im Wald",
@@ -9745,6 +9160,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "gladbecker-sparkassenlauf-2026",
+    "url": "/event/gladbecker-sparkassenlauf-2026/",
+    "event_name": "Gladbecker Sparkassenlauf",
+    "date": "23.08.2026",
+    "city": "Gladbeck",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Halbmarathon, 10 km, 5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -9828,6 +9256,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "gondo-marathon-2026",
+    "url": "/event/gondo-marathon-2026/",
+    "event_name": "Gondo Marathon",
+    "date": "08.08.2026",
+    "city": "Gondo",
+    "country": "Switzerland",
+    "sport": "Ultramarathon",
+    "distance": "28 km / 42 km / 84 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "gorch-fock-lauf-2026",
     "url": "/event/gorch-fock-lauf-2026/",
     "event_name": "Gorch-Fock-Lauf",
@@ -9888,6 +9329,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "hachede-triathlon-geesthacht-2026",
+    "url": "/event/hachede-triathlon-geesthacht-2026/",
+    "event_name": "Hachede-Triathlon - Geesthacht",
+    "date": "23.08.2026",
+    "city": "Geesthacht",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Olympic Triathlon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -10075,6 +9529,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "heidekoniginnenpokal-2026",
+    "url": "/event/heidekoniginnenpokal-2026/",
+    "event_name": "Heideköniginnenpokal",
+    "date": "22.08.2026",
+    "city": "Amelinghausen",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "heidelberg-triathlon-2026",
     "url": "/event/heidelberg-triathlon-2026/",
     "event_name": "Heidelberg Triathlon",
@@ -10140,6 +9607,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "helsinki-marathon-2026",
+    "url": "/event/helsinki-marathon-2026/",
+    "event_name": "Helsinki Marathon",
+    "date": "22.08.2026",
+    "city": "Helsinki",
+    "country": "Finland",
+    "sport": "Running",
+    "distance": "10 km / 21 km / 42 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "hembser-drei-dorfer-lauf-brakel-2026",
     "url": "/event/hembser-drei-dorfer-lauf-brakel-2026/",
     "event_name": "Hembser Drei-Dörfer-Lauf - Brakel",
@@ -10174,6 +9654,19 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "herxheimer-abendstrassenlauf-mit-pfalzmeisterschaften-10k-herxheim-bei-landau-pfalz-2026",
+    "url": "/event/herxheimer-abendstrassenlauf-mit-pfalzmeisterschaften-10k-herxheim-bei-landau-pfalz-2026/",
+    "event_name": "Herxheimer Abendstraßenlauf mit Pfalzmeisterschaften 10k - Herxheim bei Landau (Pfalz)",
+    "date": "21.08.2026",
+    "city": "Herxheim bei Landau (Pfalz)",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -10226,6 +9719,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "Halbmarathon, 10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "hiltruper-halbmarathon-2026",
+    "url": "/event/hiltruper-halbmarathon-2026/",
+    "event_name": "Hiltruper Halbmarathon",
+    "date": "23.08.2026",
+    "city": "Münster",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -10322,6 +9828,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "hunsbuckeltrail-hubut-laubach-hunsruck-2026",
+    "url": "/event/hunsbuckeltrail-hubut-laubach-hunsruck-2026/",
+    "event_name": "Hunsbuckeltrail (HuBuT) - Laubach, Hunsrück",
+    "date": "16.08.2026",
+    "city": "Laubach",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "47 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "hunsruck-trail-morschied-2026",
     "url": "/event/hunsruck-trail-morschied-2026/",
     "event_name": "Hunsrück-Trail - Mörschied",
@@ -10413,6 +9932,32 @@
     "has_rich_details": false
   },
   {
+    "slug": "ironman-70-3-duisburg-2026",
+    "url": "/event/ironman-70-3-duisburg-2026/",
+    "event_name": "IRONMAN 70.3 Duisburg",
+    "date": "16.08.2026",
+    "city": "Duisburg",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Middle",
+    "has_category_details": true,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "ironman-70-3-leipzig-2026",
+    "url": "/event/ironman-70-3-leipzig-2026/",
+    "event_name": "IRONMAN 70.3 Leipzig",
+    "date": "23.08.2026",
+    "city": "Leipzig",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Middle",
+    "has_category_details": true,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "ironman-70-3-luxembourg-2026",
     "url": "/event/ironman-70-3-luxembourg-2026/",
     "event_name": "IRONMAN 70.3 Luxembourg",
@@ -10448,6 +9993,19 @@
     "sport": "Triathlon",
     "distance": "Middle",
     "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "ironman-copenhagen-2026",
+    "url": "/event/ironman-copenhagen-2026/",
+    "event_name": "IRONMAN Copenhagen",
+    "date": "16.08.2026",
+    "city": "Copenhagen",
+    "country": "Denmark",
+    "sport": "Triathlon",
+    "distance": "Full / 3.8 km swim / 180 km bike / 42.2 km run",
+    "has_category_details": true,
     "has_knowledge_details": false,
     "has_rich_details": false
   },
@@ -10517,6 +10075,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "jedermanntriathlon-neustrelitz-2026",
+    "url": "/event/jedermanntriathlon-neustrelitz-2026/",
+    "event_name": "Jedermanntriathlon - Neustrelitz",
+    "date": "22.08.2026",
+    "city": "Neustrelitz",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Sprint Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "jemgumer-dorploop-2026",
     "url": "/event/jemgumer-dorploop-2026/",
     "event_name": "Jemgumer Dörploop",
@@ -10525,6 +10096,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "Halbmarathon, 10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "josef-kaderhandt-waldlauf-menden-sauerland-2026",
+    "url": "/event/josef-kaderhandt-waldlauf-menden-sauerland-2026/",
+    "event_name": "Josef-Kaderhandt Waldlauf - Menden (Sauerland)",
+    "date": "15.08.2026",
+    "city": "Menden (Sauerland)",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "Half Marathon, Marathon, 50 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -10551,6 +10135,32 @@
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Olympic Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "kelheimer-volksfestlauf-2026",
+    "url": "/event/kelheimer-volksfestlauf-2026/",
+    "event_name": "Kelheimer Volksfestlauf",
+    "date": "15.08.2026",
+    "city": "Kelheim",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "kerwelauf-huttenfeld-lampertheim-2026",
+    "url": "/event/kerwelauf-huttenfeld-lampertheim-2026/",
+    "event_name": "Kerwelauf Hüttenfeld - Lampertheim",
+    "date": "15.08.2026",
+    "city": "Lampertheim",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -10686,6 +10296,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "kraichgau-energie-summertime-triathlon-2026",
+    "url": "/event/kraichgau-energie-summertime-triathlon-2026/",
+    "event_name": "Kraichgau Energie Summertime Triathlon",
+    "date": "09.08.2026",
+    "city": "Karlsdorf-Neuthard",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "ksc-schlossparklauf-karlsruhe-2026",
     "url": "/event/ksc-schlossparklauf-karlsruhe-2026/",
     "event_name": "KSC-Schlossparklauf - Karlsruhe",
@@ -10816,11 +10439,37 @@
     "has_rich_details": false
   },
   {
+    "slug": "lemgoer-hanselauf-2026",
+    "url": "/event/lemgoer-hanselauf-2026/",
+    "event_name": "Lemgoer Hanselauf",
+    "date": "21.08.2026",
+    "city": "Lemgo",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "lexware-freiburg-triathlon-2026-2026",
     "url": "/event/lexware-freiburg-triathlon-2026-2026/",
     "event_name": "LEXWARE Freiburg-Triathlon",
     "date": "05.07.2026",
     "city": "Freiburg im Breisgau",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "licher-cross-triathlon-2026",
+    "url": "/event/licher-cross-triathlon-2026/",
+    "event_name": "Licher Cross-Triathlon",
+    "date": "08.08.2026",
+    "city": "Lich",
     "country": "Germany",
     "sport": "Triathlon",
     "distance": "Triathlon",
@@ -11050,6 +10699,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "michelsmarktlauf-reichelsheim-odenwald-2026",
+    "url": "/event/michelsmarktlauf-reichelsheim-odenwald-2026/",
+    "event_name": "Michelsmarktlauf - Reichelsheim (Odenwald)",
+    "date": "22.08.2026",
+    "city": "Reichelsheim (Odenwald)",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "midnight-run-reykjavik-104-reykjavik-21-1-km-10-km-5-km-2026",
     "url": "/event/midnight-run-reykjavik-104-reykjavik-21-1-km-10-km-5-km-2026/",
     "event_name": "Midnight Run Reykjavík 104 Reykjavík 21,1 km, 10 km, 5 km",
@@ -11167,6 +10829,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "muldental-triathlon-grimma-2026",
+    "url": "/event/muldental-triathlon-grimma-2026/",
+    "event_name": "Muldental-Triathlon - Grimma",
+    "date": "23.08.2026",
+    "city": "Grimma",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Olympic Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "muppberg-trailrun-neustadt-2026",
     "url": "/event/muppberg-trailrun-neustadt-2026/",
     "event_name": "Muppberg-Trailrun Neustadt",
@@ -11188,6 +10863,19 @@
     "country": "Germany",
     "sport": "Ultramarathon",
     "distance": "75 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "nacht-der-zehner-hamburg-2026",
+    "url": "/event/nacht-der-zehner-hamburg-2026/",
+    "event_name": "Nacht der Zehner - Hamburg",
+    "date": "08.08.2026",
+    "city": "Hamburg",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -11271,6 +10959,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "nordschwarzwald-triathlon-2026",
+    "url": "/event/nordschwarzwald-triathlon-2026/",
+    "event_name": "Nordschwarzwald Triathlon",
+    "date": "15.08.2026",
+    "city": "Nagold",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "north-pole-marathon-spitzbergen-spitzbergen-42-195-km-2026",
     "url": "/event/north-pole-marathon-spitzbergen-spitzbergen-42-195-km-2026/",
     "event_name": "North Pole Marathon Spitzbergen - Spitzbergen 42,195 km",
@@ -11293,6 +10994,19 @@
     "sport": "Triathlon",
     "distance": "Triathlon",
     "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "o-see-challenge-dm-cross-triathlon-xterra-2026",
+    "url": "/event/o-see-challenge-dm-cross-triathlon-xterra-2026/",
+    "event_name": "O-SEE Challenge/DM Cross Triathlon/XTERRA",
+    "date": "15.08.2026",
+    "city": "Olbersdorf",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": true,
     "has_knowledge_details": false,
     "has_rich_details": false
   },
@@ -11531,6 +11245,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "rag-hartfussler-trail-saarbrucken-2026",
+    "url": "/event/rag-hartfussler-trail-saarbrucken-2026/",
+    "event_name": "Rag Hartfüssler Trail - Saarbrücken",
+    "date": "23.08.2026",
+    "city": "Saarbrücken",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "Marathon, 58 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "raiffeisentriathlon-2026",
     "url": "/event/raiffeisentriathlon-2026/",
     "event_name": "Raiffeisentriathlon",
@@ -11609,6 +11336,32 @@
     "has_rich_details": false
   },
   {
+    "slug": "reykjavik-marathon-2026",
+    "url": "/event/reykjavik-marathon-2026/",
+    "event_name": "Reykjavik Marathon",
+    "date": "22.08.2026",
+    "city": "Reykjavik",
+    "country": "Iceland",
+    "sport": "Running",
+    "distance": "10 km / 21 km / 42 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "rheiner-channel-triathlon-2026",
+    "url": "/event/rheiner-channel-triathlon-2026/",
+    "event_name": "Rheiner Channel Triathlon",
+    "date": "09.08.2026",
+    "city": "Rheine",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "rheingauer-halbmarathon-2026",
     "url": "/event/rheingauer-halbmarathon-2026/",
     "event_name": "Rheingauer Halbmarathon",
@@ -11669,6 +11422,19 @@
     "country": "Italy",
     "sport": "Ultramarathon",
     "distance": "Marathon, 46 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "rosengartenlauf-2026",
+    "url": "/event/rosengartenlauf-2026/",
+    "event_name": "Rosengartenlauf",
+    "date": "23.08.2026",
+    "city": "Rosengarten-Vahrendorf",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "5 km / 10 km / 21 km / 50 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -11830,6 +11596,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "schierker-sommerlauf-wernigerode-2026",
+    "url": "/event/schierker-sommerlauf-wernigerode-2026/",
+    "event_name": "Schierker Sommerlauf - Wernigerode",
+    "date": "08.08.2026",
+    "city": "Wernigerode",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "16 km, 8 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "schlaubetal-triathlon-2026",
     "url": "/event/schlaubetal-triathlon-2026/",
     "event_name": "Schlaubetal- Triathlon",
@@ -11965,6 +11744,45 @@
     "event_name": "Seelbach-Schwarzwald-Sonnwendlauf",
     "date": "19.06.2026",
     "city": "Seelbach",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "sengbach-talsperrenlauf-leichlingen-rheinland-2026",
+    "url": "/event/sengbach-talsperrenlauf-leichlingen-rheinland-2026/",
+    "event_name": "Sengbach-Talsperrenlauf - Leichlingen (Rheinland)",
+    "date": "16.08.2026",
+    "city": "Leichlingen (Rheinland)",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, Half Marathon, Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "seven-summits-siegen-2026",
+    "url": "/event/seven-summits-siegen-2026/",
+    "event_name": "Seven Summits Siegen",
+    "date": "22.08.2026",
+    "city": "Siegen",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "50 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "shoe-workers-hard-trail-run-hauenstein-2026",
+    "url": "/event/shoe-workers-hard-trail-run-hauenstein-2026/",
+    "event_name": "Shoe Workers Hard Trail-Run - Hauenstein",
+    "date": "08.08.2026",
+    "city": "Hauenstein",
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km",
@@ -12194,6 +12012,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "stadtlauf-in-gedern-2026",
+    "url": "/event/stadtlauf-in-gedern-2026/",
+    "event_name": "Stadtlauf in Gedern",
+    "date": "15.08.2026",
+    "city": "Gedern",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "stadtlauf-saarburg-2026",
     "url": "/event/stadtlauf-saarburg-2026/",
     "event_name": "Stadtlauf Saarburg",
@@ -12207,6 +12038,58 @@
     "has_rich_details": false
   },
   {
+    "slug": "stadtwerke-borken-triathlon-2026",
+    "url": "/event/stadtwerke-borken-triathlon-2026/",
+    "event_name": "Stadtwerke Borken Triathlon",
+    "date": "08.08.2026",
+    "city": "Borken",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "stadtwerke-europalauf-2026",
+    "url": "/event/stadtwerke-europalauf-2026/",
+    "event_name": "Stadtwerke-Europalauf",
+    "date": "09.08.2026",
+    "city": "Neustadt in Holstein",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km, Half Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "stadtwerke-halle-triathlon-halle-saale-2026",
+    "url": "/event/stadtwerke-halle-triathlon-halle-saale-2026/",
+    "event_name": "Stadtwerke Halle Triathlon - Halle (Saale)",
+    "date": "16.08.2026",
+    "city": "Halle (Saale)",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Sprint Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "stadtwerkelauf-delitzsch-2026",
+    "url": "/event/stadtwerkelauf-delitzsch-2026/",
+    "event_name": "Stadtwerkelauf Delitzsch",
+    "date": "22.08.2026",
+    "city": "Delitzsch",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "staffelsee-panoramalauf-murnau-2026",
     "url": "/event/staffelsee-panoramalauf-murnau-2026/",
     "event_name": "Staffelsee-Panoramalauf Murnau",
@@ -12215,6 +12098,32 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "stauseelauf-bad-worishofer-bad-worishofen-2026",
+    "url": "/event/stauseelauf-bad-worishofer-bad-worishofen-2026/",
+    "event_name": "Stauseelauf Bad Wörishofer - Bad Wörishofen",
+    "date": "07.08.2026",
+    "city": "Bad Wörishofen",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "stefan-andres-freundschaftslauf-schweich-2026",
+    "url": "/event/stefan-andres-freundschaftslauf-schweich-2026/",
+    "event_name": "Stefan Andres Freundschaftslauf - Schweich",
+    "date": "09.08.2026",
+    "city": "Schweich",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "12 km, 18 km, 26 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -12428,6 +12337,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "the-last-light-backyard-ultra-frankfurt-oder-2026",
+    "url": "/event/the-last-light-backyard-ultra-frankfurt-oder-2026/",
+    "event_name": "The Last Light Backyard Ultra - Frankfurt (Oder)",
+    "date": "14.08.2026",
+    "city": "Frankfurt (Oder)",
+    "country": "Germany",
+    "sport": "Ultramarathon",
+    "distance": "6.7 km, 25 km, 7 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "thuringen-ultra-2026",
     "url": "/event/thuringen-ultra-2026/",
     "event_name": "Thüringen Ultra",
@@ -12558,6 +12480,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "triathlon-festival-rheinhessen-2026",
+    "url": "/event/triathlon-festival-rheinhessen-2026/",
+    "event_name": "Triathlon Festival Rheinhessen",
+    "date": "16.08.2026",
+    "city": "Wörrstadt",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "uberlingen-run-2026",
     "url": "/event/uberlingen-run-2026/",
     "event_name": "Überlingen Run",
@@ -12623,6 +12558,19 @@
     "has_rich_details": false
   },
   {
+    "slug": "viernheimer-triathlon-2026",
+    "url": "/event/viernheimer-triathlon-2026/",
+    "event_name": "Viernheimer Triathlon",
+    "date": "23.08.2026",
+    "city": "Viernheim",
+    "country": "Germany",
+    "sport": "Triathlon",
+    "distance": "Olympic Triathlon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
     "slug": "vodafone-prague-marathon-2026",
     "url": "/event/vodafone-prague-marathon-2026/",
     "event_name": "Vodafone Prague Marathon",
@@ -12667,6 +12615,19 @@
     "event_name": "Volkslauf Rund um Geislar",
     "date": "17.07.2026",
     "city": "Bonn",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "volkslauf-rund-um-zehnhausen-landau-in-der-pfalz-2026",
+    "url": "/event/volkslauf-rund-um-zehnhausen-landau-in-der-pfalz-2026/",
+    "event_name": "Volkslauf rund um Zehnhausen - Landau in der Pfalz",
+    "date": "21.08.2026",
+    "city": "Landau in der Pfalz",
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km, 10 km",
@@ -12852,6 +12813,45 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "6 km / 10 km / 21 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "wohldenberger-waldlauf-holle-2026",
+    "url": "/event/wohldenberger-waldlauf-holle-2026/",
+    "event_name": "Wohldenberger Waldlauf - Holle",
+    "date": "16.08.2026",
+    "city": "Holle",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "10 km, Half Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "wohler-lauf-rund-um-die-aabachtalsperre-bad-wunnenberg-2026",
+    "url": "/event/wohler-lauf-rund-um-die-aabachtalsperre-bad-wunnenberg-2026/",
+    "event_name": "Wöhler-Lauf \"Rund um die Aabachtalsperre\" - Bad Wünnenberg",
+    "date": "16.08.2026",
+    "city": "Bad Wünnenberg",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km, 10 km, Half Marathon",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "wossner-halbmarathon-unterwossen-2026",
+    "url": "/event/wossner-halbmarathon-unterwossen-2026/",
+    "event_name": "Wössner Halbmarathon - Unterwössen",
+    "date": "16.08.2026",
+    "city": "Unterwössen",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false

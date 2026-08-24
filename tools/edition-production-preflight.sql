@@ -112,6 +112,15 @@ history_state as (
       )
       and differences.unexpected_or_renamed = '[]'::jsonb
       as exact_predeployment_history,
+    differences.remote_count = (select count(*) + 1 from expected_predeployment)
+      and differences.missing_predeployment = '[]'::jsonb
+      and differences.pending_not_applied = (
+        select jsonb_agg(version order by version)
+        from expected_pending
+        where version <> '20260814120000'
+      )
+      and differences.unexpected_or_renamed = '[]'::jsonb
+      as exact_security_baseline_history,
     differences.remote_count = (select count(*) from expected_full)
       and differences.missing_predeployment = '[]'::jsonb
       and differences.pending_not_applied = '[]'::jsonb
@@ -249,11 +258,13 @@ select jsonb_build_object(
   'migration_history', jsonb_build_object(
     'state', case
       when result.exact_predeployment_history then 'expected_predeployment_history'
+      when result.exact_security_baseline_history then 'expected_security_baseline_history'
       when result.exact_full_history then 'expected_full_history'
       else 'drift_or_partial_rollout'
     end,
     'remote_count', result.remote_count,
     'expected_predeployment_count', (select count(*) from expected_predeployment),
+    'expected_security_baseline_count', (select count(*) + 1 from expected_predeployment),
     'expected_full_count', (select count(*) from expected_full),
     'missing_predeployment', result.missing_predeployment,
     'expected_pending', result.pending_not_applied,
@@ -267,6 +278,7 @@ select jsonb_build_object(
     ),
     'unexpected_or_renamed', result.unexpected_or_renamed,
     'exact_predeployment_history', result.exact_predeployment_history,
+    'exact_security_baseline_history', result.exact_security_baseline_history,
     'exact_full_history', result.exact_full_history
   ),
   'data_integrity', result.integrity_payload,
@@ -285,10 +297,16 @@ select jsonb_build_object(
   'automatic_publication_authorized', false,
   'ready_for_schema_deployment', false,
   'next_gate', case
-    when not (result.exact_predeployment_history or result.exact_full_history)
+    when not (
+      result.exact_predeployment_history
+      or result.exact_security_baseline_history
+      or result.exact_full_history
+    )
       then 'stop_and_investigate_migration_drift'
     when result.exact_full_history
       then 'run_edition_staging_postflight_and_keep_backfill_blocked'
+    when result.exact_security_baseline_history
+      then 'security_baseline_active_keep_remaining_migrations_blocked'
     when not result.data_integrity_gates_pass or not result.automation_gates_pass
       then 'stop_and_investigate_data_or_automation_gate'
     when not result.quiet_window_observed

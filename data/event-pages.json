@@ -3081,19 +3081,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "hoka-utmb-mont-blanc-2026",
-    "url": "/event/hoka-utmb-mont-blanc-2026/",
-    "event_name": "HOKA UTMB Mont-Blanc",
-    "date": "24.08.2026",
-    "city": "Chamonix-Mont-Blanc",
-    "country": "France",
-    "sport": "Ultramarathon",
-    "distance": "OCC / CCC / TDS / UTMB / multi-distance trail",
-    "has_category_details": true,
-    "has_knowledge_details": true,
-    "has_rich_details": false
-  },
-  {
     "slug": "holzlandlauf-2026",
     "url": "/event/holzlandlauf-2026/",
     "event_name": "Holzlandlauf",
@@ -9799,6 +9786,19 @@
     "distance": "10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "hoka-utmb-mont-blanc-2026",
+    "url": "/event/hoka-utmb-mont-blanc-2026/",
+    "event_name": "HOKA UTMB Mont-Blanc",
+    "date": "24.08.2026",
+    "city": "Chamonix-Mont-Blanc",
+    "country": "France",
+    "sport": "Ultramarathon",
+    "distance": "OCC / CCC / TDS / UTMB / multi-distance trail",
+    "has_category_details": true,
+    "has_knowledge_details": true,
     "has_rich_details": false
   },
   {

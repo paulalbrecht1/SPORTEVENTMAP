@@ -1,4 +1,4 @@
 Sport Event Map - Production Baseline
-Version: 20260824-production-baseline-v81
+Version: 20260825-detail-metadata-privacy-v82
 Build: only from a clean committed source tree; dist/release.json is authoritative.
 Includes: Supabase RPC security hardening, verified public catalog export, reproducible release metadata, static event pages, sitemap, legal pages, CSS and JavaScript. Stage 4 and automatic publication remain disabled.

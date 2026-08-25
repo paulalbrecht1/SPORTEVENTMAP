@@ -4,13 +4,16 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import eventMarkerTypes from "../js/event-marker-types.js";
 import eventTableUtils from "../tools/event-table-utils.js";
+import catalogExport from "../tools/export-supabase-event-catalog.js";
 
 const {
-  COLUMNS,
   getValidationErrors,
   parseCsvFile,
   splitDelimitedLine
 } = eventTableUtils;
+const {
+  PUBLIC_CATALOG_COLUMNS
+} = catalogExport;
 
 const root =
   path.resolve(
@@ -363,10 +366,16 @@ const csvRows =
     .split(/\r?\n/)
     .filter(line => line.trim());
 
+assert.deepEqual(
+  splitDelimitedLine(csvRows[0], ";"),
+  PUBLIC_CATALOG_COLUMNS,
+  "Public CSV header must match the exporter schema"
+);
+
 csvRows.forEach((line, index) => {
   assert.equal(
     splitDelimitedLine(line, ";").length,
-    COLUMNS.length,
+    PUBLIC_CATALOG_COLUMNS.length,
     `CSV line ${index + 1} has an invalid column count`
   );
 });

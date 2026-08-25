@@ -3,7 +3,7 @@ const path = require("path");
 const crypto = require("crypto");
 
 const ROOT = path.resolve(__dirname, "..");
-const COLUMNS = [
+const PUBLIC_CATALOG_COLUMNS = [
   "event_name", "sport", "date", "city", "country", "address", "latitude", "longitude",
   "distance", "description", "event_url", "data_source", "source_url", "verification_status",
   "priority", "check_frequency", "last_checked", "next_check", "source_note", "image",
@@ -133,7 +133,9 @@ function mapDiscoveryRow(row, exportedAt) {
     distance: row.distance,
     description: row.description,
     event_url: row.event_url,
-    data_source: "Supabase public_event_discovery export",
+    // Keep implementation provenance out of the public fallback catalog. The
+    // concrete database/view remains an internal operational detail.
+    data_source: "Sport Event Map verified event catalog",
     source_url: row.source_url,
     // Legacy CSV readers use this column for the public registration state.
     // The explicit columns below preserve verification and registration as
@@ -205,7 +207,7 @@ async function main() {
 
   const exportedAt = new Date().toISOString();
   const mapped = rows.map(row => mapDiscoveryRow(row, exportedAt));
-  const output = [COLUMNS.join(";"), ...mapped.map(row => COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
+  const output = [PUBLIC_CATALOG_COLUMNS.join(";"), ...mapped.map(row => PUBLIC_CATALOG_COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
   const archiveOutput = `${JSON.stringify({ exported_at: exportedAt, editions: archiveRows }, null, 2)}\n`;
   const metrics = buildExportMetrics(rows, archiveRows, exportedAt);
   const manifestOutput = `${JSON.stringify({
@@ -237,6 +239,7 @@ if (require.main === module) {
 }
 
 module.exports = {
+  PUBLIC_CATALOG_COLUMNS,
   buildExportMetrics,
   isCompleteDiscoveryRow,
   isFreshDiscoveryRow,

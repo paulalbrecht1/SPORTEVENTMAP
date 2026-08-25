@@ -2,12 +2,14 @@ const fs = require("fs");
 const path = require("path");
 
 const {
-  COLUMNS,
   dedupeEvents,
   getValidationErrors,
   parseCsvFile,
   splitDelimitedLine
 } = require("./event-table-utils");
+const {
+  PUBLIC_CATALOG_COLUMNS
+} = require("./export-supabase-event-catalog");
 
 const ROOT =
   path.resolve(__dirname, "..");
@@ -383,13 +385,18 @@ function checkEventsCsv() {
       .split(/\r?\n/)
       .filter(line => line.trim());
 
+  const headerColumns =
+    physicalRows.length
+      ? splitDelimitedLine(physicalRows[0], ";")
+      : [];
+
   const malformedRows =
     physicalRows
       .map((line, index) => ({
         line: index + 1,
         columns: splitDelimitedLine(line, ";").length
       }))
-      .filter(row => row.columns !== COLUMNS.length);
+      .filter(row => row.columns !== PUBLIC_CATALOG_COLUMNS.length);
 
   const events =
     parseCsvFile(csvPath);
@@ -426,6 +433,14 @@ function checkEventsCsv() {
     );
 
   const failures = [];
+
+  if (headerColumns.join("\0") !== PUBLIC_CATALOG_COLUMNS.join("\0")) {
+    failures.push(
+      fail("data/events.csv header does not match the public catalog export schema")
+    );
+  } else {
+    pass("data/events.csv header matches the public catalog export schema");
+  }
 
   const exactKeys =
     new Set();
@@ -482,7 +497,7 @@ function checkEventsCsv() {
       fail(`data/events.csv has ${malformedRows.length} malformed physical rows: ${sample}`)
     );
   } else {
-    pass(`data/events.csv has exactly ${COLUMNS.length} columns per row`);
+    pass(`data/events.csv has exactly ${PUBLIC_CATALOG_COLUMNS.length} columns per row`);
   }
 
   if (invalid.length) {

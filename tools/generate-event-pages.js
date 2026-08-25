@@ -1744,12 +1744,29 @@ function getBrandDetails(richDetails = null) {
   return getRichDetailsSection(richDetails, "basis");
 }
 
+function publicOrganizerName(value) {
+  const name = clean(value);
+
+  if (!name) {
+    return "";
+  }
+
+  // Organizer fields are public product facts. Never render technical
+  // provenance, database views or export labels as an organizer, even if a
+  // malformed import accidentally stores one in an organizer column.
+  if (/\b(?:supabase|postgrest)\b|public_event_(?:discovery|archive)|\b(?:database|data|discovery|archive)\s+(?:export|view)\b/i.test(name)) {
+    return "";
+  }
+
+  return name;
+}
+
 function resolveOrganizer(event, richDetails = null) {
   const brand = getBrandDetails(richDetails);
   const name = firstUsefulValue(
-    event.organizer_name,
-    brand.organizer_name,
-    brand.organizer
+    publicOrganizerName(event.organizer_name),
+    publicOrganizerName(brand.organizer_name),
+    publicOrganizerName(brand.organizer)
   );
 
   if (!name) {
@@ -1829,7 +1846,7 @@ function parseEventDate(value) {
 function formatVerificationDate(value, language = "en") {
   const isoDate = parseEventDate(value);
   if (!isoDate) {
-    return clean(value);
+    return "";
   }
 
   const [year, month, day] = isoDate.split("-").map(Number);
@@ -1844,7 +1861,7 @@ function formatVerificationDate(value, language = "en") {
 function renderVerificationDate(value) {
   const isoDate = parseEventDate(value);
   if (!isoDate) {
-    return escapeHtml(clean(value));
+    return "";
   }
 
   return `<time datetime="${isoDate}" data-detail-verification-date="${isoDate}">${escapeHtml(formatVerificationDate(isoDate))}</time>`;
@@ -3559,7 +3576,7 @@ function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, stat
       detailRows.map(row => clean(row.start_time)).filter(hasUsefulValue).join(" / ")
     );
   const verification = getVerificationContext(event, richDetails);
-  const lastChecked = verification.edition.lastVerifiedAt;
+  const lastChecked = parseEventDate(verification.edition.lastVerifiedAt);
   const fallbackKey = editionFallbackKey(event);
   const date = clean(event.event_status).toLowerCase() === "date_unconfirmed"
     ? ""
@@ -3956,8 +3973,8 @@ function buildRaceGuideSources(event, richDetails = null) {
       : sources;
   const verification = getVerificationContext(event, richDetails);
   const status = verification.edition.status;
-  const lastChecked = verification.edition.lastVerifiedAt;
-  const brandLastChecked = verification.brand.lastVerifiedAt;
+  const lastChecked = parseEventDate(verification.edition.lastVerifiedAt);
+  const brandLastChecked = parseEventDate(verification.brand.lastVerifiedAt);
   const verificationBadges = [
     lastChecked ? `<span class="event-detail-badge verified">${detailLabel("detail.lastChecked")}: ${renderVerificationDate(lastChecked)}</span>` : "",
     brandLastChecked && parseEventDate(brandLastChecked) !== parseEventDate(lastChecked)

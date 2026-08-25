@@ -83,10 +83,31 @@ assert.doesNotMatch(noOrganizerBrandSection, /detail\.organizer/);
 assert.doesNotMatch(noOrganizerPage, /Random Calendar Aggregator/);
 assert.equal(resolveOrganizer({ data_source: "Random Calendar Aggregator" }), null);
 
+const internalOrganizerValue = "Supabase public_event_discovery export";
+const internalOrganizerPage = buildEventPage(
+  event({
+    organizer_name: internalOrganizerValue,
+    organizer_url: "",
+    edition_last_verified_at: "source-monitor-run-42"
+  }),
+  "internal-metadata-test-2027"
+);
+assert.equal(resolveOrganizer({ organizer_name: internalOrganizerValue }), null);
+assert.doesNotMatch(internalOrganizerPage, /Supabase public_event_discovery export/);
+assert.doesNotMatch(internalOrganizerPage, /source-monitor-run-42/);
+assert.equal(
+  resolveOrganizer(
+    { organizer_name: internalOrganizerValue },
+    { brand: { organizer: "Safe Organizer e.V." } }
+  ).name,
+  "Safe Organizer e.V."
+);
+
 assert.equal(
   formatVerificationDate("2026-08-18T09:30:00+00:00", "de"),
   "18. August 2026"
 );
+assert.equal(formatVerificationDate("source-monitor-run-42", "de"), "");
 assert.match(brandedPage, /data-detail-verification-date="2026-08-18"/);
 assert.equal(
   getVerificationContext({
@@ -119,6 +140,11 @@ const mapped = mapDiscoveryRow({
 assert.equal(mapped.last_checked, "2026-08-18T10:00:00Z");
 assert.equal(mapped.edition_last_verified_at, "2026-08-18T10:00:00Z");
 assert.notEqual(mapped.last_checked, "2026-08-24T11:00:00Z");
+assert.equal(mapped.data_source, "Sport Event Map verified event catalog");
+assert.doesNotMatch(mapped.data_source, /supabase|public_event_discovery/i);
+
+const publicCatalog = fs.readFileSync(path.join(root, "data/events.csv"), "utf8");
+assert.doesNotMatch(publicCatalog, /Supabase public_event_discovery export/);
 
 const sharedBrand = {
   brand: {

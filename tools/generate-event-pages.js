@@ -3511,41 +3511,16 @@ function buildRaceGuideHero(event, richDetails = null, statusLabel = "", website
     </section>`;
 }
 
-function buildRaceGuideEventBrand(event, richDetails = null) {
-  const organizer = resolveOrganizer(event, richDetails);
-  const officialWebsite = getOfficialEventWebsite(event, richDetails);
-  const cards = [
-    organizer
-      ? renderFactCard("check", "detail.organizer", organizer.name, {
-          html: organizer.url
-            ? `<a href="${organizer.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(organizer.name)}</a>`
-            : escapeHtml(organizer.name)
-        })
-      : "",
-    officialWebsite
-      ? renderFactCard("external", "detail.officialWebsite", officialWebsite, {
-          html: `<a href="${officialWebsite}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr("detail.openOfficialWebsite")}>${escapeHtml(detailTranslation("detail.openOfficialWebsite"))}</a>`
-        })
-      : ""
-  ].filter(Boolean).join("");
+function buildEventFactsHeading(event) {
+  const date = clean(event.event_status).toLowerCase() === "date_unconfirmed"
+    ? ""
+    : formatDetailDate(event.date);
+  const title = [clean(event.event_name), date].filter(Boolean).join(" \u00b7 ");
 
-  if (!cards) {
-    return "";
-  }
-
-  return `
-    <section id="event-brand" class="event-detail-card race-guide-section event-brand-section">
-      ${sectionHeading("detail.event", "detail.event")}
-      <div class="race-guide-fact-grid is-tight">${cards}</div>
-    </section>`;
-}
-
-function buildEditionSectionHeading(event) {
-  const year = clean(event.edition_year || getEventYear(event));
   return `
       <div class="race-guide-section-heading">
         <span ${detailI18nAttr("detail.overview")}>${escapeHtml(detailTranslation("detail.overview"))}</span>
-        <h2><span ${detailI18nAttr("detail.edition")}>${escapeHtml(detailTranslation("detail.edition"))}</span>${year ? ` ${escapeHtml(year)}` : ""}</h2>
+        <h2>${escapeHtml(title)}</h2>
       </div>`;
 }
 
@@ -3577,6 +3552,7 @@ function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, stat
     );
   const verification = getVerificationContext(event, richDetails);
   const lastChecked = parseEventDate(verification.edition.lastVerifiedAt);
+  const organizer = resolveOrganizer(event, richDetails);
   const fallbackKey = editionFallbackKey(event);
   const date = clean(event.event_status).toLowerCase() === "date_unconfirmed"
     ? ""
@@ -3589,18 +3565,25 @@ function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, stat
 
   return `
     <section id="key-facts" class="event-detail-card race-guide-section race-guide-key-facts-section">
-      ${buildEditionSectionHeading(event)}
+      ${buildEventFactsHeading(event)}
       <div class="race-guide-fact-grid">
         ${renderFactCard("calendar", "detail.date", date, { always: true, fallbackKey })}
         ${renderFactCard("location", "detail.location", `${clean(event.city)}, ${clean(event.country)}`, { always: true })}
         ${renderFactCard("sport", "detail.sport", event.sport, { always: true })}
         ${renderFactCard("distance", "detail.distance", distance, { always: true, fallbackKey })}
+        ${renderFactCard("status", "detail.status", firstUsefulValue(registration.registration_status, statusLabel), { kind: "status" })}
+        ${organizer
+          ? renderFactCard("check", "detail.organizer", organizer.name, {
+              html: organizer.url
+                ? `<a href="${organizer.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(organizer.name)}</a>`
+                : escapeHtml(organizer.name)
+            })
+          : ""}
         ${renderFactCard("clock", "detail.startTime", startTime)}
         ${renderFactCard("clock", "detail.cutoff", cutoff, { kind: "cutoff" })}
         ${renderFactCard("mountain", "detail.elevation", elevation, { kind: "elevation" })}
         ${renderFactCard("fee", "detail.entryFee", getPriceSummary(registration, detailRows))}
         ${renderFactCard("sport", "detail.participants", firstUsefulValue(statistics.participant_count, statistics.finisher_count), { kind: "participants" })}
-        ${renderFactCard("status", "detail.status", firstUsefulValue(registration.registration_status, statusLabel), { kind: "status" })}
         ${renderFactCard("check", "detail.lastChecked", lastChecked, {
           html: lastChecked ? renderVerificationDate(lastChecked) : ""
         })}
@@ -4030,12 +4013,6 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   const sections =
     [
       {
-        id: "event-brand",
-        icon: "check",
-        labelKey: "detail.event",
-        html: buildRaceGuideEventBrand(event, richDetails)
-      },
-      {
         id: "key-facts",
         icon: "info",
         labelKey: "detail.keyFacts",
@@ -4276,7 +4253,6 @@ if (require.main === module) {
 
 module.exports = {
   buildEventPage,
-  buildRaceGuideEventBrand,
   buildRaceGuideKeyFacts,
   buildRaceGuideRegistration,
   buildRaceGuideSources,

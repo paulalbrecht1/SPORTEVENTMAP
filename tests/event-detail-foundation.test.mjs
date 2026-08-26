@@ -56,9 +56,15 @@ assert.deepEqual(resolveOrganizer(brandedEvent), {
   name: "Example Events GmbH",
   url: "https://organizer.example/"
 });
-assert.match(brandedPage, /id="event-brand"/);
-assert.match(brandedPage, />Example Events GmbH<\/a>/);
-assert.match(brandedPage, /href="https:\/\/organizer\.example\/"/);
+assert.doesNotMatch(brandedPage, /id="event-brand"/);
+const brandedFacts = /<section id="key-facts"[\s\S]*?<\/section>/.exec(brandedPage)?.[0] || "";
+assert.match(brandedFacts, /<h2>Test City Marathon \u00b7 18\.04\.2027<\/h2>/);
+assert.match(brandedFacts, />Example Events GmbH<\/a>/);
+assert.match(brandedFacts, /href="https:\/\/organizer\.example\/"/);
+assert.ok(
+  brandedPage.indexOf('id="key-facts"') < brandedPage.indexOf('id="registration"'),
+  "Key Facts must remain the first public detail section"
+);
 
 const schema = JSON.parse(buildSchema(
   brandedEvent,
@@ -78,8 +84,8 @@ const noOrganizerPage = buildEventPage(
   }),
   "test-city-marathon-2027"
 );
-const noOrganizerBrandSection = /<section id="event-brand"[\s\S]*?<\/section>/.exec(noOrganizerPage)?.[0] || "";
-assert.doesNotMatch(noOrganizerBrandSection, /detail\.organizer/);
+const noOrganizerFacts = /<section id="key-facts"[\s\S]*?<\/section>/.exec(noOrganizerPage)?.[0] || "";
+assert.doesNotMatch(noOrganizerFacts, /detail\.organizer/);
 assert.doesNotMatch(noOrganizerPage, /Random Calendar Aggregator/);
 assert.equal(resolveOrganizer({ data_source: "Random Calendar Aggregator" }), null);
 
@@ -191,7 +197,8 @@ assert.doesNotMatch(edition2027, /register-2026/);
 assert.doesNotMatch(edition2027, />10 km</);
 const edition2027Facts = /<section id="key-facts"[\s\S]*?<\/section>/.exec(edition2027)?.[0] || "";
 assert.match(edition2027Facts, /Not yet officially confirmed/);
-assert.match(edition2027Facts, /data-detail-i18n="detail\.edition">Edition<\/span> 2027/);
+assert.match(edition2027Facts, /<h2>Test City Marathon<\/h2>/);
+assert.doesNotMatch(edition2027Facts, /data-detail-i18n="detail\.edition"|>Edition(?:\s|<)/);
 
 const seen = new Set();
 assert.equal(createSlug(event({ edition_slug: "stable-public-slug-2027" }), seen), "stable-public-slug-2027");

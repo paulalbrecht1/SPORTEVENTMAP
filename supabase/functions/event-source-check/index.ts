@@ -14,7 +14,7 @@ import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.2-phase-a-shadow";
+const WORKER_VERSION = "source-monitor-4.1.3-phase-a-shadow-third-party-successor-gate";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
@@ -309,7 +309,12 @@ async function recordLifecycleSignals(
   if (editionError) throw new Error(`Lifecycle edition context failed: ${cleanError(editionError)}`);
 
   let editionCount = 0;
-  const successors = selectLifecycleSuccessors(signals, latestEdition);
+  const successors = selectLifecycleSuccessors(
+    signals,
+    latestEdition,
+    new Date().toISOString().slice(0, 10),
+    { source_type: claim.source_type }
+  );
   for (const successor of successors) {
     const combinedRiskSignals = [...new Set([
       ...(signals.risk_signals || []),

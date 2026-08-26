@@ -383,13 +383,26 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
   };
 }
 
-export function selectLifecycleSuccessors(signals, latestEdition = null, referenceDate = new Date().toISOString().slice(0, 10)) {
+export function selectLifecycleSuccessors(
+  signals,
+  latestEdition = null,
+  referenceDate = new Date().toISOString().slice(0, 10),
+  sourceContext = {}
+) {
   const latestYear = Number(latestEdition?.edition_year || 0);
   const latestDate = String(latestEdition?.start_date || "");
+  const sourceType = String(
+    typeof sourceContext === "string" ? sourceContext : sourceContext?.source_type || ""
+  ).toLowerCase();
+  const requiresStructuredNamedEvent = sourceType === "third_party_platform";
   const candidates = (signals?.editions || []).filter(candidate =>
     Number(candidate.year) > latestYear &&
     String(candidate.start_date || "") > referenceDate &&
-    (!latestDate || String(candidate.start_date) > latestDate)
+    (!latestDate || String(candidate.start_date) > latestDate) &&
+    (!requiresStructuredNamedEvent || (
+      candidate.evidence_type === "json_ld" &&
+      Boolean(String(candidate.name || "").trim())
+    ))
   );
   const structured = candidates.filter(candidate => candidate.evidence_type === "json_ld");
   const selected = structured.length ? structured : candidates.length === 1 ? candidates : [];

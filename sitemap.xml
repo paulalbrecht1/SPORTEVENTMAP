@@ -955,12 +955,6 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://sporteventmap.com/event/edersee-lauf-2026/</loc>
-    <lastmod>2026-08-26</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://sporteventmap.com/event/edith-lucke-frauenlauf-trier-2026/</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
@@ -3986,6 +3980,12 @@
   </url>
   <url>
     <loc>https://sporteventmap.com/event/durener-firmenlauf-2026/</loc>
+    <lastmod>2026-08-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://sporteventmap.com/event/edersee-lauf-2026/</loc>
     <lastmod>2026-08-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

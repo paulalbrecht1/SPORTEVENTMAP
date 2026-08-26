@@ -53,6 +53,7 @@ Deutsch und Englisch werden für geplant, Anmeldung offen/geschlossen, ausverkau
 - Sportarten auf `running`, `trail_running`, `ultra_running`, `triathlon`.
 - Registrierungsstatus auf `registration_not_open`, `registration_open`, `sold_out`, `cancelled`, `unknown`.
 - Editionstatus auf `scheduled`, `postponed`, `cancelled`, `completed`, `date_unconfirmed`.
+- Neue Austragungen aus Drittquellen benötigen benannte JSON-LD-Eventevidenz. Ein einzelnes sichtbares Datum auf einer Aggregator- oder Tourismusseite reicht nicht aus, weil dort häufig weitere Veranstaltungen rotieren.
 - Distanzen auf Kilometer beziehungsweise standardisierte Typen für Marathon, Halbmarathon, Ultramarathon sowie Sprint-, olympische, Mittel- und Langdistanz im Triathlon. Der Originaltext bleibt erhalten.
 - URLs ohne Fragment und Trackingparameter.
 

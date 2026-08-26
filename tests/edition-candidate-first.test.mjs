@@ -84,6 +84,33 @@ assert.deepEqual(
   "Multiple weak visible dates must not become arbitrary successor candidates."
 );
 
+const rotatingThirdPartyDate = extractLifecycleSignals(
+  "Weitere Veranstaltungen auf der Insel: 20.08.2027",
+  "text/html",
+  "https://tourism.example/event"
+);
+assert.deepEqual(
+  selectLifecycleSuccessors(
+    rotatingThirdPartyDate,
+    { edition_year: 2026 },
+    "2026-08-17",
+    { source_type: "third_party_platform" }
+  ),
+  [],
+  "A lone visible date on a third-party page must not create a successor candidate."
+);
+
+assert.deepEqual(
+  selectLifecycleSuccessors(
+    structuredSignals,
+    { edition_year: 2026, start_date: "2026-06-07" },
+    "2026-08-17",
+    { source_type: "third_party_platform" }
+  ).map(candidate => candidate.start_date),
+  ["2027-06-06"],
+  "Named JSON-LD event evidence remains eligible on a third-party page."
+);
+
 const postponedSignals = extractLifecycleSignals(`
   <script type="application/ld+json">{
     "@type":"SportsEvent",

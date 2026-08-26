@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "exported_at": "2026-08-26T09:52:03.338Z",
+  "exported_at": "2026-08-26T16:23:33.120Z",
   "sources": {
     "discovery": "public_event_discovery",
     "archive": "public_event_archive"
   },
   "sha256": {
-    "discovery": "7d7f5edf70ded6828f72f38215e91b7ebe28f3e9bfdc83c2d03395e4c15025f4",
-    "archive": "55fdf9e40ba1ab2aeeee4a8502886ca77106d1a22a4ff11716d49157775530c0"
+    "discovery": "6ba83cdc1b58c34420974a4e35031ad170812da01dfe7fe9cf1d0330ddcd8e6e",
+    "archive": "066f6bc0aa7afd3957d4689cd970b3c448ab9a621b5a5abb3a53a5b416262796"
   },
   "metrics": {
-    "discovery_rows": 433,
+    "discovery_rows": 432,
     "archive_rows": 994,
-    "fresh_rows": 262,
-    "freshness_rate": 60.51,
-    "complete_rows": 205,
-    "completeness_rate": 47.34,
-    "review_required_rows": 171
+    "fresh_rows": 270,
+    "freshness_rate": 62.5,
+    "complete_rows": 206,
+    "completeness_rate": 47.69,
+    "review_required_rows": 162
   }
 }

@@ -225,10 +225,10 @@
     "url": "/event/30-lauf-um-den-arendsee-2026/",
     "event_name": "30. Lauf um den Arendsee",
     "date": "30.08.2026",
-    "city": "Saxony-Anhalt",
+    "city": "Arendsee",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
+    "distance": "31.65 km, Half Marathon, 9.2 km, 5 km, 1.5 km, Bambini",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -653,11 +653,11 @@
     "slug": "altra-sunset-wattenmeer-2026",
     "url": "/event/altra-sunset-wattenmeer-2026/",
     "event_name": "Altra Sunset Wattenmeer",
-    "date": "30.08.2026",
+    "date": "29.08.2026",
     "city": "Hamburg",
     "country": "Germany",
     "sport": "Ultramarathon",
-    "distance": "Ultramarathon",
+    "distance": "ca. 250 km team relay: 10-person, Ultra 5-person, 5 Pack",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1151,7 +1151,7 @@
     "city": "Gelting",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Marathon, Halbmarathon, 10 km",
+    "distance": "0.75 km, 2.5 km, 5 km, 16.04 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1200,10 +1200,10 @@
     "url": "/event/blankeneser-heldenlauf-2026/",
     "event_name": "Blankeneser Heldenlauf",
     "date": "30.08.2026",
-    "city": "Blankeneser Treppenviertel",
+    "city": "Hamburg",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 6.8 km, 6.5 km",
+    "distance": "6.5 km, 11 km, 21 km Derbe, 21 km Sutsche, 6.8 km Bergziege",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1989,19 +1989,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "edersee-lauf-2026",
-    "url": "/event/edersee-lauf-2026/",
-    "event_name": "Edersee-Lauf",
-    "date": "29.08.2026",
-    "city": "Hesse",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "edith-lucke-frauenlauf-trier-2026",
     "url": "/event/edith-lucke-frauenlauf-trier-2026/",
     "event_name": "EDITH LÜCKE-Frauenlauf TRIER",
@@ -2243,7 +2230,7 @@
     "city": "Fehmarn",
     "country": "Germany",
     "sport": "Running",
-    "distance": "5 km / 11 km / 21 km / 42 km",
+    "distance": "1.4 km, 5 km, 12 km, Half Marathon, Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3361,7 +3348,7 @@
     "city": "Egelsbach",
     "country": "Germany",
     "sport": "Running",
-    "distance": "10 km / 21 km",
+    "distance": "Bambini, 5 km, 10 km, Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3400,7 +3387,7 @@
     "city": "Köln",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Half Marathon",
+    "distance": "7 km, 14 km, 21 km, 28 km",
     "has_category_details": true,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -5194,7 +5181,7 @@
     "city": "Wolgast",
     "country": "Germany",
     "sport": "Running",
-    "distance": "21 km / 42 km",
+    "distance": "Half Marathon, Marathon, 5-person Marathon Relay",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -8562,6 +8549,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "edersee-lauf-2026",
+    "url": "/event/edersee-lauf-2026/",
+    "event_name": "Edersee-Lauf",
+    "date": "29.08.2026",
+    "city": "Vöhl-Herzhausen",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "0.5 km, 1 km, 1.2 km, 2 km, 3.2 km, 10 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false

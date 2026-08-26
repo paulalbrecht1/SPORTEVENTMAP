@@ -11,6 +11,7 @@ const {
   buildSchema,
   createSlug,
   formatVerificationDate,
+  getRegistrationStatus,
   getVerificationContext,
   resolveOrganizer
 } = require("../tools/generate-event-pages.js");
@@ -134,6 +135,27 @@ const noVerificationPage = buildEventPage(
   "unverified-test-city-marathon-2027"
 );
 assert.doesNotMatch(noVerificationPage, /data-detail-verification-date="2026-08-24"/);
+
+const separatedRegistrationStatusEvent = event({
+  registration_status: "unknown",
+  verification_status: "verified",
+  edition_verification_status: "source_unreachable"
+});
+assert.equal(
+  getRegistrationStatus(separatedRegistrationStatusEvent),
+  "Not yet officially confirmed"
+);
+const separatedRegistrationStatusPage = buildEventPage(
+  separatedRegistrationStatusEvent,
+  "separated-registration-status-2027"
+);
+const separatedRegistrationSection =
+  /<section id="registration"[\s\S]*?<\/section>/.exec(separatedRegistrationStatusPage)?.[0] || "";
+const separatedSourcesSection =
+  /<section id="sources"[\s\S]*?<\/section>/.exec(separatedRegistrationStatusPage)?.[0] || "";
+assert.doesNotMatch(separatedRegistrationSection, /Source Unreachable|Verified/);
+assert.match(separatedRegistrationSection, /Not yet officially confirmed/);
+assert.match(separatedSourcesSection, /source unreachable/i);
 
 const mapped = mapDiscoveryRow({
   event_name: "Mapped Event",

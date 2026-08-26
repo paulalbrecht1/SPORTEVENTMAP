@@ -45661,6 +45661,8 @@ html[data-theme="light"] .event-detail-page .event-detail-header {
     max-width: 100%;
     font-size: clamp(2.25rem, 12vw, 3.15rem) !important;
     line-height: 1.02 !important;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
   }
 
   .event-detail-page .event-detail-tabs a {
@@ -45688,6 +45690,12 @@ html[data-theme="light"] .event-detail-page .event-detail-header {
 
   body.platform-route-discovery:not(.landing-open) #eventDrawer.open .drawer-title-copy h2 {
     font-size: 1.3rem !important;
+  }
+}
+
+@media (max-width: 359px) {
+  .event-detail-page .event-detail-hero-main h1 {
+    font-size: 2rem !important;
   }
 }
 

@@ -12,6 +12,10 @@ const detailPages = [
   {
     name: "London Marathon knowledge page",
     path: "/event/london-marathon-2027/"
+  },
+  {
+    name: "long German event title",
+    path: "/event/1-laufchallenge-mellendorfer-tv-2026/"
   }
 ];
 

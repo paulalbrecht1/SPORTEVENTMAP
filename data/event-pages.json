@@ -897,19 +897,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "b2run-hamburg-2026",
-    "url": "/event/b2run-hamburg-2026/",
-    "event_name": "B2Run Hamburg",
-    "date": "25.08.2026",
-    "city": "Volksparkstadion",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "baaber-heidelauf-2026",
     "url": "/event/baaber-heidelauf-2026/",
     "event_name": "Baaber Heidelauf",
@@ -7483,6 +7470,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "5 km / 10 km / 21 km / 42 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "b2run-hamburg-2026",
+    "url": "/event/b2run-hamburg-2026/",
+    "event_name": "B2Run Hamburg",
+    "date": "25.08.2026",
+    "city": "Volksparkstadion",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false

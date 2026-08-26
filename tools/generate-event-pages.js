@@ -1891,8 +1891,7 @@ function getRegistrationStatus(event, richDetails = null, detailRows = []) {
   const rawStatus = firstUsefulValue(
     registration.registration_status,
     detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "),
-    event.registration_status,
-    event.verification_status
+    event.registration_status
   );
   const normalized = clean(rawStatus).toLowerCase().replace(/\s+/g, "_");
 

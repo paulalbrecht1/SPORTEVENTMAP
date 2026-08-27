@@ -85,7 +85,7 @@
     "city": "Buchholz in der Nordheide",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon, 11.7 km, 5 km",
+    "distance": "0.3 km, 1 km, 1.5 km, 2.5 km, 5 km, 11.7 km, Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -715,19 +715,6 @@
     "has_rich_details": false
   },
   {
-    "slug": "aok-firmenlauf-bielefeld-2026",
-    "url": "/event/aok-firmenlauf-bielefeld-2026/",
-    "event_name": "AOK Firmenlauf Bielefeld",
-    "date": "26.08.2026",
-    "city": "Bielefeld",
-    "country": "Germany",
-    "sport": "Running",
-    "distance": "5 km",
-    "has_category_details": false,
-    "has_knowledge_details": false,
-    "has_rich_details": false
-  },
-  {
     "slug": "aok-firmenlauf-feuerbach-2026",
     "url": "/event/aok-firmenlauf-feuerbach-2026/",
     "event_name": "AOK Firmenlauf Feuerbach",
@@ -927,10 +914,10 @@
     "url": "/event/bahndammlauf-2026/",
     "event_name": "Bahndammlauf",
     "date": "06.09.2026",
-    "city": "53567 Buchholz",
+    "city": "Buchholz",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
+    "distance": "0.4 km, 5 km, 10 km, 10 km Walking, 10.8 km Hike, 21.2 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1281,7 +1268,7 @@
     "city": "Berlin",
     "country": "Germany",
     "sport": "Running",
-    "distance": "5 km / 10 km / 21 km",
+    "distance": "Kids, 4.7 km, 10 km, Half Marathon, 4 x 5.274 km Relay",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1551,10 +1538,10 @@
     "url": "/event/canyon-run-muhlheim-2026/",
     "event_name": "Canyon Run Mühlheim",
     "date": "06.09.2026",
-    "city": "Hesse",
+    "city": "Mühlheim am Main",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon, 10 km, 5 km",
+    "distance": "0.4 km, 0.8 km, 5 km, 10 km, Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1658,7 +1645,7 @@
     "city": "Bremerhaven",
     "country": "Germany",
     "sport": "Running",
-    "distance": "7 km / 10 km / 21 km / 42 km",
+    "distance": "0.4 km, 0.8 km, 5 km, 6 km, 10 km, Half Marathon, 3/4 Marathon, Marathon, Relays",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -1892,7 +1879,7 @@
     "city": "Dresden",
     "country": "Germany",
     "sport": "Running",
-    "distance": "Halbmarathon",
+    "distance": "Half Marathon",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -2308,7 +2295,7 @@
     "city": "Flensburg",
     "country": "Germany",
     "sport": "Running",
-    "distance": "5 km / 10 km / 21 km / 42 km",
+    "distance": "0.195 km, 1.07 km, 5 km, 10 km, Half Marathon, Marathon, Marathon Relay",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -2343,11 +2330,11 @@
     "slug": "frankische-schweiz-marathon-2026",
     "url": "/event/frankische-schweiz-marathon-2026/",
     "event_name": "Fränkische Schweiz Marathon",
-    "date": "06.09.2026",
+    "date": "05.09.2026",
     "city": "Ebermannstadt",
     "country": "Germany",
     "sport": "Running",
-    "distance": "10 km / 21 km / 42 km",
+    "distance": "Kids, 1/10 Marathon, 10 km, Half Marathon, Marathon, Marathon Relay, Run & Bike, Handbike",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -3361,7 +3348,7 @@
     "city": "Köln",
     "country": "Germany",
     "sport": "Triathlon",
-    "distance": "Sprint, Olympic, Middle",
+    "distance": "Sprint, Olympic, Middle, Olympic Relay, Middle Relay",
     "has_category_details": true,
     "has_knowledge_details": false,
     "has_rich_details": false
@@ -7275,6 +7262,19 @@
     "country": "Germany",
     "sport": "Running",
     "distance": "10 km, 5 km",
+    "has_category_details": false,
+    "has_knowledge_details": false,
+    "has_rich_details": false
+  },
+  {
+    "slug": "aok-firmenlauf-bielefeld-2026",
+    "url": "/event/aok-firmenlauf-bielefeld-2026/",
+    "event_name": "AOK Firmenlauf Bielefeld",
+    "date": "26.08.2026",
+    "city": "Bielefeld",
+    "country": "Germany",
+    "sport": "Running",
+    "distance": "5 km",
     "has_category_details": false,
     "has_knowledge_details": false,
     "has_rich_details": false

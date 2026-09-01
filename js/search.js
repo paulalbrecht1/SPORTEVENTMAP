@@ -5,6 +5,9 @@ let searchAnalyticsTimer = null;
 let lastTrackedSearchAt = 0;
 let invalidRangeNotified = false;
 let searchLanguageListenerInitialized = false;
+let searchUiInitialized = false;
+let filterApplicationFrame = 0;
+let pendingFilterZoom = false;
 
 function getActiveFilterAnalytics() {
   return {
@@ -703,7 +706,7 @@ function applySearchSuggestion(query) {
 
   input.value = query;
   hideSearchSuggestions();
-  applyFilters(true);
+  scheduleFilterApplication(true);
 }
 
 function syncDistanceFilterButtons() {
@@ -1137,6 +1140,33 @@ function updateDiscoveryFilterCount() {
   }
 }
 
+function scheduleFilterApplication(zoom = false) {
+  pendingFilterZoom = pendingFilterZoom || Boolean(zoom);
+
+  if (filterApplicationFrame) {
+    return;
+  }
+
+  filterApplicationFrame = window.requestAnimationFrame(() => {
+    const shouldZoom = pendingFilterZoom;
+    filterApplicationFrame = 0;
+    pendingFilterZoom = false;
+    applyFilters(shouldZoom);
+  });
+}
+
+function flushFilterApplication(zoom = false) {
+  const shouldZoom = pendingFilterZoom || Boolean(zoom);
+
+  if (filterApplicationFrame) {
+    window.cancelAnimationFrame(filterApplicationFrame);
+    filterApplicationFrame = 0;
+  }
+
+  pendingFilterZoom = false;
+  applyFilters(shouldZoom);
+}
+
 function resetAllFilters() {
   const searchInput =
     document.getElementById("searchInput");
@@ -1166,10 +1196,14 @@ function resetAllFilters() {
   syncDistanceFilterButtons();
 
   updateDateRangeState();
-  applyFilters();
+  flushFilterApplication();
 }
 
 function initSearch() {
+
+  if (searchUiInitialized) {
+    return;
+  }
 
   initFilterAccordions();
 
@@ -1179,7 +1213,7 @@ function initSearch() {
       () => {
         syncDistanceFilterButtons();
         updateSearchSuggestions();
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1196,13 +1230,15 @@ function initSearch() {
     return;
   }
 
+  searchUiInitialized = true;
+
   // LIVE FILTER
   searchInput.addEventListener(
     "input",
     () => {
       updateSearchSuggestions();
       trackSearchUsedDebounced();
-      applyFilters();
+      scheduleFilterApplication();
     }
   );
 
@@ -1229,7 +1265,7 @@ function initSearch() {
           });
         }
 
-        applyFilters(true);
+        scheduleFilterApplication(true);
 
       }
 
@@ -1314,7 +1350,7 @@ function initSearch() {
             filter
           );
 
-          applyFilters();
+          scheduleFilterApplication();
 
         }
       );
@@ -1348,7 +1384,7 @@ function initSearch() {
             "distance",
             filter
           );
-          applyFilters();
+          scheduleFilterApplication();
         }
       );
 
@@ -1364,7 +1400,7 @@ function initSearch() {
           "sort",
           event.target.value
         );
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1378,7 +1414,7 @@ function initSearch() {
           "country",
           event.target.value
         );
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1393,7 +1429,7 @@ function initSearch() {
           "date",
           event.target.value
         );
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1407,7 +1443,7 @@ function initSearch() {
           "date_from",
           "custom"
         );
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1421,7 +1457,7 @@ function initSearch() {
           "date_to",
           "custom"
         );
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1435,7 +1471,7 @@ function initSearch() {
           "date_range",
           "apply"
         );
-        applyFilters(true);
+        scheduleFilterApplication(true);
       }
     );
 
@@ -1458,7 +1494,7 @@ function initSearch() {
         if (dateTo) dateTo.value = "";
 
         updateDateRangeState();
-        applyFilters();
+        scheduleFilterApplication();
       }
     );
 
@@ -1575,15 +1611,21 @@ function initSearch() {
   const mobileFilterBackdrop =
     document.getElementById("mobileFilterBackdrop");
 
-  const closeMobileFilters = () => {
-    document.body.classList.remove(
-      "mobile-filter-open"
-    );
-
+  const closeMobileFilters = (restoreFocus = false) => {
     if (typeof window.setSidebarExpanded === "function") {
       window.setSidebarExpanded(false);
     } else {
       document.getElementById("sidebar")?.classList.add("closed");
+      document.body.classList.remove("mobile-filter-open");
+    }
+
+    if (restoreFocus) {
+      window.requestAnimationFrame(() => {
+        const primaryTrigger =
+          document.getElementById("toggleSidebar") || mobileFilterBtn;
+
+        primaryTrigger?.focus({ preventScroll: true });
+      });
     }
   };
 
@@ -1596,10 +1638,6 @@ function initSearch() {
         } else {
           document.getElementById("sidebar")?.classList.remove("closed");
         }
-
-        document.body.classList.add(
-          "mobile-filter-open"
-        );
       }
     );
   }
@@ -1607,27 +1645,18 @@ function initSearch() {
   if (mobileFilterBackdrop) {
     mobileFilterBackdrop.addEventListener(
       "click",
-      closeMobileFilters
+      () => closeMobileFilters(true)
     );
   }
 
-  const mobileFilterShell =
-    document.getElementById("sidebar");
+  const applyMobileFiltersBtn =
+    document.getElementById("applyMobileFiltersBtn");
 
-  if (mobileFilterShell) {
-    mobileFilterShell.addEventListener(
-      "click",
-      event => {
-        if (
-          !document.body.classList.contains("mobile-filter-open") ||
-          event.target.closest("#sidebar-header")
-        ) {
-          return;
-        }
-
-        closeMobileFilters();
-      }
-    );
+  if (applyMobileFiltersBtn) {
+    applyMobileFiltersBtn.addEventListener("click", () => {
+      flushFilterApplication();
+      closeMobileFilters(true);
+    });
   }
 
 }

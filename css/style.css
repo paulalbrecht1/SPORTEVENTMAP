@@ -45795,3 +45795,199 @@ html[data-theme="light"] body.event-detail-page
   background: #e9f8ee !important;
   color: #166534 !important;
 }
+
+/* Mobile stability and theme closure --------------------------------------
+   This layer intentionally uses the shared theme tokens and a single filter
+   panel state. It is kept last so historic mobile overrides cannot revive the
+   legacy sheet or sticky event title. */
+.platform-mobile-menu {
+  border-left-color: var(--theme-border) !important;
+  background: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.platform-mobile-menu-header,
+.platform-mobile-menu-header strong {
+  color: var(--theme-text) !important;
+}
+
+.platform-mobile-menu-header #platformMenuCloseBtn,
+.platform-mobile-menu a,
+.platform-mobile-menu-actions button {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-text) !important;
+}
+
+.platform-mobile-menu a.active,
+.platform-mobile-menu :is(a, .platform-mobile-menu-actions button):is(:hover, :focus-visible) {
+  border-color: color-mix(in srgb, var(--theme-action) 46%, transparent) !important;
+  background: var(--theme-selected) !important;
+  color: var(--theme-text) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent) !important;
+}
+
+#authModal {
+  padding:
+    max(12px, env(safe-area-inset-top))
+    max(12px, env(safe-area-inset-right))
+    max(12px, env(safe-area-inset-bottom))
+    max(12px, env(safe-area-inset-left));
+  overflow-y: auto;
+}
+
+#authModal .auth-card {
+  max-width: min(400px, 100%);
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  border: 1px solid var(--theme-border) !important;
+  background: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+  box-shadow: var(--theme-shadow) !important;
+}
+
+#authModal .auth-card :is(h2, label) {
+  color: var(--theme-text) !important;
+}
+
+#authModal .auth-card input {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-text) !important;
+  caret-color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+}
+
+#authModal .auth-card input::placeholder {
+  color: var(--theme-subtle) !important;
+  -webkit-text-fill-color: var(--theme-subtle) !important;
+  opacity: 1;
+}
+
+#authModal .auth-card input:is(:focus, :focus-visible) {
+  border-color: var(--theme-action) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--theme-action) 18%, transparent) !important;
+}
+
+#authModal .auth-card input:is(:-webkit-autofill, :autofill),
+#authModal .auth-card input:is(:-webkit-autofill, :autofill):is(:hover, :focus) {
+  border-color: var(--theme-border) !important;
+  caret-color: var(--theme-text) !important;
+  -webkit-text-fill-color: var(--theme-text) !important;
+  box-shadow: 0 0 0 1000px var(--theme-surface-soft) inset !important;
+  transition: background-color 9999s ease-out 0s;
+}
+
+#authModal #authSubmitBtn {
+  border-color: var(--theme-action) !important;
+  background: var(--theme-action) !important;
+  color: var(--theme-action-text) !important;
+}
+
+#authModal .auth-secondary-btn {
+  border-color: var(--theme-border) !important;
+  background: var(--theme-surface-soft) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Legacy nth-of-type grid rules assign the sport accordion to the distance
+   slot once select cards are mixed into the toolbar. Pin both named cards to
+   their semantic grid areas so tablet/fullscreen controls cannot overlap. */
+body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+  #sidebar-header .filter-sport-card {
+  grid-area: sportGroup !important;
+}
+
+body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+  #sidebar-header .filter-distance-card {
+  grid-area: distanceGroup !important;
+}
+
+@media (max-width: 860px) {
+  body.platform-route-discovery:not(.landing-open).event-list-fullscreen
+    #sidebar-header {
+    grid-template-rows: repeat(6, max-content) !important;
+    grid-auto-rows: max-content !important;
+    align-content: start !important;
+  }
+}
+
+#applyMobileFiltersBtn {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  body.platform-route-discovery:not(.landing-open) #applyMobileFiltersBtn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    min-height: 46px !important;
+    border-color: var(--theme-action) !important;
+    border-radius: var(--product-radius-control) !important;
+    background: var(--theme-action) !important;
+    color: var(--theme-action-text) !important;
+    font-weight: 800 !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #sidebar-header .filter-actions-row {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #sidebar-header #resetFiltersBtn {
+    width: 100% !important;
+    min-height: 46px !important;
+  }
+
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open) #sidebar {
+    z-index: 5200 !important;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open) #sidebar-header {
+    padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    scroll-padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
+  body.platform-route-discovery.discovery-panel-open:not(.landing-open) :is(#map, #eventDrawer, #floatingActions) {
+    pointer-events: none !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #eventDrawer.open .drawer-titlebar {
+    position: relative !important;
+    top: auto !important;
+    z-index: auto !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #discoveryFooter {
+    min-height: 48px !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #legalLinks {
+    gap: 4px !important;
+    scroll-padding-inline: 8px;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #legalLinks :is(a, button) {
+    flex: 0 0 auto;
+    min-height: 44px !important;
+    padding-inline: 8px !important;
+    border-radius: 8px;
+    color: var(--theme-muted) !important;
+    white-space: nowrap !important;
+  }
+
+  body.platform-route-discovery:not(.landing-open) #legalLinks :is(a, button):is(:hover, :focus-visible) {
+    background: var(--theme-selected) !important;
+    color: var(--theme-text) !important;
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--theme-border) !important;
+  }
+}

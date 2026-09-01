@@ -1,4 +1,4 @@
-Sport Event Map - Production Baseline
-Version: 20260826-detail-layout-v83
+Sport Event Map - Production Release
+Version: 20260901-mobile-stability-v84
 Build: only from a clean committed source tree; dist/release.json is authoritative.
-Includes: Supabase RPC security hardening, verified public catalog export, reproducible release metadata, static event pages, sitemap, legal pages, CSS and JavaScript. Stage 4 and automatic publication remain disabled.
+Includes: Stable mobile filters, responsive event details, mobile light/dark theme fixes, readable authentication fields, verified public catalog export, reproducible release metadata, static event pages, sitemap, legal pages, CSS and JavaScript. Stage 4 and automatic publication remain disabled.

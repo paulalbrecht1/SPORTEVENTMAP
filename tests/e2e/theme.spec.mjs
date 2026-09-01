@@ -144,6 +144,17 @@ test("Discovery search is prominent in dark mode without changing light mode", a
   await expect.poll(async () =>
     (await getSearchAppearance()).backgroundImage
   ).toContain("linear-gradient");
+  await expect.poll(async () => {
+    const appearance = await getSearchAppearance();
+
+    return {
+      borderColor: appearance.borderColor,
+      placeholderColor: appearance.placeholderColor
+    };
+  }).toEqual({
+    borderColor: "rgba(190, 218, 203, 0.42)",
+    placeholderColor: "rgb(175, 190, 182)"
+  });
 
   const darkAppearance = await getSearchAppearance();
   expect(darkAppearance.backgroundImage).toContain("linear-gradient");

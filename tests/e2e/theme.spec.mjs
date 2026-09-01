@@ -126,7 +126,6 @@ test("Discovery search is prominent in dark mode without changing light mode", a
   });
   await expect(page.locator("html"))
     .toHaveAttribute("data-theme", "dark");
-  await page.waitForTimeout(220);
 
   const getSearchAppearance = () =>
     page.locator("#searchInput").evaluate((input) => {
@@ -142,6 +141,10 @@ test("Discovery search is prominent in dark mode without changing light mode", a
       };
     });
 
+  await expect.poll(async () =>
+    (await getSearchAppearance()).backgroundImage
+  ).toContain("linear-gradient");
+
   const darkAppearance = await getSearchAppearance();
   expect(darkAppearance.backgroundImage).toContain("linear-gradient");
   expect(darkAppearance.backgroundImage).toContain("rgb(24, 53, 43)");
@@ -154,7 +157,9 @@ test("Discovery search is prominent in dark mode without changing light mode", a
       persist: false
     });
   });
-  await page.waitForTimeout(220);
+  await expect.poll(async () =>
+    (await getSearchAppearance()).backgroundColor
+  ).toBe("rgb(255, 255, 255)");
 
   const lightAppearance = await getSearchAppearance();
   expect(lightAppearance.backgroundImage).toBe("none");

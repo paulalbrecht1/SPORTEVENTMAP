@@ -267,11 +267,20 @@ export async function openEventDrawer(page, name) {
   await waitForEventList(page);
   await searchForEvent(page, name);
 
-  if (await page.locator("body.mobile-filter-open").count()) {
-    await page.evaluate(() => {
-      document.body.classList.remove("mobile-filter-open");
-    });
-    await expect(page.locator("body")).not.toHaveClass(/mobile-filter-open/);
+  const usesMobilePanel = await page.evaluate(() => window.innerWidth <= 767);
+  const panelToggle = page.getByTestId("discovery-panel-toggle");
+
+  if (
+    usesMobilePanel &&
+    (await panelToggle.getAttribute("aria-expanded")) === "true"
+  ) {
+    await page.getByTestId("discovery-panel-close").click();
+    await expect(panelToggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("body"))
+      .not.toHaveClass(/discovery-panel-open|mobile-filter-open/);
+    await page.waitForFunction(() =>
+      !document.body.classList.contains("sidebar-is-transitioning")
+    );
   }
 
   const eventCard = page
@@ -279,7 +288,9 @@ export async function openEventDrawer(page, name) {
     .filter({ hasText: name })
     .first();
 
-  if (await eventCard.isVisible()) {
+  if (usesMobilePanel) {
+    await eventCard.evaluate(element => element.click());
+  } else if (await eventCard.isVisible()) {
     await eventCard.click();
   } else {
     await eventCard.evaluate(element => element.click());

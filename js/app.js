@@ -98,6 +98,9 @@ function updateSidebarToggleState() {
     "aria-expanded",
     String(isExpanded)
   );
+
+  document.getElementById("mobileFilterBtn")
+    ?.setAttribute("aria-expanded", String(isExpanded));
   toggleBtn.setAttribute("aria-label", accessibleLabel);
   toggleBtn.title = accessibleLabel;
   sidebar.setAttribute(
@@ -143,17 +146,48 @@ function setSidebarExpanded(expanded, options = {}) {
   const wasExpanded =
     !sidebar.classList.contains("closed");
 
+  // `sidebar.closed` is the single source of truth. Clearing the legacy class
+  // prevents the old mobile sheet and the current discovery panel from racing.
+  document.body.classList.remove("mobile-filter-open");
   sidebar.classList.toggle("closed", !shouldExpand);
 
-  if (!shouldExpand) {
-    document.body.classList.remove("mobile-filter-open");
+  const usesModalPanel = Boolean(
+    shouldExpand &&
+    window.matchMedia?.("(max-width: 767px)").matches
+  );
+
+  sidebar.setAttribute(
+    "role",
+    usesModalPanel ? "dialog" : "complementary"
+  );
+
+  if (usesModalPanel) {
+    sidebar.setAttribute("aria-modal", "true");
+    sidebar.setAttribute("aria-labelledby", "discoveryPanelTitle");
   } else {
+    sidebar.removeAttribute("aria-modal");
+    sidebar.removeAttribute("aria-labelledby");
+  }
+
+  // Closing preserves the selected filters and only restores map/list access.
+  if (shouldExpand) {
     const filterHeader =
       document.getElementById("sidebar-header");
 
     if (filterHeader) {
       window.requestAnimationFrame(() => {
-        filterHeader.scrollTop = 0;
+        if (!sidebar.classList.contains("closed")) {
+          filterHeader.scrollTop = 0;
+        }
+      });
+    }
+
+    if (usesModalPanel && options.focusPanel !== false) {
+      window.requestAnimationFrame(() => {
+        if (!sidebar.classList.contains("closed")) {
+          document.getElementById("closeDiscoveryPanelBtn")
+            ?.focus({ preventScroll: true });
+        }
       });
     }
   }

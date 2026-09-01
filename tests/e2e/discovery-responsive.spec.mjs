@@ -331,6 +331,9 @@ test("event drawer stays contained and scrollable at release viewports", async (
         contentScrollHeight: content.scrollHeight,
         overflowX: getComputedStyle(content).overflowX,
         overflowY: getComputedStyle(content).overflowY,
+        titlebarPosition: getComputedStyle(
+          content.querySelector(".drawer-titlebar")
+        ).position,
         overflowingDescendants
       };
     });
@@ -358,10 +361,38 @@ test("event drawer stays contained and scrollable at release viewports", async (
       expect(drawerLayout.contentScrollHeight, `${width}x${height} mobile scroll`).toBeGreaterThan(
         drawerLayout.contentClientHeight
       );
+      expect(
+        drawerLayout.titlebarPosition,
+        `${width}x${height} mobile titlebar`
+      ).not.toMatch(/fixed|sticky/);
     }
     expect(drawerLayout.overflowingDescendants, `${width}x${height}`).toEqual([]);
 
     if (drawerLayout.contentScrollHeight > drawerLayout.contentClientHeight) {
+      if (width <= 767) {
+        const titleBeforeScroll = await page
+          .locator("#eventDrawer .drawer-titlebar")
+          .evaluate(element => element.getBoundingClientRect().top);
+        const scrollTravel = await drawerContent.evaluate(element => {
+          const travel = Math.min(
+            240,
+            element.scrollHeight - element.clientHeight
+          );
+
+          element.scrollTop = travel;
+          return travel;
+        });
+        const titleAfterScroll = await page
+          .locator("#eventDrawer .drawer-titlebar")
+          .evaluate(element => element.getBoundingClientRect().top);
+
+        expect(scrollTravel, `${width}x${height} scroll travel`).toBeGreaterThan(0);
+        expect(
+          titleBeforeScroll - titleAfterScroll,
+          `${width}x${height} title must scroll with content`
+        ).toBeGreaterThanOrEqual(Math.max(1, scrollTravel * 0.75));
+      }
+
       await drawerContent.evaluate(element => {
         element.scrollTop = element.scrollHeight;
       });

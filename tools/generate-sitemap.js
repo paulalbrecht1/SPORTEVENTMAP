@@ -35,6 +35,18 @@ function normalizeUrl(pathname) {
   return SITE_URL + pathname;
 }
 
+function writeFileIfChanged(filePath, content) {
+  if (
+    fs.existsSync(filePath) &&
+    fs.readFileSync(filePath, "utf8") === content
+  ) {
+    return false;
+  }
+
+  fs.writeFileSync(filePath, content, "utf8");
+  return true;
+}
+
 function readEventRows() {
   if (!fs.existsSync(EVENTS_PATH)) {
     return [];
@@ -121,7 +133,7 @@ ${body}
 </urlset>
 `;
 
-  fs.writeFileSync(SITEMAP_PATH, xml, "utf8");
+  writeFileIfChanged(SITEMAP_PATH, xml);
   return urls.length;
 }
 
@@ -132,7 +144,7 @@ Allow: /
 Sitemap: ${SITE_URL}/sitemap.xml
 `;
 
-  fs.writeFileSync(ROBOTS_PATH, robots, "utf8");
+  writeFileIfChanged(ROBOTS_PATH, robots);
 }
 
 function main() {

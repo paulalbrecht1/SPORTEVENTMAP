@@ -334,6 +334,20 @@ test("tablet filter panel stays non-modal across map and list views", async ({ p
   await expect(page.getByTestId("event-list")).toBeVisible();
   await expect(fullscreen).toBeVisible();
   await expect(page.getByTestId("map")).toHaveCSS("pointer-events", "auto");
+  await page.waitForFunction(() =>
+    !document.body.classList.contains("sidebar-is-transitioning")
+  );
+  await expect.poll(() => page.evaluate(() => {
+    const panelBounds = document.querySelector("#sidebar")
+      .getBoundingClientRect();
+    const mapBounds = document.querySelector("#map")
+      .getBoundingClientRect();
+
+    return panelBounds.left >= mapBounds.left - 1 &&
+      panelBounds.right <= mapBounds.right + 1 &&
+      panelBounds.top >= mapBounds.top - 1 &&
+      panelBounds.bottom <= mapBounds.bottom + 1;
+  })).toBe(true);
 
   const splitLayout = await page.evaluate(() => {
     const panelBounds = document.querySelector("#sidebar").getBoundingClientRect();
@@ -343,6 +357,18 @@ test("tablet filter panel stays non-modal across map and list views", async ({ p
       pageOverflow:
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
+      panelBounds: {
+        left: panelBounds.left,
+        right: panelBounds.right,
+        top: panelBounds.top,
+        bottom: panelBounds.bottom
+      },
+      mapBounds: {
+        left: mapBounds.left,
+        right: mapBounds.right,
+        top: mapBounds.top,
+        bottom: mapBounds.bottom
+      },
       panelInsideMap:
         panelBounds.left >= mapBounds.left - 1 &&
         panelBounds.right <= mapBounds.right + 1 &&
@@ -352,7 +378,10 @@ test("tablet filter panel stays non-modal across map and list views", async ({ p
   });
 
   expect(splitLayout.pageOverflow).toBeLessThanOrEqual(2);
-  expect(splitLayout.panelInsideMap).toBe(true);
+  expect(
+    splitLayout.panelInsideMap,
+    JSON.stringify(splitLayout)
+  ).toBe(true);
 
   await fullscreen.click();
   await expect(page.locator("body")).toHaveClass(/event-list-fullscreen/);

@@ -3,12 +3,26 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { evaluateCatalogRelease, maximumAllowedDrop, sha256 } = require("../tools/check-catalog-release.js");
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const root = fs.mkdtempSync(path.join(os.tmpdir(), "catalog-release-gate-"));
 const data = path.join(root, "data");
 fs.mkdirSync(data, { recursive: true });
+
+const attributes = fs.readFileSync(path.join(repositoryRoot, ".gitattributes"), "utf8");
+for (const artifact of [
+  "data/events.csv",
+  "data/event-editions-public.json",
+  "data/catalog-export-manifest.json"
+]) {
+  assert.ok(
+    attributes.split(/\r?\n/).some(line => line.trim() === `${artifact} text eol=lf`),
+    `${artifact} must keep LF bytes because the catalog manifest hashes exact file contents.`
+  );
+}
 
 const exportedAt = "2026-08-24T08:00:00.000Z";
 const discovery = "event_name;date\nTest Event;01.01.2027\n";

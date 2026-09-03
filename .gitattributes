@@ -1,1 +1,8 @@
 *.sh text eol=lf
+
+# These generated public-catalog files are covered by the SHA-256 values in
+# catalog-export-manifest.json. Keep their exact bytes stable on Windows so a
+# clean checkout verifies the same artifacts that the exporter created.
+data/events.csv text eol=lf
+data/event-editions-public.json text eol=lf
+data/catalog-export-manifest.json text eol=lf

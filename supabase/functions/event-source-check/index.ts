@@ -168,7 +168,7 @@ async function checkRobots(admin: ReturnType<typeof createClient>, claim: Record
       policy: {
         ...fetchPolicy,
         maxResponseBytes: Math.min(Number(fetchPolicy.maxResponseBytes), 512000),
-        allowedContentTypes: ["text/plain", "text/html"],
+        allowedContentTypes: ["text/plain", "text/html", "text/x-robots"],
         allowEmptyContent: true,
         accept: "text/plain,*/*;q=0.1"
       },

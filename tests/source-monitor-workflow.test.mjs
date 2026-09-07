@@ -30,6 +30,7 @@ for (const fragment of [
 for (const fragment of ["fetchSource", "resolvePublicDns", "record_source_crawl_result", "record_source_crawl_observation", "runProductionSmoke", "pinnedTransport", "SOURCE_MONITOR_USER_AGENT", "SOURCE_MONITOR_ALLOW_HTTP"]) {
   assert.ok(worker.includes(fragment), `Worker missing ${fragment}`);
 }
+assert.match(worker, /allowedContentTypes:\s*\["text\/plain",\s*"text\/html",\s*"text\/x-robots"\]/);
 for (const fragment of ["ssrf_blocked", "redirect: \"manual\"", "maxResponseBytes", "unsupported_content_type", "normalizeRelevantContent", "extractSemanticSignals", "NORMALIZATION_VERSION"]) {
   assert.ok(core.includes(fragment), `Core missing ${fragment}`);
 }

@@ -45,7 +45,7 @@ const manifested = [...applied, ...pending.map(({ version, name }) => ({ version
   .sort((left, right) => left.version.localeCompare(right.version));
 
 assert.equal(applied.length, 36, "Expected active predeployment baseline changed.");
-assert.equal(pending.length, 11, "Expected pending rollout set changed.");
+assert.equal(pending.length, 12, "Expected pending rollout set changed.");
 assert.deepEqual(manifested, migrationFiles,
   "Production preflight manifest must match every local migration exactly.");
 assert.ok(applied.some(row => row.version === "20260817121601"));

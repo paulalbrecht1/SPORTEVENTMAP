@@ -124,7 +124,7 @@ function normalizeStatus(value) {
   }
 
   if (status.includes("not open")) {
-    return "Registration not open yet";
+    return "Registration not open";
   }
 
   if (status.includes("sold out")) {
@@ -654,7 +654,7 @@ function inferRegistrationStatus(row) {
   }
 
   if (/not open/.test(feeTrend)) {
-    return "Registration not open yet";
+    return "Registration not open";
   }
 
   if (/inventory based/.test(feeTrend)) {
@@ -714,7 +714,7 @@ function formatRegistrationCell(row) {
   }
 
   if (/not open/i.test(normalizedStatus)) {
-    return detailBadge("Registration not open yet", "pending");
+    return detailBadge("Registration not open", "pending");
   }
 
   if (/registration open/i.test(normalizedStatus)) {
@@ -4268,6 +4268,5 @@ module.exports = {
   parseEventDate,
   resolveOrganizer
 };
-
 
 

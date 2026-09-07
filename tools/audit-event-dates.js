@@ -1,9 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const crypto = require("crypto");
 
 const {
   cleanValue,
-  parseCsvFile,
+  parseCsv,
   writeJsonFile
 } = require("./event-table-utils");
 
@@ -211,6 +212,44 @@ function makeDate(year, month, day) {
   return date;
 }
 
+function parseIsoTimestamp(raw) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d{1,9}))?(Z|([+-])(\d{2}):(\d{2}))$/.exec(raw);
+
+  if (!match) {
+    return null;
+  }
+
+  const date = makeDate(
+    Number(match[1]),
+    Number(match[2]),
+    Number(match[3])
+  );
+  const hour = Number(match[4]);
+  const minute = Number(match[5]);
+  const second = Number(match[6]);
+  const offsetHour = match[10] ? Number(match[10]) : 0;
+  const offsetMinute = match[11] ? Number(match[11]) : 0;
+  const hasValidOffset =
+    offsetHour <= 14 &&
+    offsetMinute <= 59 &&
+    (offsetHour !== 14 || offsetMinute === 0);
+
+  if (
+    !date ||
+    hour > 23 ||
+    minute > 59 ||
+    second > 59 ||
+    !hasValidOffset ||
+    !Number.isFinite(Date.parse(raw))
+  ) {
+    return null;
+  }
+
+  // The audit compares calendar days, so keep the date component instead of
+  // shifting it through the timestamp's UTC offset.
+  return date;
+}
+
 function parseFlexibleDate(value) {
   const raw = cleanValue(value);
 
@@ -237,6 +276,26 @@ function parseFlexibleDate(value) {
       date: makeDate(Number(iso[1]), Number(iso[2]), Number(iso[3])),
       format: "YYYY-MM-DD",
       exact: true
+    };
+  }
+
+  const isoTimestamp = parseIsoTimestamp(raw);
+  if (isoTimestamp) {
+    return {
+      date: isoTimestamp,
+      format: "ISO 8601 timestamp",
+      exact: true
+    };
+  }
+
+  // Do not let a malformed timestamp degrade into an "embedded date" match.
+  // A value that starts like an ISO datetime must pass the complete timestamp
+  // validation above, including its time and timezone offset.
+  if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) {
+    return {
+      date: null,
+      format: "",
+      exact: false
     };
   }
 
@@ -323,7 +382,7 @@ function addDateFieldChecks(row, event, events, fieldName, label) {
       "warning",
       `${fieldName}_not_parseable`,
       `${label} is present but cannot be parsed: ${value}.`,
-      `Normalize ${label} to DD.MM.YYYY or ISO format.`
+      `Normalize ${label} to an ISO 8601 date or timestamp.`
     );
     return null;
   }
@@ -334,7 +393,7 @@ function addDateFieldChecks(row, event, events, fieldName, label) {
       "info",
       `${fieldName}_non_standard_format`,
       `${label} can be parsed but is not stored as a clean standalone date: ${value}.`,
-      `Normalize ${label} to DD.MM.YYYY after manual verification.`
+      `Store ${label} as a standalone ISO 8601 date or timestamp after manual verification.`
     );
   }
 
@@ -594,6 +653,13 @@ function summarize(rows) {
   );
 }
 
+function sha256(content) {
+  return crypto
+    .createHash("sha256")
+    .update(content)
+    .digest("hex");
+}
+
 function main() {
   const args = parseArgs(process.argv);
   const input = resolveProjectPath(args.input);
@@ -604,7 +670,8 @@ function main() {
 
   today.setHours(0, 0, 0, 0);
 
-  const events = parseCsvFile(input);
+  const inputBuffer = fs.readFileSync(input);
+  const events = parseCsv(inputBuffer.toString("utf8"));
   const rows = events.map(event =>
     auditEvent(event, events, today)
   );
@@ -612,8 +679,10 @@ function main() {
   addDuplicateIssues(rows, events);
 
   const report = {
+    schema_version: 2,
     generated_at: new Date().toISOString(),
     input: path.relative(ROOT, input).replace(/\\/g, "/"),
+    input_sha256: sha256(inputBuffer),
     total_events: events.length,
     summary: summarize(rows),
     events: rows
@@ -638,4 +707,14 @@ function main() {
   );
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = {
+  addDateFieldChecks,
+  auditEvent,
+  parseFlexibleDate,
+  parseIsoTimestamp,
+  sha256
+};

@@ -1793,6 +1793,440 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.equal(cleanup.response.ok, true, JSON.stringify(cleanup.data));
     }
   );
+
+  await test(
+    "19. Freshness verification is fail-closed, fact-preserving and conflict-aware",
+    async () => {
+      const sourceUrl = `https://example.com/freshness-verification-${runId}`;
+      const futureDate = new Date(Date.now() + 180 * 86400000);
+      const editionDate = futureDate.toISOString().slice(0, 10);
+      const legacyDate = `${String(futureDate.getUTCDate()).padStart(2, "0")}.${String(futureDate.getUTCMonth() + 1).padStart(2, "0")}.${futureDate.getUTCFullYear()}`;
+      const editionYear = futureDate.getUTCFullYear();
+      let eventId = null;
+      let feedbackId = null;
+      try {
+      const insertedEvent = await restRequest("events", {
+        token: admin.token,
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_name: `[FRESHNESS VERIFY TEST] ${runId}`,
+          sport: "Running",
+          date: legacyDate,
+          city: "Berlin",
+          country: "Germany",
+          address: "Freshness verification venue, Berlin",
+          latitude: "52.5200",
+          longitude: "13.4050",
+          distance: "10 km",
+          description: "A complete freshness verification fixture with enough descriptive content for the strict release-quality threshold and immutable fact checks.",
+          event_url: sourceUrl,
+          status: "pending",
+          created_by: admin.user.id
+        }
+      });
+      assert.equal(insertedEvent.response.ok, true, JSON.stringify(insertedEvent.data));
+      eventId = insertedEvent.data[0].id;
+
+      const approvedEvent = await restRequest(`events?id=eq.${encodeURIComponent(eventId)}`, {
+        token: admin.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { status: "approved" }
+      });
+      assert.equal(approvedEvent.response.ok, true, JSON.stringify(approvedEvent.data));
+
+      const editions = await serviceRequest(
+        `event_editions?select=id&event_id=eq.${encodeURIComponent(eventId)}&limit=1`
+      );
+      assert.equal(editions.response.ok, true, JSON.stringify(editions.data));
+      assert.equal(editions.data.length, 1);
+      const editionId = editions.data[0].id;
+
+      const updatedEdition = await serviceRequest(`event_editions?id=eq.${encodeURIComponent(editionId)}`, {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: {
+          edition_year: editionYear,
+          start_date: editionDate,
+          end_date: editionDate,
+          publication_status: "published",
+          discovery_status: "active",
+          edition_status: "scheduled",
+          verification_status: "stale",
+          needs_review: true,
+          review_priority: "high",
+          registration_status: "registration_open",
+          registration_url: `${sourceUrl}/register`,
+          source_url: sourceUrl,
+          race_formats: [{ label: "10 km", distance_km: 10 }],
+          next_check_at: new Date(Date.now() - 86400000).toISOString()
+        }
+      });
+      assert.equal(updatedEdition.response.ok, true, JSON.stringify(updatedEdition.data));
+
+      const insertedSource = await serviceRequest("event_sources", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: eventId,
+          edition_id: editionId,
+          source_type: "official_event_website",
+          source_url: sourceUrl,
+          parser_type: "html",
+          is_active: true,
+          crawl_status: "not_modified",
+          consecutive_failures: 0,
+          last_change_status: "unchanged",
+          last_fetched_at: new Date().toISOString(),
+          next_fetch_at: new Date(Date.now() + 86400000).toISOString()
+        }
+      });
+      assert.equal(insertedSource.response.ok, true, JSON.stringify(insertedSource.data));
+      const sourceId = insertedSource.data[0].id;
+
+      const sourceFactsBefore = await serviceRequest(
+        `event_sources?select=event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_change_status,last_fetched_at&id=eq.${encodeURIComponent(sourceId)}`
+      );
+      assert.equal(sourceFactsBefore.response.ok, true, JSON.stringify(sourceFactsBefore.data));
+
+      const eventFactsBefore = await serviceRequest(
+        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`
+      );
+      const editionFactsBefore = await serviceRequest(
+        `event_editions?select=edition_year,start_date,end_date,registration_url,registration_status,edition_status,publication_status,discovery_status,race_formats,legacy_distance&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.equal(eventFactsBefore.response.ok, true, JSON.stringify(eventFactsBefore.data));
+      assert.equal(editionFactsBefore.response.ok, true, JSON.stringify(editionFactsBefore.data));
+
+      const inbox = await restRequest(
+        `admin_review_inbox?select=item_id,item_type,edition_id,batch_action,metadata&item_type=eq.freshness_review&edition_id=eq.${encodeURIComponent(editionId)}`,
+        { token: admin.token }
+      );
+      assert.equal(inbox.response.ok, true, JSON.stringify(inbox.data));
+      assert.equal(inbox.data.length, 1, JSON.stringify(inbox.data));
+      assert.equal(inbox.data[0].batch_action, "review");
+      assert.equal(inbox.data[0].metadata.source_id, sourceId);
+      assert.equal(inbox.data[0].metadata.source_url, sourceUrl);
+      assert.ok(inbox.data[0].metadata.source_checked_at);
+      assert.deepEqual(inbox.data[0].metadata.affected_fields, []);
+      assert.equal(inbox.data[0].metadata.stored_values.event_name, `[FRESHNESS VERIFY TEST] ${runId}`);
+      assert.equal(inbox.data[0].metadata.stored_values.edition_year, editionYear);
+      assert.equal(inbox.data[0].metadata.stored_values.date, editionDate);
+      assert.equal(inbox.data[0].metadata.stored_values.registration_link, `${sourceUrl}/register`);
+
+      const eventFacts = eventFactsBefore.data[0];
+      const editionFacts = editionFactsBefore.data[0];
+      const requiredFields = [
+        "event_name", "edition_year", "date", "city", "country", "address",
+        "latitude", "longitude", "sport", "distances", "description",
+        "registration_status", "official_event_page", "registration_link"
+      ];
+      const storedValues = {
+        event_name: eventFacts.canonical_name || eventFacts.event_name,
+        edition_year: editionFacts.edition_year,
+        date: editionFacts.start_date,
+        city: eventFacts.city,
+        country: eventFacts.country,
+        address: eventFacts.address,
+        latitude: eventFacts.latitude,
+        longitude: eventFacts.longitude,
+        sport: eventFacts.sport,
+        distances: editionFacts.race_formats?.length ? editionFacts.race_formats : editionFacts.legacy_distance || eventFacts.distance,
+        description: eventFacts.description,
+        registration_status: editionFacts.registration_status,
+        official_event_page: sourceUrl,
+        registration_link: editionFacts.registration_url
+      };
+      const evidence = {
+        source_id: sourceId,
+        source_url: sourceUrl,
+        source_checked_at: new Date().toISOString(),
+        confidence: 0.95,
+        confirmed_fields: requiredFields,
+        uncertain_fields: [],
+        observed_values: storedValues
+      };
+      const rpcBody = candidateEvidence => ({
+        p_edition_ids: [editionId],
+        p_notes: "Official source and all central fields checked.",
+        p_evidence: { [editionId]: candidateEvidence }
+      });
+
+      const guardBefore = await restRequest("rpc/get_public_event_freshness_guard", {
+        method: "POST",
+        body: { p_edition_ids: [editionId] }
+      });
+      assert.equal(guardBefore.response.ok, true, JSON.stringify(guardBefore.data));
+      assert.equal(guardBefore.data.schema_version, 1);
+      assert.equal(guardBefore.data.requested_count, 1);
+      assert.equal(guardBefore.data.decisions[editionId], false);
+
+      const anonymousVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        method: "POST",
+        body: rpcBody(evidence)
+      });
+      assert.equal(anonymousVerification.response.ok, false);
+
+      const normalVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: userA.token,
+        method: "POST",
+        body: rpcBody(evidence)
+      });
+      assert.equal(normalVerification.response.ok, false);
+
+      const nullConfidence = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, confidence: null })
+      });
+      assert.equal(nullConfidence.response.ok, false, JSON.stringify(nullConfidence.data));
+
+      const missingUncertainFields = { ...evidence };
+      delete missingUncertainFields.uncertain_fields;
+      const missingUncertain = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody(missingUncertainFields)
+      });
+      assert.equal(missingUncertain.response.ok, false, JSON.stringify(missingUncertain.data));
+
+      const mismatchVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({
+          ...evidence,
+          observed_values: { ...storedValues, city: "Hamburg" }
+        })
+      });
+      assert.equal(mismatchVerification.response.ok, false, JSON.stringify(mismatchVerification.data));
+
+      const insertedActiveJob = await serviceRequest("source_crawl_jobs", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          source_id: sourceId,
+          event_id: eventId,
+          edition_id: editionId,
+          status: "queued",
+          idempotency_key: `freshness-active-${runId}`,
+          trigger_source: "test"
+        }
+      });
+      assert.equal(insertedActiveJob.response.ok, true, JSON.stringify(insertedActiveJob.data));
+      const activeCrawlVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody(evidence)
+      });
+      assert.equal(activeCrawlVerification.response.ok, false, JSON.stringify(activeCrawlVerification.data));
+      const removedActiveJob = await serviceRequest(
+        `source_crawl_jobs?id=eq.${encodeURIComponent(insertedActiveJob.data[0].id)}`,
+        { method: "DELETE" }
+      );
+      assert.equal(removedActiveJob.response.ok, true, JSON.stringify(removedActiveJob.data));
+
+      const nullSourceState = await serviceRequest(`event_sources?id=eq.${encodeURIComponent(sourceId)}`, {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { last_change_status: null }
+      });
+      assert.equal(nullSourceState.response.ok, true, JSON.stringify(nullSourceState.data));
+      const nullSourceVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody(evidence)
+      });
+      assert.equal(nullSourceVerification.response.ok, false, JSON.stringify(nullSourceVerification.data));
+      const restoredSourceState = await serviceRequest(`event_sources?id=eq.${encodeURIComponent(sourceId)}`, {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { last_change_status: "unchanged" }
+      });
+      assert.equal(restoredSourceState.response.ok, true, JSON.stringify(restoredSourceState.data));
+
+      const verified = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, source_checked_at: new Date().toISOString() })
+      });
+      assert.equal(verified.response.ok, true, JSON.stringify(verified.data));
+      assert.equal(Number(verified.data.verified_count), 1);
+      assert.equal(verified.data.automatic_fact_changes, false);
+
+      const guardAfter = await restRequest("rpc/get_public_event_freshness_guard", {
+        method: "POST",
+        body: { p_edition_ids: [editionId] }
+      });
+      assert.equal(guardAfter.response.ok, true, JSON.stringify(guardAfter.data));
+      assert.equal(guardAfter.data.decisions[editionId], true);
+
+      const verifiedEdition = await serviceRequest(
+        `event_editions?select=verification_status,needs_review,review_priority,last_verified_at,next_check_at,last_verified_source_id&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.equal(verifiedEdition.response.ok, true, JSON.stringify(verifiedEdition.data));
+      assert.equal(verifiedEdition.data[0].verification_status, "verified");
+      assert.equal(verifiedEdition.data[0].needs_review, false);
+      assert.equal(verifiedEdition.data[0].review_priority, "low");
+      assert.equal(verifiedEdition.data[0].last_verified_source_id, sourceId);
+      assert.ok(Date.parse(verifiedEdition.data[0].last_verified_at) <= Date.now() + 300000);
+      assert.ok(Date.parse(verifiedEdition.data[0].next_check_at) > Date.now());
+
+      const eventFactsAfter = await serviceRequest(
+        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`
+      );
+      const editionFactsAfter = await serviceRequest(
+        `event_editions?select=edition_year,start_date,end_date,registration_url,registration_status,edition_status,publication_status,discovery_status,race_formats,legacy_distance&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.deepEqual(eventFactsAfter.data, eventFactsBefore.data, "Freshness verification changed event facts.");
+      assert.deepEqual(editionFactsAfter.data, editionFactsBefore.data, "Freshness verification changed edition facts.");
+      const sourceFactsAfter = await serviceRequest(
+        `event_sources?select=event_id,edition_id,source_type,source_url,is_active,crawl_status,consecutive_failures,last_change_status,last_fetched_at&id=eq.${encodeURIComponent(sourceId)}`
+      );
+      assert.deepEqual(sourceFactsAfter.data, sourceFactsBefore.data, "Freshness verification changed source facts.");
+
+      const audit = await serviceRequest(
+        `event_audit_log?select=field_name,new_value,change_source,changed_by,changed_by_process&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(editionId)}&field_name=eq.__freshness_verification__`
+      );
+      assert.equal(audit.response.ok, true, JSON.stringify(audit.data));
+      assert.equal(audit.data.length, 1);
+      assert.equal(audit.data[0].change_source, "manual_admin");
+      assert.equal(audit.data[0].changed_by, admin.user.id);
+      assert.equal(audit.data[0].changed_by_process, "freshness_review_queue");
+      assert.equal(audit.data[0].new_value.automatic_fact_changes, false);
+
+      const clearedInbox = await restRequest(
+        `admin_review_inbox?select=item_id&item_type=eq.freshness_review&edition_id=eq.${encodeURIComponent(editionId)}`,
+        { token: admin.token }
+      );
+      assert.equal(clearedInbox.response.ok, true, JSON.stringify(clearedInbox.data));
+      assert.deepEqual(clearedInbox.data, []);
+
+      const repeatedVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, source_checked_at: new Date().toISOString() })
+      });
+      assert.equal(repeatedVerification.response.ok, false);
+      const repeatedAudit = await serviceRequest(
+        `event_audit_log?select=id&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(editionId)}&field_name=eq.__freshness_verification__`
+      );
+      assert.equal(repeatedAudit.data.length, 1);
+
+      const feedbackBlocker = await serviceRequest("user_feedback", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          category: "incorrect_event_data",
+          summary: "Freshness alias blocker",
+          message: "Moderated test feedback must block exact numeric aliases.",
+          event_id: String(eventId).padStart(String(eventId).length + 2, "0"),
+          status: "reviewed"
+        }
+      });
+      assert.equal(feedbackBlocker.response.ok, true, JSON.stringify(feedbackBlocker.data));
+      feedbackId = feedbackBlocker.data[0].id;
+
+      const feedbackInvalidated = await serviceRequest(
+        `event_editions?select=verification_status,needs_review,last_verified_source_id&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.equal(feedbackInvalidated.data[0].verification_status, "needs_review");
+      assert.equal(feedbackInvalidated.data[0].needs_review, true);
+      assert.equal(feedbackInvalidated.data[0].last_verified_source_id, null);
+
+      const feedbackGuard = await restRequest("rpc/get_public_event_freshness_guard", {
+        method: "POST",
+        body: { p_edition_ids: [editionId] }
+      });
+      assert.equal(feedbackGuard.response.ok, true, JSON.stringify(feedbackGuard.data));
+      assert.equal(feedbackGuard.data.decisions[editionId], false);
+
+      const feedbackBlockedVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, source_checked_at: new Date().toISOString() })
+      });
+      assert.equal(feedbackBlockedVerification.response.ok, false, JSON.stringify(feedbackBlockedVerification.data));
+
+      const resolvedFeedback = await serviceRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { status: "resolved" }
+      });
+      assert.equal(resolvedFeedback.response.ok, true, JSON.stringify(resolvedFeedback.data));
+
+      const reverifiedAfterFeedback = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, source_checked_at: new Date().toISOString() })
+      });
+      assert.equal(reverifiedAfterFeedback.response.ok, true, JSON.stringify(reverifiedAfterFeedback.data));
+      assert.equal(Number(reverifiedAfterFeedback.data.verified_count), 1);
+
+      const blocker = await serviceRequest("event_change_proposals", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: eventId,
+          edition_id: editionId,
+          source_id: sourceId,
+          entity_type: "edition",
+          proposal_status: "pending",
+          rule_code: "rls_freshness_conflict",
+          proposed_changes: { registration_status: "sold_out" },
+          observed_values: { registration_status: "sold_out" },
+          baseline_values: { registration_status: "registration_open" },
+          proposal_fingerprint: `freshness-conflict-${runId}`,
+          confidence: 0.9,
+          priority: "high",
+          reason: "RLS freshness invalidation fixture",
+          source_url: sourceUrl
+        }
+      });
+      assert.equal(blocker.response.ok, true, JSON.stringify(blocker.data));
+      const invalidatedEdition = await serviceRequest(
+        `event_editions?select=verification_status,needs_review,review_priority,next_check_at&id=eq.${encodeURIComponent(editionId)}`
+      );
+      assert.equal(invalidatedEdition.data[0].verification_status, "needs_review");
+      assert.equal(invalidatedEdition.data[0].needs_review, true);
+      assert.equal(invalidatedEdition.data[0].review_priority, "high");
+      assert.ok(Date.parse(invalidatedEdition.data[0].next_check_at) <= Date.now() + 300000);
+
+      const guardBlocked = await restRequest("rpc/get_public_event_freshness_guard", {
+        method: "POST",
+        body: { p_edition_ids: [editionId] }
+      });
+      assert.equal(guardBlocked.response.ok, true, JSON.stringify(guardBlocked.data));
+      assert.equal(guardBlocked.data.decisions[editionId], false);
+
+      const blockedVerification = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token,
+        method: "POST",
+        body: rpcBody({ ...evidence, source_checked_at: new Date().toISOString() })
+      });
+      assert.equal(blockedVerification.response.ok, false, JSON.stringify(blockedVerification.data));
+      const blockerAudit = await serviceRequest(
+        `event_audit_log?select=id&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(editionId)}&field_name=eq.__freshness_verification__`
+      );
+      assert.equal(blockerAudit.data.length, 2);
+
+      } finally {
+        if (feedbackId != null) {
+          const feedbackCleanup = await serviceRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+            method: "DELETE"
+          });
+          assert.equal(feedbackCleanup.response.ok, true, JSON.stringify(feedbackCleanup.data));
+        }
+        if (eventId != null) {
+          const cleanup = await restRequest(`events?id=eq.${encodeURIComponent(eventId)}`, {
+            token: admin.token,
+            method: "DELETE"
+          });
+          assert.equal(cleanup.response.ok, true, JSON.stringify(cleanup.data));
+        }
+      }
+    }
+  );
 }
 
 // Cleanup rows created by the test.

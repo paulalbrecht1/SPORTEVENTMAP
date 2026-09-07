@@ -1,169 +1,197 @@
 {
-  "generated_at": "2026-06-19T09:39:34.919Z",
-  "events_checked": 994,
+  "schema_version": 2,
+  "generated_at": "2026-09-04T00:04:32.852Z",
+  "input": "data/events.csv",
+  "input_sha256": "492d58602925fed4fc9e53d74ebde5bc3953ee43f18161f84969a6592650d414",
+  "events_checked": 431,
   "exact_duplicates": 0,
-  "likely_duplicates": 2,
-  "same_website_duplicates": 4,
-  "same_coordinates_date_suspicious": 3,
-  "priority_review_list": [
+  "likely_duplicates": 5,
+  "same_website_duplicates": 2,
+  "same_coordinates_date_suspicious": 2,
+  "release_blocking_candidates": 5,
+  "unresolved_release_blocking_candidates": 5,
+  "candidates": [
     {
-      "reason": "similar_name_city_near_date",
-      "confidence": 60,
-      "first": {
-        "event_name": "IRONMAN Vitoria-Gasteiz",
-        "date": "12.07.2026",
-        "city": "Vitoria-Gasteiz",
-        "country": "Spain",
-        "event_url": "https://www.ironman.com/races/im-vitoria",
-        "latitude": "42.8465088",
-        "longitude": "-2.6724025"
-      },
-      "second": {
-        "event_name": "IRONMAN 70.3 Vitoria-Gasteiz",
-        "date": "12.07.2026",
-        "city": "Vitoria-Gasteiz",
-        "country": "Spain",
-        "event_url": "https://www.ironman.com/races/im703-vitoria",
-        "latitude": "42.8465088",
-        "longitude": "-2.6724025"
-      }
-    },
-    {
-      "reason": "similar_name_city_near_date",
+      "candidate_id": "dup_235db71b358509a7e676",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
       "confidence": 100,
+      "reasons": [
+        {
+          "code": "similar_or_prefix_name_same_city_near_date",
+          "confidence": 100,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names overlap in the same city and the dates are 5 day(s) apart."
+        }
+      ],
       "first": {
-        "event_name": "Haspa Marathon Hamburg",
-        "date": "25.04.2027",
-        "city": "Hamburg",
+        "event_id": "123",
+        "edition_id": "4bcc25f6-c0d6-4b35-8d21-a7939a089eb5",
+        "edition_slug": "einstein-marathon-2026",
+        "event_name": "Einstein Marathon",
+        "date": "27.09.2026",
+        "city": "Ulm",
         "country": "Germany",
-        "event_url": "https://haspa-marathon-hamburg.de/",
-        "latitude": "53.557504",
-        "longitude": "9.975498"
+        "event_url": "https://einsteinmarathon.de/",
+        "latitude": "48.3984968",
+        "longitude": "9.9912458"
       },
       "second": {
-        "event_name": "Haspa Halbmarathon Hamburg",
-        "date": "25.04.2027",
-        "city": "Hamburg",
+        "event_id": "476",
+        "edition_id": "e9a440de-0f28-4f58-982f-8e4573c8a10a",
+        "edition_slug": "einstein-marathon-ulm-2026",
+        "event_name": "Einstein-Marathon Ulm",
+        "date": "22.09.2026",
+        "city": "Ulm",
         "country": "Germany",
-        "event_url": "https://haspa-marathon-hamburg.de/halbmarathon/",
-        "latitude": "53.5501721",
-        "longitude": "10.0013165"
-      }
+        "event_url": "http://www.einstein-marathon.de",
+        "latitude": "48.3984968",
+        "longitude": "9.9912458"
+      },
+      "evidence_signature": "df1521e39f79875aef9210890f3f14e9b29f89457dc78748b889d500e52a4404",
+      "reason": "similar_or_prefix_name_same_city_near_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
     },
     {
-      "reason": "same_website",
-      "confidence": 92,
+      "candidate_id": "dup_5c2973ed6a9dce0d6b58",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 100,
+      "reasons": [
+        {
+          "code": "similar_name_nearby_same_date",
+          "confidence": 100,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names strongly overlap and coordinates are 7.9 km apart on the same date."
+        }
+      ],
       "first": {
-        "event_name": "SportScheck RUN München",
-        "date": "05.07.2026",
-        "city": "München",
+        "event_id": "436",
+        "edition_id": "b45cc9f3-5885-4de8-8048-7b4f5067946f",
+        "edition_slug": "10-teiche-marathon-2026",
+        "event_name": "10 Teiche Marathon",
+        "date": "12.09.2026",
+        "city": "Hahnenklee",
         "country": "Germany",
-        "event_url": "https://www.sportscheck.com/run.html",
-        "latitude": "48.1371079",
-        "longitude": "11.5753822"
+        "event_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+        "latitude": "51.8602508",
+        "longitude": "10.3384485"
       },
       "second": {
-        "event_name": "SportScheck RUN Nürnberg",
-        "date": "25.10.2026",
-        "city": "Nürnberg",
+        "event_id": "966",
+        "edition_id": "e5bedc8e-4f23-4572-bdf7-5c03b0aa8500",
+        "edition_slug": "10-teiche-marathon-goslar-2026",
+        "event_name": "10-Teiche-Marathon - Goslar",
+        "date": "12.09.2026",
+        "city": "Goslar",
         "country": "Germany",
-        "event_url": "https://www.sportscheck.com/run.html",
-        "latitude": "49.453872",
-        "longitude": "11.077298"
-      }
+        "event_url": "https://www.hahnenklee.de/spass/harzerwanderwochen",
+        "latitude": "51.9059936",
+        "longitude": "10.4266284"
+      },
+      "evidence_signature": "07728004a01fb130a428861af336b4988bed4ec047463b1b112ec5604d85d1fe",
+      "reason": "similar_name_nearby_same_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
     },
     {
-      "reason": "same_website",
-      "confidence": 92,
+      "candidate_id": "dup_2c3e3f631d55e720e1d3",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 99,
+      "reasons": [
+        {
+          "code": "same_url_same_date",
+          "confidence": 99,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "The canonical event URL and event date are identical."
+        }
+      ],
       "first": {
-        "event_name": "1. Laufchallenge Mellendorfer TV",
-        "date": "23.08.2026",
-        "city": "Hanover",
-        "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.3744779",
-        "longitude": "9.7385532"
+        "event_id": "74",
+        "edition_id": "14ff1d40-75a7-42d9-8076-13df4f59466c",
+        "edition_slug": "montafon-arlberg-marathon-2027",
+        "event_name": "Montafon Arlberg Marathon",
+        "date": "26.06.2027",
+        "city": "St. Anton am Arlberg",
+        "country": "Austria",
+        "event_url": "https://www.montafon.at/montafon-arlberg-marathon/de",
+        "latitude": "47.1288996",
+        "longitude": "10.2663669"
       },
       "second": {
-        "event_name": "10. Charity-Lauf Koldingen",
-        "date": "02.08.2026",
-        "city": "Region Hannover",
+        "event_id": "721",
+        "edition_id": "8efb9d79-b50f-4554-b3cb-4170dffb3917",
+        "edition_slug": "montafon-arlberg-marathon-st-anton-2027",
+        "event_name": "Montafon-Arlberg-Marathon",
+        "date": "26.06.2027",
+        "city": "St. Anton",
         "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.2714193",
-        "longitude": "9.7968916"
-      }
+        "event_url": "https://www.montafon.at/montafon-arlberg-marathon/de",
+        "latitude": "51.2341228",
+        "longitude": "6.2472597"
+      },
+      "evidence_signature": "c22608e508e0908f706f30b7d901142546a517a305cb0ab16ba054f6bea6c3b3",
+      "reason": "same_url_same_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
     },
     {
-      "reason": "same_website",
-      "confidence": 92,
+      "candidate_id": "dup_3f8e6a973238bdd191fd",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 94,
+      "reasons": [
+        {
+          "code": "similar_or_prefix_name_same_city_near_date",
+          "confidence": 94,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names overlap in the same city and the dates are 1 day(s) apart."
+        },
+        {
+          "code": "same_coordinates_date_with_name_signal",
+          "confidence": 94,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Coordinates differ by at most 50 m, dates by 1 day(s), and the names share a meaningful signal."
+        }
+      ],
       "first": {
-        "event_name": "1. Laufchallenge Mellendorfer TV",
-        "date": "23.08.2026",
-        "city": "Hanover",
+        "event_id": "490",
+        "edition_id": "5475fe4f-73ad-404f-8092-cfd37385088a",
+        "edition_slug": "internationaler-schwarzwald-marathon-2026",
+        "event_name": "Internationaler Schwarzwald-Marathon",
+        "date": "11.10.2026",
+        "city": "Bräunlingen",
         "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.3744779",
-        "longitude": "9.7385532"
+        "event_url": "http://www.schwarzwald-marathon.de",
+        "latitude": "47.9300645",
+        "longitude": "8.448329"
       },
       "second": {
-        "event_name": "25. Volkslauf um den Altwarmbüchener See",
-        "date": "10.10.2026",
-        "city": "Isernhagen",
-        "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.4347962",
-        "longitude": "9.8483711"
-      }
-    },
-    {
-      "reason": "same_website",
-      "confidence": 92,
-      "first": {
-        "event_name": "10. Charity-Lauf Koldingen",
-        "date": "02.08.2026",
-        "city": "Region Hannover",
-        "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.2714193",
-        "longitude": "9.7968916"
-      },
-      "second": {
-        "event_name": "25. Volkslauf um den Altwarmbüchener See",
-        "date": "10.10.2026",
-        "city": "Isernhagen",
-        "country": "Germany",
-        "event_url": "https://www.hannover.de/Kultur-Freizeit/Freizeit-Sport/Sport/Laufpass-2026",
-        "latitude": "52.4347962",
-        "longitude": "9.8483711"
-      }
-    },
-    {
-      "reason": "same_coordinates_near_date",
-      "confidence": 60,
-      "first": {
-        "event_name": "IRONMAN Vitoria-Gasteiz",
-        "date": "12.07.2026",
-        "city": "Vitoria-Gasteiz",
-        "country": "Spain",
-        "event_url": "https://www.ironman.com/races/im-vitoria",
-        "latitude": "42.8465088",
-        "longitude": "-2.6724025"
-      },
-      "second": {
-        "event_name": "IRONMAN 70.3 Vitoria-Gasteiz",
-        "date": "12.07.2026",
-        "city": "Vitoria-Gasteiz",
-        "country": "Spain",
-        "event_url": "https://www.ironman.com/races/im703-vitoria",
-        "latitude": "42.8465088",
-        "longitude": "-2.6724025"
-      }
-    },
-    {
-      "reason": "same_coordinates_near_date",
-      "confidence": 50,
-      "first": {
+        "event_id": "125",
+        "edition_id": "fda1a411-f5ac-438a-b895-8109497563a1",
+        "edition_slug": "schwarzwald-marathon-2026",
         "event_name": "Schwarzwald Marathon",
         "date": "10.10.2026",
         "city": "Bräunlingen",
@@ -172,7 +200,283 @@
         "latitude": "47.9300645",
         "longitude": "8.448329"
       },
+      "evidence_signature": "cdf02bf8e2e7efadd8db740fe948e401a10530bff3300850bb4679d79084d2b8",
+      "reason": "similar_or_prefix_name_same_city_near_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_7dabfda183a947b5e46b",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 90,
+      "reasons": [
+        {
+          "code": "same_coordinates_date_with_name_signal",
+          "confidence": 90,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Coordinates differ by at most 50 m, dates by 0 day(s), and the names share a meaningful signal."
+        }
+      ],
+      "first": {
+        "event_id": "108",
+        "edition_id": "50b5b657-fd77-48e0-9c50-3ab91550e0ca",
+        "edition_slug": "wep-strom-lauf-2026",
+        "event_name": "wep-Strom Lauf",
+        "date": "13.09.2026",
+        "city": "Hückelhoven",
+        "country": "Germany",
+        "event_url": "http://www.wepstrom-lauf.de/",
+        "latitude": "51.0552368",
+        "longitude": "6.2247322"
+      },
       "second": {
+        "event_id": "979",
+        "edition_id": "5e580d8a-63af-4858-8556-c5c71aa14eff",
+        "edition_slug": "weplauf-huckelhoven-2026",
+        "event_name": "Weplauf Hückelhoven",
+        "date": "13.09.2026",
+        "city": "Hückelhoven",
+        "country": "Germany",
+        "event_url": "https://www.wep-lauf.de/",
+        "latitude": "51.0552368",
+        "longitude": "6.2247322"
+      },
+      "evidence_signature": "d5638ee3b09928c9727b0be76853b5d0974dd41b9d163e1ec1a14954acd92abd",
+      "reason": "same_coordinates_date_with_name_signal",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_35c069daae3b9a76caac",
+      "classification": "review_candidate",
+      "release_blocking": false,
+      "confidence": 70,
+      "reasons": [
+        {
+          "code": "shared_url_different_date",
+          "confidence": 70,
+          "release_blocking": false,
+          "classification": "review_candidate",
+          "detail": "The canonical URL is shared, but the dates differ; this may be a series landing page."
+        }
+      ],
+      "first": {
+        "event_id": "81",
+        "edition_id": "99340138-12b7-492a-87c9-aa40a8861905",
+        "edition_slug": "sportscheck-run-munchen-2027",
+        "event_name": "SportScheck RUN München",
+        "date": "18.06.2027",
+        "city": "München",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "48.1371079",
+        "longitude": "11.5753822"
+      },
+      "second": {
+        "event_id": "144",
+        "edition_id": "e183d8c3-ba77-4a52-9180-fdd9b9084af2",
+        "edition_slug": "sportscheck-run-nurnberg-2026",
+        "event_name": "SportScheck RUN Nürnberg",
+        "date": "25.10.2026",
+        "city": "Nürnberg",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "49.453872",
+        "longitude": "11.077298"
+      },
+      "evidence_signature": "22ab28965ef42f945277793aae27d0f71f13ddd8093ec6e07eea7ca227f5112a",
+      "reason": "shared_url_different_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    }
+  ],
+  "priority_review_list": [
+    {
+      "candidate_id": "dup_235db71b358509a7e676",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 100,
+      "reasons": [
+        {
+          "code": "similar_or_prefix_name_same_city_near_date",
+          "confidence": 100,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names overlap in the same city and the dates are 5 day(s) apart."
+        }
+      ],
+      "first": {
+        "event_id": "123",
+        "edition_id": "4bcc25f6-c0d6-4b35-8d21-a7939a089eb5",
+        "edition_slug": "einstein-marathon-2026",
+        "event_name": "Einstein Marathon",
+        "date": "27.09.2026",
+        "city": "Ulm",
+        "country": "Germany",
+        "event_url": "https://einsteinmarathon.de/",
+        "latitude": "48.3984968",
+        "longitude": "9.9912458"
+      },
+      "second": {
+        "event_id": "476",
+        "edition_id": "e9a440de-0f28-4f58-982f-8e4573c8a10a",
+        "edition_slug": "einstein-marathon-ulm-2026",
+        "event_name": "Einstein-Marathon Ulm",
+        "date": "22.09.2026",
+        "city": "Ulm",
+        "country": "Germany",
+        "event_url": "http://www.einstein-marathon.de",
+        "latitude": "48.3984968",
+        "longitude": "9.9912458"
+      },
+      "evidence_signature": "df1521e39f79875aef9210890f3f14e9b29f89457dc78748b889d500e52a4404",
+      "reason": "similar_or_prefix_name_same_city_near_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_5c2973ed6a9dce0d6b58",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 100,
+      "reasons": [
+        {
+          "code": "similar_name_nearby_same_date",
+          "confidence": 100,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names strongly overlap and coordinates are 7.9 km apart on the same date."
+        }
+      ],
+      "first": {
+        "event_id": "436",
+        "edition_id": "b45cc9f3-5885-4de8-8048-7b4f5067946f",
+        "edition_slug": "10-teiche-marathon-2026",
+        "event_name": "10 Teiche Marathon",
+        "date": "12.09.2026",
+        "city": "Hahnenklee",
+        "country": "Germany",
+        "event_url": "https://www.harzer-wanderwochen.de/10-teiche-marathon",
+        "latitude": "51.8602508",
+        "longitude": "10.3384485"
+      },
+      "second": {
+        "event_id": "966",
+        "edition_id": "e5bedc8e-4f23-4572-bdf7-5c03b0aa8500",
+        "edition_slug": "10-teiche-marathon-goslar-2026",
+        "event_name": "10-Teiche-Marathon - Goslar",
+        "date": "12.09.2026",
+        "city": "Goslar",
+        "country": "Germany",
+        "event_url": "https://www.hahnenklee.de/spass/harzerwanderwochen",
+        "latitude": "51.9059936",
+        "longitude": "10.4266284"
+      },
+      "evidence_signature": "07728004a01fb130a428861af336b4988bed4ec047463b1b112ec5604d85d1fe",
+      "reason": "similar_name_nearby_same_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_2c3e3f631d55e720e1d3",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 99,
+      "reasons": [
+        {
+          "code": "same_url_same_date",
+          "confidence": 99,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "The canonical event URL and event date are identical."
+        }
+      ],
+      "first": {
+        "event_id": "74",
+        "edition_id": "14ff1d40-75a7-42d9-8076-13df4f59466c",
+        "edition_slug": "montafon-arlberg-marathon-2027",
+        "event_name": "Montafon Arlberg Marathon",
+        "date": "26.06.2027",
+        "city": "St. Anton am Arlberg",
+        "country": "Austria",
+        "event_url": "https://www.montafon.at/montafon-arlberg-marathon/de",
+        "latitude": "47.1288996",
+        "longitude": "10.2663669"
+      },
+      "second": {
+        "event_id": "721",
+        "edition_id": "8efb9d79-b50f-4554-b3cb-4170dffb3917",
+        "edition_slug": "montafon-arlberg-marathon-st-anton-2027",
+        "event_name": "Montafon-Arlberg-Marathon",
+        "date": "26.06.2027",
+        "city": "St. Anton",
+        "country": "Germany",
+        "event_url": "https://www.montafon.at/montafon-arlberg-marathon/de",
+        "latitude": "51.2341228",
+        "longitude": "6.2472597"
+      },
+      "evidence_signature": "c22608e508e0908f706f30b7d901142546a517a305cb0ab16ba054f6bea6c3b3",
+      "reason": "same_url_same_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_3f8e6a973238bdd191fd",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 94,
+      "reasons": [
+        {
+          "code": "similar_or_prefix_name_same_city_near_date",
+          "confidence": 94,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Names overlap in the same city and the dates are 1 day(s) apart."
+        },
+        {
+          "code": "same_coordinates_date_with_name_signal",
+          "confidence": 94,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Coordinates differ by at most 50 m, dates by 1 day(s), and the names share a meaningful signal."
+        }
+      ],
+      "first": {
+        "event_id": "490",
+        "edition_id": "5475fe4f-73ad-404f-8092-cfd37385088a",
+        "edition_slug": "internationaler-schwarzwald-marathon-2026",
         "event_name": "Internationaler Schwarzwald-Marathon",
         "date": "11.10.2026",
         "city": "Bräunlingen",
@@ -180,29 +484,124 @@
         "event_url": "http://www.schwarzwald-marathon.de",
         "latitude": "47.9300645",
         "longitude": "8.448329"
-      }
-    },
-    {
-      "reason": "same_coordinates_near_date",
-      "confidence": 50,
-      "first": {
-        "event_name": "Esenser Volksbanklauf - 31. Stadtlauf",
-        "date": "31.07.2026",
-        "city": "Friesland",
-        "country": "Germany",
-        "event_url": "https://aeu-esens.de/veranstaltungen/2-volksbanklauf-27-esenser-stadtlauf/",
-        "latitude": "53.6468107",
-        "longitude": "7.6118499"
       },
       "second": {
-        "event_name": "Esenser Volksbanklauf",
-        "date": "31.07.2026",
-        "city": "Esens",
+        "event_id": "125",
+        "edition_id": "fda1a411-f5ac-438a-b895-8109497563a1",
+        "edition_slug": "schwarzwald-marathon-2026",
+        "event_name": "Schwarzwald Marathon",
+        "date": "10.10.2026",
+        "city": "Bräunlingen",
         "country": "Germany",
-        "event_url": "https://www.lt-schafhauserwald.de/esenser-volksbanklauf/",
-        "latitude": "53.6468107",
-        "longitude": "7.6118499"
-      }
+        "event_url": "https://www.schwarzwaldmarathon.de/",
+        "latitude": "47.9300645",
+        "longitude": "8.448329"
+      },
+      "evidence_signature": "cdf02bf8e2e7efadd8db740fe948e401a10530bff3300850bb4679d79084d2b8",
+      "reason": "similar_or_prefix_name_same_city_near_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_7dabfda183a947b5e46b",
+      "classification": "high_confidence_duplicate",
+      "release_blocking": true,
+      "confidence": 90,
+      "reasons": [
+        {
+          "code": "same_coordinates_date_with_name_signal",
+          "confidence": 90,
+          "release_blocking": true,
+          "classification": "high_confidence_duplicate",
+          "detail": "Coordinates differ by at most 50 m, dates by 0 day(s), and the names share a meaningful signal."
+        }
+      ],
+      "first": {
+        "event_id": "108",
+        "edition_id": "50b5b657-fd77-48e0-9c50-3ab91550e0ca",
+        "edition_slug": "wep-strom-lauf-2026",
+        "event_name": "wep-Strom Lauf",
+        "date": "13.09.2026",
+        "city": "Hückelhoven",
+        "country": "Germany",
+        "event_url": "http://www.wepstrom-lauf.de/",
+        "latitude": "51.0552368",
+        "longitude": "6.2247322"
+      },
+      "second": {
+        "event_id": "979",
+        "edition_id": "5e580d8a-63af-4858-8556-c5c71aa14eff",
+        "edition_slug": "weplauf-huckelhoven-2026",
+        "event_name": "Weplauf Hückelhoven",
+        "date": "13.09.2026",
+        "city": "Hückelhoven",
+        "country": "Germany",
+        "event_url": "https://www.wep-lauf.de/",
+        "latitude": "51.0552368",
+        "longitude": "6.2247322"
+      },
+      "evidence_signature": "d5638ee3b09928c9727b0be76853b5d0974dd41b9d163e1ec1a14954acd92abd",
+      "reason": "same_coordinates_date_with_name_signal",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
+    },
+    {
+      "candidate_id": "dup_35c069daae3b9a76caac",
+      "classification": "review_candidate",
+      "release_blocking": false,
+      "confidence": 70,
+      "reasons": [
+        {
+          "code": "shared_url_different_date",
+          "confidence": 70,
+          "release_blocking": false,
+          "classification": "review_candidate",
+          "detail": "The canonical URL is shared, but the dates differ; this may be a series landing page."
+        }
+      ],
+      "first": {
+        "event_id": "81",
+        "edition_id": "99340138-12b7-492a-87c9-aa40a8861905",
+        "edition_slug": "sportscheck-run-munchen-2027",
+        "event_name": "SportScheck RUN München",
+        "date": "18.06.2027",
+        "city": "München",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "48.1371079",
+        "longitude": "11.5753822"
+      },
+      "second": {
+        "event_id": "144",
+        "edition_id": "e183d8c3-ba77-4a52-9180-fdd9b9084af2",
+        "edition_slug": "sportscheck-run-nurnberg-2026",
+        "event_name": "SportScheck RUN Nürnberg",
+        "date": "25.10.2026",
+        "city": "Nürnberg",
+        "country": "Germany",
+        "event_url": "https://www.sportscheck.com/run.html",
+        "latitude": "49.453872",
+        "longitude": "11.077298"
+      },
+      "evidence_signature": "22ab28965ef42f945277793aae27d0f71f13ddd8093ec6e07eea7ca227f5112a",
+      "reason": "shared_url_different_date",
+      "resolution": {
+        "status": "unresolved",
+        "reviewed_at": "",
+        "reviewed_by": "",
+        "note": ""
+      },
+      "resolution_status": "unresolved"
     }
   ]
 }

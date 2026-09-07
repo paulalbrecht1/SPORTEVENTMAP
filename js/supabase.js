@@ -4936,8 +4936,10 @@ let dataOpsSources = [];
 let dataOpsProposals = [];
 let dataOpsAlerts = [];
 let dataOpsRuns = [];
+let dataOpsFreshnessBlockingFeedback = [];
 
 let sourceMonitorJobs = [];
+let sourceMonitorActiveJobs = [];
 let sourceMonitorResults = [];
 let sourceMonitorReviews = [];
 let editionLifecycleInbox = [];
@@ -5131,6 +5133,33 @@ function getDataOpsEditions(eventId) {
     .sort((left, right) => Number(right.edition_year) - Number(left.edition_year));
 }
 
+function getCurrentDataOpsEdition(eventId) {
+  const event = dataOpsEvents.find(row => String(row.id) === String(eventId));
+  if (!event || event.status !== "approved" || event.publication_status !== "published" || event.event_status !== "active") {
+    return null;
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  return getDataOpsEditions(eventId)
+    .filter(edition =>
+      edition.publication_status === "published" &&
+      edition.discovery_status === "active" &&
+      !["cancelled", "inactive", "completed"].includes(edition.edition_status) &&
+      (!edition.start_date || String(edition.end_date || edition.start_date) >= today)
+    )
+    .sort((left, right) =>
+      String(left.start_date || "9999-12-31").localeCompare(String(right.start_date || "9999-12-31")) ||
+      Number(left.edition_year || 9999) - Number(right.edition_year || 9999) ||
+      String(left.id).localeCompare(String(right.id))
+    )[0] || null;
+}
+
+function getFreshnessReviewForEdition(editionId) {
+  return editionLifecycleInbox.find(row =>
+    row.item_type === "freshness_review" &&
+    String(row.edition_id || row.item_id) === String(editionId)
+  ) || null;
+}
+
 function getDataOpsIssues(eventId) {
   return dataOpsIssues.filter(issue => String(issue.event_id) === String(eventId));
 }
@@ -5147,14 +5176,15 @@ function getDataOpsFilteredRows() {
 
   return dataOpsEvents.filter(event => {
     const issues = getDataOpsIssues(event.id);
+    const currentEdition = getCurrentDataOpsEdition(event.id);
     if (country && event.country !== country) return false;
     if (sport && event.sport !== sport) return false;
     if (eventStatus && event.event_status !== eventStatus) return false;
-    if (verification && event.verification_status !== verification) return false;
+    if (verification && currentEdition?.verification_status !== verification) return false;
     if (severity && !issues.some(issue => issue.severity === severity)) return false;
-    if (priority && event.review_priority !== priority) return false;
-    if (lastCheck && (!event.last_verified_at || event.last_verified_at.slice(0, 10) < lastCheck)) return false;
-    if (nextCheck && (!event.next_check_at || event.next_check_at.slice(0, 10) > nextCheck)) return false;
+    if (priority && currentEdition?.review_priority !== priority) return false;
+    if (lastCheck && (!currentEdition?.last_verified_at || currentEdition.last_verified_at.slice(0, 10) < lastCheck)) return false;
+    if (nextCheck && (!currentEdition?.next_check_at || currentEdition.next_check_at.slice(0, 10) > nextCheck)) return false;
     return true;
   });
 }
@@ -5170,26 +5200,27 @@ function renderDataOpsEvents(rows) {
 
   dataOpsElements.eventsList.innerHTML = rows.slice(0, 250).map(event => {
     const editions = getDataOpsEditions(event.id);
-    const latest = editions[0] || null;
+    const currentEdition = getCurrentDataOpsEdition(event.id);
+    const freshnessReview = currentEdition ? getFreshnessReviewForEdition(currentEdition.id) : null;
     const issues = getDataOpsIssues(event.id);
     const officialUrl = safeAdminUrl(event.official_url || event.event_url || "");
-    const editionUrl = latest?.edition_slug
-      ? `/event/${encodeURIComponent(latest.edition_slug)}/`
+    const editionUrl = currentEdition?.edition_slug
+      ? `/event/${encodeURIComponent(currentEdition.edition_slug)}/`
       : "";
     return `
       <article class="admin-data-operations-card" data-dataops-event-id="${event.id}">
         <div class="admin-data-operations-card-heading">
           <div>
-            <span class="admin-data-operations-status is-${escapeAdminHTML(event.verification_status)}">${escapeAdminHTML(event.verification_status)}</span>
+            <span class="admin-data-operations-status is-${escapeAdminHTML(currentEdition?.verification_status || event.verification_status)}">${escapeAdminHTML(currentEdition?.verification_status || event.verification_status)}</span>
             <h5>${escapeAdminHTML(event.canonical_name || event.event_name || `Event ${event.id}`)}</h5>
             <p>${escapeAdminHTML(event.sport || "—")} · ${escapeAdminHTML(event.city || "—")}, ${escapeAdminHTML(event.country || "—")}</p>
           </div>
           <strong>${editions.length} ${editions.length === 1 ? "Austragung" : "Austragungen"}</strong>
         </div>
         <dl class="admin-data-operations-meta">
-          <div><dt>${dataOpsText("admin.dataOps.lastCheck", "Last check")}</dt><dd>${formatDataOpsDate(event.last_verified_at)}</dd></div>
-          <div><dt>${dataOpsText("admin.dataOps.nextCheck", "Next check")}</dt><dd>${formatDataOpsDate(event.next_check_at)}</dd></div>
-          <div><dt>${dataOpsText("admin.dataOps.confidence", "Confidence")}</dt><dd>${Math.round(Number(event.data_confidence || 0) * 100)}%</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.lastCheck", "Last check")}</dt><dd>${formatDataOpsDate(currentEdition?.last_verified_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.nextCheck", "Next check")}</dt><dd>${formatDataOpsDate(currentEdition?.next_check_at)}</dd></div>
+          <div><dt>${dataOpsText("admin.dataOps.confidence", "Confidence")}</dt><dd>${Math.round(Number(currentEdition?.data_confidence || 0) * 100)}%</dd></div>
           <div><dt>${dataOpsText("admin.dataOps.issues", "Issues")}</dt><dd>${issues.length}</dd></div>
         </dl>
         <div class="admin-data-operations-editions">
@@ -5197,20 +5228,16 @@ function renderDataOpsEvents(rows) {
             <div>
               <span>${edition.edition_year} · ${escapeAdminHTML(edition.edition_status)}</span>
               <strong>${formatDataOpsDate(edition.start_date)}</strong>
-              ${edition.id === latest?.id ? '<em>aktuell</em>' : ''}
+              ${edition.id === currentEdition?.id ? '<em>aktuell</em>' : ''}
             </div>
           `).join("") || '<p>Keine Austragung vorhanden.</p>'}
         </div>
         <div class="admin-data-operations-card-actions">
           ${officialUrl ? `<a href="${officialUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEvent", "Open event")}</a>` : ''}
           ${editionUrl ? `<a href="${editionUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEdition", "Open edition")}</a>` : ''}
-          <button type="button" data-dataops-action="verify" data-event-id="${event.id}">${dataOpsText("admin.dataOps.manualVerify", "Verify manually")}</button>
-          <button type="button" data-dataops-action="review" data-event-id="${event.id}">${dataOpsText("admin.dataOps.markReview", "Needs review")}</button>
+          ${freshnessReview ? `<button type="button" data-dataops-action="open-freshness" data-item-id="${escapeAdminHTML(freshnessReview.item_id)}" data-item-type="freshness_review">In Review Inbox pruefen</button>` : ""}
+          ${currentEdition ? `<button type="button" data-dataops-action="review-edition" data-edition-id="${currentEdition.id}">${dataOpsText("admin.dataOps.markReview", "Needs review")}</button>` : ""}
           <button type="button" data-dataops-action="history" data-entity-type="event" data-entity-id="${event.id}" data-entity-label="${escapeAdminHTML(event.canonical_name || event.event_name)}">${dataOpsText("admin.dataOps.history", "History")}</button>
-        </div>
-        <div class="admin-data-operations-schedule">
-          <label>${dataOpsText("admin.dataOps.nextCheck", "Next check")} <input type="date" data-dataops-next-check value="${escapeAdminHTML((event.next_check_at || "").slice(0, 10))}"></label>
-          <button type="button" data-dataops-action="schedule" data-event-id="${event.id}">${dataOpsText("admin.dataOps.save", "Save")}</button>
         </div>
       </article>`;
   }).join("");
@@ -5498,6 +5525,9 @@ async function handleDataFreshnessAction(button) {
 function renderDataOperations() {
   const today = new Date().toISOString().slice(0, 10);
   const openIssues = dataOpsIssues.filter(issue => issue.status === "open");
+  const currentEditions = dataOpsEvents
+    .map(event => getCurrentDataOpsEdition(event.id))
+    .filter(Boolean);
   const pastWithoutNext = dataOpsEvents.filter(event => {
     const editions = getDataOpsEditions(event.id);
     return editions.length && editions.every(edition => !edition.start_date || edition.start_date < today);
@@ -5505,12 +5535,12 @@ function renderDataOperations() {
 
   setDataOpsKpi("totalEvents", dataOpsEvents.length);
   setDataOpsKpi("totalEditions", dataOpsEditions.length);
-  setDataOpsKpi("verified", dataOpsEvents.filter(row => row.verification_status === "verified").length);
-  setDataOpsKpi("unverified", dataOpsEvents.filter(row => row.verification_status === "unverified").length);
-  setDataOpsKpi("stale", dataOpsEvents.filter(row => row.verification_status === "stale").length);
-  setDataOpsKpi("review", dataOpsEvents.filter(row => row.needs_review || row.verification_status === "needs_review").length);
-  setDataOpsKpi("noNextCheck", dataOpsEvents.filter(row => !row.next_check_at).length);
-  setDataOpsKpi("unreachable", dataOpsEvents.filter(row => row.verification_status === "source_unreachable").length);
+  setDataOpsKpi("verified", currentEditions.filter(row => row.verification_status === "verified" && !row.needs_review).length);
+  setDataOpsKpi("unverified", currentEditions.filter(row => row.verification_status === "unverified").length);
+  setDataOpsKpi("stale", currentEditions.filter(row => row.verification_status === "stale").length);
+  setDataOpsKpi("review", currentEditions.filter(row => row.needs_review || row.verification_status === "needs_review").length);
+  setDataOpsKpi("noNextCheck", currentEditions.filter(row => !row.next_check_at).length);
+  setDataOpsKpi("unreachable", currentEditions.filter(row => row.verification_status === "source_unreachable").length);
   setDataOpsKpi("critical", openIssues.filter(row => row.severity === "critical").length);
   setDataOpsKpi("warnings", openIssues.filter(row => row.severity === "warning").length);
   setDataOpsKpi("pastWithoutNext", pastWithoutNext);
@@ -5541,8 +5571,131 @@ function setEditionLifecycleStatus(message, type = "") {
   editionLifecycleElements.status.textContent = message;
 }
 
+function normalizeDataOpsEventId(value) {
+  const text = String(value ?? "");
+  if (!/^[0-9]+$/.test(text)) return null;
+  return text.replace(/^0+(?=\d)/, "");
+}
+
+function hasFreshnessBlockingFeedback(row) {
+  const eventId = normalizeDataOpsEventId(row?.event_id);
+  if (eventId === null) return true;
+  return dataOpsFreshnessBlockingFeedback.some(feedback =>
+    feedback.category === "incorrect_event_data" &&
+    ["reviewed", "planned"].includes(feedback.status) &&
+    normalizeDataOpsEventId(feedback.event_id) === eventId
+  );
+}
+
+function matchesFreshnessBlockerScope(record, row, sourceId, includeSource = true) {
+  if (includeSource && sourceId && String(record?.source_id || "") === String(sourceId)) return true;
+  if (record?.edition_id != null && String(record.edition_id) === String(row?.edition_id)) return true;
+  return record?.edition_id == null && String(record?.event_id || "") === String(row?.event_id);
+}
+
+function hasFreshnessOpenReviewConflict(row, source) {
+  const sourceId = source?.id;
+  return sourceMonitorReviews.some(task =>
+    task.status === "open" && matchesFreshnessBlockerScope(task, row, sourceId)
+  ) || dataOpsProposals.some(proposal =>
+    proposal.proposal_status === "pending" && matchesFreshnessBlockerScope(proposal, row, sourceId)
+  ) || dataOpsIssues.some(issue =>
+    issue.status === "open" &&
+    ["error", "critical"].includes(issue.severity) &&
+    matchesFreshnessBlockerScope(issue, row, sourceId, false)
+  ) || dataOpsAlerts.some(alert =>
+    alert.alert_status === "open" &&
+    ["error", "critical"].includes(alert.severity) &&
+    matchesFreshnessBlockerScope(alert, row, sourceId)
+  ) || hasFreshnessBlockingFeedback(row);
+}
+
+function getEligibleFreshnessReviewSource(row) {
+  const metadata = row?.metadata || {};
+  const edition = dataOpsEditions.find(candidate => String(candidate.id) === String(row?.edition_id || ""));
+  const currentEdition = getCurrentDataOpsEdition(row?.event_id);
+  const source = dataOpsSources.find(candidate => String(candidate.id) === String(metadata.source_id || ""));
+  if (!edition ||
+      !currentEdition ||
+      String(currentEdition.id) !== String(edition.id) ||
+      !source ||
+      String(source.event_id) !== String(row?.event_id) ||
+      (source.edition_id != null && String(source.edition_id) !== String(row?.edition_id)) ||
+      source.is_active !== true ||
+      source.source_type !== "official_event_website" ||
+      source.source_url !== metadata.source_url ||
+      source.source_url !== edition.source_url ||
+      !/^https:\/\/\S+$/i.test(String(source.source_url || "")) ||
+      !["success", "not_modified"].includes(source.crawl_status) ||
+      Number(source.consecutive_failures || 0) !== 0 ||
+      !source.last_fetched_at ||
+      !["unchanged", "first_seen"].includes(source.last_change_status)) {
+    return null;
+  }
+  const hasActiveCrawl = sourceMonitorActiveJobs.some(job =>
+    String(job.source_id) === String(source.id) &&
+    ["queued", "processing", "retry_scheduled"].includes(job.status)
+  );
+  return hasActiveCrawl ? null : source;
+}
+
+function getFreshnessVerificationStoredValues(row) {
+  const metadata = row?.metadata || {};
+  const event = dataOpsEvents.find(candidate => String(candidate.id) === String(row?.event_id));
+  return {
+    ...(metadata.stored_values || {}),
+    address: event?.address ?? null,
+    latitude: event?.latitude ?? null,
+    longitude: event?.longitude ?? null,
+    description: event?.description ?? null
+  };
+}
+
+function hasCompleteFreshnessVerificationShape(row) {
+  const values = getFreshnessVerificationStoredValues(row);
+  const requiredFields = [
+    "event_name", "edition_year", "date", "city", "country", "address",
+    "latitude", "longitude", "sport", "distances", "description",
+    "registration_status", "official_event_page", "registration_link"
+  ];
+  if (requiredFields.some(field => !Object.prototype.hasOwnProperty.call(values, field))) return false;
+
+  const nonEmptyTextFields = [
+    "event_name", "date", "city", "country", "address", "sport",
+    "official_event_page", "registration_link"
+  ];
+  if (nonEmptyTextFields.some(field => !String(values[field] ?? "").trim())) return false;
+  if (String(values.official_event_page).trim() !== String(row?.metadata?.source_url || "").trim()) return false;
+  if (values.edition_year == null || !String(values.edition_year).trim()) return false;
+  if (String(values.description ?? "").trim().length < 80) return false;
+
+  const latitudeText = String(values.latitude ?? "").trim();
+  const longitudeText = String(values.longitude ?? "").trim();
+  const latitude = Number(latitudeText);
+  const longitude = Number(longitudeText);
+  if (!latitudeText || !longitudeText || !Number.isFinite(latitude) || !Number.isFinite(longitude) ||
+      latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return false;
+
+  const distances = values.distances;
+  return Array.isArray(distances)
+    ? distances.length > 0
+    : (typeof distances !== "object" && Boolean(String(distances ?? "").trim()));
+}
+
+function canVerifyFreshnessReview(row) {
+  const metadata = row?.metadata || {};
+  const affectedFields = Array.isArray(metadata.affected_fields) ? metadata.affected_fields : [];
+  const source = getEligibleFreshnessReviewSource(row);
+  return row?.item_type === "freshness_review" &&
+    Boolean(source) &&
+    hasCompleteFreshnessVerificationShape(row) &&
+    !hasFreshnessOpenReviewConflict(row, source) &&
+    affectedFields.length === 0;
+}
+
 function getReviewInboxCategory(row) {
   if (row.batch_action === "wait_automation") return "waiting";
+  if (canVerifyFreshnessReview(row)) return "action";
   if (row.priority === "critical" || row.batch_action === "review") return "blocked";
   return "action";
 }
@@ -5565,8 +5718,19 @@ function renderReviewInboxDiff(row) {
 }
 
 function renderContentVerificationEvidence(row) {
-  if (row.item_type !== "content_verification") return "";
+  if (!["content_verification", "freshness_review"].includes(row.item_type)) return "";
   const metadata = row.metadata || {};
+  if (row.item_type === "freshness_review") {
+    const selectedSource = getEligibleFreshnessReviewSource(row);
+    const storedValues = getFreshnessVerificationStoredValues(row);
+    return `<div class="admin-review-evidence" aria-label="Freshness-Evidenz">
+      <span><strong>Letzter Quellenabruf</strong>${escapeAdminHTML(formatDataOpsDate(selectedSource?.last_fetched_at, true))}</span>
+      <span><strong>Ausgewaehlte Quelle stabil</strong>${selectedSource ? "Ja" : "Nein"}</span>
+      <span><strong>Zuletzt verifiziert</strong>${escapeAdminHTML(formatDataOpsDate(metadata.last_verified_at, true))}</span>
+      <span><strong>Pruefung faellig</strong>${escapeAdminHTML(formatDataOpsDate(metadata.next_check_at, true))}</span>
+      <span class="is-wide"><strong>Zu bestaetigen</strong>${escapeAdminHTML(Object.keys(storedValues).join(", ") || "Keine Feldwerte verfuegbar")}</span>
+    </div>`;
+  }
   const confidenceLabels = { high: "deutlich", medium: "mittel", low: "gering" };
   const reasonLabels = {
     semantic_event_signals_changed: "Event-Signale geaendert",
@@ -5602,16 +5766,35 @@ function renderReviewPriorityContext(row) {
 
 function collectContentVerificationEvidence(row) {
   const metadata = row.metadata || {};
-  const sourceUrl = String(metadata.source_url || "").trim();
-  const storedValues = metadata.stored_values || {};
-  const requiredFields = [
+  const freshnessSource = row.item_type === "freshness_review"
+    ? getEligibleFreshnessReviewSource(row)
+    : null;
+  const sourceId = String(freshnessSource?.id || metadata.source_id || "").trim();
+  const sourceUrl = String(freshnessSource?.source_url || metadata.source_url || "").trim();
+  const baseRequiredFields = [
     "event_name", "edition_year", "date", "city", "country", "sport",
     "distances", "registration_status", "official_event_page", "registration_link"
   ];
+  const requiredFields = row.item_type === "freshness_review"
+    ? [
+        "event_name", "edition_year", "date", "city", "country", "address",
+        "latitude", "longitude", "sport", "distances", "description",
+        "registration_status", "official_event_page", "registration_link"
+      ]
+    : baseRequiredFields;
+  const storedValues = row.item_type === "freshness_review"
+    ? getFreshnessVerificationStoredValues(row)
+    : (metadata.stored_values || {});
+  if (row.item_type === "freshness_review" && !hasCompleteFreshnessVerificationShape(row)) {
+    throw new Error("Zentrale Eventdaten fehlen oder erfüllen die Mindestqualität nicht. Dieser Fall bleibt im Review.");
+  }
   if (!sourceUrl || requiredFields.some(field => !Object.prototype.hasOwnProperty.call(storedValues, field))) {
     throw new Error("Die strukturierte Feld-Evidenz ist unvollständig. Dieser Fall bleibt im Review.");
   }
-  if (!window.confirm("Offizielle Quelle geöffnet und alle zehn zentralen Felder einzeln verglichen?")) return null;
+  if (row.item_type === "freshness_review" && (!sourceId || !freshnessSource)) {
+    throw new Error("Die ausgewählte offizielle Quelle ist nicht stabil oder wird gerade geprüft. Dieser Fall bleibt im Review.");
+  }
+  if (!window.confirm(`Offizielle Quelle geöffnet und alle ${requiredFields.length} zentralen Felder einzeln verglichen?`)) return null;
 
   const observedInput = window.prompt(
     "Extern beobachtete Werte als JSON. Abweichungen nicht überschreiben, sondern exakt eintragen; sie bleiben dann im Review:",
@@ -5652,6 +5835,7 @@ function collectContentVerificationEvidence(row) {
   return {
     notes: notes.trim(),
     evidence: {
+      ...(sourceId ? { source_id: sourceId } : {}),
       source_url: sourceUrl,
       source_checked_at: new Date().toISOString(),
       confidence,
@@ -5672,7 +5856,7 @@ function renderEditionLifecycleInbox() {
   });
   const actionable = rows.filter(row => getReviewInboxCategory(row) !== "waiting");
   const waiting = rows.filter(row => getReviewInboxCategory(row) === "waiting");
-  const batch = rows.filter(row => ["approve_successor", "approve_result", "verify_content"].includes(row.batch_action));
+  const batch = rows.filter(row => ["approve_successor", "approve_result"].includes(row.batch_action));
   const blocked = rows.filter(row => getReviewInboxCategory(row) === "blocked");
   if (editionLifecycleElements.decisions) editionLifecycleElements.decisions.textContent = String(actionable.length);
   if (editionLifecycleElements.waiting) editionLifecycleElements.waiting.textContent = String(waiting.length);
@@ -5685,6 +5869,15 @@ function renderEditionLifecycleInbox() {
   const visibleRows = selectedFilter === "all"
     ? rows
     : rows.filter(row => getReviewInboxCategory(row) === selectedFilter);
+  const focusedItemId = editionLifecycleElements.list.dataset.focusItemId || "";
+  const focusedItemType = editionLifecycleElements.list.dataset.focusItemType || "";
+  delete editionLifecycleElements.list.dataset.focusItemId;
+  delete editionLifecycleElements.list.dataset.focusItemType;
+  const displayedRows = visibleRows.slice();
+  const focusedIndex = displayedRows.findIndex(row =>
+    String(row.item_id) === focusedItemId && row.item_type === focusedItemType
+  );
+  if (focusedIndex > 0) displayedRows.unshift(...displayedRows.splice(focusedIndex, 1));
 
   if (!rows.length) {
     editionLifecycleElements.list.innerHTML = '<div class="admin-review-inbox-empty"><strong>Keine Entscheidung offen</strong><p>Archivierung, Quellenpruefung und sichere Lifecycle-Aktualisierungen laufen automatisch.</p></div>';
@@ -5700,12 +5893,12 @@ function renderEditionLifecycleInbox() {
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
   const editionById = new Map(dataOpsEditions.map(edition => [String(edition.id), edition]));
   const typeLabels = { new_edition: "Neuer Jahrgang", result: "Ergebnisse", proposal: "Datenaenderung", content_verification: "Quellenpruefung", freshness_review: "Freshness", source: "Quelle", validation: "Datenfehler", workflow: "Systemfehler" };
-  editionLifecycleElements.list.innerHTML = visibleRows.slice(0, 300).map(row => {
+  editionLifecycleElements.list.innerHTML = displayedRows.slice(0, 300).map(row => {
     const event = eventById.get(String(row.event_id));
     const edition = editionById.get(String(row.edition_id));
     const canPublish = ["approve_successor", "approve_result"].includes(row.batch_action);
     const canVerifyContent = row.batch_action === "verify_content";
-    const canApprove = canPublish || canVerifyContent;
+    const canVerifyFreshness = canVerifyFreshnessReview(row);
     const canApproveProposal = row.batch_action === "approve_proposal";
     const isWaiting = row.batch_action === "wait_automation";
     const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : "";
@@ -5713,12 +5906,13 @@ function renderEditionLifecycleInbox() {
     const confirmations = Number(row.metadata?.confirmations || 0);
     const requiredConfirmations = Number(row.metadata?.required_confirmations || 0);
     return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
-      ${canApprove ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
+      ${canPublish ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
       <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${row.metadata?.review_tier ? `<span class="admin-review-tier">${escapeAdminHTML(row.metadata.review_tier)}</span>` : ""}${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewPriorityContext(row)}${renderReviewInboxDiff(row)}${renderContentVerificationEvidence(row)}</div>
       <dl><div><dt>Status</dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt>Bestaetigungen</dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
       <div class="source-monitor-actions">
         ${canPublish ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
         ${canVerifyContent ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="content_verification">Feldweise bestaetigen</button>` : ""}
+        ${canVerifyFreshness ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="freshness_review">Edition feldweise bestaetigen</button>` : ""}
         ${canApproveProposal ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Aenderung uebernehmen</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Ablehnen</button>` : ""}
         ${["source", "validation", "workflow"].includes(row.item_type) ? `<button type="button" data-lifecycle-action="resolve-exception" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Als erledigt markieren</button>` : ""}
         ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
@@ -5732,7 +5926,10 @@ async function approveEditionLifecycleItems(items) {
   const successorIds = items.filter(item => item.item_type === "new_edition").map(item => item.item_id);
   const resultIds = items.filter(item => item.item_type === "result").map(item => item.item_id);
   const verificationIds = items.filter(item => item.item_type === "content_verification").map(item => item.item_id);
-  if (verificationIds.length > 1) throw new Error("Quellenpruefungen müssen wegen der Feld-Evidenz einzeln bestaetigt werden.");
+  const freshnessEditionIds = items.filter(item => item.item_type === "freshness_review").map(item => item.edition_id || item.item_id);
+  if (verificationIds.length + freshnessEditionIds.length > 1) {
+    throw new Error("Quellenpruefungen müssen wegen der Feld-Evidenz einzeln bestaetigt werden.");
+  }
   const responses = [];
   if (successorIds.length) responses.push(await supabaseClient.rpc("approve_edition_succession_candidates", { p_candidate_ids: successorIds, p_limit: successorIds.length }));
   if (resultIds.length) responses.push(await supabaseClient.rpc("approve_edition_result_candidates", { p_result_ids: resultIds, p_limit: resultIds.length }));
@@ -5742,6 +5939,13 @@ async function approveEditionLifecycleItems(items) {
     p_evidence: Object.fromEntries(items
       .filter(item => item.item_type === "content_verification")
       .map(item => [String(item.item_id), item._verificationEvidence]))
+  }));
+  if (freshnessEditionIds.length) responses.push(await supabaseClient.rpc("verify_freshness_review_editions", {
+    p_edition_ids: freshnessEditionIds,
+    p_notes: items.find(item => item.item_type === "freshness_review")?._verificationNotes,
+    p_evidence: Object.fromEntries(items
+      .filter(item => item.item_type === "freshness_review")
+      .map(item => [String(item.edition_id || item.item_id), item._verificationEvidence]))
   }));
   const failed = responses.find(result => result.error);
   if (failed) throw failed.error;
@@ -5764,20 +5968,25 @@ async function handleEditionLifecycleAction(button) {
     items = editionLifecycleInbox.filter(item => selected.has(String(item.item_id)));
     if (!items.length) { setEditionLifecycleStatus("Bitte mindestens eine Ausnahme auswaehlen.", "error"); return; }
   } else {
-    items = editionLifecycleInbox.filter(item => String(item.item_id) === String(button.dataset.itemId));
+    items = editionLifecycleInbox.filter(item =>
+      String(item.item_id) === String(button.dataset.itemId) &&
+      (!button.dataset.itemType || item.item_type === button.dataset.itemType)
+    );
   }
 
-  const contentVerificationItems = items.filter(item => item.item_type === "content_verification");
-  if (contentVerificationItems.length) {
+  const evidenceVerificationItems = items.filter(item =>
+    ["content_verification", "freshness_review"].includes(item.item_type)
+  );
+  if (evidenceVerificationItems.length) {
     if (items.length !== 1) {
       setEditionLifecycleStatus("Quellenpruefungen müssen mit eigener Feld-Evidenz einzeln bearbeitet werden.", "error");
       return;
     }
     try {
-      const verification = collectContentVerificationEvidence(contentVerificationItems[0]);
+      const verification = collectContentVerificationEvidence(evidenceVerificationItems[0]);
       if (!verification) return;
-      contentVerificationItems[0]._verificationNotes = verification.notes;
-      contentVerificationItems[0]._verificationEvidence = verification.evidence;
+      evidenceVerificationItems[0]._verificationNotes = verification.notes;
+      evidenceVerificationItems[0]._verificationEvidence = verification.evidence;
     } catch (error) {
       setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Feld-Evidenz ist unvollständig."), "error");
       return;
@@ -5821,7 +6030,7 @@ async function handleEditionLifecycleAction(button) {
     }
     await loadDataOperations();
   } catch (error) {
-    setEditionLifecycleStatus(getFriendlyErrorMessage(error, "Lifecycle-Aktion fehlgeschlagen."), "error");
+    setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Lifecycle-Aktion fehlgeschlagen."), "error");
   } finally {
     setButtonLoading(button, false);
   }
@@ -5838,6 +6047,63 @@ async function loadSourceMonitorRecent(table, columns, limit = 1000) {
   const { data, error } = await supabaseClient.from(table).select(columns)
     .order("created_at", { ascending: false }).limit(limit);
   return { rows: data || [], error };
+}
+
+async function loadSourceMonitorActiveJobs() {
+  const rows = [];
+  const pageSize = 1000;
+  let from = 0;
+  let totalCount = null;
+  while (rows.length < 100000) {
+    const { data, error, count } = await supabaseClient
+      .from("source_crawl_jobs")
+      .select("id,source_id,status,created_at", { count: "exact" })
+      .in("status", ["queued", "processing", "retry_scheduled"])
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: false })
+      .range(from, from + pageSize - 1);
+    if (error) return { rows: null, error };
+    const pageRows = data || [];
+    if (totalCount === null && Number.isFinite(count)) totalCount = count;
+    rows.push(...pageRows);
+    if (!pageRows.length || (totalCount !== null && rows.length >= totalCount)) {
+      return { rows: totalCount === null ? rows : rows.slice(0, totalCount), error: null };
+    }
+    from += pageRows.length;
+  }
+  return {
+    rows: null,
+    error: new Error("Zu viele aktive Source-Monitor-Jobs; Freshness-Aktionen bleiben gesperrt.")
+  };
+}
+
+async function loadFreshnessBlockingFeedback() {
+  const rows = [];
+  const pageSize = 1000;
+  let from = 0;
+  let totalCount = null;
+  while (rows.length < 100000) {
+    const { data, error, count } = await supabaseClient
+      .from("user_feedback")
+      .select("id,event_id,category,status,created_at", { count: "exact" })
+      .eq("category", "incorrect_event_data")
+      .in("status", ["reviewed", "planned"])
+      .order("created_at", { ascending: false })
+      .order("id", { ascending: true })
+      .range(from, from + pageSize - 1);
+    if (error) return { rows: null, error };
+    const pageRows = data || [];
+    if (totalCount === null && Number.isFinite(count)) totalCount = count;
+    rows.push(...pageRows);
+    if (!pageRows.length || (totalCount !== null && rows.length >= totalCount)) {
+      return { rows: totalCount === null ? rows : rows.slice(0, totalCount), error: null };
+    }
+    from += pageRows.length;
+  }
+  return {
+    rows: null,
+    error: new Error("Zu viele offene Datenfehler-Meldungen; Freshness-Aktionen bleiben gesperrt.")
+  };
 }
 
 function sourceMonitorLatestBy(rows, key) {
@@ -6268,20 +6534,23 @@ async function handleStageFourAction(button) {
 async function loadDataOperations() {
   if (!dataOpsElements.panel) return;
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
-  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult] = await Promise.all([
-    loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,official_url,event_url,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
-    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult] = await Promise.all([
+    loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
     loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
     loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,crawl_id,entity_type,rule_code,field_name,old_value,proposed_value,normalized_value,applied_value,proposed_changes,observed_values,confidence,confidence_reasons,change_type,extraction_method,extractor_version,evidence,source_context,validation_warnings,priority,locked_field,reason,source_url,proposal_status,detected_at,reviewed_at,rejection_reason,next_review_at,created_at"),
-    loadAdminTablePages("data_workflow_alerts", "id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
+    loadAdminTablePages("data_workflow_alerts", "id,source_id,event_id,edition_id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
     loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
+    loadSourceMonitorActiveJobs(),
     loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
-    loadSourceMonitorRecent("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at"),
-    loadSourceMonitorRecent("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata")
+    loadAdminTablePages("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at", null, ["id"]),
+    loadFreshnessBlockingFeedback(),
+    loadAdminTablePages("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
+    loadAdminTablePages("admin_freshness_attestation_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"])
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, crawlResultsResult, reviewsResult, lifecycleResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult].find(result => result.error);
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
@@ -6299,9 +6568,20 @@ async function loadDataOperations() {
   );
   dataOpsRuns = runsResult.rows || [];
   sourceMonitorJobs = jobsResult.rows || [];
+  sourceMonitorActiveJobs = activeJobsResult.rows || [];
   sourceMonitorResults = crawlResultsResult.rows || [];
   sourceMonitorReviews = reviewsResult.rows || [];
-  editionLifecycleInbox = lifecycleResult.rows || [];
+  dataOpsFreshnessBlockingFeedback = feedbackBlockersResult.rows || [];
+  const seenInboxItems = new Set();
+  editionLifecycleInbox = [
+    ...(lifecycleResult.rows || []),
+    ...(freshnessAttestationResult.rows || [])
+  ].filter(row => {
+    const key = `${row.item_type}:${row.item_id}`;
+    if (seenInboxItems.has(key)) return false;
+    seenInboxItems.add(key);
+    return true;
+  });
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   populateDataOpsSelect(dataOpsElements.proposalType, dataOpsProposals.map(row => row.change_type));
@@ -6352,6 +6632,39 @@ async function showDataOpsHistory(entityType, entityId, label) {
 async function handleDataOpsAction(button) {
   const action = button.dataset.dataopsAction;
   const eventId = button.dataset.eventId;
+  if (action === "open-freshness") {
+    if (editionLifecycleElements.filter) editionLifecycleElements.filter.value = "all";
+    editionLifecycleElements.list.dataset.focusItemId = button.dataset.itemId || "";
+    editionLifecycleElements.list.dataset.focusItemType = button.dataset.itemType || "freshness_review";
+    renderEditionLifecycleInbox();
+    const target = [...editionLifecycleElements.list.querySelectorAll("[data-lifecycle-item-id]")]
+      .find(card =>
+        card.dataset.lifecycleItemId === String(button.dataset.itemId || "") &&
+        card.dataset.lifecycleItemType === String(button.dataset.itemType || "freshness_review")
+      );
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+    } else {
+      setEditionLifecycleStatus("Der Freshness-Fall ist nicht mehr offen. Die Daten werden neu geladen.", "error");
+      await loadDataOperations();
+    }
+    return;
+  }
+  if (action === "review-edition") {
+    const editionId = button.dataset.editionId;
+    if (!editionId) return;
+    const { error } = await supabaseClient.from("event_editions").update({
+      verification_status: "needs_review",
+      needs_review: true,
+      review_priority: "high"
+    }).eq("id", editionId);
+    if (error) {
+      setDataOpsStatus(dataOpsText("admin.dataOps.updateFailed", "The edition could not be updated. Check the admin role and RLS."), "error");
+    } else {
+      await loadDataOperations();
+    }
+    return;
+  }
   if (action === "history") {
     await showDataOpsHistory(button.dataset.entityType, button.dataset.entityId, button.dataset.entityLabel);
     return;
@@ -6419,17 +6732,6 @@ async function handleDataOpsAction(button) {
     return;
   }
   if (!eventId) return;
-  let patch = null;
-  if (action === "verify") patch = { verification_status: "verified", data_confidence: 0.9, needs_review: false, last_verified_at: new Date().toISOString() };
-  if (action === "review") patch = { verification_status: "needs_review", needs_review: true, review_priority: "high" };
-  if (action === "schedule") {
-    const value = button.closest(".admin-data-operations-card")?.querySelector("[data-dataops-next-check]")?.value;
-    if (!value) { setDataOpsStatus(dataOpsText("admin.dataOps.dateRequired", "Choose a date for the next check."), "error"); return; }
-    patch = { next_check_at: `${value}T09:00:00.000Z` };
-  }
-  if (!patch) return;
-  const { error } = await supabaseClient.from("events").update(patch).eq("id", eventId);
-  if (error) setDataOpsStatus(dataOpsText("admin.dataOps.updateFailed", "The event could not be updated. Check the admin role and RLS."), "error"); else await loadDataOperations();
 }
 
 [
@@ -9012,7 +9314,8 @@ const ADMIN_ANALYTICS_ROW_LIMIT = 100000;
 async function loadAdminTablePages(
   tableName,
   selectFields,
-  sinceDate = null
+  sinceDate = null,
+  stableTieBreakFields = []
 ) {
   const rows = [];
   let from = 0;
@@ -9027,11 +9330,16 @@ async function loadAdminTablePages(
         })
         .order("created_at", {
           ascending: false
-        })
-        .range(
-          from,
-          from + ADMIN_ANALYTICS_PAGE_SIZE - 1
-        );
+        });
+
+    stableTieBreakFields.forEach(fieldName => {
+      query = query.order(fieldName, { ascending: true });
+    });
+
+    query = query.range(
+      from,
+      from + ADMIN_ANALYTICS_PAGE_SIZE - 1
+    );
 
     if (sinceDate) {
       query =
@@ -12221,7 +12529,7 @@ function renderQualityPriorityQueue(rows) {
                     <select data-quality-registration>
                       ${[
                         ["registration_open", "Registration open"],
-                        ["registration_not_open", "Registration not open yet"],
+                        ["registration_not_open", "Registration not open"],
                         ["sold_out", "Sold out"],
                         ["date_expected", "Date expected"],
                         ["cancelled", "Cancelled"],
@@ -13449,7 +13757,7 @@ function renderPendingEvents() {
                     ${[
                       ["unclear", "Status unclear"],
                       ["registration_open", "Registration open"],
-                      ["registration_not_open", "Registration not open yet"],
+                      ["registration_not_open", "Registration not open"],
                       ["sold_out", "Sold out"],
                       ["cancelled", "Cancelled"],
                       ["date_expected", "Date expected"],

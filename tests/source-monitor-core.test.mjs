@@ -151,6 +151,16 @@ const emptyRobots = await fetchSource("https://example.com/robots.txt", {
 });
 assert.equal(emptyRobots.rawText, "");
 assert.equal(emptyRobots.normalized, "");
+const vendorRobotsMime = await fetchSource("https://example.com/robots.txt", {
+  resolveDns: publicDns,
+  policy: { allowedContentTypes: ["text/plain", "text/html", "text/x-robots"], allowEmptyContent: true },
+  fetchImpl: async () => response("User-agent: *\nDisallow:", {
+    status: 200,
+    headers: { "content-type": "text/x-robots; charset=utf-8" }
+  })
+});
+assert.equal(vendorRobotsMime.contentType, "text/x-robots");
+assert.equal(robotsAllows(vendorRobotsMime.rawText, new URL("https://example.com/event")), true);
 
 const notModified = await fetchSource("https://example.com/cached", {
   resolveDns: publicDns, previousHash: "abc123",

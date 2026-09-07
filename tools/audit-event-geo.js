@@ -1,10 +1,11 @@
+const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
 const {
   cleanValue,
   parseCoordinate,
-  parseCsvFile,
+  parseCsv,
   writeJsonFile
 } = require("./event-table-utils");
 
@@ -213,6 +214,13 @@ function ensureDirectoryForFile(filePath) {
   fs.mkdirSync(path.dirname(filePath), {
     recursive: true
   });
+}
+
+function sha256(value) {
+  return crypto
+    .createHash("sha256")
+    .update(value)
+    .digest("hex");
 }
 
 function escapeCsv(value) {
@@ -833,7 +841,8 @@ function main() {
     });
   }
 
-  const events = parseCsvFile(input);
+  const inputBuffer = fs.readFileSync(input);
+  const events = parseCsv(inputBuffer.toString("utf8"));
   const cacheIndex = buildCacheIndex(cacheFiles);
   const rows = events.map(event => auditEvent(event, cacheIndex));
 
@@ -866,8 +875,10 @@ function main() {
     }));
 
   const report = {
+    schema_version: 2,
     generated_at: new Date().toISOString(),
     input: path.relative(ROOT, input).replace(/\\/g, "/"),
+    input_sha256: sha256(inputBuffer),
     total_events: events.length,
     cache_files: cacheFiles.map(filePath =>
       path.relative(ROOT, filePath).replace(/\\/g, "/")

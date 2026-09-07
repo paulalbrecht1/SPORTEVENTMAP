@@ -90,6 +90,20 @@ const leafletStub = `
 export const test = base.extend({
   pageErrors: [async ({ page }, use) => {
     const errors = [];
+    let mainFrameNavigation = null;
+
+    page.on("request", request => {
+      if (
+        request.isNavigationRequest() &&
+        request.frame() === page.mainFrame()
+      ) {
+        mainFrameNavigation = request;
+      }
+    });
+
+    page.on("load", () => {
+      mainFrameNavigation = null;
+    });
 
     page.on("pageerror", error => {
       errors.push(error.message);
@@ -111,13 +125,28 @@ export const test = base.extend({
 
     page.on("requestfailed", request => {
       const url = new URL(request.url());
+      const failureText =
+        request.failure()?.errorText || "";
 
       if (externalHosts.includes(url.hostname)) {
         return;
       }
 
+      // A new document navigation legitimately cancels outstanding assets
+      // from the previous document. Keep reporting every other local failure.
+      if (
+        mainFrameNavigation &&
+        request !== mainFrameNavigation &&
+        request.frame() === page.mainFrame() &&
+        request.method() === "GET" &&
+        url.origin === new URL(mainFrameNavigation.url()).origin &&
+        failureText === "net::ERR_ABORTED"
+      ) {
+        return;
+      }
+
       errors.push(
-        `Request failed: ${request.method()} ${request.url()} ${request.failure()?.errorText || ""}`
+        `Request failed: ${request.method()} ${request.url()} ${failureText}`
       );
     });
 

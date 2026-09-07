@@ -145,6 +145,10 @@ assert.equal(
   getRegistrationStatus(separatedRegistrationStatusEvent),
   "Not yet officially confirmed"
 );
+assert.equal(
+  getRegistrationStatus(event({ registration_status: "registration_not_open" })),
+  "Registration not open"
+);
 const separatedRegistrationStatusPage = buildEventPage(
   separatedRegistrationStatusEvent,
   "separated-registration-status-2027"

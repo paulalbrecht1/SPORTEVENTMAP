@@ -33,7 +33,9 @@ test-results-*/
 playwright-report/
 reports/responsive-screenshots/
 reports/event-date-audit.*
+!reports/event-date-audit.json
 reports/event-geo-audit.*
+!reports/event-geo-audit.json
 reports/event-geo-fixes-proposed.json
 reports/responsive-layout-audit.*
 reports/responsive-qa-report.*

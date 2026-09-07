@@ -1,8 +1,10 @@
 # Datenaktualität, Verifikation und Alarmierung
 
-Stand: 17. August 2026. Produktionsabfragen in diesem Dokument sind read-only.
+Stand: 4. September 2026. Produktionsabfragen in diesem Dokument sind read-only.
 Die Stabilisierungsmigration `20260817121601_data_quality_stabilization.sql`
-ist lokal verifiziert, aber noch nicht in Produktion ausgerollt.
+ist produktiv aktiv. Der editionsgebundene Freshness-Abschlusspfad liegt in
+`20260904080319_freshness_review_verification.sql` und wird vor dem ersten
+operativen Batch separat ausgerollt und verifiziert.
 
 ## Produktive Baselines
 
@@ -103,6 +105,60 @@ Löschung und Zusammenführung werden niemals über diese Bestätigungs-RPC geä
 Erfolgreiche Bestätigung schreibt einen unveränderlichen Audit-Eintrag mit Quelle,
 beobachteten Werten, Confidence, Policy-Entscheidung und
 `automatic_fact_changes=false`.
+
+## Freshness-Verifikation aktueller Editionen
+
+Generierte `freshness_review`-Einträge besitzen keinen zugrunde liegenden
+Task-Datensatz. Sie werden deshalb über die eigene Admin-RPC
+`verify_freshness_review_editions` abgeschlossen. Die RPC übernimmt dieselbe
+Feld-Evidenz wie die Content-Verifikation und ergänzt Adresse, Beschreibung
+sowie Breiten- und Längengrad. Damit werden 14 zentrale Werte bestätigt; die
+Beschreibung muss zugleich die 80-Zeichen-Regel des Release-Gates erfüllen und
+die Koordinaten müssen parsebar sowie innerhalb der Weltgrenzen liegen. Nach dem
+Sperren von Quelle, Event und Edition prüft die RPC alle Voraussetzungen erneut.
+
+Zusätzliche Grenzen:
+
+- nur die aktuelle veröffentlichte Discovery-Edition,
+- nur aktive, technisch gesunde offizielle HTTPS-Eventseiten,
+- keine laufenden Crawls, offenen Source-Tasks, Proposals, kritischen
+  Validierungsprobleme, Workflow-Alarme oder bereits moderierten
+  Datenfehler-Meldungen,
+- maximal 25 eindeutige Editionen pro atomarem Aufruf; die Admin-Oberfläche
+  sammelt die individuelle Feld-Evidenz bewusst einzeln,
+- ausschließlich `verification_status`, `data_confidence`, `needs_review`,
+  `review_priority`, `last_verified_at`, `next_check_at` und die exakte
+  `last_verified_source_id`-Provenienz dürfen sich ändern.
+
+Neue oder wieder geöffnete Proposals, Source-Tasks, kritische Validierungs- und
+Workflow-Signale sowie Meldungen zu falschen Eventdaten invalidieren eine zuvor
+frische Discovery-Edition automatisch. Gleiches gilt, wenn die dafür verwendete
+offizielle Quelle instabil wird, gelöscht wird oder eine Inhaltsänderung meldet.
+Auch spätere Änderungen an einem der bestätigten Event- oder Editionswerte
+entziehen die Attestierung. Die Trigger
+sperren dieselbe Edition wie die RPC: Ein paralleles Signal ist dadurch entweder
+vor der Freigabe sichtbar oder setzt die Edition unmittelbar danach wieder auf
+`needs_review`.
+Ist der optionale Proposal-Review-RPC installiert, sperrt ein vorgeschalteter
+Admin-Wrapper zuerst Proposal und Parent-Event, bevor die bestehende Logik eine
+Edition ändert. Damit bleibt auch dieser Pfad in der gemeinsamen
+Event-vor-Edition-Sperrreihenfolge und parallele Review-Batches laufen nicht in
+den früher möglichen Deadlock.
+
+Event-, Datums-, Orts-, Distanz-, Registrierungs-, Quellen- und Lifecycle-Fakten
+bleiben unverändert. Jede erfolgreiche Bestätigung erzeugt zusätzlich den
+Audit-Eintrag `__freshness_verification__` mit Vorzustand, beobachteten Werten,
+Quelle, Prüfzeitpunkt und `automatic_fact_changes=false`. Bei Drift oder
+Unsicherheit bricht der komplette Aufruf ab und der Fall bleibt im Review.
+
+Der öffentliche Export vertraut nicht länger allein den sichtbaren
+Verifikationsfeldern. Er ruft zusätzlich den begrenzten, read-only
+`get_public_event_freshness_guard` auf. Dieser liefert je angefragter
+Discovery-Edition nur eine boolesche Entscheidung und prüft intern die exakte
+Quelle, die jüngste Audit-Attestierung, alle 14 unveränderten Werte, Laufzeiten
+und konkurrierende Review-Signale. Fehlende, zusätzliche oder nicht boolesche
+Entscheidungen brechen den Export auch bei einem diagnostischen
+`--allow-unhealthy`-Lauf vor jeder Dateiänderung ab.
 
 ## Quellenfehler und Dead Letter
 

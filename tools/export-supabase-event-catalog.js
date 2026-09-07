@@ -27,15 +27,137 @@ function parseArgs(argv) {
     out: path.join(ROOT, "data", "events.csv"),
     archiveOut: path.join(ROOT, "data", "event-editions-public.json"),
     manifestOut: path.join(ROOT, "data", "catalog-export-manifest.json"),
-    write: false
+    write: false,
+    allowUnhealthy: false
   };
   for (let index = 2; index < argv.length; index += 1) {
     if (argv[index] === "--out") args.out = path.resolve(argv[++index]);
     if (argv[index] === "--archive-out") args.archiveOut = path.resolve(argv[++index]);
     if (argv[index] === "--manifest-out") args.manifestOut = path.resolve(argv[++index]);
     if (argv[index] === "--write") args.write = true;
+    if (argv[index] === "--allow-unhealthy") args.allowUnhealthy = true;
   }
   return args;
+}
+
+function maximumAllowedDrop(reference, maximumDropPercent) {
+  return Math.floor(reference * (1 - maximumDropPercent / 100));
+}
+
+function evaluateExportPolicy(metrics, policy) {
+  const checks = [
+    {
+      name: "minimum discovery rows",
+      passed: Number(metrics.discovery_rows) >= Number(policy.minimum_discovery_rows),
+      actual: Number(metrics.discovery_rows),
+      expected: `>= ${policy.minimum_discovery_rows}`
+    },
+    {
+      name: "discovery baseline drop",
+      passed: Number(metrics.discovery_rows) >= maximumAllowedDrop(
+        Number(policy.reference_discovery_rows),
+        Number(policy.maximum_discovery_drop_percent)
+      ),
+      actual: Number(metrics.discovery_rows),
+      expected: `>= ${maximumAllowedDrop(
+        Number(policy.reference_discovery_rows),
+        Number(policy.maximum_discovery_drop_percent)
+      )}`
+    },
+    {
+      name: "minimum archive rows",
+      passed: Number(metrics.archive_rows) >= Number(policy.minimum_archive_rows),
+      actual: Number(metrics.archive_rows),
+      expected: `>= ${policy.minimum_archive_rows}`
+    },
+    {
+      name: "archive baseline drop",
+      passed: Number(metrics.archive_rows) >= maximumAllowedDrop(
+        Number(policy.reference_archive_rows),
+        Number(policy.maximum_archive_drop_percent)
+      ),
+      actual: Number(metrics.archive_rows),
+      expected: `>= ${maximumAllowedDrop(
+        Number(policy.reference_archive_rows),
+        Number(policy.maximum_archive_drop_percent)
+      )}`
+    },
+    {
+      name: "freshness floor",
+      passed: Number(metrics.freshness_rate) >= Number(policy.minimum_freshness_rate),
+      actual: Number(metrics.freshness_rate),
+      expected: `>= ${policy.minimum_freshness_rate}%`
+    },
+    {
+      name: "completeness floor",
+      passed: Number(metrics.completeness_rate) >= Number(policy.minimum_completeness_rate),
+      actual: Number(metrics.completeness_rate),
+      expected: `>= ${policy.minimum_completeness_rate}%`
+    }
+  ];
+
+  return {
+    passed: checks.every(check => check.passed),
+    checks
+  };
+}
+
+function assertExportPolicy(metrics, policy) {
+  const result = evaluateExportPolicy(metrics, policy);
+
+  if (!result.passed) {
+    const failures = result.checks
+      .filter(check => !check.passed)
+      .map(check => `${check.name}: ${check.actual} (expected ${check.expected})`)
+      .join("; ");
+
+    throw new Error(
+      "Refusing to replace the public fallback with an unhealthy catalog: " +
+      `${failures}. Use --allow-unhealthy only for an explicitly reviewed diagnostic snapshot.`
+    );
+  }
+
+  return result;
+}
+
+function writeCatalogSnapshot({
+  args,
+  archiveOutput,
+  exportedAt,
+  metrics,
+  output,
+  policy
+}) {
+  const policyResult = evaluateExportPolicy(metrics, policy);
+
+  if (args.allowUnhealthy) {
+    if (!policyResult.passed) {
+      console.warn("WARNING Writing an explicitly allowed unhealthy diagnostic catalog snapshot.");
+    }
+  } else {
+    assertExportPolicy(metrics, policy);
+  }
+
+  const manifestOutput = `${JSON.stringify({
+    schema_version: 1,
+    exported_at: exportedAt,
+    sources: {
+      discovery: "public_event_discovery",
+      archive: "public_event_archive",
+      freshness_guard: "get_public_event_freshness_guard"
+    },
+    sha256: {
+      discovery: sha256(output),
+      archive: sha256(archiveOutput)
+    },
+    metrics
+  }, null, 2)}\n`;
+
+  fs.writeFileSync(args.out, output, "utf8");
+  fs.writeFileSync(args.archiveOut, archiveOutput, "utf8");
+  fs.writeFileSync(args.manifestOut, manifestOutput, "utf8");
+
+  return { manifestOutput, policyResult };
 }
 
 function readPublicRuntimeConfig() {
@@ -77,14 +199,14 @@ function isCompleteDiscoveryRow(row) {
     clean(row.description).trim().length >= 80;
 }
 
-function isFreshDiscoveryRow(row, exportedAt) {
+function isFreshDiscoveryRow(row, exportedAt, authoritativeDecision = false) {
   const nextCheck = Date.parse(clean(row.next_check));
 
   return clean(row.verification_status).toLowerCase() === "verified" &&
     Boolean(clean(row.last_checked).trim()) &&
     Number.isFinite(nextCheck) &&
     nextCheck > Date.parse(exportedAt) &&
-    row.needs_review !== true;
+    authoritativeDecision === true;
 }
 
 function percentage(numerator, denominator) {
@@ -93,8 +215,58 @@ function percentage(numerator, denominator) {
     : 0;
 }
 
-function buildExportMetrics(rows, archiveRows, exportedAt) {
-  const freshRows = rows.filter(row => isFreshDiscoveryRow(row, exportedAt));
+function assertFreshnessGuardCoverage(rows, payload, now = Date.now()) {
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    throw new Error("Freshness guard returned no valid JSON object.");
+  }
+  if (payload.schema_version !== 1) {
+    throw new Error(`Unsupported freshness guard schema version: ${clean(payload.schema_version) || "missing"}.`);
+  }
+
+  const evaluatedAt = Date.parse(clean(payload.evaluated_at));
+  if (!Number.isFinite(evaluatedAt) || evaluatedAt < now - 300000 || evaluatedAt > now + 300000) {
+    throw new Error("Freshness guard evaluation is missing or older than five minutes.");
+  }
+
+  const editionIds = rows.map(row => clean(row.edition_id).trim());
+  if (editionIds.some(id => !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))) {
+    throw new Error("Discovery export contains a missing or invalid edition id.");
+  }
+  const expectedIds = new Set(editionIds);
+  if (expectedIds.size !== editionIds.length) {
+    throw new Error("Discovery export contains duplicate edition ids.");
+  }
+  if (Number(payload.requested_count) !== expectedIds.size) {
+    throw new Error("Freshness guard requested_count does not match the Discovery snapshot.");
+  }
+
+  const decisions = payload.decisions;
+  if (!decisions || typeof decisions !== "object" || Array.isArray(decisions)) {
+    throw new Error("Freshness guard decisions are missing or malformed.");
+  }
+  const decisionIds = Object.keys(decisions);
+  if (decisionIds.length !== expectedIds.size ||
+      decisionIds.some(id => !expectedIds.has(id)) ||
+      editionIds.some(id => !Object.prototype.hasOwnProperty.call(decisions, id))) {
+    throw new Error("Freshness guard decisions do not exactly match the Discovery snapshot.");
+  }
+  if (decisionIds.some(id => typeof decisions[id] !== "boolean")) {
+    throw new Error("Freshness guard returned a non-boolean decision.");
+  }
+
+  return {
+    decisions: new Map(decisionIds.map(id => [id, decisions[id]])),
+    evaluatedAt: new Date(evaluatedAt).toISOString()
+  };
+}
+
+function buildExportMetrics(rows, archiveRows, exportedAt, freshnessGuardPayload) {
+  const guard = assertFreshnessGuardCoverage(rows, freshnessGuardPayload);
+  const freshRows = rows.filter(row => isFreshDiscoveryRow(
+    row,
+    exportedAt,
+    guard.decisions.get(clean(row.edition_id).trim())
+  ));
   const completeRows = rows.filter(isCompleteDiscoveryRow);
 
   return {
@@ -104,7 +276,8 @@ function buildExportMetrics(rows, archiveRows, exportedAt) {
     freshness_rate: percentage(freshRows.length, rows.length),
     complete_rows: completeRows.length,
     completeness_rate: percentage(completeRows.length, rows.length),
-    review_required_rows: rows.length - freshRows.length
+    review_required_rows: rows.length - freshRows.length,
+    freshness_guard_evaluated_at: guard.evaluatedAt
   };
 }
 
@@ -188,6 +361,25 @@ async function requestAll(url, key, view) {
   }
 }
 
+async function requestFreshnessGuard(url, key, editionIds) {
+  const response = await fetch(`${url}/rest/v1/rpc/get_public_event_freshness_guard`, {
+    method: "POST",
+    headers: {
+      apikey: key,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ p_edition_ids: editionIds })
+  });
+  if (!response.ok) {
+    throw new Error(`Supabase freshness guard failed (${response.status}): ${(await response.text()).slice(0, 500)}`);
+  }
+  try {
+    return await response.json();
+  } catch {
+    throw new Error("Supabase freshness guard returned malformed JSON.");
+  }
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   const runtime = readPublicRuntimeConfig();
@@ -205,30 +397,32 @@ async function main() {
   if (!rows.length) throw new Error("Refusing to replace the discovery fallback with an empty active catalog.");
   if (archiveRows.length < 900) throw new Error(`Refusing to replace the archive with only ${archiveRows.length} public editions.`);
 
+  const freshnessGuard = await requestFreshnessGuard(
+    url,
+    key,
+    rows.map(row => clean(row.edition_id).trim())
+  );
   const exportedAt = new Date().toISOString();
   const mapped = rows.map(row => mapDiscoveryRow(row, exportedAt));
   const output = [PUBLIC_CATALOG_COLUMNS.join(";"), ...mapped.map(row => PUBLIC_CATALOG_COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
   const archiveOutput = `${JSON.stringify({ exported_at: exportedAt, editions: archiveRows }, null, 2)}\n`;
-  const metrics = buildExportMetrics(rows, archiveRows, exportedAt);
-  const manifestOutput = `${JSON.stringify({
-    schema_version: 1,
-    exported_at: exportedAt,
-    sources: {
-      discovery: "public_event_discovery",
-      archive: "public_event_archive"
-    },
-    sha256: {
-      discovery: sha256(output),
-      archive: sha256(archiveOutput)
-    },
-    metrics
-  }, null, 2)}\n`;
+  const metrics = buildExportMetrics(rows, archiveRows, exportedAt, freshnessGuard);
+  const policy = JSON.parse(
+    fs.readFileSync(path.join(ROOT, "data", "catalog-release-policy.json"), "utf8")
+  );
 
-  fs.writeFileSync(args.out, output, "utf8");
-  fs.writeFileSync(args.archiveOut, archiveOutput, "utf8");
-  fs.writeFileSync(args.manifestOut, manifestOutput, "utf8");
-  console.log(`Exported ${mapped.length} active discovery editions and ${archiveRows.length} public archive editions.`);
+  console.log(`Fetched ${mapped.length} active discovery editions and ${archiveRows.length} public archive editions.`);
   console.log(`Freshness ${metrics.freshness_rate}%; completeness ${metrics.completeness_rate}%.`);
+
+  writeCatalogSnapshot({
+    args,
+    archiveOutput,
+    exportedAt,
+    metrics,
+    output,
+    policy
+  });
+  console.log(`Exported ${mapped.length} active discovery editions and ${archiveRows.length} public archive editions.`);
 }
 
 if (require.main === module) {
@@ -240,12 +434,18 @@ if (require.main === module) {
 
 module.exports = {
   PUBLIC_CATALOG_COLUMNS,
+  assertExportPolicy,
+  assertFreshnessGuardCoverage,
   buildExportMetrics,
+  evaluateExportPolicy,
   isCompleteDiscoveryRow,
   isFreshDiscoveryRow,
   mapDiscoveryRow,
   main,
+  maximumAllowedDrop,
   percentage,
   readPublicRuntimeConfig,
-  sha256
+  requestFreshnessGuard,
+  sha256,
+  writeCatalogSnapshot
 };

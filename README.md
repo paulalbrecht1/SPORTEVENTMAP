@@ -42,6 +42,9 @@ Source-of-Truth-Regeln stehen in
 [`docs/REPOSITORY_STRUCTURE.md`](docs/REPOSITORY_STRUCTURE.md).
 Der verbindliche Ablauf für neue Aufgaben steht in
 [`docs/DEVELOPMENT_WORKFLOW.md`](docs/DEVELOPMENT_WORKFLOW.md).
+Die priorisierten nächsten Produkt- und Entwicklungsstufen mit messbaren
+Abnahmekriterien stehen in
+[`docs/NEXT_IMPLEMENTATION_STAGES.md`](docs/NEXT_IMPLEMENTATION_STAGES.md).
 
 ## Lokal prüfen
 

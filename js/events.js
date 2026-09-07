@@ -1412,7 +1412,7 @@ const EVENT_STATUS_CONFIG = {
     className: "registration-open"
   },
   registration_not_open: {
-    label: "Registration not open yet",
+    label: "Registration not open",
     className: "registration-not-open"
   },
   sold_out: {

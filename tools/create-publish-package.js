@@ -2,12 +2,26 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { execFileSync } = require("child_process");
+const { assertReleaseReadiness } = require("./check-release-readiness");
 
 const ROOT =
   path.resolve(__dirname, "..");
 
 const DIST =
   path.join(ROOT, "dist");
+
+const CRITICAL_PATHS = Object.freeze([
+  "index.html",
+  "css/style.css",
+  "css/mobile-discovery.css",
+  "js/app.js",
+  "js/mobile-discovery.js",
+  "js/supabase.js",
+  "data/events.csv",
+  "data/event-editions-public.json",
+  "data/catalog-export-manifest.json",
+  "sitemap.xml"
+]);
 
 const COPY_ENTRIES = [
   "index.html",
@@ -311,16 +325,6 @@ function writeReleaseMetadata(identity) {
     }))
     .sort((left, right) => left.path.localeCompare(right.path));
   const eventPages = entries.filter(entry => /^event\/[^/]+\/index\.html$/.test(entry.path));
-  const criticalPaths = [
-    "index.html",
-    "css/style.css",
-    "js/app.js",
-    "js/supabase.js",
-    "data/events.csv",
-    "data/event-editions-public.json",
-    "data/catalog-export-manifest.json",
-    "sitemap.xml"
-  ];
   const byPath = new Map(entries.map(entry => [entry.path, entry.sha256]));
 
   const release = {
@@ -328,7 +332,7 @@ function writeReleaseMetadata(identity) {
     ...identity,
     source_dirty: false,
     critical_files: Object.fromEntries(
-      criticalPaths.map(relativePath => {
+      CRITICAL_PATHS.map(relativePath => {
         if (!byPath.has(relativePath)) throw new Error(`Missing release artifact: ${relativePath}`);
         return [relativePath, byPath.get(relativePath)];
       })
@@ -414,6 +418,7 @@ function validateDist() {
 }
 
 function main() {
+  assertReleaseReadiness();
   assertCleanSource();
   const identity = {
     version: releaseVersion(),
@@ -450,6 +455,7 @@ function main() {
 if (require.main === module) main();
 
 module.exports = {
+  CRITICAL_PATHS,
   inventoryDigest,
   main,
   releaseVersion,

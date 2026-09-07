@@ -8,6 +8,8 @@ Direct Upload; GitHub pushes do not change the public website.
 - Work on a dedicated branch and review the complete diff.
 - Confirm the branch contains no local credentials or private import files.
 - Merge only a tested, reviewable commit into `main`.
+- Use `npm.cmd run test:code` for complete technical validation of development
+  changes. A green code suite does not grant a production data release.
 
 ## 2. Reproducible Build
 
@@ -17,11 +19,19 @@ From the project directory run:
 npm.cmd ci
 npm.cmd run test:all
 npm.cmd run prepare-package
+npm.cmd run verify-package
 ```
 
 Confirm `dist/` contains the homepage, event pages, `data/events.csv`,
 `sitemap.xml`, `robots.txt` and legal pages. Browser configuration may contain
 only the public Supabase URL and publishable key.
+
+`test:all` requires the unchanged publish, data-quality and current-catalog
+release gates plus every technical test group. Both package commands repeat
+those release gates themselves. A blocked build stops before changing generated
+pages, sitemap or an existing `dist/`; there is no release-gate override.
+Verification covers all critical files (including mobile discovery), the full
+artifact inventory and the event-page inventory/count from the packaged catalog.
 
 ## 3. Backend Compatibility
 
@@ -47,11 +57,15 @@ favorites, Season Planner, admin surfaces, feedback and public event pages.
 After the preview succeeds, deploy the exact tested `main` build:
 
 ```powershell
+npm.cmd run verify-package
 npx wrangler pages deploy dist --project-name=sporteventmap --branch=main
 ```
 
-Record the Git commit and Cloudflare deployment URL. Re-run the public HTTP
-smoke checks and confirm Supabase requests, authentication and RLS behavior.
+Reverify immediately before uploading so the catalog still satisfies its
+24-hour age limit. Record the Git commit and Cloudflare deployment URL. Verify
+the release metadata and hashes on the immutable deployment URL, then re-run
+the main-domain HTTP smoke checks and confirm Supabase requests, authentication
+and RLS behavior. Main-domain HTML may include Cloudflare-injected content.
 
 ## 6. Manual Dashboard Checks
 

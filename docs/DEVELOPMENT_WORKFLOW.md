@@ -26,7 +26,9 @@ nachvollziehbare Entwicklungshistorie; Production wird davon getrennt behandelt.
 ## Eine Aufgabe abschließen
 
 1. Alle für die Änderung relevanten Tests ausführen; vor dem Push müssen sie
-   grün sein.
+   grün sein. `npm run test:code` führt alle technischen Scriptgruppen,
+   Daten-Gate-Tests mit kontrollierten Fixtures, Layout- und Browserprüfungen
+   aus. Der Befehl benötigt keinen aktuell freigegebenen Production-Export.
 2. `git status` prüfen und neue temporäre, generierte oder private Dateien
    kontrollieren.
 3. Den Änderungssatz und den Staging-Bereich auf Secrets, Tokens,
@@ -43,6 +45,33 @@ working tree clean
 
 Schlägt ein Test oder eine Sicherheitsprüfung fehl, wird nicht gepusht, bis
 die Ursache behoben ist oder die Aufgabe ausdrücklich gestoppt wurde.
+
+## Technische Prüfung und Datenfreigabe
+
+`npm run test:code` prüft den Entwicklungsstand unabhängig vom Alter des
+versionierten Katalogexports. Die Regeln der Daten-Gates werden dabei weiterhin
+mit Testdaten geprüft, einschließlich der Ablehnung veralteter Exporte,
+ungeklärter Dubletten und fehlender Auditnachweise. Ein grüner technischer Lauf
+bestätigt keine aktuelle fachliche Freigabe des Production-Katalogs.
+
+`npm run check` bleibt die verbindliche Prüfung der Veröffentlichbarkeit:
+Publish- und Secret-Prüfung, gebundene Datenqualitäts-Audits sowie Katalogalter,
+Bestand, Frische und Vollständigkeit. `npm run test:all` verlangt zuerst diese
+Freigabe und anschließend die vollständige technische Suite. Bekannte
+Datenfreigabesperren werden mit Befund dokumentiert und verhindern den
+Production-Release; sie verhindern nicht den Push einer unabhängig vollständig
+getesteten Codeänderung. Technische Fehler oder fehlende für die Änderung
+erforderliche Sicherheitsprüfungen bleiben Stoppsignale.
+
+Lokale/credential-basierte RLS-Prüfungen und lesende Production-Zugriffsaudits
+werden separat ausgeführt. Sie sind weder durch `test:code` noch `test:all`
+ersetzt. Vor einer Veröffentlichung müssen die aktuelle Datenfreigabe und alle
+erforderlichen technischen und Sicherheitsprüfungen bestehen.
+
+`prepare-package` und `verify-package` führen dieselbe Releaseprüfung selbst
+aus. Der Build prüft vor dem Generieren von Eventseiten, Sitemap und `dist/`;
+ein gesperrter Katalog verändert daher keine vorhandenen Ausgabedateien. Es
+gibt für diese Prüfung keinen Skip- oder Zeit-Override.
 
 ## GitHub und Production
 

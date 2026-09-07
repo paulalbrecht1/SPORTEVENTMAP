@@ -127,24 +127,36 @@ export function createPinnedHttpFetch(runtime) {
     const port = Number(url.port || (url.protocol === "https:" ? 443 : 80));
     const path = `${url.pathname || "/"}${url.search}`;
     const lines = [`GET ${path} HTTP/1.1`, ...requestHeaders(url, init.headers), "", ""];
+    const throwIfAborted = () => {
+      if (init.signal?.aborted) throw new DOMException("aborted", "AbortError");
+    };
     let lastError;
     for (const address of addresses) {
       let connection;
       const abort = () => { try { connection?.close(); } catch { /* already closed */ } };
       try {
-        if (init.signal?.aborted) throw new DOMException("aborted", "AbortError");
+        throwIfAborted();
         init.signal?.addEventListener("abort", abort, { once: true });
         connection = await runtime.connect({ transport: "tcp", hostname: address, port });
+        throwIfAborted();
         if (url.protocol === "https:") {
           connection = await runtime.startTls(connection, {
             hostname: url.hostname,
             alpnProtocols: ["http/1.1"]
           });
+          throwIfAborted();
         }
         await writeAll(connection, encoder.encode(lines.join("\r\n")));
+        throwIfAborted();
         const maximum = Number(target.maxResponseBytes || 1500000) + 65536;
-        return parseHttpResponse(await readAll(connection, maximum), address);
+        const bytes = await readAll(connection, maximum);
+        throwIfAborted();
+        return parseHttpResponse(bytes, address);
       } catch (error) {
+        // Closing a timed-out TCP/TLS socket may report a runtime-specific error
+        // or even EOF. Preserve the caller's deadline instead of retrying IPs or
+        // presenting this as a failed connection.
+        throwIfAborted();
         if (error?.name === "AbortError") throw error;
         lastError = error;
       } finally {

@@ -278,9 +278,25 @@ Datenbereinigung abgeschlossen.
   Fokusfehler im ersten Lauf ließ sich in vier gezielten Wiederholungen und
   dem vollständigen Nachlauf unverändert nicht reproduzieren. Die anonymen
   Produktionsprüfungen (7/7) und Frische-Zugriffsprüfungen (5/5) bestanden.
-- [ ] Als nächsten fachlichen P0 die zeitnahen deutschen Problemquellen und
-  vorbereiteten Einzelreviews bearbeiten, darunter Braunenbergs weiterhin
-  offener Transportfehler. Anschließend mindestens 68 gültige Nettozugänge
+- [x] Braunenbergs technischen Quellenblocker am 8. September behoben:
+  langsamer vollständiger Download überschritt das 12-Sekunden-Budget.
+  Deadline-Abbrüche werden jetzt korrekt als Timeout gemeldet; ausschließlich
+  die vorhandene Braunenberg-Domainregel erhält 20 Sekunden. Worker v22/4.1.6
+  ist mit unverändertem JWT-Schutz veröffentlicht. Der echte Quellenlauf
+  4958/2657 liefert HTTP 200 in 14,45 Sekunden, Fehlerzähler 0. Vier Vorschläge
+  und ein 2027-Nachfolgekandidat bleiben ungeprüft; keine öffentlichen Fakten
+  wurden überschrieben. Restore, Rücknahmeprobe, 87/87 Browserfälle und alle
+  drei Produktions-Zugriffsaudits bestanden.
+- [x] Mülheimer Firmenlauf parallel mit 14 vorgeschlagenen Feldern vorbereitet:
+  offizieller Startmarker, Campusadresse, Lauf-/Wanderangebot und Anmeldung
+  sind belegt und unabhängig geprüft. Noch keine Faktenänderung oder Attestierung.
+- [ ] Die separat belegten älteren HTTP-Framing-Lücken beheben: vollständige
+  Antworten nicht unnötig bis EOF lesen; unvollständige Chunks und ungeframtes
+  fehlerhaftes TLS-EOF ablehnen. Sie waren nicht Braunenbergs Timeoutursache.
+- [ ] Den vorbereiteten Mülheim-Faktenreview kontrolliert anwenden und
+  attestieren; Braunenbergs Feld-/Distanzkonflikte und neue Vorschläge sowie
+  die übrigen zeitnahen deutschen Problemquellen prüfen. Anschließend
+  mindestens 68 gültige Nettozugänge
   ergänzen und bei 400 Discovery-Editionen insgesamt mindestens 220 gültige
   Frischenachweise erreichen. Auslaufende Editionen erhöhen diesen Bedarf.
   Extraktion und Faktenkorrektur allein ersetzen keinen Admin-Frischenachweis.
@@ -300,6 +316,10 @@ Der [anschließende Vollreview](P0_EVENT_FULL_REVIEW_20260907.md) verbessert die
 Frische auf **3 von 332 (0,90 %)** bei weiterhin 989 Archiv-Editionen und
 49,40 % Vollständigkeit. Der reguläre Refresh wird weiterhin vor Dateiänderungen
 abgelehnt: Mindestbestand 400 und Frische 55 % bleiben unverändert.
+Die [Braunenberg-Quellenreparatur](P0_BRAUNENBERG_SOURCE_RECOVERY_20260908.md)
+beseitigt anschließend den technischen Abrufblocker, ohne eine fachliche
+Frischefreigabe vorwegzunehmen. Der aktuelle Refresh bleibt bei denselben
+Bestands- und Frischewerten gesperrt.
 
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.

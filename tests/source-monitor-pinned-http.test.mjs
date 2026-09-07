@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { createPinnedHttpFetch } from "../supabase/functions/_shared/pinned-http.mjs";
+import { fetchSource } from "../supabase/functions/_shared/source-monitor-core.mjs";
 
 const encoder = new TextEncoder();
 
@@ -130,4 +131,74 @@ await assert.rejects(
   error => error.code === "invalid_http_response"
 );
 
-console.log("Pinned HTTP transport: verified IP connection, TLS hostname, safe headers, chunk decoding and private-IP refusal.");
+// Runtime cancellation can surface as a generic socket error, a clean EOF or
+// the tolerated TLS close_notify error. None may turn a deadline into success
+// or cause a second target IP to be contacted.
+for (const outcome of ["operation canceled", "close_notify: unexpected EOF", "eof"]) {
+  const controller = new AbortController();
+  let connections = 0;
+  let canceledConnection;
+  const canceledFetch = createPinnedHttpFetch({
+    connect: async () => {
+      connections += 1;
+      canceledConnection = new FakeConnection(contentLengthResponse);
+      const read = canceledConnection.read.bind(canceledConnection);
+      canceledConnection.read = async buffer => {
+        if (canceledConnection.offset < contentLengthResponse.byteLength) return read(buffer);
+        controller.abort();
+        if (outcome === "eof") return null;
+        throw new Error(outcome);
+      };
+      return canceledConnection;
+    },
+    startTls: async value => value
+  });
+  await assert.rejects(() => canceledFetch("https://events.example/", {
+    signal: controller.signal
+  }, { addresses: ["93.184.216.34", "93.184.216.35"] }), error => error.name === "AbortError");
+  assert.equal(connections, 1, "An aborted request must not try the next public IP.");
+  assert.equal(canceledConnection.closed, true);
+}
+
+for (const phase of ["connect", "tls"]) {
+  const controller = new AbortController();
+  const lateConnection = new FakeConnection(contentLengthResponse);
+  const lateFetch = createPinnedHttpFetch({
+    connect: async () => {
+      if (phase === "connect") controller.abort();
+      return lateConnection;
+    },
+    startTls: async value => {
+      controller.abort();
+      return value;
+    }
+  });
+  await assert.rejects(() => lateFetch("https://events.example/", {
+    signal: controller.signal
+  }, { addresses: ["93.184.216.34"] }), error => error.name === "AbortError");
+  assert.equal(lateConnection.request, "", "No HTTP request may be sent after cancellation.");
+  assert.equal(lateConnection.closed, true);
+}
+
+let rejectPendingRead;
+let timeoutConnections = 0;
+const deadlineFetch = createPinnedHttpFetch({
+  connect: async () => {
+    timeoutConnections += 1;
+    return {
+      async write(bytes) { return bytes.byteLength; },
+      read() { return new Promise((_resolve, reject) => { rejectPendingRead = reject; }); },
+      close() { rejectPendingRead?.(new Error("operation canceled")); }
+    };
+  },
+  startTls: async value => value
+});
+await assert.rejects(() => fetchSource("https://events.example/", {
+  resolveDns: async () => ["93.184.216.34", "93.184.216.35"],
+  requirePinnedTransport: true,
+  fetchImpl: deadlineFetch,
+  policy: { requestTimeoutMs: 5 }
+}), error => error.code === "timeout" && error.retriable === true);
+assert.equal(timeoutConnections, 1);
+
+console.log("Pinned HTTP transport: verified IP/TLS, headers, chunk decoding, private-IP refusal and preserved deadline cancellation.");

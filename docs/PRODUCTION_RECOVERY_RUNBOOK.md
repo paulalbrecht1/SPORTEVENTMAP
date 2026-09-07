@@ -1,6 +1,6 @@
 # Production Recovery Runbook
 
-Stand: 7. September 2026
+Stand: 8. September 2026
 
 ## Schutzstandard
 
@@ -227,31 +227,32 @@ lokalen Abweichungen wurden nicht pauschal nachgezogen. Details stehen im
 
 | Feld | Wert |
 | --- | --- |
-| Verifizierter Dump | `sporteventmap-production-20260907T212209412Z.sembackup` |
-| Backup-Zeitfenster (UTC) | 2026-09-07 21:23:12 bis 21:24:00 |
-| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 21:44:34 |
-| Restore-Dauer | 73,730 Sekunden |
-| Verschlüsselte Dateigröße | 8.682.760 Bytes |
-| SHA-256 der verschlüsselten Datei | `45e1a63cdd69c3c16a083b833295b8ae88feb9acc67bb39120ccd3c47580bb89` |
+| Verifizierter Dump | `sporteventmap-production-20260907T223002394Z.sembackup` |
+| Backup-Zeitfenster (UTC) | 2026-09-07 22:30:02 bis 22:31:31 |
+| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 22:38:53 |
+| Restore-Dauer | 37,726 Sekunden |
+| Verschlüsselte Dateigröße | 8.707.121 Bytes |
+| SHA-256 der verschlüsselten Datei | `cf3b71577278e0d944502cc3b2abf8a18622bb3390e3fff2f6e3273ff4cec0e8` |
 | Kern-Counts | 999 Events; 1.022 Editionen; 1.016 Sources; 40 Migrationen |
 | Nutzerstrukturen | 5 Auth-Nutzer; 5 Profile; 36 Favoriten; 48 Planner-Einträge |
 | Schema/Datenintegrität | bestanden |
 | RLS/Nutzerisolation | bestanden |
 | `run_event_validation(...)` für normalen Nutzer | verweigert |
-| Faktenbatch vom 7. September, 20:15 UTC | 3 korrigierte Editionen und 13 private Snapshots enthalten; weiterhin `needs_review` |
+| Vollständiger Faktenreview vom 7. September | Beide Faktenbatches sowie die drei anschließend über echte Admin-Sitzung erteilten Frischenachweise enthalten |
 | Schemaabgleich im aktuellen Dump | Migrationen `20260907205727` und `20260907205741` enthalten |
 | Vollständiger lokaler Neuaufbau | 50 Migrationen, SQL-Lint, 22/22 RLS, 61 SQL- und vier REST-Prüfungen bestanden; Staging bereinigt |
-| Faktenbatch 02 auf frischer Wiederherstellung | Apply, Verify, Wiederholungssperre, Rollback-Driftsperre und vollständige Rücknahme bestanden |
-| Restoreumgebungen nach Faktenprobe | Beide exakten Testprojekte, Datenbank-/Storage-Volumes und entschlüsselte Verzeichnisse entfernt; Backup erhalten |
+| Braunenberg-Konfiguration und Wiederholung | Apply, Verify, Wiederholungssperren, Rollback-Driftsperre und vollständige Rücknahme bestanden; übrige Policies/Fakten/Nutzerdaten unverändert |
+| Restoreumgebung nach Probe | Exaktes Projekt `sport-event-map-recovery-drill-b8dbc423`, beide Volumes und Klartextverzeichnis am 7. September um 22:46:17 UTC entfernt; Backup erhalten |
 | Production während des Drills verändert | nein |
 
 Der Nachweis liegt unter
-`backups/production/restore-reports/sporteventmap-production-20260907T212209412Z-restore-report.json`.
-Der ergänzende Faktennachweis liegt daneben als
-`sporteventmap-production-20260907T212209412Z-facts-batch-02-rehearsal.json`.
-Der Dump dokumentiert den Stand nach dem Schemaabgleich und vor Faktenbatch 02.
-Die lokale Probe verändert den gesicherten Produktionsstand nicht. Der erste
-Restore-Bericht desselben Dumps bleibt separat mit Suffix `-1fe34f82` erhalten.
+`backups/production/restore-reports/sporteventmap-production-20260907T223002394Z-restore-report.json`.
+Der ergänzende Konfigurationsnachweis liegt unter
+`exports/p0-review-20260908/braunenberg-timeout-rehearsal.json`.
+Der Dump dokumentiert den Stand nach Schemaabgleich, Faktenbatch 02 und den
+drei Frischeattestierungen, vor der Braunenberg-Quellenreparatur. Die lokale
+Probe verändert den gesicherten Produktionsstand nicht. Die historischen
+Restore-/Faktenberichte des vorherigen Dumps `20260907T212209412Z` bleiben erhalten.
 
 Damit ist die Wiederherstellung eines aktuellen Production-Dumps praktisch
 belegt. Nicht abgedeckt sind PITR zwischen zwei Dumps, ein gleichzeitiger Verlust

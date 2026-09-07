@@ -8,6 +8,13 @@ Der aktuelle Nachweis steht im
 unten zu noch fehlender Laufzeit oder nicht erfolgten Datenbankwrites beziehen
 sich ausschließlich auf den ersten Folgeschritt. Die Website-Datensperre bleibt.
 
+Fortschreibung vom 8. September: Die
+[Braunenberg-Quellenreparatur](P0_BRAUNENBERG_SOURCE_RECOVERY_20260908.md)
+ist mit Worker v22/4.1.6 und einer gezielten 20-Sekunden-Domainregel produktiv.
+Der echte Abruf gelingt in 14,45 Sekunden; extrahierte Vorschläge bleiben im
+Review. Mülheims 14-Felder-Review ist vorbereitet. Der Website-Refresh bleibt
+bei 332 Discovery-Editionen und 0,90 % Frische vor dem Schreiben gesperrt.
+
 ## Ergebnis
 
 Der Nutzer hat die Veröffentlichung fertiger Änderungen über Wrangler,

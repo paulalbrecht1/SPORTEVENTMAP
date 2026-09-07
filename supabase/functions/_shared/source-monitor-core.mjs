@@ -4,7 +4,7 @@ export const DEFAULT_ALLOWED_CONTENT_TYPES = [
   "application/json"
 ];
 
-export const NORMALIZATION_VERSION = "sem-v2";
+export const NORMALIZATION_VERSION = "sem-v3";
 
 export function classifySourceFailure(code, httpStatus = null) {
   const normalized = String(code || "technical_other").toLowerCase();
@@ -197,7 +197,8 @@ export function normalizeRelevantContent(content, contentType = "text/html") {
     .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, " ")
     .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript\s*>/gi, " ")
     .replace(/<(nav|header|footer)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
-    .replace(/<([a-z0-9]+)\b[^>]*(?:id|class)=["'][^"']*(?:cookie|consent|tracking|newsletter-popup|random-id)[^"']*["'][^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
+    // Themes put consent state on html/body; these document roots are not banners.
+    .replace(/<(?!html\b|body\b)([a-z0-9]+)\b[^>]*(?:id|class)=["'][^"']*(?:cookie|consent|tracking|newsletter-popup|random-id)[^"']*["'][^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
     .replace(/([?&])(utm_[a-z]+|fbclid|gclid|mc_[a-z]+)=[^&#"'\s<]*/gi, "$1")
     .replace(/\b(?:generated|updated|rendered)\s*(?:at|on)?\s*[:=-]?\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:[\d:.+-]+/gi, " ")
     .replace(/\b\d{13}\b/g, " ")
@@ -254,7 +255,7 @@ export function extractSemanticSignals(content, contentType = "text/html") {
     .replace(/\b(?:generated|updated|rendered)\s*(?:at|on)?\s*[:=-]?\s*\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:[\d:.+-]+/gi, " ")
     .replace(/<!--[\s\S]*?-->/g, " ")
     .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
-    .replace(/<([a-z0-9]+)\b[^>]*(?:id|class)=["'][^"']*(?:cookie|consent|tracking|newsletter-popup)[^"']*["'][^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/<(?!html\b|body\b)([a-z0-9]+)\b[^>]*(?:id|class)=["'][^"']*(?:cookie|consent|tracking|newsletter-popup)[^"']*["'][^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
     .replace(/<[^>]+>/g, " "))
     .replace(/\s+/g, " ")
     .trim();

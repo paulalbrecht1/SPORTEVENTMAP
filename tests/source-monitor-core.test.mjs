@@ -97,7 +97,22 @@ assert.equal(await sha256Hex(normalizedV1), await sha256Hex(normalizedDynamic));
 assert.notEqual(await sha256Hex(normalizedV1), await sha256Hex(normalizedV2));
 assert.equal(extractSemanticSignals(fixture("event-v1.html")), extractSemanticSignals(fixture("event-v1-dynamic.html")));
 assert.notEqual(extractSemanticSignals(fixture("event-v1.html")), extractSemanticSignals(fixture("event-v2.html")));
-assert.equal(NORMALIZATION_VERSION, "sem-v2");
+assert.equal(NORMALIZATION_VERSION, "sem-v3");
+
+const rootConsent = fixture("event-root-consent.html");
+const rootConsentBaseline = '<html><head><title>Waldlauf</title></head><body><main><h1>Waldlauf</h1><p>Termin: 17.09.2026</p><p>Distanz: 5,6 km</p><a href="/register">Anmeldung offen</a></main></body></html>';
+for (const html of [rootConsent, rootConsent.replace(/\b(html|body)\b/g, tag => tag.toUpperCase())]) {
+  assert.equal(normalizeRelevantContent(html), normalizeRelevantContent(rootConsentBaseline), "Consent state on html/body must retain the event while real banners are removed.");
+  assert.equal(extractSemanticSignals(html), extractSemanticSignals(rootConsentBaseline), "Semantic extraction must preserve event dates and registration signals without banner noise.");
+}
+assert.notEqual(extractSemanticSignals(rootConsent), extractSemanticSignals(rootConsent.replace('17.09.2026', '18.09.2026')), "Date changes remain detectable on pages with root consent classes.");
+const consentFetched = await fetchSource("https://example.com/root-consent", {
+  resolveDns: publicDns,
+  fetchImpl: async () => response(rootConsent, { status: 200, headers: { "content-type": "text/html" } })
+});
+assert.match(consentFetched.normalized, /17\.09\.2026/);
+assert.match(consentFetched.semanticSignals, /5,6 km/);
+assert.equal(consentFetched.normalizationVersion, NORMALIZATION_VERSION);
 
 const redirectFetch = queueFetch([
   response(null, { status: 302, headers: { location: "https://example.org/final" } }),

@@ -1578,7 +1578,7 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   );
 
   await test(
-    "18. Content verification requires complete matching evidence and writes an audit record",
+    "18. Content verification writes evidence without bypassing full freshness review",
     async () => {
       const sourceUrl = `https://example.com/content-verification-${runId}`;
       const insertedEvent = await restRequest("events", {
@@ -1773,10 +1773,24 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.equal(verified.data.automatic_fact_changes, false);
 
       const verifiedEdition = await serviceRequest(
-        `event_editions?select=verification_status,needs_review,last_verified_at,next_check_at&id=eq.${encodeURIComponent(editionId)}`
+        `event_editions?select=verification_status,needs_review,last_verified_at,next_check_at,last_verified_source_id&id=eq.${encodeURIComponent(editionId)}`
       );
-      assert.deepEqual(verifiedEdition.data.map(row => row.verification_status), ["verified"]);
-      assert.deepEqual(verifiedEdition.data.map(row => row.needs_review), [false]);
+      assert.equal(verifiedEdition.response.ok, true, JSON.stringify(verifiedEdition.data));
+      assert.deepEqual(verifiedEdition.data.map(row => row.verification_status), ["needs_review"]);
+      assert.deepEqual(verifiedEdition.data.map(row => row.needs_review), [true]);
+      assert.deepEqual(verifiedEdition.data.map(row => row.last_verified_source_id), [null]);
+      const resolvedTask = await serviceRequest(
+        `source_review_tasks?select=status&id=eq.${encodeURIComponent(taskId)}`
+      );
+      assert.equal(resolvedTask.response.ok, true, JSON.stringify(resolvedTask.data));
+      assert.deepEqual(resolvedTask.data.map(row => row.status), ["resolved"]);
+      const contentOnlyGuard = await restRequest("rpc/get_public_event_freshness_guard", {
+        method: "POST",
+        body: { p_edition_ids: [editionId] }
+      });
+      assert.equal(contentOnlyGuard.response.ok, true, JSON.stringify(contentOnlyGuard.data));
+      assert.equal(contentOnlyGuard.data.decisions[editionId], false,
+        "Ten-field content evidence must not replace a complete freshness attestation.");
 
       const audit = await serviceRequest(
         `event_audit_log?select=field_name,new_value,change_source&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(editionId)}&field_name=eq.__content_verification__`
@@ -1890,8 +1904,9 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       );
       assert.equal(sourceFactsBefore.response.ok, true, JSON.stringify(sourceFactsBefore.data));
 
-      const eventFactsBefore = await serviceRequest(
-        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`
+      const eventFactsBefore = await restRequest(
+        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`,
+        { token: admin.token }
       );
       const editionFactsBefore = await serviceRequest(
         `event_editions?select=edition_year,start_date,end_date,registration_url,registration_status,edition_status,publication_status,discovery_status,race_formats,legacy_distance&id=eq.${encodeURIComponent(editionId)}`
@@ -2072,8 +2087,9 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       assert.ok(Date.parse(verifiedEdition.data[0].last_verified_at) <= Date.now() + 300000);
       assert.ok(Date.parse(verifiedEdition.data[0].next_check_at) > Date.now());
 
-      const eventFactsAfter = await serviceRequest(
-        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`
+      const eventFactsAfter = await restRequest(
+        `events?select=event_name,canonical_name,sport,city,country,address,latitude,longitude,distance,description,official_url,event_url&id=eq.${encodeURIComponent(eventId)}`,
+        { token: admin.token }
       );
       const editionFactsAfter = await serviceRequest(
         `event_editions?select=edition_year,start_date,end_date,registration_url,registration_status,edition_status,publication_status,discovery_status,race_formats,legacy_distance&id=eq.${encodeURIComponent(editionId)}`
@@ -2113,19 +2129,26 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       );
       assert.equal(repeatedAudit.data.length, 1);
 
-      const feedbackBlocker = await serviceRequest("user_feedback", {
+      const feedbackBlocker = await restRequest("user_feedback", {
+        token: admin.token,
         method: "POST",
         prefer: "return=representation",
         body: {
           category: "incorrect_event_data",
           summary: "Freshness alias blocker",
           message: "Moderated test feedback must block exact numeric aliases.",
-          event_id: String(eventId).padStart(String(eventId).length + 2, "0"),
-          status: "reviewed"
+          event_id: String(eventId).padStart(String(eventId).length + 2, "0")
         }
       });
       assert.equal(feedbackBlocker.response.ok, true, JSON.stringify(feedbackBlocker.data));
       feedbackId = feedbackBlocker.data[0].id;
+      const moderatedFeedback = await restRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+        token: admin.token,
+        method: "PATCH",
+        prefer: "return=representation",
+        body: { status: "reviewed" }
+      });
+      assert.equal(moderatedFeedback.response.ok, true, JSON.stringify(moderatedFeedback.data));
 
       const feedbackInvalidated = await serviceRequest(
         `event_editions?select=verification_status,needs_review,last_verified_source_id&id=eq.${encodeURIComponent(editionId)}`
@@ -2148,7 +2171,8 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
       });
       assert.equal(feedbackBlockedVerification.response.ok, false, JSON.stringify(feedbackBlockedVerification.data));
 
-      const resolvedFeedback = await serviceRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+      const resolvedFeedback = await restRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+        token: admin.token,
         method: "PATCH",
         prefer: "return=representation",
         body: { status: "resolved" }
@@ -2212,8 +2236,12 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
 
       } finally {
         if (feedbackId != null) {
-          const feedbackCleanup = await serviceRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
-            method: "DELETE"
+          // Admin moderation intentionally has no DELETE grant. Neutralize the
+          // synthetic report; the disposable local staging database is removed.
+          const feedbackCleanup = await restRequest(`user_feedback?id=eq.${encodeURIComponent(feedbackId)}`, {
+            token: admin.token,
+            method: "PATCH",
+            body: { status: "resolved", event_id: null }
           });
           assert.equal(feedbackCleanup.response.ok, true, JSON.stringify(feedbackCleanup.data));
         }

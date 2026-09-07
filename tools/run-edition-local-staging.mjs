@@ -194,6 +194,16 @@ async function removeExactStageVolumes() {
     await dockerEngineRequest("DELETE", `/volumes/${encodeURIComponent(volume.Name)}`);
     console.log(`Removed disposable local staging volume ${volume.Name}.`);
   }
+  const remaining = await dockerEngineRequest(
+    "GET",
+    `/volumes?filters=${dockerFilters({ label: [label] })}`
+  );
+  assert.deepEqual(
+    remaining?.Volumes || [],
+    [],
+    "Disposable staging volumes remain after cleanup; refusing to reuse test data."
+  );
+  console.log("Disposable local staging project has no retained database volumes.");
 }
 
 function verifyWindowsLoopbackListeners() {
@@ -324,7 +334,9 @@ try {
   await cleanupDockerStageResources();
   runSupabase(["start", "-x", excludedServices]);
   verifyWindowsLoopbackListeners();
-  runSupabase(["db", "reset", "--local", "--no-seed"]);
+  // The exact project volumes were removed above, so start already rebuilds
+  // the schema from all migrations. A second reset is redundant and can hang
+  // while waiting for an exited Auth migration container with Podman on Windows.
   verifyMigrationHistory();
   runSupabase([
     "db", "lint", "--local", "--schema", "public,private",

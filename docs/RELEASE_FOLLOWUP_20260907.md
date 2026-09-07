@@ -8,12 +8,44 @@ Der aktuelle Nachweis steht im
 unten zu noch fehlender Laufzeit oder nicht erfolgten Datenbankwrites beziehen
 sich ausschließlich auf den ersten Folgeschritt. Die Website-Datensperre bleibt.
 
-Fortschreibung vom 8. September: Die
+Erste Fortschreibung vom 8. September: Die
 [Braunenberg-Quellenreparatur](P0_BRAUNENBERG_SOURCE_RECOVERY_20260908.md)
 ist mit Worker v22/4.1.6 und einer gezielten 20-Sekunden-Domainregel produktiv.
 Der echte Abruf gelingt in 14,45 Sekunden; extrahierte Vorschläge bleiben im
 Review. Mülheims 14-Felder-Review ist vorbereitet. Der Website-Refresh bleibt
 bei 332 Discovery-Editionen und 0,90 % Frische vor dem Schreiben gesperrt.
+
+Weitere Fortschreibung vom 8. September, nach 01:21 MESZ: Der
+[Faktenbatch 03](P0_BATCH_03_20260908.md) ist inzwischen für sieben bestehende
+Events und ihre 2026-Editionen produktiv angewendet und separat nachgeprüft.
+29 private Vorher-/Nachher-Snapshots einschließlich Batchmanifest sichern
+den Vorgang. Die sieben Editionen enthalten 19 gespeicherte Formate:
+18 fachlich geprüfte Formate der sechs vollständigen Pakete sowie
+Braunenbergs unverändertes bisheriges Format. Der dortige Konflikt zwischen
+30, 32 und rund 32,5 km verhindert weiterhin die Vollattestierung.
+Die Faktenänderungen selbst erzeugen keinen Frischenachweis.
+
+Worker v23 mit `source-monitor-4.1.7-phase-a-shadow-http-framing` ist ebenfalls
+produktiv verifiziert: zwölf Quelldateien stimmen überein, JWT-Schutz ist aktiv.
+Der echte Quellenaufruf 6524 mit Workflowlauf 4961 und Crawlergebnis 2659
+liefert HTTP 200 und unveränderten Inhalt ohne öffentliche Faktenänderung.
+Die isolierte SQL-Restoreprobe samt Wiederholungs-/Driftabwehr und Rücknahme
+ist bestanden. Die sechs echten Adminattestierungen enthalten jeweils 14
+bestätigte Felder und keine Unsicherheit; der öffentliche Guard bestätigt
+alle sechs neuen und drei bisherigen Nachweise. Vier Braunenberg-Vorschläge
+sind mit echter Admin-Zuordnung abgeschlossen (zwei `superseded`, zwei
+`rejected`); die offene Distanzfrage bleibt gesperrt. Die produktiven
+Zugriffstests sind grün. Der neue reguläre Refresh bleibt bei 332/400 Discovery
+und 2,71/55 % Frische vor dem Schreiben gesperrt; 989 Archiv-Editionen und
+49,40 % Vollständigkeit sind erhalten. Die Gates bleiben unverändert.
+Ein neues Wrangler-Deployment wurde nicht ausgeführt.
+
+Abschlussprüfung dieses Pakets: `npm run test:code` erfolgreich,
+**93/93 Browserfälle** in 4,8 Minuten. Die 18 produktiven Zugriffsprüfungen
+(7 anonyme Zugriffe, 5 Frischegrenzen, 6 Source-Monitor-Berechtigungen)
+sind ebenfalls grün. `npm run check` bleibt wegen des vorhandenen
+Datenpakets gesperrt. Die geprüften Frontend-/Backend-/Test-/Protokolldateien
+bilden den nächsten technischen GitHub-Stand, unabhängig vom Website-Gate.
 
 ## Ergebnis
 
@@ -89,6 +121,15 @@ korrigiert und über eine echte Admin-Sitzung mit 14 quellengebundenen Feldern
 attestiert. Der reguläre Refresh bestätigt jetzt 3 von 332 frischen Editionen
 (0,90 %); Bestand und Frische bleiben unter den bestehenden Releasegrenzen.
 Die ursprüngliche Diagnose unten bleibt als Ausgangsstand dokumentiert.
+
+**Fortschreibung nach Faktenbatch 03:** Die vorgeschlagenen Korrekturen für
+Mülheim, Hanau, den Firmenlauf Bamberg, Bedburg, DeisterCrossing und Future Run
+sind angewendet und ihre sechs vollständigen 14-Felder-Pakete inzwischen
+getrennt über die echte Admin-Sitzung attestiert. Braunenbergs sichere Orts-, Beschreibungs-
+und Anmeldekorrekturen sind ebenfalls angewendet, sein Distanzpaket bleibt
+unverändert. Der offizielle 18.09.2027 ist als eigener Braunenberg-Kandidat
+belegt, nicht als vollständige Folgeedition veröffentlicht. Die historischen
+Diagnosen und Prioritäten unten beschreiben den Ausgangspunkt dieser Arbeit.
 
 Die heutige Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
 989 Archiv-Editionen, 0 gültige Frischenachweise und 164 vollständige Einträge

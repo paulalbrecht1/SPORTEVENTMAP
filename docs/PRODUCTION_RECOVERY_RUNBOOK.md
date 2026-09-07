@@ -227,32 +227,63 @@ lokalen Abweichungen wurden nicht pauschal nachgezogen. Details stehen im
 
 | Feld | Wert |
 | --- | --- |
-| Verifizierter Dump | `sporteventmap-production-20260907T223002394Z.sembackup` |
-| Backup-Zeitfenster (UTC) | 2026-09-07 22:30:02 bis 22:31:31 |
-| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 22:38:53 |
-| Restore-Dauer | 37,726 Sekunden |
-| Verschlüsselte Dateigröße | 8.707.121 Bytes |
-| SHA-256 der verschlüsselten Datei | `cf3b71577278e0d944502cc3b2abf8a18622bb3390e3fff2f6e3273ff4cec0e8` |
+| Verifizierter Dump | `sporteventmap-production-20260907T230817138Z.sembackup` |
+| Backup-Zeitfenster laut Manifest (UTC) | 2026-09-07 23:09:31 bis 23:10:55 |
+| Verschlüsseltes Backup veröffentlicht (UTC) | 2026-09-07 23:11:04 |
+| Lokaler Restore (UTC) | 2026-09-07 23:12:21 bis 23:13:42 |
+| Restore-Dauer | 80,685 Sekunden |
+| Verschlüsselte Dateigröße | 8.711.859 Bytes |
+| SHA-256 der verschlüsselten Datei | `b3e850601b6669ae4b1092337bdd9a8a013f03f93dc0d3ef32482b9511f4be41` |
 | Kern-Counts | 999 Events; 1.022 Editionen; 1.016 Sources; 40 Migrationen |
 | Nutzerstrukturen | 5 Auth-Nutzer; 5 Profile; 36 Favoriten; 48 Planner-Einträge |
 | Schema/Datenintegrität | bestanden |
 | RLS/Nutzerisolation | bestanden |
 | `run_event_validation(...)` für normalen Nutzer | verweigert |
-| Vollständiger Faktenreview vom 7. September | Beide Faktenbatches sowie die drei anschließend über echte Admin-Sitzung erteilten Frischenachweise enthalten |
+| Vorherige Faktenreviews vom 7. September | Faktenbatches 01/02 sowie die drei anschließend über echte Admin-Sitzung erteilten Frischenachweise enthalten |
 | Schemaabgleich im aktuellen Dump | Migrationen `20260907205727` und `20260907205741` enthalten |
 | Vollständiger lokaler Neuaufbau | 50 Migrationen, SQL-Lint, 22/22 RLS, 61 SQL- und vier REST-Prüfungen bestanden; Staging bereinigt |
-| Braunenberg-Konfiguration und Wiederholung | Apply, Verify, Wiederholungssperren, Rollback-Driftsperre und vollständige Rücknahme bestanden; übrige Policies/Fakten/Nutzerdaten unverändert |
-| Restoreumgebung nach Probe | Exaktes Projekt `sport-event-map-recovery-drill-b8dbc423`, beide Volumes und Klartextverzeichnis am 7. September um 22:46:17 UTC entfernt; Backup erhalten |
+| Faktenbatch 03 lokal geprobt (UTC) | 2026-09-07 23:19:52 bis 23:20:07; Apply, Read-only-Verify, Vorzustandsdrift, Wiederholungssperre, Rollback-Driftsperre, vollständige Rücknahme und erneute Rollbacksperre bestanden |
+| Umfang der lokalen Faktenprobe | 7 Events, 7 bestehende Editionen, 19 Formatobjekte und 29 Apply-Snapshots; Quellen, Nutzerreferenzen und übrige Datensätze unverändert |
+| Restoreumgebung nach Probe | Exaktes Projekt `sport-event-map-recovery-drill-e9b2a440`, 3 Container, 2 Volumes und Klartextverzeichnis am 7. September um 23:26:06 UTC entfernt |
+| Negative Abschlussinventur | Keine Clone-Container, Clone-Volumes oder passenden Klartextverzeichnisse; die vier vorhandenen Entwicklungscontainer und ihr DB-Volume in identischem Zustand erhalten |
+| Backup nach Bereinigung | SHA-256 vor/nachher identisch; verschlüsselte Sicherung und Berichte erhalten |
 | Production während des Drills verändert | nein |
 
 Der Nachweis liegt unter
-`backups/production/restore-reports/sporteventmap-production-20260907T223002394Z-restore-report.json`.
-Der ergänzende Konfigurationsnachweis liegt unter
-`exports/p0-review-20260908/braunenberg-timeout-rehearsal.json`.
-Der Dump dokumentiert den Stand nach Schemaabgleich, Faktenbatch 02 und den
-drei Frischeattestierungen, vor der Braunenberg-Quellenreparatur. Die lokale
-Probe verändert den gesicherten Produktionsstand nicht. Die historischen
-Restore-/Faktenberichte des vorherigen Dumps `20260907T212209412Z` bleiben erhalten.
+`backups/production/restore-reports/sporteventmap-production-20260907T230817138Z-restore-report.json`.
+Manifest und verschlüsselter Dump liegen unter `backups/production/`.
+Die angegebenen Backup-Zeiten stammen aus den beiden Manifest-Snapshots;
+die Uhrzeit im Dateinamen ist der frühere Start des Backup-Auftrags.
+
+Der ergänzende Faktennachweis liegt unter
+`exports/p0-batch-20260908/rehearsal-report.json`. Er enthält die SHA-256-Werte
+der tatsächlich geprobten Apply-, Verify- und Rollback-Dateien. Die private
+Backuptabelle enthält pro Apply sieben Event- und sieben Editionszeilen vor
+der Änderung, dieselben 14 Zeilen danach und einen Batch-Manifestdatensatz.
+Eine erneute Anwendung und eine Rücknahme nach einem zwischenzeitlichen
+Fakten- oder Frischeverifikations-Edit werden abgewiesen. Der Rollback stellt
+nur die berührten Fakten wieder her und belässt den Reviewbedarf.
+
+Die Abschlussinventur ist unter
+`exports/p0-batch-20260908/cleanup-report.json` gespeichert; das verwendete
+Skript liegt unter `exports/p0-batch-20260908/cleanup-clone.ps1`. Vor dem Stop
+wurden der Projektbezeichner in `supabase/config.toml`, die exakten
+Container-/Volume-Labels, der absolute Pfad und das Fehlen von Reparse-Points
+geprüft. Das ausschließlich hierfür verwendete Verzeichnis
+`%LOCALAPPDATA%\SportEventMap\RestoreDrill\sport-event-map-recovery-drill-e9b2a440-e269f46d0d8741fd974fdcdb18266491`
+existiert nicht mehr. IDs, Startzeiten und Zustand der übrigen Container sowie
+der Erstellungszeitpunkt ihres Datenbank-Volumes blieben unverändert.
+
+Der Dump dokumentiert den Stand nach Schemaabgleich, Faktenbatch 02, den
+drei damaligen Frischeattestierungen und der Braunenberg-Timeoutkorrektur,
+**vor Faktenbatch 03**. Nach erfolgreichem lokalem Rehearsal wurden die sieben
+begrenzten Faktenpatches produktiv angewendet und separat lesend verifiziert.
+Diese Anwendung erteilt keine Frischeattestierung; Braunenbergs ungeklärte
+vollständige Distanzstruktur bleibt ausdrücklich offen. Details zur fachlichen
+Abnahme stehen im [Protokoll zu Faktenbatch 03](P0_BATCH_03_20260908.md).
+Der lokale Drill selbst hat Production nicht verändert. Die historischen
+Berichte der Dumps `20260907T212209412Z` und `20260907T223002394Z` einschließlich
+`exports/p0-review-20260908/braunenberg-timeout-rehearsal.json` bleiben erhalten.
 
 Damit ist die Wiederherstellung eines aktuellen Production-Dumps praktisch
 belegt. Nicht abgedeckt sind PITR zwischen zwei Dumps, ein gleichzeitiger Verlust

@@ -1,12 +1,19 @@
 import { SourceFetchError, isBlockedIp } from "./source-monitor-core.mjs";
 
 const encoder = new TextEncoder();
-const decoder = new TextDecoder();
 const FORWARDED_HEADERS = new Set(["accept", "if-none-match", "if-modified-since", "user-agent"]);
 
-async function writeAll(connection, bytes) {
+async function writeAll(connection, bytes, throwIfAborted) {
   let offset = 0;
-  while (offset < bytes.byteLength) offset += await connection.write(bytes.subarray(offset));
+  while (offset < bytes.byteLength) {
+    throwIfAborted();
+    const count = await connection.write(bytes.subarray(offset));
+    throwIfAborted();
+    if (!Number.isInteger(count) || count <= 0 || count > bytes.byteLength - offset) {
+      throw new SourceFetchError("pinned_connect_error", "HTTP-Request konnte nicht vollstaendig geschrieben werden.");
+    }
+    offset += count;
+  }
 }
 
 function isUncleanTlsEof(error) {
@@ -14,94 +21,201 @@ function isUncleanTlsEof(error) {
   return /close_notify|unexpected[ -]?eof|peer closed connection/i.test(message);
 }
 
-async function readAll(connection, limit) {
-  const chunks = [];
-  let total = 0;
-  const buffer = new Uint8Array(16384);
-  while (true) {
-    let count;
-    try {
-      count = await connection.read(buffer);
-    } catch (error) {
-      if (total > 0 && isUncleanTlsEof(error)) break;
-      throw error;
-    }
-    if (count === null) break;
-    total += count;
-    if (total > limit) throw new SourceFetchError("response_too_large", `Gepinnte Antwort ueberschreitet ${limit} Bytes.`, { retriable: false });
-    chunks.push(buffer.slice(0, count));
-  }
+// RFC 9112 sections 6.3, 7.1 and 8: a framed message ends at its declared
+// boundary, while a close-delimited message requires a clean connection EOF.
+// The existing 64 KiB wire allowance also bounds all framing overhead together
+// (interim/final headers, chunk lines and trailers), independently of body size.
+const MAX_FRAMING_BYTES = 65536;
+const MAX_CHUNK_LINE_BYTES = 8192;
+const MAX_INFORMATIONAL_RESPONSES = 8;
+const TOKEN = "[!#$%&'*+.^_`|~0-9A-Za-z-]+";
+const FIELD_NAME = new RegExp(`^${TOKEN}$`);
+const QUOTED_STRING = '"(?:[\\t\\x20\\x21\\x23-\\x5b\\x5d-\\x7e\\x80-\\xff]|\\\\[\\t\\x20-\\x7e\\x80-\\xff])*"';
+const CHUNK_LINE = new RegExp(`^([0-9a-fA-F]+)(?:[ \\t]*;[ \\t]*${TOKEN}(?:[ \\t]*=[ \\t]*(?:${TOKEN}|${QUOTED_STRING}))?)*$`);
+const FORBIDDEN_TRAILERS = new Set(["content-length", "transfer-encoding", "host", "content-encoding"]);
+
+function invalidResponse(message) {
+  return new SourceFetchError("invalid_http_response", message, { retriable: true });
+}
+
+function tooLarge() {
+  return new SourceFetchError("response_too_large", "Gepinnte Antwort ueberschreitet das Body- oder Framinglimit.", { retriable: false });
+}
+
+function concatenate(chunks, total) {
   const output = new Uint8Array(total);
   let offset = 0;
   for (const chunk of chunks) { output.set(chunk, offset); offset += chunk.byteLength; }
   return output;
 }
 
-function indexOfSequence(bytes, sequence, start = 0) {
-  outer: for (let index = start; index <= bytes.length - sequence.length; index += 1) {
-    for (let offset = 0; offset < sequence.length; offset += 1) if (bytes[index + offset] !== sequence[offset]) continue outer;
-    return index;
-  }
-  return -1;
+function decodeHttpLine(bytes) {
+  // HTTP field values may contain opaque bytes, not necessarily UTF-8.
+  let line = "";
+  for (const byte of bytes) line += String.fromCharCode(byte);
+  return line;
 }
 
-function decodeChunked(bytes) {
-  const crlf = encoder.encode("\r\n");
-  const chunks = [];
-  let total = 0;
-  let offset = 0;
-  while (offset < bytes.length) {
-    const lineEnd = indexOfSequence(bytes, crlf, offset);
-    if (lineEnd < 0) throw new SourceFetchError("invalid_http_response", "Ungueltige Chunk-Laengenzeile.", { retriable: true });
-    const sizeToken = decoder.decode(bytes.subarray(offset, lineEnd)).split(";", 1)[0].trim();
-    if (!/^[0-9a-f]+$/i.test(sizeToken)) throw new SourceFetchError("invalid_http_response", "Ungueltige Chunk-Laenge.", { retriable: true });
-    const size = Number.parseInt(sizeToken, 16);
-    offset = lineEnd + 2;
-    if (size === 0) break;
-    if (offset + size + 2 > bytes.length) throw new SourceFetchError("invalid_http_response", "Unvollstaendige Chunk-Antwort.", { retriable: true });
-    const chunk = bytes.slice(offset, offset + size);
-    chunks.push(chunk);
-    total += chunk.byteLength;
-    offset += size + 2;
+function parseField(line) {
+  const colon = line.indexOf(":");
+  const name = line.slice(0, colon);
+  if (colon <= 0 || !FIELD_NAME.test(name) || /[\x00-\x08\x0a-\x1f\x7f]/.test(line.slice(colon + 1))) {
+    throw invalidResponse("Ungueltiger HTTP-Header oder Trailer.");
   }
-  const output = new Uint8Array(total);
-  let position = 0;
-  for (const chunk of chunks) { output.set(chunk, position); position += chunk.byteLength; }
-  return output;
+  return [name.toLowerCase(), line.slice(colon + 1).replace(/^[ \t]+|[ \t]+$/g, "")];
 }
 
-function parseHttpResponse(bytes, pinnedIp) {
-  const separator = encoder.encode("\r\n\r\n");
-  const headerEnd = indexOfSequence(bytes, separator);
-  if (headerEnd < 0 || headerEnd > 65536) throw new SourceFetchError("invalid_http_response", "HTTP-Header fehlt oder ist zu gross.", { retriable: true });
-  const lines = decoder.decode(bytes.subarray(0, headerEnd)).split("\r\n");
-  const statusMatch = lines.shift()?.match(/^HTTP\/1\.[01]\s+(\d{3})(?:\s|$)/i);
-  if (!statusMatch) throw new SourceFetchError("invalid_http_response", "Ungueltige HTTP-Statuszeile.", { retriable: true });
-  const headers = new Headers();
-  for (const line of lines) {
-    const separatorIndex = line.indexOf(":");
-    if (separatorIndex <= 0) throw new SourceFetchError("invalid_http_response", "Ungueltiger HTTP-Header.", { retriable: true });
-    headers.append(line.slice(0, separatorIndex).trim(), line.slice(separatorIndex + 1).trim());
+function createResponseReader(connection, maximumBodyBytes, throwIfAborted) {
+  const buffer = new Uint8Array(16384);
+  let pending = new Uint8Array(0);
+  let received = 0;
+  let framingBytes = 0;
+  let ended = false;
+
+  async function fill() {
+    throwIfAborted();
+    if (ended) return false;
+    let count;
+    try { count = await connection.read(buffer); }
+    catch (error) {
+      throwIfAborted();
+      if (isUncleanTlsEof(error)) throw invalidResponse("TLS-Verbindung endete vor dem vollstaendigen HTTP-Nachrichtenende.");
+      throw error;
+    }
+    throwIfAborted();
+    if (count === null) { ended = true; return false; }
+    if (!Number.isInteger(count) || count <= 0 || count > buffer.byteLength) throw invalidResponse("Ungueltiger TCP-Lesefortschritt.");
+    received += count;
+    if (received > maximumBodyBytes + MAX_FRAMING_BYTES) throw tooLarge();
+    pending = concatenate([pending, buffer.subarray(0, count)], pending.byteLength + count);
+    return true;
   }
+
+  async function line(maximum = MAX_FRAMING_BYTES) {
+    const limit = Math.min(maximum, MAX_FRAMING_BYTES - framingBytes);
+    let scanned = 0;
+    while (true) {
+      for (let index = scanned; index < pending.byteLength - 1; index += 1) {
+        if (pending[index] !== 13 || pending[index + 1] !== 10) continue;
+        if (index + 2 > limit) throw tooLarge();
+        const result = decodeHttpLine(pending.subarray(0, index));
+        framingBytes += index + 2;
+        pending = pending.subarray(index + 2);
+        return result;
+      }
+      if (pending.byteLength >= limit) throw tooLarge();
+      scanned = Math.max(0, pending.byteLength - 1);
+      if (!await fill()) throw invalidResponse("Unvollstaendige HTTP-Zeile.");
+    }
+  }
+
+  async function exactly(length) {
+    const chunks = [];
+    let remaining = length;
+    while (remaining > 0) {
+      if (!pending.byteLength && !await fill()) throw invalidResponse("Unvollstaendige HTTP-Antwort.");
+      const count = Math.min(remaining, pending.byteLength);
+      chunks.push(pending.subarray(0, count));
+      pending = pending.subarray(count);
+      remaining -= count;
+    }
+    return concatenate(chunks, length);
+  }
+
+  async function chunkEnd() {
+    const bytes = await exactly(2);
+    if (bytes[0] !== 13 || bytes[1] !== 10) throw invalidResponse("Chunk-Daten enden nicht mit CRLF.");
+    framingBytes += 2;
+    if (framingBytes > MAX_FRAMING_BYTES) throw tooLarge();
+  }
+
+  async function toCleanEof() {
+    const chunks = [];
+    let total = 0;
+    while (pending.byteLength || await fill()) {
+      total += pending.byteLength;
+      if (total > maximumBodyBytes) throw tooLarge();
+      chunks.push(pending);
+      pending = new Uint8Array(0);
+    }
+    return concatenate(chunks, total);
+  }
+
+  return { line, exactly, chunkEnd, toCleanEof };
+}
+
+async function readHttpResponse(connection, pinnedIp, maximumBodyBytes, throwIfAborted) {
+  const reader = createResponseReader(connection, maximumBodyBytes, throwIfAborted);
+  let status;
+  let version;
+  let headers;
+  let informationalCount = 0;
+  do {
+    const statusMatch = (await reader.line()).match(/^HTTP\/(1\.[01]) ([1-5]\d{2})(?: [\t\x20-\x7e\x80-\xff]*)?$/);
+    if (!statusMatch) throw invalidResponse("Ungueltige HTTP-Statuszeile.");
+    [, version] = statusMatch;
+    status = Number(statusMatch[2]);
+    headers = new Headers();
+    for (let line = await reader.line(); line !== ""; line = await reader.line()) {
+      const [name, value] = parseField(line);
+      headers.append(name, value);
+    }
+    if (headers.has("transfer-encoding") && headers.has("content-length")) {
+      throw invalidResponse("Mehrdeutige HTTP-Antwort mit Transfer-Encoding und Content-Length.");
+    }
+    if (status === 101 || (status < 200 && ++informationalCount > MAX_INFORMATIONAL_RESPONSES)) {
+      throw invalidResponse("Protokollwechsel oder zu viele vorlaeufige HTTP-Antworten.");
+    }
+  } while (status < 200);
   headers.set("x-source-monitor-pinned-ip", pinnedIp);
+  // These responses end at the header, even when metadata describes the
+  // representation that would have been sent in a normal 200 response.
+  if (status === 204 || status === 304) return new Response(null, { status, headers });
+
   const encoding = (headers.get("content-encoding") || "identity").toLowerCase();
-  if (!["", "identity"].includes(encoding)) throw new SourceFetchError("unsupported_content_encoding", `Content-Encoding ${encoding} wird im gepinnten Transport nicht akzeptiert.`, { retriable: false });
-  let body = bytes.slice(headerEnd + separator.byteLength);
-  const status = Number(statusMatch[1]);
-  if (/\bchunked\b/i.test(headers.get("transfer-encoding") || "")) {
-    body = decodeChunked(body);
-  } else if (![204, 205, 304].includes(status) && headers.has("content-length")) {
-    const rawLength = headers.get("content-length")?.trim() || "";
-    if (!/^\d+$/.test(rawLength)) {
-      throw new SourceFetchError("invalid_http_response", "Ungueltiger Content-Length-Header.", { retriable: true });
+  if (encoding !== "identity") throw new SourceFetchError("unsupported_content_encoding", `Content-Encoding ${encoding} wird im gepinnten Transport nicht akzeptiert.`, { retriable: false });
+  let body;
+  if (headers.has("transfer-encoding")) {
+    if (version !== "1.1" || headers.get("transfer-encoding").toLowerCase() !== "chunked") {
+      throw invalidResponse("Nicht unterstuetztes oder mehrdeutiges Transfer-Encoding.");
     }
-    const expectedLength = Number(rawLength);
-    if (!Number.isSafeInteger(expectedLength) || body.byteLength < expectedLength) {
-      throw new SourceFetchError("invalid_http_response", "Unvollstaendige HTTP-Antwort.", { retriable: true });
+    const chunks = [];
+    let total = 0;
+    while (true) {
+      const sizeMatch = (await reader.line(MAX_CHUNK_LINE_BYTES)).match(CHUNK_LINE);
+      if (!sizeMatch) throw invalidResponse("Ungueltige Chunk-Laengenzeile.");
+      const size = Number.parseInt(sizeMatch[1], 16);
+      if (!Number.isSafeInteger(size)) throw invalidResponse("Ungueltige Chunk-Laenge.");
+      if (size === 0) {
+        for (let line = await reader.line(); line !== ""; line = await reader.line()) {
+          const [name] = parseField(line);
+          if (FORBIDDEN_TRAILERS.has(name)) throw invalidResponse("Trailer darf das HTTP-Framing nicht veraendern.");
+          // Trailers are validated and bounded, never merged into trusted headers.
+        }
+        break;
+      }
+      if (status === 205) throw invalidResponse("HTTP 205 darf keinen Inhalt enthalten.");
+      total += size;
+      if (total > maximumBodyBytes) throw tooLarge();
+      chunks.push(await reader.exactly(size));
+      await reader.chunkEnd();
     }
-    if (body.byteLength > expectedLength) body = body.slice(0, expectedLength);
+    body = concatenate(chunks, total);
+  } else if (headers.has("content-length")) {
+    const rawLength = headers.get("content-length");
+    if (!/^\d+$/.test(rawLength) || !Number.isSafeInteger(Number(rawLength))) {
+      // Repeated/list Content-Length is deliberately rejected, even if equal.
+      throw invalidResponse("Ungueltiger oder wiederholter Content-Length-Header.");
+    }
+    const length = Number(rawLength);
+    if (status === 205 && length !== 0) throw invalidResponse("HTTP 205 darf keinen Inhalt enthalten.");
+    if (length > maximumBodyBytes) throw tooLarge();
+    body = await reader.exactly(length);
+  } else {
+    body = await reader.toCleanEof();
   }
-  return new Response([204, 205, 304].includes(status) ? null : body, { status, headers });
+  if (status === 205 && body.byteLength !== 0) throw invalidResponse("HTTP 205 darf keinen Inhalt enthalten.");
+  return new Response(status === 205 ? null : body, { status, headers });
 }
 
 function requestHeaders(url, input) {
@@ -146,12 +260,12 @@ export function createPinnedHttpFetch(runtime) {
           });
           throwIfAborted();
         }
-        await writeAll(connection, encoder.encode(lines.join("\r\n")));
+        await writeAll(connection, encoder.encode(lines.join("\r\n")), throwIfAborted);
         throwIfAborted();
-        const maximum = Number(target.maxResponseBytes || 1500000) + 65536;
-        const bytes = await readAll(connection, maximum);
+        const maximum = Number(target.maxResponseBytes || 1500000);
+        const response = await readHttpResponse(connection, address, maximum, throwIfAborted);
         throwIfAborted();
-        return parseHttpResponse(bytes, address);
+        return response;
       } catch (error) {
         // Closing a timed-out TCP/TLS socket may report a runtime-specific error
         // or even EOF. Preserve the caller's deadline instead of retrying IPs or

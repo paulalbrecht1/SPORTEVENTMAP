@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import "./source-proposal-review.test.mjs";
 import { cleanError, countAcceptedResultCandidate, loadSourceMonitorRuntimeCapabilities, runOptionalStageFourCall } from "../supabase/functions/_shared/source-monitor-worker-outcomes.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");

@@ -289,14 +289,44 @@ Datenbereinigung abgeschlossen.
   drei Produktions-Zugriffsaudits bestanden.
 - [x] Mülheimer Firmenlauf parallel mit 14 vorgeschlagenen Feldern vorbereitet:
   offizieller Startmarker, Campusadresse, Lauf-/Wanderangebot und Anmeldung
-  sind belegt und unabhängig geprüft. Noch keine Faktenänderung oder Attestierung.
-- [ ] Die separat belegten älteren HTTP-Framing-Lücken beheben: vollständige
-  Antworten nicht unnötig bis EOF lesen; unvollständige Chunks und ungeframtes
-  fehlerhaftes TLS-EOF ablehnen. Sie waren nicht Braunenbergs Timeoutursache.
-- [ ] Den vorbereiteten Mülheim-Faktenreview kontrolliert anwenden und
-  attestieren; Braunenbergs Feld-/Distanzkonflikte und neue Vorschläge sowie
-  die übrigen zeitnahen deutschen Problemquellen prüfen. Anschließend
-  mindestens 68 gültige Nettozugänge
+  sind belegt und unabhängig geprüft. Das zunächst vorbereitete Paket wurde
+  anschließend als Teil des Faktenbatches 03 angewendet.
+- [x] Die separat belegten HTTP-Framing-Lücken behoben und Worker
+  `source-monitor-4.1.7-phase-a-shadow-http-framing` als Plattformversion 23
+  produktiv veröffentlicht. Alle zwölf Quelldateien stimmen mit dem geprüften
+  Stand überein; JWT-Schutz bleibt aktiv. Der echte Quellenaufruf 6524,
+  Workflowlauf 4961 und Crawlergebnis 2659 bestätigen HTTP 200 und unveränderten
+  Inhalt ohne öffentliche Faktenänderung. Die Framing-Lücken waren nicht die
+  Ursache des zuvor behobenen Braunenberg-Timeouts.
+- [x] [Faktenbatch 03](P0_BATCH_03_20260908.md) für sieben bestehende
+  2026-Editionen produktiv angewendet und separat nachgeprüft: Mülheim, Hanau,
+  Firmenlauf Bamberg, Bedburg, DeisterCrossing, Future Run und BraunenBerg.
+  Der Nachweis umfasst 29 private Vorher-/Nachher-Snapshots einschließlich
+  Batchmanifest. Gespeichert sind insgesamt 19 Formate: 18 fachlich geprüfte
+  Formate der sechs vollständigen Pakete und Braunenbergs unverändertes altes
+  Format. Die isolierte Restoreprobe einschließlich Wiederholungs-/Driftabwehr
+  und Rücknahme ist bestanden. Eventidentitäten und Nutzerreferenzen bleiben
+  erhalten; die Faktenanwendung attestiert keine Frische.
+- [x] Die sechs vollständigen Feldpakete aus Batch 03 über die echte
+  Admin-Sitzung separat attestiert und den öffentlichen Guard nachgeprüft:
+  sechs neue plus drei bestehende Freigaben gültig, je 14 Felder bestätigt.
+  Regulärer Refresh: 332 Discovery, 989 Archiv, 2,71 % Frische, 49,40 %
+  Vollständigkeit; unveränderte Gates stoppen vor Dateiänderungen.
+- [x] Einzelne Quellenvorschläge per HTML-Dialog begründet ablehnen oder als
+  bereits umgesetzt schließen; tatsächlichen RPC-Status darstellen.
+  Vier Braunenberg-Vorschläge mit echter Admin-Sitzung abgeschlossen:
+  Anmeldelink/EUR `superseded`, Mindestpreis/Streckenextrakt `rejected`.
+- [ ] Braunenbergs Trail-Konflikt von 30/32/rund 32,5 km anhand einer
+  eindeutigen offiziellen Korrektur klären. Keine Vollattestierung bis dahin.
+  Termin 18.09.2027 als separat belegten Kandidaten weiterbearbeiten,
+  ohne Ausgabeinformationen von 2026 zu übernehmen.
+- [x] Produktions-Zugriffsprüfungen bestanden und regulären Refresh mit
+  unveränderten Gates erneut geprüft; der Katalog-Prewrite-Guard bleibt wirksam.
+- [x] Vollständige Codeabnahme bestanden: `npm run test:code` einschließlich
+  **93/93 Browserfällen** grün. Quellen-/Freigaberegressionen, sechs neue
+  Dialogfälle und produktive Zugriffstests bestanden. `npm run check`
+  bleibt wegen des vorhandenen gesperrten Datenpakets rot; kein Gate umgangen.
+- [ ] Weitere priorisierte Quellenreviews und mindestens 68 gültige Nettozugänge
   ergänzen und bei 400 Discovery-Editionen insgesamt mindestens 220 gültige
   Frischenachweise erreichen. Auslaufende Editionen erhöhen diesen Bedarf.
   Extraktion und Faktenkorrektur allein ersetzen keinen Admin-Frischenachweis.
@@ -318,8 +348,13 @@ Frische auf **3 von 332 (0,90 %)** bei weiterhin 989 Archiv-Editionen und
 abgelehnt: Mindestbestand 400 und Frische 55 % bleiben unverändert.
 Die [Braunenberg-Quellenreparatur](P0_BRAUNENBERG_SOURCE_RECOVERY_20260908.md)
 beseitigt anschließend den technischen Abrufblocker, ohne eine fachliche
-Frischefreigabe vorwegzunehmen. Der aktuelle Refresh bleibt bei denselben
-Bestands- und Frischewerten gesperrt.
+Frischefreigabe vorwegzunehmen. Der letzte reguläre Refresh vor Batch 03
+blieb bei denselben Bestands- und Frischewerten gesperrt. Der inzwischen
+angewendete [Faktenbatch 03](P0_BATCH_03_20260908.md) und Worker v23 ändern
+diese Releasegrenzen nicht. Nach sechs neuen Attestierungen bestätigt der
+reguläre Refresh **9 von 332 (2,71 %)**, weiterhin 989 Archiveinträge und
+49,40 % Vollständigkeit. Er stoppt vor dem Schreiben. Ein neues
+Wrangler-Deployment wurde nicht ausgeführt.
 
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.

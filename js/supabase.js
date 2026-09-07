@@ -5334,7 +5334,7 @@ function renderDataOpsProposals() {
       ${proposal.source_context ? `<details class="proposal-review-evidence"><summary>Evidenz anzeigen</summary><p>${escapeAdminHTML(proposal.source_context)}</p></details>` : ""}
       ${warnings.length ? `<div class="proposal-review-warnings"><strong>Validierungswarnungen</strong>${warnings.map(item => `<span>${escapeAdminHTML(item)}</span>`).join("")}</div>` : ""}
       <div class="admin-data-operations-proposal-actions source-monitor-actions">
-        ${isPending ? `<button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}">Übernehmen</button><button type="button" data-dataops-action="edit-proposal" data-proposal-id="${proposal.id}">Bearbeiten &amp; übernehmen</button><button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">Ablehnen</button><button type="button" data-dataops-action="defer-proposal" data-proposal-id="${proposal.id}">Später prüfen</button><button type="button" data-dataops-action="lock-proposal-field" data-proposal-id="${proposal.id}">Feld sperren</button><button type="button" data-dataops-action="approve-similar" data-proposal-id="${proposal.id}">Ähnliche übernehmen</button>` : ""}
+        ${isPending ? `<button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}">Übernehmen</button><button type="button" data-dataops-action="edit-proposal" data-proposal-id="${proposal.id}">Bearbeiten &amp; übernehmen</button><button type="button" data-dataops-action="supersede-proposal" data-proposal-id="${proposal.id}">Bereits umgesetzt</button><button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">Ablehnen</button><button type="button" data-dataops-action="defer-proposal" data-proposal-id="${proposal.id}">Später prüfen</button><button type="button" data-dataops-action="lock-proposal-field" data-proposal-id="${proposal.id}">Feld sperren</button><button type="button" data-dataops-action="approve-similar" data-proposal-id="${proposal.id}">Ähnliche übernehmen</button>` : ""}
         ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a>` : ""}
         ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event öffnen</a>` : ""}
       </div>
@@ -5758,6 +5758,131 @@ function renderReviewPriorityContext(row) {
     ${affectedFields.length ? `<span>Felder: ${escapeAdminHTML(affectedFields.join(", "))}</span>` : ""}
     ${recommendation ? `<span class="is-wide">${escapeAdminHTML(recommendation)}</span>` : ""}
   </div>`;
+}
+
+function buildProposalCloseRequest(proposal, action, notes) {
+  if (!proposal?.id || proposal.proposal_status !== "pending") {
+    throw new Error("Der Vorschlag ist nicht mehr offen. Bitte die Übersicht neu laden.");
+  }
+  if (!["rejected", "superseded"].includes(action)) {
+    throw new Error("Diese Abschlussaktion wird nicht unterstützt.");
+  }
+  const reason = String(notes || "").trim();
+  if (reason.length < 12) throw new Error("Bitte eine nachvollziehbare Begründung mit mindestens 12 Zeichen eintragen.");
+  return {
+    p_proposal_id: proposal.id,
+    p_action: action,
+    p_review_notes: reason,
+    ...(action === "rejected" ? { p_rejection_reason: reason } : {})
+  };
+}
+
+function getProposalReviewOutcome(data, proposalId, requestedAction) {
+  const row = Array.isArray(data) && data.length === 1 ? data[0] : data;
+  if (!row || String(row.id) !== String(proposalId)) {
+    throw new Error("Die Serverantwort bestätigt keinen eindeutigen Vorschlagsstatus. Bitte die Übersicht neu laden.");
+  }
+  const status = row.proposal_status;
+  if (status === "superseded" && ["accepted", "edited_and_accepted"].includes(requestedAction)) {
+    return { message: "Vorschlag nicht übernommen: Der gespeicherte Wert wurde inzwischen geändert (superseded).", type: "error" };
+  }
+  if (status !== requestedAction) {
+    throw new Error(`Unerwarteter Vorschlagsstatus (${status || "unbekannt"}). Bitte die Übersicht neu laden.`);
+  }
+  const messages = {
+    accepted: "Vorschlag übernommen (accepted).",
+    edited_and_accepted: "Bearbeiteten Vorschlag übernommen (edited_and_accepted).",
+    rejected: "Vorschlag mit Begründung abgelehnt (rejected).",
+    superseded: "Vorschlag als bereits umgesetzt geschlossen (superseded)."
+  };
+  if (!messages[status]) throw new Error("Der Server hat keinen Abschluss des Vorschlags bestätigt.");
+  return { message: messages[status], type: "success" };
+}
+
+async function submitDataOpsProposalReview(button, request) {
+  if (button.disabled) return;
+  setButtonLoading(button, true, "Wird gespeichert …");
+  try {
+    const { data, error } = await supabaseClient.rpc("review_event_change_proposal", request);
+    if (error) throw error;
+    const outcome = getProposalReviewOutcome(data, request.p_proposal_id, request.p_action);
+    await loadDataOperations();
+    setDataOpsStatus(outcome.message, outcome.type);
+  } catch (error) {
+    setDataOpsStatus(getFriendlyErrorMessage(error, "Die Vorschlagsentscheidung konnte nicht bestätigt werden."), "error");
+  } finally {
+    setButtonLoading(button, false);
+  }
+}
+
+function openProposalCloseDialog(proposal, action) {
+  if (document.getElementById("proposalCloseDialog")) {
+    throw new Error("Eine Vorschlagsentscheidung ist bereits geöffnet.");
+  }
+  if (!["rejected", "superseded"].includes(action)) throw new Error("Unbekannte Vorschlagsentscheidung.");
+  const alreadyApplied = action === "superseded";
+  const title = alreadyApplied ? "Vorschlag als bereits umgesetzt schließen" : "Vorschlag ablehnen";
+  const event = dataOpsEvents.find(row => String(row.id) === String(proposal.event_id));
+  const dialog = document.createElement("dialog");
+  dialog.id = "proposalCloseDialog";
+  dialog.className = "content-verification-dialog";
+  dialog.style.overflowWrap = "anywhere";
+  dialog.setAttribute("aria-labelledby", "proposalCloseTitle");
+  dialog.setAttribute("aria-describedby", "proposalCloseHelp");
+  dialog.innerHTML = `
+    <form class="content-verification-form" novalidate>
+      <h2 id="proposalCloseTitle">${title}</h2>
+      <p class="content-verification-event">${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</p>
+      <p><strong>Feld:</strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
+      <p><strong>Vorschlag:</strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value ?? proposal.proposed_changes))}</p>
+      <p id="proposalCloseHelp">${alreadyApplied
+        ? "Beschreibe, wo und wie der geprüfte Wert bereits umgesetzt wurde. Diese Aktion schließt nur diesen Vorschlag; die Eventdaten werden dabei nicht erneut geändert."
+        : "Begründe, warum dieser Quellenvorschlag nicht übernommen wird. Die Begründung wird für spätere gleiche Vorschläge gespeichert."}</p>
+      <label for="proposalCloseNotes">Begründung (mindestens 12 Zeichen)</label>
+      <textarea id="proposalCloseNotes" name="notes" rows="4" minlength="12" required></textarea>
+      <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
+      <div class="content-verification-actions">
+        <button type="button" data-proposal-close-cancel>Abbrechen</button>
+        <button type="submit">${alreadyApplied ? "Als bereits umgesetzt schließen" : "Mit Begründung ablehnen"}</button>
+      </div>
+    </form>`;
+  const form = dialog.querySelector("form");
+  const errorMessage = dialog.querySelector('[role="alert"]');
+  const previousFocus = document.activeElement;
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      if (dialog.open) dialog.close();
+      dialog.remove();
+      if (previousFocus?.isConnected) previousFocus.focus();
+      resolve(value);
+    };
+    dialog.addEventListener("cancel", event => { event.preventDefault(); finish(null); });
+    dialog.addEventListener("close", () => finish(null));
+    dialog.querySelector("[data-proposal-close-cancel]").addEventListener("click", () => finish(null));
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      errorMessage.hidden = true;
+      try {
+        const current = dataOpsProposals.find(row => String(row.id) === String(proposal.id));
+        finish(buildProposalCloseRequest(current, action, form.elements.notes.value));
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.hidden = false;
+        errorMessage.focus();
+      }
+    });
+    document.body.append(dialog);
+    try {
+      dialog.showModal();
+      dialog.querySelector("[data-proposal-close-cancel]").focus();
+    } catch (error) {
+      dialog.remove();
+      reject(error);
+    }
+  });
 }
 
 function buildContentVerificationEvidence(context, input) {
@@ -6755,8 +6880,7 @@ async function handleDataOpsAction(button) {
   }
   if (action === "approve-proposal") {
     const notes = "Im Admin-Dashboard geprüft und freigegeben.";
-    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: button.dataset.proposalId, p_action: "accepted", p_review_notes: notes });
-    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    await submitDataOpsProposalReview(button, { p_proposal_id: button.dataset.proposalId, p_action: "accepted", p_review_notes: notes });
     return;
   }
   const proposal = dataOpsProposals.find(item => String(item.id) === String(button.dataset.proposalId));
@@ -6765,15 +6889,16 @@ async function handleDataOpsAction(button) {
     if (entered == null) return;
     let editedValue;
     try { editedValue = JSON.parse(entered); } catch { editedValue = entered; }
-    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: "Im Admin-Dashboard bearbeitet und freigegeben.", p_edited_value: editedValue });
-    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der bearbeitete Vorschlag konnte nicht übernommen werden."), "error"); else await loadDataOperations();
+    await submitDataOpsProposalReview(button, { p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: "Im Admin-Dashboard bearbeitet und freigegeben.", p_edited_value: editedValue });
     return;
   }
-  if (action === "reject-proposal" && proposal) {
-    const reason = window.prompt("Ablehnungsgrund (wird zur Duplikatunterdrückung gespeichert):", "Quelle oder Wert ist nicht maßgeblich.");
-    if (!reason?.trim()) return;
-    const { error } = await supabaseClient.rpc("review_event_change_proposal", { p_proposal_id: proposal.id, p_action: "rejected", p_review_notes: "Im Admin-Dashboard geprüft und nicht übernommen.", p_rejection_reason: reason.trim() });
-    if (error) setDataOpsStatus(getFriendlyErrorMessage(error, "Der Vorschlag konnte nicht geschlossen werden."), "error"); else await loadDataOperations();
+  if (["reject-proposal", "supersede-proposal"].includes(action) && proposal) {
+    try {
+      const request = await openProposalCloseDialog(proposal, action === "supersede-proposal" ? "superseded" : "rejected");
+      if (request) await submitDataOpsProposalReview(button, request);
+    } catch (error) {
+      setDataOpsStatus(getFriendlyErrorMessage(error, "Die Vorschlagsentscheidung konnte nicht geöffnet werden."), "error");
+    }
     return;
   }
   if (action === "defer-proposal" && proposal) {

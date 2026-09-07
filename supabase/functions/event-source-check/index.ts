@@ -15,7 +15,7 @@ import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 import { cleanError, countAcceptedResultCandidate, loadSourceMonitorRuntimeCapabilities, runOptionalStageFourCall } from "../_shared/source-monitor-worker-outcomes.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.6-phase-a-shadow-pinned-timeout";
+const WORKER_VERSION = "source-monitor-4.1.7-phase-a-shadow-http-framing";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };

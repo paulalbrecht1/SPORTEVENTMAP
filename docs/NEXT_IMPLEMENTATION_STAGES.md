@@ -1,6 +1,6 @@
 # Nächste Umsetzungsstufen
 
-Stand: 4. September 2026
+Stand: 7. September 2026
 
 Dieses Dokument ist die verbindliche Reihenfolge für die nächsten
 Produkt- und Entwicklungsarbeiten an SportEventMap. Es übersetzt die
@@ -182,6 +182,51 @@ können nicht unbemerkt veröffentlicht werden.
 Der Live-Export ist damit bewusst **blockiert**. Die Grenzwerte werden nicht an
 den schlechteren Ist-Zustand angepasst; P0 wird erst nach der fachlichen
 Datenbereinigung abgeschlossen.
+
+### Fortsetzung vom 7. September 2026
+
+- [x] Vorhandene mobile Discovery-, Navigations- und Scrollkorrekturen unabhängig
+  geprüft: 23 gezielte Browserfälle, statischer Smoke und Layout-Audit grün.
+  Der Änderungssatz ist als `19dc4f4` auf GitHub gesichert.
+- [x] Den vorhandenen Cloudflare-Release über Wrangler lesend abgeglichen;
+  Release-Metadaten und kritische Datei-Hashes der unveränderlichen
+  Deployment-URL sowie anonyme Production-Zugriffe erfolgreich geprüft.
+- [x] Technische Codeprüfungen über `test:code` vom aktuellen Datenzustand
+  getrennt. `test:all` verlangt weiterhin zuerst sämtliche Release-Gates.
+  Eine bestandene Codeprüfung ersetzt keine Daten- oder Sicherheitsfreigabe.
+- [x] `test:code` vollständig erfolgreich ausgeführt, einschließlich aller
+  83 Browserfälle. Die zusätzliche isolierte Prüfung der Release-Einstiegspunkte
+  und Paketintegrität ist ebenfalls grün.
+- [x] Build und Paketverifikation an denselben verpflichtenden Releasecheck
+  gebunden. Die echte Negativprobe bestätigt: Bei roten Datengates bleiben
+  `dist/`, Eventseiten, Daten und Sitemap bytegleich erhalten.
+- [x] Den aktuellen Live-Katalog und Reviewblocker ausschließlich lesend
+  erhoben: 332 Discovery-Editionen, davon 277 Deutschland, 989 Archiv-Editionen,
+  0 gültige Frischenachweise, 164 vollständige Einträge (49,40 %).
+- [x] Den regulären `data:refresh-public` erneut ausgeführt: Der Exporter
+  verweigert diesen Bestand vor dem Schreiben wegen 332 statt mindestens 400
+  Discovery-Editionen und 0 statt mindestens 55 % Frische.
+- [x] Einen ersten fachlichen Korrekturbatch identifiziert: wepLAUF
+  (Distanz/Startort), Friedberger Halbmarathon (Anmeldestatus) und Airport Race
+  (Startadresse/Geodaten). Veranstalterangaben widersprechen bestehenden Feldern;
+  technische Queue-Bereitschaft darf deshalb keine Verifizierung auslösen.
+- [ ] Quellenbelege des ersten Batches vollständig prüfen, erforderliche
+  Geonachweise ergänzen und die Faktenkorrektur am Quellsystem mit Vorherstand,
+  Änderungsprotokoll und Nachprüfung durchführen. Erst danach neu attestieren.
+- [ ] Die übrigen Quellen-, Feld- und Reviewkonflikte in priorisierten Batches
+  auflösen und gültige künftige Editionen ergänzen, bis die unveränderten
+  Kataloggates erfüllt sind.
+- [ ] Lokale Docker-/Supabase-Testumgebung wiederherstellen und die vollständige
+  RLS-Suite einschließlich erfolgreicher Admin-Verifikation ausführen.
+- [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
+  Production-Upload desselben geprüften Pakets ausführen.
+
+Der technische GitHub-Stand kann nach bestandenen Codeprüfungen weitergeführt
+werden; die Produktionsveröffentlichung bleibt an die vollständige Abnahme
+gebunden. Der letzte veröffentlichte Stand ist weiterhin
+`20260901-mobile-stability-v84` (`8f6ae0e`). P0 ist nicht abgeschlossen.
+Prüfnachweise, Abgrenzung und nächste Datenarbeiten stehen im
+[Release-Folgeprotokoll](RELEASE_FOLLOWUP_20260907.md).
 
 ## P1 – Vollständiger, verifizierter Deutschland-Katalog
 

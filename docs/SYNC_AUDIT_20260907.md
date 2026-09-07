@@ -2,6 +2,11 @@
 
 Stand: 7. September 2026. Alle Production-Abfragen in diesem Audit waren lesend.
 
+Dieser Ausgangsaudit hält den früheren Stand dieses Tages fest. Der spätere
+technische Abschluss mit 83 erfolgreichen Browserfällen, GitHub-Integration
+und weiterhin gesperrtem Production-Release steht im
+[Release-Folgeprotokoll](RELEASE_FOLLOWUP_20260907.md).
+
 ## Ergebnis
 
 GitHub `main`, lokales `main` und der bestehende Cloudflare-Release gehören zum

@@ -1,5 +1,13 @@
 # Release-Folgeprotokoll vom 7. September 2026
 
+Dieses Protokoll beschreibt den ersten Release-/GitHub-Abgleich. Die danach
+beauftragte Fortsetzung hat drei Faktenkorrekturen produktiv angewendet, die
+RLS-Testumgebung wiederhergestellt und den Crawlerfix gezielt veröffentlicht.
+Der aktuelle Nachweis steht im
+[P0-Faktenbatch-Protokoll](P0_EVENT_FACTS_BATCH_20260907.md); historische Aussagen
+unten zu noch fehlender Laufzeit oder nicht erfolgten Datenbankwrites beziehen
+sich ausschließlich auf den ersten Folgeschritt. Die Website-Datensperre bleibt.
+
 ## Ergebnis
 
 Der Nutzer hat die Veröffentlichung fertiger Änderungen über Wrangler,

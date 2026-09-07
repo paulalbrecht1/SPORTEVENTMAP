@@ -210,14 +210,31 @@ Datenbereinigung abgeschlossen.
   (Distanz/Startort), Friedberger Halbmarathon (Anmeldestatus) und Airport Race
   (Startadresse/Geodaten). Veranstalterangaben widersprechen bestehenden Feldern;
   technische Queue-Bereitschaft darf deshalb keine Verifizierung auslösen.
-- [ ] Quellenbelege des ersten Batches vollständig prüfen, erforderliche
-  Geonachweise ergänzen und die Faktenkorrektur am Quellsystem mit Vorherstand,
-  Änderungsprotokoll und Nachprüfung durchführen. Erst danach neu attestieren.
+- [x] Den belegten Teil des ersten Faktenbatches nach unabhängigem Review,
+  aktuellem Backup und erfolgreicher lokaler Apply-/Rollbackprobe am Quellsystem
+  korrigiert: wepLAUF-Adresse/Anmeldung, Friedberg ausgebucht/21,1 km/Startpunkt
+  und Airport-Race-Startort/Anmeldung. 37 Feldaudits, 13 private Snapshots und
+  produktive Nachprüfung bestanden. Alle drei Editionen bleiben `needs_review`;
+  ungeklärte wepLAUF-Distanzen/-Koordinaten erhalten keinen Frischenachweis.
 - [ ] Die übrigen Quellen-, Feld- und Reviewkonflikte in priorisierten Batches
   auflösen und gültige künftige Editionen ergänzen, bis die unveränderten
   Kataloggates erfüllt sind.
-- [ ] Lokale Docker-/Supabase-Testumgebung wiederherstellen und die vollständige
-  RLS-Suite einschließlich erfolgreicher Admin-Verifikation ausführen.
+- [x] Vorhandene Podman-/Supabase-Testumgebung wiederhergestellt: 48 Migrationen
+  frisch angewandt, SQL-Lint und 22/22 RLS-/Auth-Tests bestanden. Temporäre
+  Testcontainer, Volumes und entschlüsselte Restorekopie anschließend entfernt.
+- [x] Cookie-Root-Klassen im Source-Monitor korrigiert und gezielt als Worker
+  v20/Normalisierung sem-v3 veröffentlicht. Mülheimer Firmenlauf wird jetzt auch
+  im echten IP-gepinnten Workerbetrieb gelesen. Braunenbergs Verbindungsfehler
+  bleibt offen; beide automatischen Veröffentlichungsflags bleiben aus.
+- [ ] Die nun konkret belegte Worker-/Schemaabweichung gezielt abgleichen:
+  fehlende Feldkontrollen, Proposalspalten und vier Extraktions-/Stage-Four-RPCs.
+  Dazu gehört die fehlerhafte Zählung ablehnender Ergebnis-RPC-Antworten.
+  Kein pauschales Nachziehen historischer Migrationen oder Erweitern von Rechten.
+
+Nachweise und verbleibende Abgrenzungen stehen im
+[P0-Faktenbatch-Protokoll](P0_EVENT_FACTS_BATCH_20260907.md). Der erneute reguläre
+Export bleibt nach dem Batch bei 332 Discovery und 0 % Frische vor dem Schreiben
+gesperrt; der Website-Release bleibt unverändert.
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.
 

@@ -226,15 +226,56 @@ Datenbereinigung abgeschlossen.
   v20/Normalisierung sem-v3 veröffentlicht. Mülheimer Firmenlauf wird jetzt auch
   im echten IP-gepinnten Workerbetrieb gelesen. Braunenbergs Verbindungsfehler
   bleibt offen; beide automatischen Veröffentlichungsflags bleiben aus.
-- [ ] Die nun konkret belegte Worker-/Schemaabweichung gezielt abgleichen:
+- [x] Die konkret belegte Worker-/Schemaabweichung gezielt abgeglichen:
   fehlende Feldkontrollen, Proposalspalten und vier Extraktions-/Stage-Four-RPCs.
   Dazu gehört die fehlerhafte Zählung ablehnender Ergebnis-RPC-Antworten.
-  Kein pauschales Nachziehen historischer Migrationen oder Erweitern von Rechten.
+  Extraktionsschema, geschützter Faktenreview und lesender Fähigkeitenvertrag
+  sind implementiert. Auf dem frischen Production-Restore bestanden 60
+  dynamische SQL-Prüfungen; alle synthetischen Fixtures wurden zurückgerollt.
+  Stage Four bleibt dort nicht installiert und wird vom Worker ausdrücklich als
+  nicht verfügbar behandelt. Der vollständige Neuaufbau bestand mit 50
+  Migrationen, SQL-Lint, 22/22 RLS-/Auth-Tests, 61 SQL- und vier REST-Prüfungen.
+  Beide neuen Migrationen sind produktiv angewendet; Worker v21 mit Kennung
+  `4.1.5` und unverändertem JWT-Schutz ist anhand aller zwölf Dateien bestätigt.
+  Production hat jetzt 40 History-Einträge; zehn ältere lokale Migrationen
+  wurden bewusst nicht nachgezogen.
+- [x] Echte Quellenläufe für Hermannslauf und Mainz nach dem Rollout geprüft:
+  HTTP 200, null Fehler und zusammen sieben neue, unangewendete
+  `pending`-Vorschläge. Fehlendes Stage Four wird ausdrücklich übersprungen.
+  Events, Editionen, Quellen, alte Vorschläge und öffentliche Fakten bleiben
+  erhalten; alle sechs Schema-, sieben allgemeinen anonymen und fünf
+  Freshness-Prüfungen bestanden. Der dedizierte `action:smoke` bleibt mangels
+  separater Admin-/Service-Authentifizierung unausgeführt.
+- [x] Nach den produktiven Faktenkorrekturen ein neues verschlüsseltes Backup
+  `sporteventmap-production-20260907T202202971Z.sembackup` erstellt. Restore um
+  20:24:51 UTC in 38,066 Sekunden erfolgreich: Schema, Datenintegrität, RLS und
+  Nutzerisolation bestanden; alle drei Faktenkorrekturen und 13 private
+  Snapshots enthalten. Der vorübergehend behaltene Restore-Clone wurde nach der
+  Abnahme einschließlich Datenbank-/Storage-Volumes und entschlüsseltem
+  Verzeichnis gezielt entfernt; das Backup blieb erhalten. Staging-Volumes und
+  synthetische Testdaten des vollständigen Neuaufbaus sind ebenfalls entfernt.
+- [x] Zusätzlichen Mülheim-Nachlauf (Request 6504, Lauf 4948, Crawl 2655)
+  nachgeprüft: HTTP 200, unveränderter Inhalt, null Fehler, keine Extraktionen
+  oder angewendeten Ergebnisse/Editionen. Beide Autopublishflags bleiben `false`.
+- [ ] Abschließenden GitHub-Commit und Push nachweisen.
+- [ ] Nach dem abgenommenen Schemafix den nächsten fachlichen P0 abschließen:
+  vollständige 14-Felder-Reviews für Friedberg und Airport Race, eindeutige
+  Distanz-/Startkoordinatenbelege für wepLAUF sowie Auflösung ihrer aktuellen
+  Quellen- und Reviewblocker. Danach die zeitnahen deutschen Problemquellen und
+  gültige künftige Editionen bearbeiten. Extraktion und Faktenkorrektur allein
+  ersetzen weiterhin keinen administrativen Frischenachweis.
 
 Nachweise und verbleibende Abgrenzungen stehen im
 [P0-Faktenbatch-Protokoll](P0_EVENT_FACTS_BATCH_20260907.md). Der erneute reguläre
 Export bleibt nach dem Batch bei 332 Discovery und 0 % Frische vor dem Schreiben
 gesperrt; der Website-Release bleibt unverändert.
+Der anschließende technische Prüfschritt ist im
+[P0-Schemaabgleich](P0_SOURCE_SCHEMA_ALIGNMENT_20260907.md) mit getrennten
+Nachweisen für Restore, vollständiges lokales Schema und erfolgreichen
+produktiven Backend-Rollout dokumentiert. Der reguläre Export bestätigt weiter
+332 Discovery, 989 Archiv, 0 % Frische und 49,40 % Vollständigkeit und bleibt vor
+dem Schreiben gesperrt; Frontend-Artefakte und Wrangler-Deployment sind unverändert.
+
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.
 

@@ -62,7 +62,9 @@ deployment_sequence(ordinal, version, name) as (
     (9, '20260821', 'stage_four_observation_lint_fixes'),
     (10, '20260822', 'stage_four_observation_queue_lint'),
     (11, '20260824', 'event_detail_verification_foundation'),
-    (12, '20260904080319', 'freshness_review_verification')
+    (12, '20260904080319', 'freshness_review_verification'),
+    (13, '20260907205727', 'source_monitor_extraction_schema_alignment'),
+    (14, '20260907205741', 'source_monitor_runtime_capabilities')
 ),
 expected_pending(version, name) as (
   select sequence.version, sequence.name

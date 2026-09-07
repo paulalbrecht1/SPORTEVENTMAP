@@ -35,6 +35,7 @@
     "data:prepare-germany-review": "npm run build-events && npm run review:germany-expansion",
     "audit:anon": "node tests/live-anon-access-audit.mjs",
     "audit:freshness:production": "node tests/live-freshness-access-audit.mjs",
+    "audit:source-schema:production": "node tests/live-source-monitor-schema-audit.mjs",
     "backup:production": "pwsh.exe -NoProfile -File tools/backup-production.ps1",
     "backup:restore-drill": "pwsh.exe -NoProfile -File tools/restore-production-backup-drill.ps1",
     "backup:schedule": "pwsh.exe -NoProfile -File tools/install-production-backup-task.ps1",

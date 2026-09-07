@@ -32,6 +32,8 @@ const payload = await response.json().catch(() => ({}));
 if (!response.ok) throw new Error(`Production smoke returned HTTP ${response.status}: ${payload.error || "unknown error"}`);
 const requiredChecks = [
   "database",
+  "capabilities_valid",
+  "extraction_review_ready",
   "ssrf_loopback_blocked",
   "dns_pinned",
   "tls_verified",
@@ -48,6 +50,7 @@ if (payload.ok !== true || failedChecks.length) {
 console.log(JSON.stringify({
   ok: true,
   worker_version: payload.worker_version,
+  runtime_capabilities: payload.runtime_capabilities,
   checks: payload.checks,
   target: payload.target,
   duration_ms: payload.duration_ms

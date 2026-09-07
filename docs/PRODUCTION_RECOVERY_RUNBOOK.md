@@ -115,6 +115,10 @@ leere Datenbank ein; ein zweiter `db reset` ist nicht erforderlich. Dieser hing
 am 7. September mit der installierten CLI unter Podman trotz erfolgreich
 beendeter Auth-Migration. Migration-History, SQL-Lint, Edition-Prüfungen und
 die vollständige Auth-/RLS-Suite werden anschließend ausgeführt. Der Runner
+prüft außerdem die Source-Monitor-Schemaausrichtung mit synthetischen,
+zurückgerollten SQL-Fixtures und tatsächlichen lokalen REST-Aufrufen. Er
+erwartet den vollständigen lokalen Fähigkeitenvertrag; die vorhandenen
+Stage-Four-Einstellungen dürfen dadurch nicht verändert werden. Der Runner
 entfernt seine Testcontainer, Volumes und das temporäre Verzeichnis danach.
 
 Nachweis vom 7. September 2026: 48 Migrationen exakt angewandt; SQL-Lint ohne
@@ -122,8 +126,56 @@ Fehler; Loopback, Edition- und Candidate-Workflow bestanden; **22/22 RLS-Tests
 bestanden**. Der Test prüft insbesondere, dass die Prüfung geänderter Inhalte
 keinen vollständigen Frischenachweis ersetzt und dass die Frischeverifikation
 bei neuen Datenkonflikten oder moderierten Fehlermeldungen ungültig wird.
-Der separate Production-Restore unten prüft die tatsächlich veröffentlichte
-Datenbank mit 38 Migrationen.
+Der separate Production-Restore unten prüft den damaligen veröffentlichten
+Stand mit 38 Migrationen, vor dem anschließenden Schemaabgleich.
+
+Der anschließende vollständige P0-Neuaufbau mit zwei neuen Migrationen bestand:
+**50 Migrationen**, SQL-Lint ohne Fehler, **22/22 RLS-/Auth-Tests**, **61 SQL- und
+vier echte REST-Prüfungen**. Sämtliche synthetischen Fixtures sowie die
+temporären Staging-Container, Volumes und das Arbeitsverzeichnis wurden
+entfernt. Die REST-Prüfungen bestätigten insbesondere den ausführbaren
+Service-Fähigkeitenvertrag ohne zusätzliche Rechte auf das private Schema.
+
+### Begrenzte Regression auf einer Production-Kopie
+
+Für eine unmittelbar folgende lokale Reparaturprobe kann der Restore einmalig
+mit `-KeepLocalEnvironment` behalten werden. Danach nur das vom Report benannte
+isolierte Projekt verwenden; keine bestehende Datenbank zurücksetzen.
+
+Die am 7. September vorübergehend behaltene Umgebung hieß
+`sport-event-map-recovery-drill-0e154138`. Ihr damaliger Workdir lag unter
+`%LOCALAPPDATA%\SportEventMap\RestoreDrill\sport-event-map-recovery-drill-0e154138-157dedf734e24804b96cba6d43d68c4c`.
+Sie enthielt private Produktionsdaten und wurde ausschließlich zur lokalen
+Abnahme verwendet. Die Abschlussbereinigung ist erledigt: exakt dieses
+Testprojekt, seine Datenbank-/Storage-Volumes und die entschlüsselte Kopie
+wurden entfernt; die verschlüsselten Sicherungen blieben erhalten. Die separate
+Umgebung des vollständigen Staging-Neuaufbaus ist ebenfalls bereinigt.
+
+Nach lokaler Anwendung der zwei begrenzten Schemaabgleich-Migrationen bestand
+vor der Bereinigung folgender Lauf; das damalige Verzeichnis existiert nicht mehr:
+
+```powershell
+$restoreWorkdir = Join-Path $env:LOCALAPPDATA 'SportEventMap\RestoreDrill\sport-event-map-recovery-drill-0e154138-157dedf734e24804b96cba6d43d68c4c'
+node tools/run-source-monitor-schema-alignment.mjs $restoreWorkdir absent --sql-only
+```
+
+Ergebnis: **60 SQL-Prüfungen bestanden**, anschließender Nachweis des kompletten
+Fixture-Rollbacks erfolgreich. Der Test legt ausschließlich eigene synthetische
+Nutzer und Profile an. Er prüft reale Service-/Admin-/Nutzer-/Anon-Rollen,
+Quellenbelege, Baselinekonflikte, Reviewgrenzen und den Erhalt von Editionsfakten,
+Referenzschlüsseln sowie alten Verifikationswerten. `extraction_review=true`,
+alle drei Stage-Four-Fähigkeiten `false`; kein Freshness-Bypass aktiv.
+
+Dieser Restore betreibt nur die Datenbank; **REST-Prüfungen wurden dort nicht
+ausgeführt**. Der explizite Modus `--sql-only` weist daher null REST-Prüfungen
+aus. Die vier tatsächlichen REST-Prüfungen bestanden im vollständigen lokalen
+Staging-Lauf. Anschließend wurden die beiden begrenzten Migrationen
+`20260907205727` und `20260907205741` produktiv angewendet und Worker v21
+veröffentlicht. Der produktive Postflight bestätigte unveränderte Fakten,
+elf geschützte Funktionen, zehn Trigger und 507 historische Vorschläge.
+Production enthält jetzt 40 Migration-History-Einträge; die zehn älteren
+lokalen Abweichungen wurden nicht pauschal nachgezogen. Details stehen im
+[Schemaabgleich-Protokoll](P0_SOURCE_SCHEMA_ALIGNMENT_20260907.md).
 
 ## Incident: Production ist beschädigt
 
@@ -174,19 +226,30 @@ Datenbank mit 38 Migrationen.
 
 | Feld | Wert |
 | --- | --- |
-| Verifizierter Dump | `sporteventmap-production-20260907T195130002Z.sembackup` |
-| Backup-Zeitfenster (UTC) | 2026-09-07 19:52:35 bis 19:53:28 |
-| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 19:54:49 |
-| Restore-Dauer | 37,479 Sekunden |
+| Verifizierter Dump | `sporteventmap-production-20260907T202202971Z.sembackup` |
+| Backup-Zeitfenster (UTC) | 2026-09-07 20:22:03 bis 20:23:34 |
+| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 20:24:51 |
+| Restore-Dauer | 38,066 Sekunden |
+| Verschlüsselte Dateigröße | 8.638.179 Bytes |
+| SHA-256 der verschlüsselten Datei | `ad56c9de09245f41198326308e3c8d8cc96604db1cfce7ec6ca0f9d0bf3c617e` |
 | Kern-Counts | 999 Events; 1.022 Editionen; 1.016 Sources; 38 Migrationen |
 | Nutzerstrukturen | 5 Auth-Nutzer; 5 Profile; 36 Favoriten; 48 Planner-Einträge |
 | Schema/Datenintegrität | bestanden |
 | RLS/Nutzerisolation | bestanden |
 | `run_event_validation(...)` für normalen Nutzer | verweigert |
+| Faktenbatch vom 7. September, 20:15 UTC | 3 korrigierte Editionen und 13 private Snapshots enthalten; weiterhin `needs_review` |
+| Anschließende lokale Schemaabgleich-Probe | 60 SQL-Prüfungen und Fixture-Rollback bestanden; keine produktive Schemaänderung |
+| Vollständiger lokaler Neuaufbau | 50 Migrationen, SQL-Lint, 22/22 RLS, 61 SQL- und vier REST-Prüfungen bestanden; Staging bereinigt |
+| Späterer produktiver Schemaabgleich | Migrationen `20260907205727` und `20260907205741` angewendet; Postflight bestanden |
+| Restoreumgebung nach Schemaabgleich | Exaktes Testprojekt, Datenbank-/Storage-Volumes und entschlüsseltes Verzeichnis entfernt; Backup erhalten |
 | Production während des Drills verändert | nein |
 
 Der Nachweis liegt unter
-`backups/production/restore-reports/sporteventmap-production-20260907T195130002Z-restore-report.json`.
+`backups/production/restore-reports/sporteventmap-production-20260907T202202971Z-restore-report.json`.
+Der ergänzende Faktennachweis liegt daneben als
+`sporteventmap-production-20260907T202202971Z-p0-facts-report.json`.
+Der Dump dokumentiert den Stand vor den neuen Schemaabgleich-Migrationen;
+deren lokale Probe ändert den gesicherten Produktionsstand nicht.
 
 Damit ist die Wiederherstellung eines aktuellen Production-Dumps praktisch
 belegt. Nicht abgedeckt sind PITR zwischen zwei Dumps, ein gleichzeitiger Verlust

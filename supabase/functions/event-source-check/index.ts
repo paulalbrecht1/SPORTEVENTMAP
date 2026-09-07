@@ -12,19 +12,16 @@ import {
 } from "../_shared/source-monitor-core.mjs";
 import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
+import { cleanError, countAcceptedResultCandidate, loadSourceMonitorRuntimeCapabilities, runOptionalStageFourCall } from "../_shared/source-monitor-worker-outcomes.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.4-phase-a-shadow-root-consent-fix";
+const WORKER_VERSION = "source-monitor-4.1.5-phase-a-shadow-rpc-outcomes";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
 
 function response(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: jsonHeaders });
-}
-
-function cleanError(error: unknown) {
-  return error instanceof Error ? error.message.slice(0, 2000) : String(error).slice(0, 2000);
 }
 
 function parseJwtPayload(token: string) {
@@ -275,14 +272,13 @@ async function recordObservation(admin: ReturnType<typeof createClient>, claim: 
 
 async function recordPhaseAShadowObservation(
   admin: ReturnType<typeof createClient>,
-  crawlResultId: string | number | null
+  crawlResultId: string | number | null,
+  capabilities: Record<string, unknown>
 ) {
-  if (!crawlResultId) return { recorded: 0, skipped: "crawl_result_missing", dry_run: true };
-  const { data, error } = await admin.rpc("record_stage_four_shadow_observations", {
-    p_crawl_result_id: crawlResultId
+  return runOptionalStageFourCall(capabilities, "stage_four_shadow", async () => {
+    if (!crawlResultId) return { data: { recorded: 0, skipped: "crawl_result_missing", dry_run: true }, error: null };
+    return admin.rpc("record_stage_four_shadow_observations", { p_crawl_result_id: crawlResultId });
   });
-  if (error) throw new Error(`Phase-A shadow observation failed: ${cleanError(error)}`);
-  return data;
 }
 
 
@@ -352,7 +348,7 @@ async function recordLifecycleSignals(
       p_confidence: result.confidence
     });
     if (error) throw new Error(`Result candidate registration failed: ${cleanError(error)}`);
-    resultCount = data ? 1 : 0;
+    resultCount = countAcceptedResultCandidate(data);
   }
   return { editions: editionCount, results: resultCount };
 }
@@ -362,7 +358,8 @@ async function recordExtractionSignals(
   claim: Record<string, unknown>,
   fetched: Record<string, unknown>,
   crawlResultId: string | null,
-  changeStatus: string
+  changeStatus: string,
+  capabilities: Record<string, unknown>
 ) {
   if (!crawlResultId || fetched.notModified || !fetched.rawText || !["changed", "first_seen"].includes(changeStatus)) {
     return { candidates: 0, proposals: 0, adapters: [] };
@@ -409,13 +406,11 @@ async function recordExtractionSignals(
     p_worker_version: WORKER_VERSION
   });
   if (error) throw new Error(`Extraction proposal transaction failed: ${cleanError(error)}`);
-  const { data: automation, error: automationError } = await admin.rpc("simulate_stage_four_for_crawl", {
-    p_crawl_result_id: crawlResultId
-  });
-  if (automationError) throw new Error(`Stage-4 simulation failed: ${cleanError(automationError)}`);
+  const automation = await runOptionalStageFourCall(capabilities, "stage_four_simulation", () =>
+    admin.rpc("simulate_stage_four_for_crawl", { p_crawl_result_id: crawlResultId }));
   return { candidates: extraction.candidates.length, proposals: reviewProposals.length, adapters: extraction.adapters, diagnostics: extraction.diagnostics, transaction: data, automation };
 }
-async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch) {
+async function processClaim(admin: ReturnType<typeof createClient>, claim: Record<string, unknown>, workerId: string, blockedHostnames: string[], fetchImpl: typeof fetch, capabilities: Record<string, unknown>) {
   const startedAt = Date.now();
   const { error: domainPolicyEnsureError } = await admin
     .from("crawler_domain_policies")
@@ -470,15 +465,15 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     }, String(fetchPolicy.userAgent));
     let extraction: Record<string, unknown> = { candidates: 0, proposals: 0, adapters: [], error: null };
     try {
-      extraction = { ...extraction, ...await recordExtractionSignals(admin, claim, fetched, transaction?.result_id || null, changeStatus) };
+      extraction = { ...extraction, ...await recordExtractionSignals(admin, claim, fetched, transaction?.result_id || null, changeStatus, capabilities) };
     } catch (error) {
       extraction.error = cleanError(error);
     }
     let technicalAutomation: Record<string, unknown> = { dry_run: true, public_event_changes: 0, error: null };
     try {
       if (transaction?.result_id) {
-        const { data, error } = await admin.rpc("record_stage_four_crawl_automation", { p_crawl_result_id: transaction.result_id });
-        if (error) throw error;
+        const data = await runOptionalStageFourCall(capabilities, "stage_four_automation", () =>
+          admin.rpc("record_stage_four_crawl_automation", { p_crawl_result_id: transaction.result_id }));
         technicalAutomation = { ...technicalAutomation, ...(data || {}) };
       }
     } catch (error) {
@@ -488,7 +483,7 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     try {
       phaseAObservation = {
         ...phaseAObservation,
-        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null, capabilities)
       };
     } catch (error) {
       phaseAObservation.error = cleanError(error);
@@ -536,7 +531,7 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
     try {
       phaseAObservation = {
         ...phaseAObservation,
-        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null)
+        ...await recordPhaseAShadowObservation(admin, transaction?.result_id || null, capabilities)
       };
     } catch (shadowError) {
       phaseAObservation.error = cleanError(shadowError);
@@ -560,7 +555,7 @@ async function processClaim(admin: ReturnType<typeof createClient>, claim: Recor
   }
 }
 
-async function runProductionSmoke(admin: ReturnType<typeof createClient>, supabaseUrl: string, fetchImpl: typeof fetch) {
+async function runProductionSmoke(admin: ReturnType<typeof createClient>, supabaseUrl: string, fetchImpl: typeof fetch, capabilities: Record<string, unknown>) {
   const startedAt = Date.now();
   const { data: settings, error: settingsError } = await admin
     .from("source_monitor_settings")
@@ -606,8 +601,11 @@ async function runProductionSmoke(admin: ReturnType<typeof createClient>, supaba
   return {
     ok: true,
     worker_version: WORKER_VERSION,
+    runtime_capabilities: capabilities,
     checks: {
       database: Boolean(settings?.singleton),
+      capabilities_valid: true,
+      extraction_review_ready: capabilities.extraction_review === true,
       ssrf_loopback_blocked: ssrfBlocked,
       dns_pinned: Boolean(fetched.pinnedIp),
       tls_verified: fetched.finalUrl?.startsWith("https://"),
@@ -643,6 +641,12 @@ Deno.serve(async request => {
   const sourceId = typeof body.source_id === "string" && body.source_id ? body.source_id : null;
   const workerId = `edge-${crypto.randomUUID()}`;
   const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  let capabilities: Record<string, unknown>;
+  try {
+    capabilities = await loadSourceMonitorRuntimeCapabilities(() => admin.rpc("get_source_monitor_runtime_capabilities"));
+  } catch (error) {
+    return response({ ok: false, error_type: "worker_error", stage: "runtime_capabilities", error: cleanError(error), worker_version: WORKER_VERSION }, 500);
+  }
   let fetchImpl: typeof fetch;
   try {
     fetchImpl = pinnedTransport();
@@ -654,13 +658,13 @@ Deno.serve(async request => {
     if (!["smoke", "service_role", "admin"].includes(authorized.kind)) {
       return response({ error: "Dedicated smoke, service-role or admin authorization required" }, 403);
     }
-    try { return response(await runProductionSmoke(admin, supabaseUrl, fetchImpl)); }
+    try { return response(await runProductionSmoke(admin, supabaseUrl, fetchImpl, capabilities)); }
     catch (error) { return response({ ok: false, worker_version: WORKER_VERSION, error: cleanError(error) }, 500); }
   }
 
   const { data: run, error: runError } = await admin.from("data_workflow_runs").insert({
     job_type: "source_crawl", run_status: "running", trigger_source: authorized.kind,
-    metadata: { worker_id: workerId, worker_version: WORKER_VERSION, requested_source_id: sourceId }
+    metadata: { worker_id: workerId, worker_version: WORKER_VERSION, requested_source_id: sourceId, runtime_capabilities: capabilities }
   }).select("id").single();
   if (runError) return response({ error: cleanError(runError) }, 500);
 
@@ -682,7 +686,7 @@ Deno.serve(async request => {
 
     const blockedHostnames = internalHostnames(supabaseUrl);
     const results = await Promise.all((claimed || []).map((claim: Record<string, unknown>) =>
-      processClaim(admin, claim, workerId, blockedHostnames, fetchImpl)
+      processClaim(admin, claim, workerId, blockedHostnames, fetchImpl, capabilities)
     ));
     const changed = results.filter(result => result.status === "changed").length;
     const errors = results.filter(result => result.error_type).length;
@@ -690,7 +694,7 @@ Deno.serve(async request => {
       run_status: errors === 0 ? "succeeded" : errors < results.length ? "partial" : "failed",
       finished_at: new Date().toISOString(), claimed_count: (claimed || []).length,
       processed_count: results.length, changed_count: changed, error_count: errors,
-      metadata: { worker_id: workerId, worker_version: WORKER_VERSION, scheduled, results }
+      metadata: { worker_id: workerId, worker_version: WORKER_VERSION, scheduled, runtime_capabilities: capabilities, results }
     }).eq("id", run.id);
     return response({ run_id: run.id, scheduled, claimed: (claimed || []).length, changed, errors, results });
   } catch (error) {

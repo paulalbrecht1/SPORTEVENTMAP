@@ -323,6 +323,15 @@ function runRlsAndCandidateSmoke() {
     stdio: "inherit"
   });
   assert.equal(result.status, 0, "Candidate-first and RLS smoke tests failed in disposable staging.");
+  const extraction = spawnSync(process.execPath, [
+    "tools/run-source-monitor-schema-alignment.mjs", stageRoot, "present"
+  ], {
+    cwd: root,
+    encoding: "utf8",
+    env: sanitizedEnvironment(),
+    stdio: "inherit"
+  });
+  assert.equal(extraction.status, 0, "Source Monitor schema and fact-review tests failed in disposable staging.");
 }
 
 let stageWasPrepared = false;

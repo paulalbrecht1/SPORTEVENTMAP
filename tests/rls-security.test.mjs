@@ -852,10 +852,10 @@ await test(
 
 if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   await test(
-    "14. Automation proposals require admin review and source claims require service role",
+    "14. Admin review accepts facts, rejects metadata, and source claims require service role",
     async () => {
       const editions = await serviceRequest(
-        `event_editions?select=id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`
+        `event_editions?select=id,registration_status,last_verified_at&event_id=eq.${encodeURIComponent(publicFixtureEventId)}`
       );
       assert.equal(editions.response.ok, true, JSON.stringify(editions.data));
       const editionId = editions.data[0].id;
@@ -931,8 +931,53 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         method: "POST",
         body: { p_proposal_id: proposal.data[0].id, p_review_notes: "approved in test" }
       });
-      assert.equal(adminApply.response.ok, true, JSON.stringify(adminApply.data));
-      assert.equal(adminApply.data.proposal_status, "accepted");
+      assert.equal(adminApply.response.ok, false, JSON.stringify(adminApply.data));
+      assert.equal(adminApply.data.code, "22023");
+      const rejectedMetadata = await serviceRequest(
+        `event_change_proposals?select=proposal_status&id=eq.${proposal.data[0].id}`
+      );
+      assert.equal(rejectedMetadata.response.ok, true);
+      assert.equal(rejectedMetadata.data[0].proposal_status, "pending");
+
+      const registrationStatus = editions.data[0].registration_status === "sold_out"
+        ? "registration_open" : "sold_out";
+      const factProposal = await serviceRequest("event_change_proposals", {
+        method: "POST",
+        prefer: "return=representation",
+        body: {
+          event_id: publicFixtureEventId,
+          edition_id: editionId,
+          source_id: source.data[0].id,
+          entity_type: "edition",
+          rule_code: "rls_review_gate",
+          proposal_fingerprint: `${runId}-fact`,
+          proposed_changes: { registration_status: registrationStatus },
+          baseline_values: { registration_status: editions.data[0].registration_status },
+          reason: "RLS factual review integration test"
+        }
+      });
+      assert.equal(factProposal.response.ok, true, JSON.stringify(factProposal.data));
+      const normalFactApply = await restRequest("rpc/apply_event_change_proposal", {
+        token: userA.token,
+        method: "POST",
+        body: { p_proposal_id: factProposal.data[0].id, p_review_notes: "must fail" }
+      });
+      assert.equal(normalFactApply.response.ok, false);
+      const adminFactApply = await restRequest("rpc/apply_event_change_proposal", {
+        token: admin.token,
+        method: "POST",
+        body: { p_proposal_id: factProposal.data[0].id, p_review_notes: "fact approved in test" }
+      });
+      assert.equal(adminFactApply.response.ok, true, JSON.stringify(adminFactApply.data));
+      assert.equal(adminFactApply.data.proposal_status, "accepted");
+      const reviewedEdition = await serviceRequest(
+        `event_editions?select=registration_status,last_verified_at,needs_review,last_verified_source_id&id=eq.${editionId}`
+      );
+      assert.equal(reviewedEdition.response.ok, true);
+      assert.equal(reviewedEdition.data[0].registration_status, registrationStatus);
+      assert.equal(reviewedEdition.data[0].last_verified_at, editions.data[0].last_verified_at);
+      assert.equal(reviewedEdition.data[0].needs_review, true);
+      assert.equal(reviewedEdition.data[0].last_verified_source_id, null);
     }
   );
 

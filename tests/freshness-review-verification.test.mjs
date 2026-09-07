@@ -375,4 +375,46 @@ assert.doesNotMatch(admin, /from\("events"\)\.update\(patch\)/,
 assert.ok(page.includes("20260904-p0-freshness-v126"),
   "Admin runtime cache key was not advanced for the freshness workflow.");
 
-console.log("Evidence-backed edition freshness review and safe admin routing verified.");
+// The HTML form keeps the same evidence contract without native prompt/confirm.
+vm.runInContext(extractFunction("buildContentVerificationEvidence"), uiRuntime);
+const evidenceFields = Object.keys(JSON.parse(JSON.stringify(
+  uiRuntime.getFreshnessVerificationStoredValues(freshnessRow)
+)));
+const evidenceContext = {
+  sourceId: "selected-source",
+  sourceUrl: "https://example.com/current",
+  requiredFields: evidenceFields
+};
+const evidenceInput = {
+  confirmed: true,
+  observedInput: JSON.stringify(uiRuntime.getFreshnessVerificationStoredValues(freshnessRow)),
+  uncertainInput: "",
+  confidenceInput: "0,95",
+  notes: "Alle aktuellen Veranstalterfelder einzeln verglichen."
+};
+const builtEvidence = uiRuntime.buildContentVerificationEvidence(evidenceContext, evidenceInput);
+assert.equal(builtEvidence.evidence.confirmed_fields.length, 14);
+assert.equal(builtEvidence.evidence.confidence, 0.95);
+assert.equal(builtEvidence.evidence.source_id, "selected-source");
+assert.deepEqual(JSON.parse(JSON.stringify(builtEvidence.evidence.uncertain_fields)), []);
+for (const [patch, expected] of [
+  [{ confirmed: false }, /Bitte bestätigen/],
+  [{ observedInput: "invalid" }, /gültiges JSON/],
+  [{ observedInput: "[]" }, /JSON-Objekt/],
+  [{ observedInput: "{}" }, /alle zu prüfenden Felder/],
+  [{ uncertainInput: "date, date" }, /menschlichen Review/],
+  [{ confidenceInput: "" }, /0,80/],
+  [{ confidenceInput: "0.79" }, /0,80/],
+  [{ confidenceInput: "1.01" }, /0,80/],
+  [{ notes: "kurz" }, /Prüfnotiz ist zu kurz/]
+]) {
+  assert.throws(() => uiRuntime.buildContentVerificationEvidence(
+    evidenceContext, { ...evidenceInput, ...patch }
+  ), expected);
+}
+const collectStart = admin.indexOf("async function collectContentVerificationEvidence");
+const collectEnd = admin.indexOf("function renderEditionLifecycleInbox", collectStart);
+assert.ok(collectStart > 0, "Evidence collection must be asynchronous.");
+assert.doesNotMatch(admin.slice(collectStart, collectEnd), /window\.(prompt|confirm)\s*\(/);
+assert.ok(admin.includes("await collectContentVerificationEvidence(evidenceVerificationItems[0])"));
+console.log("Evidence-backed edition freshness review, HTML-form validation and safe admin routing verified.");

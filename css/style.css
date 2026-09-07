@@ -46638,3 +46638,45 @@ body.legal-page.legal-page--polished :is(a, button):focus-visible {
     transition-duration: 1ms !important;
   }
 }
+:root .content-verification-dialog {
+  box-sizing: border-box;
+  width: min(760px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: clamp(16px, 3vw, 28px);
+  overflow: auto;
+  border: 1px solid #64748b;
+  border-radius: 16px;
+  background: #101b2b;
+  color: #f1f5f9;
+  box-shadow: 0 24px 80px #0008;
+}
+.content-verification-dialog::backdrop { background: #020617b8; }
+.content-verification-form { display: grid; gap: 12px; min-width: 0; }
+.content-verification-form h2,
+.content-verification-form p { margin: 0; }
+.content-verification-event { font-weight: 700; }
+.content-verification-form a { color: #86efac; overflow-wrap: anywhere; }
+.content-verification-form > label { font-weight: 600; }
+.content-verification-form input:not([type="checkbox"]),
+.content-verification-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  background: #172539;
+  color: #f1f5f9;
+  font: inherit;
+  font-size: 16px;
+}
+.content-verification-form textarea { resize: vertical; }
+.content-verification-form textarea[name="observed"] { font-family: ui-monospace, monospace; }
+.content-verification-confirmation { display: flex; gap: 12px; align-items: flex-start; }
+.content-verification-confirmation input { flex: 0 0 auto; width: 20px; height: 20px; margin-top: 3px; }
+.content-verification-error { color: #fca5a5; }
+.content-verification-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.content-verification-actions button { min-height: 44px; padding: 10px 16px; border: 1px solid #64748b; border-radius: 8px; background: #172539; color: #f1f5f9; font: inherit; cursor: pointer; }
+.content-verification-actions button[type="submit"] { background: #15803d; color: #fff; border-color: #22c55e; }
+.content-verification-form :focus-visible { outline: 3px solid #86efac; outline-offset: 3px; }

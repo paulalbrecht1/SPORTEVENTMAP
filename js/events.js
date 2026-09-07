@@ -3448,16 +3448,34 @@ function getSeasonPlannerDetailsForEvent(event) {
   );
 }
 
-function getSeasonDistanceOptions(event) {
-  const rawDistance =
-    cleanValue(event.distance);
+function splitSeasonLegacyDistances(value) {
+  const text = cleanValue(value);
+  const options = [];
+  let start = 0;
+  let depth = 0;
 
-  if (!rawDistance) {
-    return [];
+  for (let index = 0; index < text.length; index += 1) {
+    const character = text[index];
+    if (character === "(") depth += 1;
+    if (character === ")") depth = Math.max(0, depth - 1);
+    if (depth || !"/,+;|".includes(character)) continue;
+
+    // Commas within numbers and slashes within names are not format boundaries.
+    if (character === "," && /\d/.test(text[index - 1] || "") && /\d/.test(text[index + 1] || "")) continue;
+    if (character === "/" || character === ",") {
+      const left = text.slice(start, index).trim();
+      const right = text.slice(index + 1).trim();
+      const endsWithDistance = /(?:\b\d+(?:[.,]\d+)?\s*(?:km|k|m|miles?|mi|meilen?)?|marathon|halbmarathon)\s*$/i.test(left);
+      const startsWithDistance = /^(?:\d+(?:[.,]\d+)?(?:\s*(?:km|k|m|miles?|mi|meilen?)\b|\b)|half\s*marathon\b|halbmarathon\b|marathon\b|ultra\b|sprint\b|olympic\b)/i.test(right);
+      if (!endsWithDistance || !startsWithDistance) continue;
+    }
+
+    options.push(text.slice(start, index));
+    start = index + 1;
   }
 
-  return rawDistance
-    .split(/\s*(?:\/|,|\||;|\+)\s*/g)
+  options.push(text.slice(start));
+  return options
     .map(option => cleanValue(option))
     .filter(Boolean)
     .filter((option, index, list) =>
@@ -3465,6 +3483,33 @@ function getSeasonDistanceOptions(event) {
         item.toLowerCase() === option.toLowerCase()
       ) === index
     );
+}
+
+function getSeasonRaceFormats(event) {
+  return (Array.isArray(event?.race_formats) ? event.race_formats : [])
+    .filter(format => format && typeof format === "object")
+    .map(format => ({
+      ...format,
+      label: cleanValue(format.label) || (
+        Number.isFinite(format.distance_km) && format.distance_km > 0
+          ? `${format.distance_km} km`
+          : ""
+      )
+    }))
+    .filter(format => format.label);
+}
+
+function getSeasonDistanceOptions(event) {
+  const formats = getSeasonRaceFormats(event);
+  // Legacy edition sync also stored the complete offer in one untyped label.
+  if (formats.length === 1 &&
+      !Number.isFinite(formats[0].distance_km) &&
+      !formats[0].distance_mode && !formats[0].relay) {
+    return splitSeasonLegacyDistances(formats[0].label);
+  }
+  return formats.length
+    ? [...new Set(formats.map(format => format.label))]
+    : splitSeasonLegacyDistances(event?.distance);
 }
 
 function getSeasonDisplayDistance(event) {
@@ -3725,51 +3770,70 @@ function parseSeasonDistanceKm(value) {
   const text =
     cleanValue(value).toLowerCase();
 
-  if (!text) {
+  if (!text || /\b(?:flexi|variabel\w*|variable|backyard|unknown|unbekannt|offen|tba|tbd)\b/.test(text) ||
+      /\b\d+(?:[.,]\d+)?\s*(?:h|hours?|stunden?)\b/.test(text) ||
+      splitSeasonLegacyDistances(text).length > 1) {
     return null;
   }
 
-  if (/half\s*marathon|halbmarathon/.test(text)) {
-    return 21.0975;
+  const unitPattern = "km|kilomet(?:er|re)s?|k|meilen?|miles?|mi|met(?:er|re)s?|m";
+  const amountPattern = "\\d+(?:[.,]\\d+)*";
+  const asKm = (amount, unit) => {
+    const isMeters = /^(?:m|met(?:er|re)s?)$/.test(unit);
+    const normalized = isMeters && /^\d{1,3}(?:\.\d{3})+$/.test(amount)
+      ? amount.replace(/\./g, "")
+      : amount.replace(",", ".");
+    const number = Number(normalized);
+    if (!Number.isFinite(number) || number <= 0) return null;
+    return isMeters ? number / 1000
+      : /^(?:mi|meil)/.test(unit) ? number * 1.609344
+        : number;
+  };
+  const relay = new RegExp(`\\b(\\d+)\\s*[×x]\\s*(${amountPattern})\\s*(${unitPattern})\\b`).exec(text);
+  if (relay) {
+    const legKm = asKm(relay[2], relay[3]);
+    // This is the whole relay distance, not an inferred personal relay leg.
+    return legKm !== null && Number(relay[1]) > 0
+      ? Number((Number(relay[1]) * legKm).toPrecision(12))
+      : null;
   }
 
-  if (/marathon/.test(text) && !/half|halb/.test(text)) {
-    return 42.195;
+  const distances = [...text.matchAll(new RegExp(`\\b(${amountPattern})\\s*(${unitPattern})\\b`, "g"))];
+  const kilometers = distances.filter(match => /^k/.test(match[2]));
+  // Prefer an explicit km equivalent, e.g. "10 Meilen (16.1 km)".
+  if (kilometers.length === 1) {
+    return asKm(kilometers[0][1], kilometers[0][2]);
+  }
+  if (distances.length === 1) {
+    return asKm(distances[0][1], distances[0][2]);
+  }
+  if (distances.length > 1) {
+    return null;
   }
 
-  if (/\b70\.3\b/.test(text)) {
-    return 113;
-  }
-
-  if (/ironman|langdistanz/.test(text)) {
-    return 226;
-  }
-
-  const kmMatch =
-    /(\d+(?:[\.,]\d+)?)\s*(?:km|kilometer|kilometre|kilometers|kilometres)\b/.exec(text);
-
-  if (kmMatch) {
-    return Number(kmMatch[1].replace(",", "."));
-  }
-
-  const mileMatch =
-    /(\d+(?:[\.,]\d+)?)\s*(?:mi|mile|miles)\b/.exec(text);
-
-  if (mileMatch) {
-    return Number(mileMatch[1].replace(",", ".")) * 1.609344;
-  }
-
+  if (/half\s*marathon|halbmarathon/.test(text)) return 21.0975;
+  if (/\bmarathon\b/.test(text)) return 42.195;
+  if (/\b70\.3\b/.test(text)) return 113;
+  if (/ironman|langdistanz/.test(text)) return 226;
   return null;
 }
 
 function getSeasonOfficialDistanceKm(event) {
-  return parseSeasonDistanceKm(
-    [
-      getSeasonPlannedDistance(event),
-      event?.distance,
-      event?.sport
-    ].filter(Boolean).join(" ")
+  const planned = cleanValue(getSeasonPlannedDistance(event));
+  const options = getSeasonDistanceOptions(event);
+  // An offer with several formats has no single official personal distance.
+  const selected = planned || (options.length === 1 ? options[0] : "");
+  if (!selected) return null;
+
+  const format = getSeasonRaceFormats(event).find(item =>
+    item.label.toLowerCase() === selected.toLowerCase()
   );
+  if (format?.distance_mode === "variable") return null;
+  if (Number.isFinite(format?.distance_km) && format.distance_km > 0) {
+    return format.distance_km;
+  }
+  // Never append the full event offer to an explicit selection.
+  return parseSeasonDistanceKm(selected);
 }
 
 function getSeasonDistancePresetOptions(event) {
@@ -3827,9 +3891,9 @@ function getSeasonDistanceFromResult(result = {}, event) {
     getSeasonDistancePresetOptions(event)
       .find(option => option.value === preset);
 
-  return match?.km ||
-    getSeasonOfficialDistanceKm(event) ||
-    null;
+  return Number.isFinite(match?.km) && match.km > 0
+    ? match.km
+    : null;
 }
 
 function findSeasonEventByKey(eventKey) {
@@ -3883,6 +3947,8 @@ function normalizeSeasonPlannerCalculations(details, event) {
   if (Number.isFinite(distanceKm) && distanceKm > 0) {
     result.distanceKm =
       Number(distanceKm.toFixed(3));
+  } else {
+    result.distanceKm = null;
   }
 
   if (
@@ -3904,7 +3970,7 @@ function normalizeSeasonPlannerCalculations(details, event) {
         : null;
     goals.target_pace =
       targetMetric.value;
-  } else if (sportType === "triathlon") {
+  } else if (sportType === "triathlon" || !Number.isFinite(distanceKm)) {
     goals.targetPaceSecondsPerKm =
       null;
     goals.target_pace =
@@ -3934,7 +4000,7 @@ function normalizeSeasonPlannerCalculations(details, event) {
       sportType === "cycling"
         ? Number(finishMetric.rawKmh.toFixed(2))
         : result.average_speed_kmh || "";
-  } else if (sportType === "triathlon") {
+  } else if (sportType === "triathlon" || !Number.isFinite(distanceKm)) {
     result.finishPaceSecondsPerKm =
       null;
     result.finish_pace =
@@ -5709,7 +5775,7 @@ function getSeasonResultSummaryItems(event, goals, result) {
   const sportType =
     getSeasonSportType(event);
   const distanceKm =
-    Number(result.distanceKm);
+    getSeasonNumericSeconds(result.distanceKm);
   const targetSeconds =
     getSeasonNumericSeconds(goals.targetTimeSeconds);
   const finishSeconds =
@@ -6871,14 +6937,14 @@ function getSeasonDistanceCategory(event) {
   const context =
     getSeasonClassificationContext(event);
 
-  const km =
-    getSeasonDistanceNumber(context, "km|kilometer|kilometres|kilometers");
-
-  const miles =
-    getSeasonDistanceNumber(context, "miles|mile|mi");
+  const km = getSeasonOfficialDistanceKm(event);
 
   if (/triathlon|ironman|70\.3|sprint tri|olympic tri|middle tri|full tri|mitteldistanz|langdistanz/.test(context)) {
     return "Triathlon";
+  }
+
+  if (!cleanValue(getSeasonPlannedDistance(event)) && getSeasonDistanceOptions(event).length > 1) {
+    return "Other";
   }
 
   if (/backyard|24\s*h|24\s*hour|12\s*h|12\s*hour/.test(context)) {
@@ -6897,68 +6963,11 @@ function getSeasonDistanceCategory(event) {
     if (km >= 4.5 && km <= 6.5) return "5K";
   }
 
-  if (miles !== null) {
-    if (miles >= 31) return "Ultra";
-    if (miles >= 24 && miles <= 28) return "Marathon";
-    if (miles >= 12 && miles <= 15) return "Half";
-    if (miles >= 5.5 && miles <= 7) return "10K";
-    if (miles >= 2.8 && miles <= 4.2) return "5K";
-  }
-
-  if (/half|halbmarathon|21\.?1/.test(context)) {
-    return "Half";
-  }
-
-  if (/(^|\s)marathon(\s|$)|42\.?2/.test(context)) {
-    return "Marathon";
-  }
-
-  if (/10\s*k/.test(context)) {
-    return "10K";
-  }
-
-  if (/5\s*k/.test(context)) {
-    return "5K";
-  }
-
   return "Other";
 }
 
 function getSeasonDistanceKm(event) {
-  const context =
-    getSeasonClassificationContext(event);
-
-  const km =
-    getSeasonDistanceNumber(
-      context,
-      "km|kilometer|kilometres|kilometers"
-    );
-
-  if (km !== null) {
-    return km;
-  }
-
-  const miles =
-    getSeasonDistanceNumber(
-      context,
-      "miles|mile|mi"
-    );
-
-  if (miles !== null) {
-    return miles * 1.60934;
-  }
-
-  const category =
-    getSeasonDistanceCategory(event);
-
-  const defaults = {
-    "5K": 5,
-    "10K": 10,
-    Half: 21.1,
-    Marathon: 42.2
-  };
-
-  return defaults[category] || null;
+  return getSeasonOfficialDistanceKm(event);
 }
 
 function getSeasonPriorityLabel(priority) {

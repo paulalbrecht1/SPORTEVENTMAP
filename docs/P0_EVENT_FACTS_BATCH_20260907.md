@@ -10,6 +10,12 @@ keinen neuen Website-Release frei.
 Status: **Produktiv angewendet und nachgeprüft**, 7. September 2026,
 20:15:33 UTC. P0 und der Website-Release bleiben wegen der Kataloggates offen.
 
+Die hier noch offenen fachlichen Lücken sind inzwischen im
+[nachfolgenden Vollreview](P0_EVENT_FULL_REVIEW_20260907.md) geklärt. Alle drei
+Editionen besitzen seit dem 7. September, 22:07 UTC, gültige quellengebundene
+14-Felder-Frischenachweise. Die folgenden Abschnitte dokumentieren den
+damaligen begrenzten Batch und seinen Prüfstand.
+
 ## Quellenentscheidungen
 
 Die offiziellen Seiten und öffentlich zugänglichen Anmeldeinformationen wurden

@@ -1,6 +1,6 @@
 # Nächste Umsetzungsstufen
 
-Stand: 7. September 2026
+Stand: 8. September 2026
 
 Dieses Dokument ist die verbindliche Reihenfolge für die nächsten
 Produkt- und Entwicklungsarbeiten an SportEventMap. Es übersetzt die
@@ -85,7 +85,7 @@ können nicht unbemerkt veröffentlicht werden.
 - 0 ungeklärte exakte oder hochwahrscheinliche Dubletten im Release-Gate.
 - 0 kritische Geo-, Länder- oder Datumsfehler im Release-Gate.
 - ISO-Zeitstempel erzeugen im Datums-Audit keine Format-Fehlmeldungen.
-- Die vollständige Testsuite inklusive aller 65 E2E-Szenarien ist grün.
+- Die vollständige Testsuite inklusive aller aktuellen E2E-Szenarien ist grün.
 - Der anonyme Production-Zugriffstest bestätigt weiterhin: freigegebene Events
   sind lesbar, nicht freigegebene und private Daten nicht.
 
@@ -259,12 +259,31 @@ Datenbereinigung abgeschlossen.
   oder angewendeten Ergebnisse/Editionen. Beide Autopublishflags bleiben `false`.
 - [x] Technischen Stand als `6b300f3` committed und auf GitHub `main` gepusht;
   Produktivstand und Prüfbelege sind im Schemaabgleich-Protokoll dokumentiert.
-- [ ] Nach dem abgenommenen Schemafix den nächsten fachlichen P0 abschließen:
-  vollständige 14-Felder-Reviews für Friedberg und Airport Race, eindeutige
-  Distanz-/Startkoordinatenbelege für wepLAUF sowie Auflösung ihrer aktuellen
-  Quellen- und Reviewblocker. Danach die zeitnahen deutschen Problemquellen und
-  gültige künftige Editionen bearbeiten. Extraktion und Faktenkorrektur allein
-  ersetzen weiterhin keinen administrativen Frischenachweis.
+- [x] Den anschließenden fachlichen P0 für alle drei Editionen abgeschlossen:
+  wepLAUF-Distanzen und Start-/Zielnähe geklärt, Friedberger Teilwertungen und
+  Airport-Kinderläufe ergänzt, 42 Feldwerte vollständig geprüft. Faktenbatch 02
+  am 7. September um 21:46:45 UTC produktiv angewendet; 13 private Snapshots
+  und 28 Feldaudits, Restore-/Rollbackprobe bestanden. Danach alle drei
+  Editionen mit echter Admin-Sitzung einzeln attestiert. Der öffentliche Guard
+  bestätigt am 7. September um 22:07 UTC (8. September, 00:07 MESZ)
+  **3 von 3 gültigen, quellengebundenen 14-Felder-Nachweisen**. Dabei wurden
+  ausschließlich Verifikationsmetadaten verändert.
+- [x] Zwei im echten Ablauf gefundene Oberflächenfehler behoben: ein normales
+  HTML-Prüfformular ersetzt nicht unterstützte native Texteingabefenster;
+  Saisonplaner und Profil berechnen Distanzen/Pace aus der gewählten Strecke.
+  Variable oder unbekannte Strecken erhalten keine erfundene Pace. Die
+  Profilkorrektur ist rein lesend und schreibt keine bestehenden Pläne um.
+- [x] Alle technischen Codeprüfgruppen und den abschließenden vollständigen
+  Browsernachlauf mit 87/87 Fällen erfolgreich abgenommen. Ein einzelner
+  Fokusfehler im ersten Lauf ließ sich in vier gezielten Wiederholungen und
+  dem vollständigen Nachlauf unverändert nicht reproduzieren. Die anonymen
+  Produktionsprüfungen (7/7) und Frische-Zugriffsprüfungen (5/5) bestanden.
+- [ ] Als nächsten fachlichen P0 die zeitnahen deutschen Problemquellen und
+  vorbereiteten Einzelreviews bearbeiten, darunter Braunenbergs weiterhin
+  offener Transportfehler. Anschließend mindestens 68 gültige Nettozugänge
+  ergänzen und bei 400 Discovery-Editionen insgesamt mindestens 220 gültige
+  Frischenachweise erreichen. Auslaufende Editionen erhöhen diesen Bedarf.
+  Extraktion und Faktenkorrektur allein ersetzen keinen Admin-Frischenachweis.
 
 Nachweise und verbleibende Abgrenzungen stehen im
 [P0-Faktenbatch-Protokoll](P0_EVENT_FACTS_BATCH_20260907.md). Der erneute reguläre
@@ -276,6 +295,11 @@ Nachweisen für Restore, vollständiges lokales Schema und erfolgreichen
 produktiven Backend-Rollout dokumentiert. Der reguläre Export bestätigt weiter
 332 Discovery, 989 Archiv, 0 % Frische und 49,40 % Vollständigkeit und bleibt vor
 dem Schreiben gesperrt; Frontend-Artefakte und Wrangler-Deployment sind unverändert.
+
+Der [anschließende Vollreview](P0_EVENT_FULL_REVIEW_20260907.md) verbessert die
+Frische auf **3 von 332 (0,90 %)** bei weiterhin 989 Archiv-Editionen und
+49,40 % Vollständigkeit. Der reguläre Refresh wird weiterhin vor Dateiänderungen
+abgelehnt: Mindestbestand 400 und Frische 55 % bleiben unverändert.
 
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.

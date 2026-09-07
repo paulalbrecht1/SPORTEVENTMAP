@@ -1750,13 +1750,15 @@ function getProfilePlannerEntry(event) {
     getProfileSeasonMeta();
   const key =
     getProfileFavoriteKey(event);
+  const details =
+    normalizeProfilePlannerDetails(meta[key] || {});
 
   return {
     ...(meta[key] || {}),
     planner_details:
-      normalizeProfilePlannerDetails(
-        meta[key] || {}
-      )
+      typeof normalizeSeasonPlannerCalculations === "function"
+        ? normalizeSeasonPlannerCalculations(details, event)
+        : details
   };
 }
 
@@ -2001,15 +2003,9 @@ function getProfileResultMetrics(event, details) {
       ? getProfileNumericSeconds(result.finishTimeSeconds)
       : parseProfileDuration(result.finish_time);
   const distanceKm =
-    getProfileNullableNumber(result.distanceKm) !== null
-      ? getProfileNullableNumber(result.distanceKm)
-      : parseProfileDistanceKm(
-        [
-          result.custom_distance_km,
-          event.distance,
-          event.sport
-        ].filter(Boolean).join(" ")
-      );
+    typeof getSeasonDistanceFromResult === "function"
+      ? getSeasonDistanceFromResult(result, event)
+      : getProfileNullableNumber(result.distanceKm);
   const finishPaceSecondsPerKm =
     getProfileNullableNumber(result.finishPaceSecondsPerKm) !== null
       ? getProfileNullableNumber(result.finishPaceSecondsPerKm)
@@ -5764,7 +5760,133 @@ function renderReviewPriorityContext(row) {
   </div>`;
 }
 
-function collectContentVerificationEvidence(row) {
+function buildContentVerificationEvidence(context, input) {
+  if (!input.confirmed) {
+    throw new Error("Bitte bestätigen, dass die offizielle Quelle geöffnet und jedes Feld einzeln verglichen wurde.");
+  }
+  let observedValues;
+  try {
+    observedValues = JSON.parse(input.observedInput);
+  } catch {
+    throw new Error("Die extern beobachteten Werte sind kein gültiges JSON.");
+  }
+  if (!observedValues || typeof observedValues !== "object" || Array.isArray(observedValues)) {
+    throw new Error("Die extern beobachteten Werte müssen ein JSON-Objekt sein.");
+  }
+  if (context.requiredFields.some(field => !Object.prototype.hasOwnProperty.call(observedValues, field))) {
+    throw new Error("Die extern beobachteten Werte müssen alle zu prüfenden Felder enthalten.");
+  }
+  const uncertainFields = [...new Set(input.uncertainInput.split(",").map(value => value.trim()).filter(Boolean))];
+  if (uncertainFields.length) {
+    throw new Error(`Unsichere Felder (${uncertainFields.join(", ")}) bleiben bewusst im menschlichen Review.`);
+  }
+  const confidence = Number(String(input.confidenceInput).replace(",", "."));
+  if (!Number.isFinite(confidence) || confidence < 0.8 || confidence > 1) {
+    throw new Error("Confidence muss zwischen 0,80 und 1,00 liegen.");
+  }
+  const notes = input.notes.trim();
+  if (notes.length < 12) throw new Error("Die Prüfnotiz ist zu kurz.");
+  return {
+    notes,
+    evidence: {
+      ...(context.sourceId ? { source_id: context.sourceId } : {}),
+      source_url: context.sourceUrl,
+      source_checked_at: new Date().toISOString(),
+      confidence,
+      confirmed_fields: context.requiredFields,
+      uncertain_fields: [],
+      observed_values: observedValues
+    }
+  };
+}
+
+function openContentVerificationDialog(context, validateCurrentReview) {
+  if (document.getElementById("contentVerificationDialog")) {
+    throw new Error("Eine Feldprüfung ist bereits geöffnet.");
+  }
+  const dialog = document.createElement("dialog");
+  dialog.id = "contentVerificationDialog";
+  dialog.className = "content-verification-dialog";
+  dialog.setAttribute("aria-labelledby", "contentVerificationTitle");
+  dialog.setAttribute("aria-describedby", "contentVerificationHelp");
+  dialog.innerHTML = `
+    <form class="content-verification-form" novalidate>
+      <h2 id="contentVerificationTitle">Feldprüfung bestätigen</h2>
+      <p class="content-verification-event">${escapeAdminHTML(context.eventName)}</p>
+      <p><strong>Offizielle Quelle:</strong>
+        <a href="${escapeAdminHTML(safeAdminUrl(context.sourceUrl))}" target="_blank" rel="noopener noreferrer">${escapeAdminHTML(context.sourceUrl)}</a>
+      </p>
+      <p id="contentVerificationHelp">Vergleiche alle ${context.requiredFields.length} Felder mit der aktuellen offiziellen Ausgabe. Die JSON-Vorlage zeigt den gespeicherten Stand. Trage extern beobachtete Abweichungen exakt ein; sie bleiben im Review.</p>
+      <label for="contentVerificationObserved">Extern beobachtete Werte (JSON)</label>
+      <textarea id="contentVerificationObserved" name="observed" rows="12" spellcheck="false" required aria-describedby="contentVerificationHelp"></textarea>
+      <label for="contentVerificationUncertain">Unsichere Felder (kommagetrennt)</label>
+      <input id="contentVerificationUncertain" name="uncertain" type="text" autocomplete="off" aria-describedby="contentVerificationUncertainHelp">
+      <p id="contentVerificationUncertainHelp">Nur leer lassen, wenn jedes Feld eindeutig belegt ist. Mit Unsicherheiten bleibt die Prüfung offen.</p>
+      <label for="contentVerificationConfidence">Confidence (0,80 bis 1,00)</label>
+      <input id="contentVerificationConfidence" name="confidence" type="text" inputmode="decimal" autocomplete="off" required>
+      <label for="contentVerificationNotes">Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen)</label>
+      <textarea id="contentVerificationNotes" name="notes" rows="3" minlength="12" required></textarea>
+      <label class="content-verification-confirmation">
+        <input name="confirmed" type="checkbox" required>
+        <span>Ich habe die offizielle Quelle geöffnet und alle ${context.requiredFields.length} zentralen Felder einzeln mit der aktuellen Ausgabe verglichen.</span>
+      </label>
+      <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
+      <div class="content-verification-actions">
+        <button type="button" data-verification-cancel>Abbrechen</button>
+        <button type="submit">Feldprüfung verbindlich bestätigen</button>
+      </div>
+    </form>`;
+  const form = dialog.querySelector("form");
+  form.elements.observed.value = JSON.stringify(context.storedValues, null, 2);
+  const errorMessage = dialog.querySelector('[role="alert"]');
+  const previousFocus = document.activeElement;
+  return new Promise(resolve => {
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      if (dialog.open) dialog.close();
+      dialog.remove();
+      if (previousFocus?.isConnected) previousFocus.focus();
+      resolve(value);
+    };
+    dialog.addEventListener("cancel", event => {
+      event.preventDefault();
+      finish(null);
+    });
+    dialog.addEventListener("close", () => finish(null));
+    dialog.querySelector("[data-verification-cancel]").addEventListener("click", () => finish(null));
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      errorMessage.hidden = true;
+      try {
+        validateCurrentReview();
+        const evidence = buildContentVerificationEvidence(context, {
+          confirmed: form.elements.confirmed.checked,
+          observedInput: form.elements.observed.value,
+          uncertainInput: form.elements.uncertain.value,
+          confidenceInput: form.elements.confidence.value,
+          notes: form.elements.notes.value
+        });
+        finish(evidence);
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.hidden = false;
+        errorMessage.focus();
+      }
+    });
+    document.body.append(dialog);
+    try {
+      dialog.showModal();
+      dialog.querySelector("[data-verification-cancel]").focus();
+    } catch (error) {
+      dialog.remove();
+      throw error;
+    }
+  });
+}
+
+async function collectContentVerificationEvidence(row) {
   const metadata = row.metadata || {};
   const freshnessSource = row.item_type === "freshness_review"
     ? getEligibleFreshnessReviewSource(row)
@@ -5794,56 +5916,18 @@ function collectContentVerificationEvidence(row) {
   if (row.item_type === "freshness_review" && (!sourceId || !freshnessSource)) {
     throw new Error("Die ausgewählte offizielle Quelle ist nicht stabil oder wird gerade geprüft. Dieser Fall bleibt im Review.");
   }
-  if (!window.confirm(`Offizielle Quelle geöffnet und alle ${requiredFields.length} zentralen Felder einzeln verglichen?`)) return null;
-
-  const observedInput = window.prompt(
-    "Extern beobachtete Werte als JSON. Abweichungen nicht überschreiben, sondern exakt eintragen; sie bleiben dann im Review:",
-    JSON.stringify(storedValues, null, 2)
-  );
-  if (observedInput == null) return null;
-  let observedValues;
-  try {
-    observedValues = JSON.parse(observedInput);
-  } catch {
-    throw new Error("Die extern beobachteten Werte sind kein gültiges JSON.");
-  }
-  if (!observedValues || typeof observedValues !== "object" || Array.isArray(observedValues)) {
-    throw new Error("Die extern beobachteten Werte müssen ein JSON-Objekt sein.");
-  }
-  const uncertainInput = window.prompt(
-    "Unsichere Felder, kommagetrennt. Leer lassen nur wenn wirklich alle Felder eindeutig sind:",
-    ""
-  );
-  if (uncertainInput == null) return null;
-  const uncertainFields = [...new Set(uncertainInput.split(",").map(value => value.trim()).filter(Boolean))];
-  if (uncertainFields.length) {
-    throw new Error(`Unsichere Felder (${uncertainFields.join(", ")}) bleiben bewusst im menschlichen Review.`);
-  }
-  const confidenceInput = window.prompt("Confidence zwischen 0,80 und 1,00:", "0.95");
-  if (confidenceInput == null) return null;
-  const confidence = Number(String(confidenceInput).replace(",", "."));
-  if (!Number.isFinite(confidence) || confidence < 0.8 || confidence > 1) {
-    throw new Error("Confidence muss zwischen 0,80 und 1,00 liegen.");
-  }
-  const notes = window.prompt(
-    "Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen):",
-    "Offizielle Quelle feldweise geprüft; gespeicherter Datenstand stimmt überein."
-  );
-  if (notes == null) return null;
-  if (notes.trim().length < 12) throw new Error("Die Prüfnotiz ist zu kurz.");
-
-  return {
-    notes: notes.trim(),
-    evidence: {
-      ...(sourceId ? { source_id: sourceId } : {}),
-      source_url: sourceUrl,
-      source_checked_at: new Date().toISOString(),
-      confidence,
-      confirmed_fields: requiredFields,
-      uncertain_fields: [],
-      observed_values: observedValues
+  const event = dataOpsEvents.find(candidate => String(candidate.id) === String(row.event_id));
+  return openContentVerificationDialog({
+    sourceId,
+    sourceUrl,
+    requiredFields,
+    storedValues,
+    eventName: event?.canonical_name || event?.event_name || storedValues.event_name || `Event ${row.event_id}`
+  }, () => {
+    if (row.item_type === "freshness_review" && !canVerifyFreshnessReview(row)) {
+      throw new Error("Der Datenstand oder die Quelle ist nicht mehr zur Bestätigung freigegeben. Dieser Fall bleibt im Review.");
     }
-  };
+  });
 }
 
 function renderEditionLifecycleInbox() {
@@ -5983,7 +6067,7 @@ async function handleEditionLifecycleAction(button) {
       return;
     }
     try {
-      const verification = collectContentVerificationEvidence(evidenceVerificationItems[0]);
+      const verification = await collectContentVerificationEvidence(evidenceVerificationItems[0]);
       if (!verification) return;
       evidenceVerificationItems[0]._verificationNotes = verification.notes;
       evidenceVerificationItems[0]._verificationEvidence = verification.evidence;

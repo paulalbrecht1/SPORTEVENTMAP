@@ -75,6 +75,14 @@ GitHub-Pushes veröffentlichen bei diesem Direct-Upload-Projekt keine Website.
 
 ## Nächste fachliche Datenarbeit
 
+**Fortschreibung vom 8. September, 00:07 MESZ:** Der
+[vollständige Folge-Review](P0_EVENT_FULL_REVIEW_20260907.md) ist für wepLAUF,
+Friedberg und Airport Race abgeschlossen. Alle drei Editionen sind faktisch
+korrigiert und über eine echte Admin-Sitzung mit 14 quellengebundenen Feldern
+attestiert. Der reguläre Refresh bestätigt jetzt 3 von 332 frischen Editionen
+(0,90 %); Bestand und Frische bleiben unter den bestehenden Releasegrenzen.
+Die ursprüngliche Diagnose unten bleibt als Ausgangsstand dokumentiert.
+
 Die heutige Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
 989 Archiv-Editionen, 0 gültige Frischenachweise und 164 vollständige Einträge
 (49,40 %). 330 Editionen haben einen unbekannten Anmeldestatus.

@@ -126,8 +126,9 @@ Fehler; Loopback, Edition- und Candidate-Workflow bestanden; **22/22 RLS-Tests
 bestanden**. Der Test prüft insbesondere, dass die Prüfung geänderter Inhalte
 keinen vollständigen Frischenachweis ersetzt und dass die Frischeverifikation
 bei neuen Datenkonflikten oder moderierten Fehlermeldungen ungültig wird.
-Der separate Production-Restore unten prüft den damaligen veröffentlichten
-Stand mit 38 Migrationen, vor dem anschließenden Schemaabgleich.
+Die historische Production-Kopie für die folgende Schema-Reparaturprobe
+enthielt 38 Migrationen, vor dem anschließenden Schemaabgleich. Der aktuelle
+Restore unter „Letzter Nachweis“ enthält dagegen 40 Migrationen.
 
 Der anschließende vollständige P0-Neuaufbau mit zwei neuen Migrationen bestand:
 **50 Migrationen**, SQL-Lint ohne Fehler, **22/22 RLS-/Auth-Tests**, **61 SQL- und
@@ -226,30 +227,31 @@ lokalen Abweichungen wurden nicht pauschal nachgezogen. Details stehen im
 
 | Feld | Wert |
 | --- | --- |
-| Verifizierter Dump | `sporteventmap-production-20260907T202202971Z.sembackup` |
-| Backup-Zeitfenster (UTC) | 2026-09-07 20:22:03 bis 20:23:34 |
-| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 20:24:51 |
-| Restore-Dauer | 38,066 Sekunden |
-| Verschlüsselte Dateigröße | 8.638.179 Bytes |
-| SHA-256 der verschlüsselten Datei | `ad56c9de09245f41198326308e3c8d8cc96604db1cfce7ec6ca0f9d0bf3c617e` |
-| Kern-Counts | 999 Events; 1.022 Editionen; 1.016 Sources; 38 Migrationen |
+| Verifizierter Dump | `sporteventmap-production-20260907T212209412Z.sembackup` |
+| Backup-Zeitfenster (UTC) | 2026-09-07 21:23:12 bis 21:24:00 |
+| Lokaler Restore abgeschlossen (UTC) | 2026-09-07 21:44:34 |
+| Restore-Dauer | 73,730 Sekunden |
+| Verschlüsselte Dateigröße | 8.682.760 Bytes |
+| SHA-256 der verschlüsselten Datei | `45e1a63cdd69c3c16a083b833295b8ae88feb9acc67bb39120ccd3c47580bb89` |
+| Kern-Counts | 999 Events; 1.022 Editionen; 1.016 Sources; 40 Migrationen |
 | Nutzerstrukturen | 5 Auth-Nutzer; 5 Profile; 36 Favoriten; 48 Planner-Einträge |
 | Schema/Datenintegrität | bestanden |
 | RLS/Nutzerisolation | bestanden |
 | `run_event_validation(...)` für normalen Nutzer | verweigert |
 | Faktenbatch vom 7. September, 20:15 UTC | 3 korrigierte Editionen und 13 private Snapshots enthalten; weiterhin `needs_review` |
-| Anschließende lokale Schemaabgleich-Probe | 60 SQL-Prüfungen und Fixture-Rollback bestanden; keine produktive Schemaänderung |
+| Schemaabgleich im aktuellen Dump | Migrationen `20260907205727` und `20260907205741` enthalten |
 | Vollständiger lokaler Neuaufbau | 50 Migrationen, SQL-Lint, 22/22 RLS, 61 SQL- und vier REST-Prüfungen bestanden; Staging bereinigt |
-| Späterer produktiver Schemaabgleich | Migrationen `20260907205727` und `20260907205741` angewendet; Postflight bestanden |
-| Restoreumgebung nach Schemaabgleich | Exaktes Testprojekt, Datenbank-/Storage-Volumes und entschlüsseltes Verzeichnis entfernt; Backup erhalten |
+| Faktenbatch 02 auf frischer Wiederherstellung | Apply, Verify, Wiederholungssperre, Rollback-Driftsperre und vollständige Rücknahme bestanden |
+| Restoreumgebungen nach Faktenprobe | Beide exakten Testprojekte, Datenbank-/Storage-Volumes und entschlüsselte Verzeichnisse entfernt; Backup erhalten |
 | Production während des Drills verändert | nein |
 
 Der Nachweis liegt unter
-`backups/production/restore-reports/sporteventmap-production-20260907T202202971Z-restore-report.json`.
+`backups/production/restore-reports/sporteventmap-production-20260907T212209412Z-restore-report.json`.
 Der ergänzende Faktennachweis liegt daneben als
-`sporteventmap-production-20260907T202202971Z-p0-facts-report.json`.
-Der Dump dokumentiert den Stand vor den neuen Schemaabgleich-Migrationen;
-deren lokale Probe ändert den gesicherten Produktionsstand nicht.
+`sporteventmap-production-20260907T212209412Z-facts-batch-02-rehearsal.json`.
+Der Dump dokumentiert den Stand nach dem Schemaabgleich und vor Faktenbatch 02.
+Die lokale Probe verändert den gesicherten Produktionsstand nicht. Der erste
+Restore-Bericht desselben Dumps bleibt separat mit Suffix `-1fe34f82` erhalten.
 
 Damit ist die Wiederherstellung eines aktuellen Production-Dumps praktisch
 belegt. Nicht abgedeckt sind PITR zwischen zwei Dumps, ein gleichzeitiger Verlust

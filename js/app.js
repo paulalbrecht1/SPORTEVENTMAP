@@ -153,7 +153,7 @@ function setSidebarExpanded(expanded, options = {}) {
 
   const usesModalPanel = Boolean(
     shouldExpand &&
-    window.matchMedia?.("(max-width: 767px)").matches
+    window.matchMedia?.("(max-width: 767px), (max-width: 960px) and (max-height: 500px) and (orientation: landscape)").matches
   );
 
   sidebar.setAttribute(
@@ -559,6 +559,57 @@ function setPlatformRouteClasses(route) {
   }
 }
 
+function bindMobileMenuKeyboard(menu, closeMenu) {
+  menu?.addEventListener("keydown", event => {
+    if (!menu.classList.contains("open") || event.defaultPrevented) {
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeMenu();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const controls = [...menu.querySelectorAll(
+      "a[href], button, select, input, [tabindex]"
+    )].filter(control =>
+      !control.disabled &&
+      control.tabIndex >= 0 &&
+      control.getClientRects().length > 0 &&
+      getComputedStyle(control).visibility !== "hidden"
+    );
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+
+    if (
+      (event.shiftKey && document.activeElement === first) ||
+      (!event.shiftKey && document.activeElement === last)
+    ) {
+      event.preventDefault();
+      (event.shiftKey ? last : first)?.focus();
+    }
+  });
+}
+
+function focusMobileMenuCloseButton(menu, button) {
+  // Let visibility transitions enter their first visible frame before focus.
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (menu.classList.contains("open")) {
+        button?.focus({ preventScroll: true });
+      }
+    });
+  });
+}
+
+let platformMenuReturnFocus = null;
+
 function closePlatformMobileMenu() {
   const menu =
     document.getElementById("platformMobileMenu");
@@ -570,8 +621,16 @@ function closePlatformMobileMenu() {
   document.body.classList.remove("platform-menu-open");
 
   if (menu) {
+    if (menu.contains(document.activeElement)) {
+      const returnFocus = platformMenuReturnFocus || button;
+      returnFocus?.focus({ preventScroll: true });
+    }
     menu.classList.remove("open");
+    menu.inert = true;
+    menu.setAttribute("aria-hidden", "true");
   }
+
+  platformMenuReturnFocus = null;
 
   if (overlay) {
     overlay.classList.remove("open");
@@ -951,19 +1010,31 @@ function initPlatformShell() {
 
   if (menuButton && menu && overlay) {
     menuButton.addEventListener("click", () => {
+      if (menu.classList.contains("open")) {
+        closePlatformMobileMenu();
+        return;
+      }
+
       syncPlatformMobileActions();
-
-      const isOpen =
-        menu.classList.toggle("open");
-
-      overlay.classList.toggle("open", isOpen);
-      document.body.classList.toggle("platform-menu-open", isOpen);
-      menuButton.setAttribute(
-        "aria-expanded",
-        isOpen ? "true" : "false"
-      );
+      platformMenuReturnFocus = document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : menuButton;
+      menu.inert = false;
+      menu.setAttribute("aria-hidden", "false");
+      menu.classList.add("open");
+      menu.querySelector(".platform-mobile-menu-scroll")?.scrollTo(0, 0);
+      overlay.classList.add("open");
+      document.body.classList.add("platform-menu-open");
+      menuButton.setAttribute("aria-expanded", "true");
+      focusMobileMenuCloseButton(menu, closeButton);
     });
   }
+
+  bindMobileMenuKeyboard(menu, closePlatformMobileMenu);
+
+  menu?.querySelectorAll("a").forEach(link => {
+    link.addEventListener("click", closePlatformMobileMenu);
+  });
 
   if (closeButton) {
     closeButton.addEventListener("click", closePlatformMobileMenu);
@@ -1347,17 +1418,21 @@ function initLandingPage() {
       return;
     }
 
+    if (
+      landingMenu.contains(document.activeElement) &&
+      landingMenuReturnFocus instanceof HTMLElement
+    ) {
+      landingMenuReturnFocus.focus({ preventScroll: true });
+    }
+    landingMenuReturnFocus = null;
+
     landingMenu.classList.remove("open");
     landingMenuOverlay?.classList.remove("open");
     landingPage.classList.remove("menu-open");
     document.body.classList.remove("sem-menu-open");
+    landingMenu.inert = true;
     landingMenu.setAttribute("aria-hidden", "true");
     landingMenuButton.setAttribute("aria-expanded", "false");
-
-    if (landingMenuReturnFocus instanceof HTMLElement) {
-      landingMenuReturnFocus.focus();
-      landingMenuReturnFocus = null;
-    }
   };
 
   const openLandingMenu = () => {
@@ -1370,18 +1445,16 @@ function initLandingPage() {
         ? document.activeElement
         : landingMenuButton;
 
+    landingMenu.inert = false;
     landingMenu.classList.add("open");
+    landingMenu.querySelector(".sem-mobile-menu-scroll")?.scrollTo(0, 0);
     landingMenuOverlay?.classList.add("open");
     landingPage.classList.add("menu-open");
     document.body.classList.add("sem-menu-open");
     landingMenu.setAttribute("aria-hidden", "false");
     landingMenuButton.setAttribute("aria-expanded", "true");
 
-    window.setTimeout(() => {
-      landingMenu
-        .querySelector("a, button")
-        ?.focus();
-    }, 0);
+    focusMobileMenuCloseButton(landingMenu, landingMenuCloseButton);
   };
 
   landingMenuButton?.addEventListener("click", () => {
@@ -1404,14 +1477,7 @@ function initLandingPage() {
       link.addEventListener("click", closeLandingMenu);
     });
 
-  document.addEventListener("keydown", event => {
-    if (
-      event.key === "Escape" &&
-      landingMenu?.classList.contains("open")
-    ) {
-      closeLandingMenu();
-    }
-  });
+  bindMobileMenuKeyboard(landingMenu, closeLandingMenu);
 
   const loginButton =
     document.getElementById("loginBtn");
@@ -1806,8 +1872,8 @@ function syncEventListFavoritesToggle() {
 
   listButton.innerHTML =
     active
-      ? `<span aria-hidden="true">&#10084;</span> All races`
-      : `<span aria-hidden="true">&#9825;</span> Favorites`;
+      ? `<span aria-hidden="true">&#10084;</span> ${window.getAppLanguage?.() === "de" ? "Alle Events" : "All races"}`
+      : `<span aria-hidden="true">&#9825;</span> ${window.getAppLanguage?.() === "de" ? "Favoriten" : "Favorites"}`;
 }
 
 document
@@ -1833,6 +1899,8 @@ document
   });
 
 syncEventListFavoritesToggle();
+
+document.addEventListener("app-language-changed", syncEventListFavoritesToggle);
 
 
 // LOCATE USER

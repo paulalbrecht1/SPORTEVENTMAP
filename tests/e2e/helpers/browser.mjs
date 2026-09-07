@@ -46,6 +46,7 @@ const leafletStub = `
         addLayer() {},
         removeLayer() {},
         fitBounds() {},
+        flyToBounds() {},
         flyTo(coords, nextZoom) {
           center = { lat: coords[0], lng: coords[1] };
           zoom = nextZoom;

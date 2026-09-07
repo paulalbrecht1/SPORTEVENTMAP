@@ -37575,7 +37575,7 @@ body.landing-theme-dark .sem-home,
   cursor: pointer;
 }
 
-.sem-mobile-menu > a:not(.sem-button),
+.sem-mobile-menu-scroll > a:not(.sem-button),
 .sem-mobile-auth {
   min-height: 50px;
   display: flex;
@@ -45805,6 +45805,134 @@ html[data-theme="light"] body.event-detail-page
   background: var(--theme-surface) !important;
   color: var(--theme-text) !important;
   box-shadow: var(--theme-shadow) !important;
+  box-sizing: border-box;
+  height: 100dvh;
+  padding-top: max(16px, env(safe-area-inset-top));
+  padding-right: max(18px, env(safe-area-inset-right));
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+  padding-left: 18px;
+  overflow: hidden;
+  visibility: hidden;
+  transition: transform 220ms ease, visibility 220ms ease;
+}
+
+.platform-mobile-menu.open {
+  visibility: visible;
+}
+
+.sem-mobile-menu {
+  box-sizing: border-box;
+  padding-right: max(18px, env(safe-area-inset-right));
+  padding-bottom: max(18px, env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.sem-mobile-menu-head,
+.platform-mobile-menu-header {
+  flex: 0 0 auto;
+  min-height: 48px;
+  margin-bottom: 4px;
+}
+
+.platform-mobile-menu-header #platformMenuCloseBtn {
+  flex-shrink: 0;
+  min-width: 44px !important;
+  min-height: 44px !important;
+}
+
+.sem-mobile-menu-scroll,
+.platform-mobile-menu-scroll {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 4px 12px;
+  scroll-padding-block: 8px;
+}
+
+.sem-mobile-menu-scroll > *,
+.platform-mobile-menu-scroll > * {
+  flex-shrink: 0;
+}
+
+.sem-mobile-menu .sem-button {
+  margin-top: 8px;
+}
+
+.sem-mobile-menu-language {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 0 12px;
+  color: var(--theme-muted);
+}
+
+.sem-mobile-menu-language .app-language-select {
+  min-height: 44px;
+}
+
+.sem-mobile-menu-info,
+.platform-mobile-menu-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--theme-border);
+}
+
+.platform-mobile-menu-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--theme-border);
+}
+
+.platform-mobile-menu-actions button {
+  width: 100%;
+  min-height: 44px;
+  padding: 9px 12px;
+  border: 1px solid var(--theme-border);
+  border-radius: 10px;
+  font: inherit;
+  font-weight: 800;
+  text-align: left;
+}
+
+.sem-mobile-menu-info > strong,
+.platform-mobile-menu-info > strong {
+  padding: 0 12px 6px;
+  color: var(--theme-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.sem-mobile-menu-info > a,
+.platform-mobile-menu-info > a {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: var(--theme-text);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.sem-mobile-menu :is(a, button):focus-visible {
+  outline: 2px solid var(--theme-action);
+  outline-offset: 2px;
 }
 
 .platform-mobile-menu-header,
@@ -45990,6 +46118,26 @@ body.platform-route-discovery:not(.landing-open).event-list-fullscreen
     outline: none;
     box-shadow: inset 0 0 0 1px var(--theme-border) !important;
   }
+}
+
+/* Legal documents use the browser's page scroll, outside the app's viewport lock.
+   The scoped importance overrides the shared responsive overflow:hidden rules. */
+html.legal-root {
+  height: auto;
+  min-height: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+body.legal-page {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: visible !important;
+}
+
+body.legal-page .legal-page-footer a {
+  min-height: 44px;
 }
 
 /* Legal pages: product-shell alignment, explicit theme contrast and mobile navigation. */
@@ -46448,7 +46596,8 @@ body.legal-page.legal-page--polished :is(a, button):focus-visible {
   body.legal-page.legal-page--polished .legal-document h1 {
     margin-bottom: 24px;
     padding-bottom: 22px;
-    font-size: clamp(2.15rem, 12vw, 3rem);
+    font-size: clamp(1.75rem, 8vw, 2.15rem);
+    hyphens: auto;
   }
 
   body.legal-page.legal-page--polished .legal-document h2 {

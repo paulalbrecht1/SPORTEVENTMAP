@@ -90,6 +90,11 @@ const I18N = {
     "landing.terms": "Terms",
 
     "nav.filters": "Filters",
+    "nav.information": "Information & contact",
+    "nav.mobileNavigation": "Mobile platform navigation",
+    "nav.openNavigation": "Open navigation",
+    "nav.closeNavigation": "Close navigation",
+    "nav.accountAndFeedback": "Account and feedback",
     "nav.home": "Home",
     "nav.discovery": "Discovery",
     "nav.eventWiki": "Event Wiki",
@@ -778,6 +783,11 @@ const I18N = {
     "landing.terms": "Terms",
 
     "nav.filters": "Filter",
+    "nav.information": "Information & Kontakt",
+    "nav.mobileNavigation": "Mobile Plattformnavigation",
+    "nav.openNavigation": "Navigation öffnen",
+    "nav.closeNavigation": "Navigation schließen",
+    "nav.accountAndFeedback": "Konto und Feedback",
     "nav.home": "Start",
     "nav.discovery": "Entdecken",
     "nav.eventWiki": "Event-Wiki",

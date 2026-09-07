@@ -27,7 +27,8 @@
   <script src="js/theme.js?v=20260725-publish-runtime-v96"></script>
 
   <!-- DEIN CSS -->
-  <link rel="stylesheet" href="css/style.css?v=20260901-mobile-stability-v122" />
+  <link rel="stylesheet" href="css/style.css?v=20260907-mobile-usability-v123" />
+  <link rel="stylesheet" href="css/mobile-discovery.css?v=20260907-v1" />
   <link rel="stylesheet" href="css/data-operations.css?v=20260810-freshness-overview-v2" />
 </head>
 
@@ -106,17 +107,34 @@
   </header>
 
   <div class="sem-menu-overlay" id="landingMenuOverlay"></div>
-  <nav class="sem-mobile-menu" id="landingMobileMenu" aria-label="Mobile navigation" aria-hidden="true">
+  <nav class="sem-mobile-menu" id="landingMobileMenu" aria-label="Mobile navigation" aria-hidden="true" inert>
     <div class="sem-mobile-menu-head">
       <strong>Navigation</strong>
       <button id="landingMenuCloseBtn" type="button" aria-label="Close navigation">&times;</button>
     </div>
-    <a href="#/home" data-landing-route="home">Home</a>
-    <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-    <a href="#/events" data-landing-route="events">Event Wiki</a>
-    <a href="#/planner" data-landing-route="planner">Season Planner</a>
-    <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
-    <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+    <div class="sem-mobile-menu-scroll">
+      <a href="#/home" data-landing-route="home">Home</a>
+      <a href="#/discovery" data-landing-route="discovery">Discovery</a>
+      <a href="#/events" data-landing-route="events">Event Wiki</a>
+      <a href="#/planner" data-landing-route="planner">Season Planner</a>
+      <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
+      <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+      <div class="sem-mobile-menu-language">
+        <label for="landingMobileLanguageSelect" data-i18n="language.label">Language</label>
+        <select id="landingMobileLanguageSelect" class="app-language-select" aria-label="Language">
+          <option value="en">EN</option>
+          <option value="de">DE</option>
+        </select>
+      </div>
+      <div class="sem-mobile-menu-info" role="group" aria-labelledby="landingMobileInfoTitle">
+        <strong id="landingMobileInfoTitle" data-i18n="nav.information">Information &amp; contact</strong>
+        <a href="about.html" data-i18n="landing.about">About</a>
+        <a href="contact.html" data-i18n="footer.contact">Contact</a>
+        <a href="imprint.html" data-i18n="footer.imprint">Legal notice</a>
+        <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+        <a href="legal.html" data-i18n="footer.legal">Terms</a>
+      </div>
+    </div>
   </nav>
 
   <main>
@@ -431,6 +449,7 @@
     type="button"
     aria-label="Open navigation"
     aria-controls="platformMobileMenu"
+    data-i18n-aria-label="nav.openNavigation"
     aria-expanded="false"
   >
     <span aria-hidden="true"></span>
@@ -475,9 +494,11 @@
     <div id="topbar-search">
 
       <input
-        type="text"
+        type="search"
         id="searchInput"
         data-testid="event-search"
+        aria-label="Search events"
+        enterkeyhint="search"
         placeholder="Find your next race..."
         autocomplete="off"
       />
@@ -571,6 +592,9 @@
   id="platformMobileMenu"
   class="platform-mobile-menu"
   aria-label="Mobile platform navigation"
+  data-i18n-aria-label="nav.mobileNavigation"
+  aria-hidden="true"
+  inert
 >
   <div class="platform-mobile-menu-header">
     <strong>Sport Event Map</strong>
@@ -578,27 +602,38 @@
       id="platformMenuCloseBtn"
       type="button"
       aria-label="Close navigation"
+      data-i18n-aria-label="nav.closeNavigation"
     >
       &times;
     </button>
   </div>
-  <a href="#/home" data-platform-route="home">Home</a>
-  <a href="#/discovery" data-platform-route="discovery">Discovery</a>
-  <a href="#/events" data-platform-route="events">Event Wiki</a>
-  <a href="#/planner" data-platform-route="planner">Season Planner</a>
-  <a href="#/submit" data-platform-route="submit">Event einreichen</a>
-  <a
-    href="#/admin"
-    data-platform-route="admin"
-    data-admin-nav
-    style="display:none;"
-  >Admin</a>
-  <div class="platform-mobile-menu-actions" aria-label="Account and feedback">
-    <button type="button" data-platform-mobile-action="loginBtn">Login</button>
-    <button type="button" data-platform-mobile-action="registerBtn">Register</button>
-    <button type="button" data-platform-mobile-action="profileBtn" hidden>Profile</button>
-    <button type="button" data-platform-mobile-action="logoutBtn" hidden>Logout</button>
-    <button type="button" data-platform-mobile-action="feedbackBtn">Feedback</button>
+  <div class="platform-mobile-menu-scroll">
+    <a href="#/home" data-platform-route="home">Home</a>
+    <a href="#/discovery" data-platform-route="discovery">Discovery</a>
+    <a href="#/events" data-platform-route="events">Event Wiki</a>
+    <a href="#/planner" data-platform-route="planner">Season Planner</a>
+    <a href="#/submit" data-platform-route="submit">Event einreichen</a>
+    <a
+      href="#/admin"
+      data-platform-route="admin"
+      data-admin-nav
+      style="display:none;"
+    >Admin</a>
+    <div class="platform-mobile-menu-actions" aria-label="Account and feedback" data-i18n-aria-label="nav.accountAndFeedback">
+      <button type="button" data-platform-mobile-action="loginBtn">Login</button>
+      <button type="button" data-platform-mobile-action="registerBtn">Register</button>
+      <button type="button" data-platform-mobile-action="profileBtn" hidden>Profile</button>
+      <button type="button" data-platform-mobile-action="logoutBtn" hidden>Logout</button>
+      <button type="button" data-platform-mobile-action="feedbackBtn">Feedback</button>
+    </div>
+    <div class="platform-mobile-menu-info" role="group" aria-labelledby="platformMobileInfoTitle">
+      <strong id="platformMobileInfoTitle" data-i18n="nav.information">Information &amp; contact</strong>
+      <a href="about.html" data-i18n="landing.about">About</a>
+      <a href="contact.html" data-i18n="footer.contact">Contact</a>
+      <a href="imprint.html" data-i18n="footer.imprint">Legal notice</a>
+      <a href="privacy.html" data-i18n="footer.privacy">Privacy</a>
+      <a href="legal.html" data-i18n="footer.legal">Terms</a>
+    </div>
   </div>
 </nav>
 
@@ -770,8 +805,18 @@
   </section>
 </main>
 
+  <div id="mobileDiscoveryViews" role="group" aria-label="Event view">
+    <button id="mobileMapViewBtn" type="button" aria-pressed="true" aria-controls="map">Map</button>
+    <button id="mobileListViewBtn" type="button" aria-pressed="false" aria-controls="mobileDiscoveryResults">
+      <span id="mobileListViewLabel">List</span>
+      <span id="mobileResultCount" aria-live="polite">0</span>
+    </button>
+  </div>
+
   <!-- MAIN APP -->
   <div id="app">
+
+    <section id="mobileDiscoveryResults" aria-label="Event results" hidden></section>
 
     <!-- SIDEBAR -->
     <div id="sidebar" role="complementary" aria-label="Events and filters" aria-hidden="true">
@@ -3463,7 +3508,7 @@
   defer
   src="js/config.js?v=20260706-header-nav-v67"
 ></script>
-<script defer src="js/i18n.js?v=20260827-mobile-stability-v95"></script>
+<script defer src="js/i18n.js?v=20260907-mobile-usability-v96"></script>
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
@@ -3476,7 +3521,8 @@
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
 <script defer src="js/map.js?v=20260810-uiux-hardening-v113"></script>
 <script defer src="js/search.js?v=20260827-mobile-stability-v72"></script>
-<script defer src="js/app.js?v=20260901-mobile-stability-v101"></script>
+<script defer src="js/app.js?v=20260907-mobile-usability-v102"></script>
+<script defer src="js/mobile-discovery.js?v=20260907-v1"></script>
 
 </body>
 </html>

@@ -257,7 +257,8 @@ Datenbereinigung abgeschlossen.
 - [x] Zusätzlichen Mülheim-Nachlauf (Request 6504, Lauf 4948, Crawl 2655)
   nachgeprüft: HTTP 200, unveränderter Inhalt, null Fehler, keine Extraktionen
   oder angewendeten Ergebnisse/Editionen. Beide Autopublishflags bleiben `false`.
-- [ ] Abschließenden GitHub-Commit und Push nachweisen.
+- [x] Technischen Stand als `6b300f3` committed und auf GitHub `main` gepusht;
+  Produktivstand und Prüfbelege sind im Schemaabgleich-Protokoll dokumentiert.
 - [ ] Nach dem abgenommenen Schemafix den nächsten fachlichen P0 abschließen:
   vollständige 14-Felder-Reviews für Friedberg und Airport Race, eindeutige
   Distanz-/Startkoordinatenbelege für wepLAUF sowie Auflösung ihrer aktuellen

@@ -10,8 +10,9 @@ Stand 48. Worker v20 erwartete teilweise Objekte, die in Production fehlten.
 **Status:** Lokal vollständig abgenommen und produktiv ausgerollt. Beide
 Migrationen, Worker v21 und die begrenzten Live-Prüfungen sind erfolgreich.
 Der zusätzliche Mülheim-Nachlauf und die Bereinigung des behaltenen
-Restore-Clones sind ebenfalls abgeschlossen. Offen ist der abschließende
-GitHub-Abgleich. Der Website-Release bleibt wegen der Kataloggates gesperrt.
+Restore-Clones sind ebenfalls abgeschlossen. Der technische Stand `6b300f3`
+wurde erfolgreich auf GitHub `main` gepusht. Der Website-Release bleibt wegen
+der Kataloggates gesperrt.
 
 Der lesende Ausgangsabgleich bestätigte fehlende Extraktionsspalten in
 `event_change_proposals`, die fehlende Tabelle `event_field_controls` und die
@@ -227,13 +228,14 @@ wurden berücksichtigt. Bestehende Rechte werden nicht pauschal erweitert.
 ## Abschluss
 
 Der gezielte Schema- und Worker-Rollout ist **erfolgreich abgeschlossen**.
-Die Abschlussnachweise werden jeweils erst nach ihrer Durchführung abgehakt:
+Die Abschlussarbeiten sind ebenfalls nachgewiesen:
 
 - [x] Zusätzlichen Mülheim-Nachlauf, Request 6504, ausgewertet; unverändert,
   keine Fehler oder angewendeten Änderungen.
 - [x] Behaltenen Restore-Clone einschließlich exakter Container,
   Datenbank-/Storage-Volumes und entschlüsselter Kopie entfernt; Backup erhalten.
-- [ ] Abschließenden Commit und Push auf GitHub bestätigen.
+- [x] Technischen Stand als `6b300f3` committed und erfolgreich auf GitHub
+  `main` gepusht; dieser Protokollnachtrag folgt als eigener Dokumentationscommit.
 
 Der erneute reguläre Export bleibt vor dem Schreiben gesperrt: 332 Discovery,
 989 Archiv-Editionen, 0 % Frische und 49,40 % Vollständigkeit. Frontend-Artefakte

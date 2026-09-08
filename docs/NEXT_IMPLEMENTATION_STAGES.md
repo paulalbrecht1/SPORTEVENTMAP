@@ -323,6 +323,18 @@ Datenbereinigung abgeschlossen.
   Datenaufbau bleibt ein gesonderter Arbeitsschritt.
   Vollabnahme: technische Suite mit 117/117 Browserfällen, isolierte
   Datenbankprobe mit 23/23 RLS-Fällen einschließlich echtem Batch-Rollback grün.
+- [x] [Faktenbatch 04](P0_BATCH_04_20260908.md) produktiv abgeschlossen:
+  neun bestehende Events, 98 gezielte Feldkorrekturen einschließlich der
+  Archivierung zweier falsch als künftig geführter Termine. Vier vollständige
+  14-Felder-Belege in einem echten Admin-Sammelaufruf bestätigt; drei
+  Distanz-Teilpakete bleiben ohne Vollattestierung. Wiederherstellung,
+  tatsächlicher Rollback, unabhängiger SQL-Review und 117/117 Browserfälle grün.
+  Regulärer Refresh: 330 Discovery, 989 Archiv, 13 gültige Frischenachweise
+  (3,94 %), 50 % Vollständigkeit; Veröffentlichung weiterhin gesperrt.
+- [ ] Die offenen Kinderlauf-Distanzen bei Brauereienlauf und Aerzener twinfit
+  sowie den Streckenkonflikt in Balingen durch eindeutige offizielle Belege
+  klären. Bis dahin bleiben vollständige Distanzpakete und Frischefreigaben
+  gesperrt; die offene Balingen-Quellenaufgabe bleibt erhalten.
 - [ ] Braunenbergs Trail-Konflikt von 30/32/rund 32,5 km anhand einer
   eindeutigen offiziellen Korrektur klären. Keine Vollattestierung bis dahin.
   Termin 18.09.2027 als separat belegten Kandidaten weiterbearbeiten,
@@ -333,9 +345,10 @@ Datenbereinigung abgeschlossen.
   **93/93 Browserfällen** grün. Quellen-/Freigaberegressionen, sechs neue
   Dialogfälle und produktive Zugriffstests bestanden. `npm run check`
   bleibt wegen des vorhandenen gesperrten Datenpakets rot; kein Gate umgangen.
-- [ ] Weitere priorisierte Quellenreviews und mindestens 68 gültige Nettozugänge
+- [ ] Weitere priorisierte Quellenreviews und mindestens 70 gültige Nettozugänge
   ergänzen und bei 400 Discovery-Editionen insgesamt mindestens 220 gültige
-  Frischenachweise erreichen. Auslaufende Editionen erhöhen diesen Bedarf.
+  Frischenachweise erreichen (nach Batch 04 fehlen noch mindestens 207).
+  Auslaufende Editionen erhöhen diesen Bedarf.
   Extraktion und Faktenkorrektur allein ersetzen keinen Admin-Frischenachweis.
 
 Nachweise und verbleibende Abgrenzungen stehen im
@@ -362,6 +375,12 @@ diese Releasegrenzen nicht. Nach sechs neuen Attestierungen bestätigt der
 reguläre Refresh **9 von 332 (2,71 %)**, weiterhin 989 Archiveinträge und
 49,40 % Vollständigkeit. Er stoppt vor dem Schreiben. Ein neues
 Wrangler-Deployment wurde nicht ausgeführt.
+
+Der nachfolgende [Faktenbatch 04](P0_BATCH_04_20260908.md) erreicht
+**13 von 330 (3,94 %)** und 50 % Vollständigkeit. Die zwei korrigierten
+vergangenen Termine verlassen Discovery; alle 989 öffentlichen Detail-/Archiv-
+Editionen bleiben erreichbar. Vier neue Frischenachweise sind produktiv
+bestätigt. Der reguläre Export stoppt weiterhin vor dem Schreiben.
 
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.

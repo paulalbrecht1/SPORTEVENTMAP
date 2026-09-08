@@ -141,7 +141,23 @@ unverändert. Der offizielle 18.09.2027 ist als eigener Braunenberg-Kandidat
 belegt, nicht als vollständige Folgeedition veröffentlicht. Die historischen
 Diagnosen und Prioritäten unten beschreiben den Ausgangspunkt dieser Arbeit.
 
-Die heutige Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
+**Fortschreibung nach [Faktenbatch 04](P0_BATCH_04_20260908.md), 8. September,
+08:27 MESZ:** Neun bestehende Events sind mit 98 gezielten Feldkorrekturen
+bearbeitet; vier vollständige Pakete wurden gemeinsam über die echte
+Admin-Sitzung attestiert. Cottbus (03.09.) und OT Bremen (23.08.) sind als
+vergangen berichtigt und archiviert. Brauereienlauf, twinfit und Balingen
+bleiben wegen unbelegter oder widersprüchlicher Distanzen ohne Vollattestierung.
+Der aktuelle reguläre Refresh liefert **330 Discovery, 13 frische Editionen
+(3,94 %), 989 Archiv-Editionen und 50 % Vollständigkeit**. Zum Mindestbestand
+fehlen 70 Nettozugänge; bei 400 Einträgen fehlen derzeit noch 207 gültige
+Frischenachweise bis 220. Zeitablauf kann diese Lücken vergrößern.
+117/117 Browserfälle, die übrige technische Suite, Wiederherstellungs-/Rollback-
+Probe und lesende Zugriffsaudits sind grün. Der Export stoppt an den
+unveränderten Bestands-/Frischegrenzen vor dem Schreiben; `npm run check`
+blockiert zusätzlich an fünf bestehenden ungeklärten Dublettenkandidaten.
+Es gab keinen Wrangler-Upload und keine Änderung der Releaseversion.
+
+Die ursprüngliche Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
 989 Archiv-Editionen, 0 gültige Frischenachweise und 164 vollständige Einträge
 (49,40 %). 330 Editionen haben einen unbekannten Anmeldestatus.
 113 Editionen besitzen mindestens einen Reviewkonflikt; 169 haben fehlende

@@ -288,3 +288,39 @@ Berichte der Dumps `20260907T212209412Z` und `20260907T223002394Z` einschließli
 Damit ist die Wiederherstellung eines aktuellen Production-Dumps praktisch
 belegt. Nicht abgedeckt sind PITR zwischen zwei Dumps, ein gleichzeitiger Verlust
 des Windows-Profils samt DPAPI-Schlüssel sowie künftige Storage-Dateien.
+
+## Wiederherstellung und Rücknahme für Faktenbatch 04 am 8. September 2026
+
+Vor dem [neun Events umfassenden Faktenbatch 04](P0_BATCH_04_20260908.md)
+wurde die neue verschlüsselte Sicherung
+`backups/production/p0-batch04/sporteventmap-production-20260908T055450921Z.sembackup`
+erstellt. Sie enthält den Produktionsstand vor Batch 04 einschließlich der
+neun bisherigen Frischenachweise. Der Backupzeitraum reicht von
+05:54:50 bis 05:56:21 UTC. Storage ist weiterhin leer; der DB-Snapshot wurde
+mit dem regulären Backupskript und `-DumpSnapshotOnly` erstellt.
+
+Die isolierte Wiederherstellung in `sport-event-map-recovery-drill-ba04f2d5`
+dauerte 39,648 Sekunden. Schema, 40 Migrationen, RLS, Nutzerisolation,
+öffentliche Views und vollständige Bestandsintegrität bestanden. Enthalten:
+999 Events, 1022 Editionen, 1016 Quellen, 36 Favoriten, 48 Saisonplaneinträge
+und fünf Nutzerprofile. Der Wiederherstellungslauf veränderte Production nicht.
+
+Die nachfolgende lokale Wartungsprobe um 06:13:37–06:13:50 UTC bestätigte
+Anwendung, separate Nachprüfung, tatsächliche Rücknahme, wiederholte
+Anwendungs-/Rücknahmeabwehr sowie die Ablehnung abweichender Vor-/Nachzustände.
+Alle Quellen, Favoriten, Saisonpläne, Profile und Nutzer blieben unverändert.
+Das Paket erzeugt 37 private Snapshots: neun Events und neun Editionen jeweils
+vorher/nachher sowie ein Manifest. Eine Rücknahme nach späteren Adminprüfungen
+wird durch den vollständigen Nachzustandsvergleich abgewiesen.
+
+Um 06:17:29 UTC waren ausschließlich die drei Kloncontainer, zwei Klonvolumes
+und das geprüfte Klartextverzeichnis entfernt. Andere lokale Container und
+Volumes blieben unverändert. Der SHA-256 der verschlüsselten Sicherung ist
+vor und nach der Bereinigung identisch:
+`3addaaf903d259b71f4cab0c5afa1514a57b2fb6a91eaf1aaff6547c471b9072`.
+
+Nachweise: Restore-Bericht unter `backups/production/p0-batch04/restore-reports/`,
+`rehearsal-report.json` und `cleanup-report.json` unter
+`exports/p0-batch04-20260908/`. Diese privaten Artefakte bleiben außerhalb von
+Git und der Website. Die anschließende produktive Faktenanwendung und die
+vier echten Admin-Frischeprüfungen sind im Batchprotokoll dokumentiert.

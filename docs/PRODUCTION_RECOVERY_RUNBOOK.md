@@ -354,3 +354,35 @@ dem Backupordner sowie `contract-rehearsal.json` und `cleanup-report.json`
 unter `exports/p0-acceleration-20260908/`. Die produktive Migration
 trägt Version `20260908070046`; ihr gesonderter Live-Nachweis steht im
 verlinkten P0-Protokoll.
+
+## Wiederherstellung und Rücknahme für Faktenbatch 05 am 8. September 2026
+
+Vor dem [Faktenbatch für Speed5 und Ring Running Series](P0_BATCH_05_20260908.md)
+wurde der Snapshot `20260908T072116331Z` unter
+`backups/production/p0-batch05/` erstellt. SHA-256:
+`80e286a743ffd3c8e3c27e32205fb6db9fe759a5768d7b1a211ef60837cd4d9a`.
+Er enthält den Stand vor den 22 Faktenkorrekturen und den zwei späteren
+Adminattestierungen, einschließlich der bereits produktiven öffentlichen
+Wettkampfformate und 41 Migrationen. Backupzeitraum: 07:21:16–07:22:49 UTC.
+
+Die isolierte Wiederherstellung in `sport-event-map-recovery-drill-00a74626`
+dauerte 36,767 Sekunden. Bestandsintegrität, Schema, RLS, Nutzerisolation und
+öffentliche Views bestanden; enthalten sind 999 Events, 1022 Editionen,
+1016 Quellen, 36 Favoriten, 48 Saisonplaneinträge und fünf Nutzer.
+Anwendung, separate Nachprüfung und tatsächliche Rücknahme wurden um
+07:29:37–07:29:44 UTC erprobt, einschließlich Wiederholungs- und Driftabwehr.
+
+Das Anwendungspaket hält neun private Vorher-/Nachher-/Manifestzeilen fest.
+Die vollständige Zustandsbindung verhindert eine unveränderte Rücknahme nach
+späteren Adminattestierungen. Seit deren produktivem Abschluss um 07:42:26 UTC
+ist für eine Rücknahme ein neu geprüfter Vorgang erforderlich; das archivierte
+Batch-05-Skript darf nicht zur Umgehung dieses Schutzes angepasst und blind
+wiederholt werden.
+
+Um 07:43:38 UTC waren exakt drei Kloncontainer, zwei Volumes und das geprüfte
+Klartextverzeichnis entfernt. Andere lokale Ressourcen und das verschlüsselte
+Backup blieben unverändert. Der temporäre Admin-Preview wurde um 07:48:31 UTC
+beendet und nur sein geprüftes Kopierverzeichnis entfernt; Port 4187 ist frei.
+Originalbelege und Quellenarchiv bleiben erhalten. Nachweise liegen in
+`exports/p0-batch05-20260908/` und im zugehörigen Restore-Berichtsordner unter
+dem Backupverzeichnis; keine privaten Artefakte werden veröffentlicht.

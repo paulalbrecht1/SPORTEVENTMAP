@@ -3,6 +3,15 @@
 Stand: 8. September 2026. Ausgangspunkt ist der abgeschlossene
 [Faktenbatch 04](P0_BATCH_04_20260908.md).
 
+Fortschreibung nach [Faktenbatch 05](P0_BATCH_05_20260908.md), 07:42 UTC:
+Die beiden unten vorbereiteten vollständigen Pakete 342/159 sind jetzt mit
+22 Feldkorrekturen produktiv angewendet und gemeinsam über die echte
+Admin-Sitzung attestiert. Frische: 15/330 (4,55 %), Archiv: 989,
+Vollständigkeit: 50 %. Nettozugänge aus diesem Paket: null. Bei genau
+400 sichtbaren Editionen fehlen aktuell noch 205 gültige Nachweise und
+mindestens 70 Nettozugänge. Die nachstehenden Vorprüfungsangaben dokumentieren
+den Zustand vor dieser Anwendung; Rostock und Köhlbrand bleiben Teilpakete.
+
 ## Engpass und Arbeitsweise
 
 Die bisherige Einzelprüfung hat echte Fehler beseitigt. Für das Erreichen der

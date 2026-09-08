@@ -169,6 +169,20 @@ Der nächste Datenaufbau nutzt frühe Konfliktprüfung und gemeinsame vollständ
 Faktenpakete; 15 potenzielle Nettozugänge sind priorisiert und bei vier davon
 die offiziellen Termine bestätigt. Keiner wurde dadurch bereits veröffentlicht.
 
+**Fortschreibung nach [Faktenbatch 05](P0_BATCH_05_20260908.md),
+8. September, 09:42 MESZ:** Die vollständigen Speed5-/Ring-Running-Pakete sind
+mit 22 Feldkorrekturen und sechs Formaten produktiv angewendet. Beide echten
+Admin-Frischeprüfungen sind in einem Sammelaufruf gespeichert und unabhängig
+im Audit bestätigt: je 14 Felder, keine Unsicherheit, unveränderte originale
+Quellenprüfzeiten. Der reguläre Refresh bestätigt **330 Discovery, 15 frische
+Editionen (4,55 %), 989 Archiv-Editionen und 50 % Vollständigkeit**.
+Restore-/Rollbackprobe, gezielte Frischeregressionen und 14 lesende produktive
+Zugriffsprüfungen sind grün. Kein Anwendungscode wurde verändert. Die bestehenden
+Daten-Gates stoppen weiter vor dem Export; kein Wrangler-Upload.
+Als Nächstes folgt die Absicherung des Veröffentlichungswegs für vollständige
+zukünftige Editionen. Mindestens 70 Nettozugänge und bei 400 Editionen noch
+205 zusätzliche gültige Nachweise fehlen, vorbehaltlich weiterer Zeitabläufe.
+
 Die ursprüngliche Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
 989 Archiv-Editionen, 0 gültige Frischenachweise und 164 vollständige Einträge
 (49,40 %). 330 Editionen haben einen unbekannten Anmeldestatus.

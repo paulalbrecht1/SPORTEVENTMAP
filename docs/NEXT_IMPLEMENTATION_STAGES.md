@@ -340,6 +340,16 @@ Datenbereinigung abgeschlossen.
   Warteschlangen; vier offizielle Folgeeditionstermine sind bestätigt,
   aber noch nicht vollständig freigegeben. Ein technischer Vorfilter umfasst
   70 Bestandsevents, eine priorisierte Nettozugangsliste 15 Kandidaten.
+- [x] [Faktenbatch 05](P0_BATCH_05_20260908.md) produktiv abgeschlossen:
+  Speed5 und Ring Running Series mit 22 Feldkorrekturen und sechs Formaten
+  angewendet; beide vollständigen 14-Felder-Belege über die echte Admin-Sitzung
+  gemeinsam bestätigt. Frische steigt auf 15/330 (4,55 %), Archiv bleibt 989,
+  Vollständigkeit 50 %. Restore-/Rollbackprobe, gezielte Frischeregressionen
+  sowie 9/9 anonyme und 5/5 Frische-Zugriffsfälle bestanden.
+- [ ] Veröffentlichungspfad für zukünftige Editionen so absichern, dass
+  Kalendererkennung oder Datum-/URL-Bestätigung keine vollständige Verifikation
+  erzeugen. Erst danach vollständig belegte Folgeeditionen veröffentlichen
+  und ihren tatsächlichen Nettozuwachs nachprüfen.
 - [ ] Die offenen Kinderlauf-Distanzen bei Brauereienlauf und Aerzener twinfit
   sowie den Streckenkonflikt in Balingen durch eindeutige offizielle Belege
   klären. Bis dahin bleiben vollständige Distanzpakete und Frischefreigaben
@@ -356,7 +366,7 @@ Datenbereinigung abgeschlossen.
   bleibt wegen des vorhandenen gesperrten Datenpakets rot; kein Gate umgangen.
 - [ ] Weitere priorisierte Quellenreviews und mindestens 70 gültige Nettozugänge
   ergänzen und bei 400 Discovery-Editionen insgesamt mindestens 220 gültige
-  Frischenachweise erreichen (nach Batch 04 fehlen noch mindestens 207).
+  Frischenachweise erreichen (nach Batch 05 fehlen noch mindestens 205).
   Auslaufende Editionen erhöhen diesen Bedarf.
   Extraktion und Faktenkorrektur allein ersetzen keinen Admin-Frischenachweis.
 
@@ -390,6 +400,12 @@ Der nachfolgende [Faktenbatch 04](P0_BATCH_04_20260908.md) erreicht
 vergangenen Termine verlassen Discovery; alle 989 öffentlichen Detail-/Archiv-
 Editionen bleiben erreichbar. Vier neue Frischenachweise sind produktiv
 bestätigt. Der reguläre Export stoppt weiterhin vor dem Schreiben.
+
+Nach [Faktenbatch 05](P0_BATCH_05_20260908.md) sind **15 von 330 (4,55 %)**
+frisch; Bestand, Archiv und Vollständigkeit bleiben unverändert. Die beiden
+vorbereiteten vollständigen Pakete sind damit angewendet und gesondert
+attestiert. Mindestens 70 Nettozugänge fehlen weiterhin. Die nächste konkrete
+Arbeit ist der sichere Freigabepfad für belegte zukünftige Editionen.
 
 - [ ] Anschließend frischen Export, vollständige Release-Abnahme, Preview und
   Production-Upload desselben geprüften Pakets ausführen.

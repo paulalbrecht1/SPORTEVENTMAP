@@ -3,6 +3,11 @@
 The public website is generated into `dist/`. GitHub and Cloudflare are not
 connected, so commits and merges never publish the website automatically.
 
+For explicitly requested UI-only releases that preserve every deployed data
+artifact, use the separate [UI release workflow](UI_ONLY_RELEASE.md). Its fixed
+allowlist and base-package integrity checks do not change the full-release
+requirements below and do not approve a new catalog export.
+
 ## Install, Test and Build
 
 Run all commands from the project directory:

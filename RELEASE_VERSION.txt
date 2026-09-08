@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260901-mobile-stability-v84
-Build: only from a clean committed source tree; dist/release.json is authoritative.
-Includes: Stable mobile filters, responsive event details, mobile light/dark theme fixes, readable authentication fields, verified public catalog export, reproducible release metadata, static event pages, sitemap, legal pages, CSS and JavaScript. Stage 4 and automatic publication remain disabled.
+Version: 20260908-ui-only-v85
+Build: only from a clean committed source tree; the deployed release.json is authoritative.
+Includes: Finished mobile discovery, navigation and information-page improvements, verified-format rendering and guarded admin review UI. UI-only release preserves the exact v84 published catalog, static event pages, sitemap and public runtime configuration. No new catalog-quality approval, data export or database migration is included. Stage 4 and automatic publication remain disabled.

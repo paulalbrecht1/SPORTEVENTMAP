@@ -75,6 +75,12 @@ gibt für diese Prüfung keinen Skip- oder Zeit-Override.
 
 ## GitHub und Production
 
+Für den ausdrücklich beauftragten Fall einer reinen Oberflächenveröffentlichung
+gilt seit 08.09.2026 zusätzlich der enge [UI-Releaseweg](UI_ONLY_RELEASE.md).
+Er behält das exakt nachgewiesene bisherige Produktionsdatenpaket bei und prüft
+ein separates Artefakt mit fester Dateiliste. Die oben beschriebenen normalen
+Build-/Datenfreigaben bleiben unverändert; der UI-Weg erteilt keine Katalogfreigabe.
+
 Jede vollständig getestete Entwicklungsänderung wird committed und auf GitHub
 gepusht. Ein Git-Push ist kein Production-Deployment und löst keinen normalen
 Wrangler-/Cloudflare-Schritt aus. Production wird ausschließlich in einem

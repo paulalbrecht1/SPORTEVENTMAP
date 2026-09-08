@@ -76,7 +76,7 @@
     "test:e2e:headed": "node tests/e2e/run-playwright.mjs --headed",
     "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
     "test:catalog-release": "node tests/catalog-release-gate.test.mjs && node tests/catalog-export-policy.test.mjs",
-    "test:release-entrypoints": "node tests/release-entrypoints.test.mjs && node tests/release-package-integrity.test.mjs",
+    "test:release-entrypoints": "node tests/release-entrypoints.test.mjs && node tests/release-package-integrity.test.mjs && node --test tests/ui-release.test.mjs",
     "test:code": "npm run test:release-entrypoints && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:germany-expansion && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
     "test:all": "npm run check && npm run test:code",
     "test:gate": "npm run check && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run audit:layout && npm run test:e2e && npm run test:rls:local && npm run audit:anon"

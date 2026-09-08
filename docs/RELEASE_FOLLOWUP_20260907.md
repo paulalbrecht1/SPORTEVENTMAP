@@ -157,6 +157,18 @@ unveränderten Bestands-/Frischegrenzen vor dem Schreiben; `npm run check`
 blockiert zusätzlich an fünf bestehenden ungeklärten Dublettenkandidaten.
 Es gab keinen Wrangler-Upload und keine Änderung der Releaseversion.
 
+**Fortschreibung nach dem [Distanzvertrags-Fix](P0_ACCELERATION_20260908.md),
+8. September, 09:01 MESZ:** Beide Live-Views geben vorhandene strukturierte
+Wettkampfformate wieder korrekt weiter. Die gezielte Migration erhält alle
+bisherigen öffentlichen Werte und Zugriffsregeln. CSV-Normalisierung und
+ein dauerhafter anonymer Feldtest sind ergänzt; 117/117 Browserfälle,
+9/9 anonyme Zugriffsprüfungen und 5/5 Frische-Zugriffsfälle bestanden.
+Der reguläre Refresh bleibt bei 330/989, 13 gültigen Nachweisen und 50 %
+Vollständigkeit vor dem Schreiben gesperrt. Kein Wrangler-Upload.
+Der nächste Datenaufbau nutzt frühe Konfliktprüfung und gemeinsame vollständige
+Faktenpakete; 15 potenzielle Nettozugänge sind priorisiert und bei vier davon
+die offiziellen Termine bestätigt. Keiner wurde dadurch bereits veröffentlicht.
+
 Die ursprüngliche Diagnose bestätigt 332 Discovery-Editionen (277 Deutschland),
 989 Archiv-Editionen, 0 gültige Frischenachweise und 164 vollständige Einträge
 (49,40 %). 330 Editionen haben einen unbekannten Anmeldestatus.

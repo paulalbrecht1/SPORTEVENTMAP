@@ -28,6 +28,16 @@ if (!supabaseUrl || !publishableKey) {
 
 const checks = [
   [
+    "discovery competition formats",
+    "public_event_discovery?select=edition_id,race_formats&order=edition_id.asc&limit=5",
+    "public_formats"
+  ],
+  [
+    "archive competition formats",
+    "public_event_archive?select=edition_id,race_formats&order=edition_id.asc&limit=5",
+    "public_formats"
+  ],
+  [
     "approved events",
     "events?select=id,status&status=eq.approved&limit=1",
     "public"
@@ -98,7 +108,13 @@ for (const [name, query, visibility] of checks) {
       : null;
 
   const secure =
-    visibility === "public"
+    visibility === "public_formats"
+      ? response.ok && rowCount > 0 && data.every(row =>
+          typeof row.edition_id === "string" &&
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(row.edition_id) &&
+          Array.isArray(row.race_formats)
+        )
+      : visibility === "public"
       ? response.ok
       : (
           response.status === 401 ||

@@ -153,6 +153,20 @@ function parseCoordinate(value) {
 }
 
 
+function normalizeRaceFormats(value) {
+  let formats = value;
+  if (typeof formats === "string") {
+    try {
+      formats = JSON.parse(formats);
+    } catch {
+      return [];
+    }
+  }
+  return Array.isArray(formats)
+    ? formats.filter(format => format && typeof format === "object" && !Array.isArray(format))
+    : [];
+}
+
 function normalizeEvent(rawEvent) {
   const normalized = {
     ...rawEvent,
@@ -168,6 +182,8 @@ function normalizeEvent(rawEvent) {
       cleanValue(rawEvent.country),
     distance:
       cleanValue(rawEvent.distance),
+    race_formats:
+      normalizeRaceFormats(rawEvent.race_formats),
     description:
       cleanValue(rawEvent.description),
     image:

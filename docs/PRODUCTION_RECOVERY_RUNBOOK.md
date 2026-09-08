@@ -324,3 +324,33 @@ Nachweise: Restore-Bericht unter `backups/production/p0-batch04/restore-reports/
 `exports/p0-batch04-20260908/`. Diese privaten Artefakte bleiben außerhalb von
 Git und der Website. Die anschließende produktive Faktenanwendung und die
 vier echten Admin-Frischeprüfungen sind im Batchprotokoll dokumentiert.
+
+## Öffentlicher Distanzvertrag am 8. September 2026
+
+Für die [gezielte Ergänzung der öffentlichen Formate](P0_ACCELERATION_20260908.md)
+wurde der Snapshot `20260908T064329512Z` unter
+`backups/production/p0-public-contract/` erstellt. SHA-256:
+`0106932955318db30fb544e95b941e60e80a9db622eed8e1ab12442f909e54f9`.
+Der Klon `sport-event-map-recovery-drill-ee6ec898` stellte den aktuellen Stand
+einschließlich der 13 Frischenachweise in 39,394 Sekunden wieder her;
+Schema, Datenintegrität, RLS und Nutzerisolation bestanden.
+
+Die Migration erhält alle alten Spalten, Werte und Sichtbarkeitsregeln.
+Rücknahme und Forward-Recovery sind dauerhaft als
+`supabase/maintenance/20260908_public_race_formats_contract_rollback.sql` und
+`supabase/maintenance/20260908_public_race_formats_contract_restore.sql`
+hinterlegt. Sie wurden am Klon praktisch ausgeführt, einschließlich ihrer
+Wiederholungsabwehr. Die Rücknahme ersetzt die zusätzliche Spalte ausschließlich
+durch `NULL::jsonb`; ihre Position und die abhängige Admin-Inbox bleiben
+erhalten. Anschließend wird nur der Guarded-Restore verwendet, denn die
+Migration selbst lehnt eine unerwartete NULL-Projektion ab. Nach jeder
+Wiederherstellung sind der SQL-Postflight und die anonymen REST-Prüfungen
+erneut erforderlich.
+
+Um 07:05:04 UTC waren exakt die drei Kloncontainer, zwei Volumes und das
+geprüfte Klartextverzeichnis entfernt. Andere lokale Umgebungen und das
+verschlüsselte Backup blieben unverändert. Nachweise: Restore-Bericht unter
+dem Backupordner sowie `contract-rehearsal.json` und `cleanup-report.json`
+unter `exports/p0-acceleration-20260908/`. Die produktive Migration
+trägt Version `20260908070046`; ihr gesonderter Live-Nachweis steht im
+verlinkten P0-Protokoll.

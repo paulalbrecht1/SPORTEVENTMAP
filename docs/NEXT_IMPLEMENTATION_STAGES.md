@@ -331,6 +331,15 @@ Datenbereinigung abgeschlossen.
   tatsächlicher Rollback, unabhängiger SQL-Review und 117/117 Browserfälle grün.
   Regulärer Refresh: 330 Discovery, 989 Archiv, 13 gültige Frischenachweise
   (3,94 %), 50 % Vollständigkeit; Veröffentlichung weiterhin gesperrt.
+- [x] [Öffentlichen Distanzvertrag und P0-Durchsatz](P0_ACCELERATION_20260908.md)
+  verbessert: fehlende strukturierte Wettkampfformate in beiden Live-Views
+  ergänzt, CSV-Normalisierung und dauerhafte anonyme Vertragsprüfung eingeführt.
+  Migration, Rücknahme/Wiederherstellung und 117/117 Browserfälle bestanden.
+  Frische und Bestand bleiben 13/330; keine neuen Fakten oder Attestierungen
+  vorgetäuscht. Fachliche Vorprüfung und Nettozugänge laufen in getrennten
+  Warteschlangen; vier offizielle Folgeeditionstermine sind bestätigt,
+  aber noch nicht vollständig freigegeben. Ein technischer Vorfilter umfasst
+  70 Bestandsevents, eine priorisierte Nettozugangsliste 15 Kandidaten.
 - [ ] Die offenen Kinderlauf-Distanzen bei Brauereienlauf und Aerzener twinfit
   sowie den Streckenkonflikt in Balingen durch eindeutige offizielle Belege
   klären. Bis dahin bleiben vollständige Distanzpakete und Frischefreigaben

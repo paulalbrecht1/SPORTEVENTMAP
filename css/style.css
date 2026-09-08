@@ -46680,3 +46680,213 @@ body.legal-page.legal-page--polished :is(a, button):focus-visible {
 .content-verification-actions button { min-height: 44px; padding: 10px 16px; border: 1px solid #64748b; border-radius: 8px; background: #172539; color: #f1f5f9; font: inherit; cursor: pointer; }
 .content-verification-actions button[type="submit"] { background: #15803d; color: #fff; border-color: #22c55e; }
 .content-verification-form :focus-visible { outline: 3px solid #86efac; outline-offset: 3px; }
+
+/* Field-by-field batch review shares the existing verification dialog. */
+:root .content-verification-dialog.freshness-batch-dialog {
+  width: min(1080px, calc(100vw - 24px));
+  max-width: 1080px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.freshness-batch-dialog *,
+.freshness-batch-dialog *::before,
+.freshness-batch-dialog *::after {
+  box-sizing: border-box;
+}
+.freshness-batch-dialog .content-verification-form > *,
+.freshness-batch-card > * {
+  min-width: 0;
+  max-width: 100%;
+}
+.freshness-batch-import,
+.freshness-batch-list {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+.freshness-batch-import {
+  padding: 14px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #0c1522;
+}
+.freshness-batch-import > label,
+.freshness-batch-card > label:not(.content-verification-attestation) {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+}
+.freshness-batch-dialog input:not([type="checkbox"]),
+.freshness-batch-dialog textarea {
+  max-width: 100%;
+  min-height: 44px;
+  font-size: 16px;
+}
+.freshness-batch-dialog input[type="file"]::file-selector-button {
+  max-width: 100%;
+  min-height: 44px;
+  margin-inline-end: 8px;
+  padding: 8px 12px;
+  border: 1px solid #64748b;
+  border-radius: 6px;
+  background: #24364e;
+  color: #f1f5f9;
+  font: inherit;
+  cursor: pointer;
+}
+.freshness-batch-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #475569;
+  border-radius: 10px;
+  background: #172539;
+  color: #f1f5f9;
+}
+.freshness-batch-card summary {
+  min-height: 44px;
+  padding: 8px 0;
+  color: inherit;
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.freshness-batch-card[open] > summary {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #475569;
+}
+.freshness-batch-card > p,
+.freshness-batch-card > label {
+  margin-block: 12px;
+}
+.freshness-batch-comparison {
+  display: grid;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 0;
+  min-width: 0;
+}
+.freshness-batch-field {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.6fr) repeat(2, minmax(0, 1fr));
+  min-width: 0;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  background: #101b2b;
+}
+.freshness-batch-field[data-match="true"] {
+  border-inline-start: 3px solid #4ade80;
+}
+.freshness-batch-field[data-match="false"] {
+  border: 1px solid #fbbf24;
+  border-inline-start-width: 3px;
+  background: #292417;
+}
+.freshness-batch-field > dt,
+.freshness-batch-field > dd {
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.freshness-batch-field > dt {
+  font-weight: 700;
+  line-height: 1.5;
+}
+.freshness-batch-field > dd {
+  border-inline-start: 1px solid #475569;
+}
+.freshness-batch-field > dd > span {
+  display: block;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.freshness-batch-field pre {
+  max-width: 100%;
+  margin: 6px 0 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #f1f5f9;
+  font: 14px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.freshness-batch-dialog .content-verification-attestation {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 12px;
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.freshness-batch-dialog .content-verification-attestation input[type="checkbox"] {
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+}
+.freshness-batch-dialog .freshness-batch-errors,
+.freshness-batch-dialog .freshness-batch-status {
+  margin: 0;
+  padding: 12px;
+  border: 1px solid #64748b;
+  border-radius: 8px;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
+}
+.freshness-batch-dialog .freshness-batch-errors {
+  border-color: #f87171;
+  background: #3a1b25;
+  color: #fecaca;
+}
+.freshness-batch-dialog .freshness-batch-errors:empty {
+  display: none;
+}
+.freshness-batch-dialog .freshness-batch-status {
+  background: #0c1522;
+  color: #e2e8f0;
+}
+.freshness-batch-dialog button {
+  min-width: 44px;
+  min-height: 44px;
+  max-width: 100%;
+  font-size: 16px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.freshness-batch-dialog button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+@media (max-width: 700px) {
+  .freshness-batch-field {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .freshness-batch-field > dd {
+    border-inline-start: 0;
+    border-top: 1px solid #475569;
+  }
+  .freshness-batch-dialog .content-verification-actions > button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+@media (max-width: 400px) {
+  :root .content-verification-dialog.freshness-batch-dialog {
+    padding: 12px;
+  }
+  .freshness-batch-import,
+  .freshness-batch-card,
+  .freshness-batch-field > dt,
+  .freshness-batch-field > dd {
+    padding: 10px;
+  }
+}

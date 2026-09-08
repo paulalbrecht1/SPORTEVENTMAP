@@ -4649,6 +4649,8 @@ function ensureDataOpsReviewWorkspace() {
         </label>
         <button type="button" data-lifecycle-action="select-all">Pruefbare waehlen</button>
         <button type="button" data-lifecycle-action="approve-selected">Auswahl bestaetigen</button>
+        <button type="button" data-lifecycle-action="select-freshness">Bis zu 25 Frischeprüfungen wählen</button>
+        <button type="button" data-lifecycle-action="review-freshness-selected">Frischeauswahl prüfen</button>
       </div>
       <div id="editionLifecycleList" class="edition-lifecycle-list" aria-live="polite"></div>`;
     operationsRoot.insertBefore(review, operationsRoot.querySelector(".admin-data-operations-kpis"));
@@ -6116,6 +6118,7 @@ function renderEditionLifecycleInbox() {
     const requiredConfirmations = Number(row.metadata?.required_confirmations || 0);
     return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
       ${canPublish ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
+      ${canVerifyFreshness ? `<label class="edition-lifecycle-select"><input type="checkbox" data-freshness-select value="${escapeAdminHTML(row.edition_id)}"> Für Frischepaket wählen</label>` : ""}
       <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${row.metadata?.review_tier ? `<span class="admin-review-tier">${escapeAdminHTML(row.metadata.review_tier)}</span>` : ""}${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewPriorityContext(row)}${renderReviewInboxDiff(row)}${renderContentVerificationEvidence(row)}</div>
       <dl><div><dt>Status</dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt>Bestaetigungen</dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
       <div class="source-monitor-actions">
@@ -6163,6 +6166,10 @@ async function approveEditionLifecycleItems(items) {
 
 async function handleEditionLifecycleAction(button) {
   const action = button.dataset.lifecycleAction;
+  if (["select-freshness", "review-freshness-selected"].includes(action)) {
+    await handleFreshnessBatchAction(button);
+    return;
+  }
   if (action === "select-all") {
     const selectable = [...(editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]") || [])];
     selectable.forEach((input, index) => { input.checked = index < 50; });
@@ -6242,6 +6249,67 @@ async function handleEditionLifecycleAction(button) {
     setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Lifecycle-Aktion fehlgeschlagen."), "error");
   } finally {
     setButtonLoading(button, false);
+  }
+}
+
+function getFreshnessBatchContext(editionId) {
+  const row = editionLifecycleInbox.find(item => item.item_type === "freshness_review" && String(item.edition_id) === editionId);
+  if (!row) return { editionId, eligible: false };
+  const source = getEligibleFreshnessReviewSource(row);
+  const edition = dataOpsEditions.find(item => String(item.id) === editionId);
+  return {
+    eventId: String(row.event_id), editionId, sourceId: String(source?.id || ""), sourceUrl: source?.source_url || "",
+    storedValues: getFreshnessVerificationStoredValues(row), eligible: canVerifyFreshnessReview(row),
+    revision: JSON.stringify({ source, edition })
+  };
+}
+
+async function handleFreshnessBatchAction(button) {
+  if (button.dataset.lifecycleAction === "select-freshness") {
+    const selected = new Set();
+    [...editionLifecycleElements.list.querySelectorAll("[data-freshness-select]")].forEach(input => {
+      input.checked = selected.size < 25 && !selected.has(input.value) && getFreshnessBatchContext(input.value).eligible;
+      if (input.checked) selected.add(input.value);
+    });
+    setEditionLifecycleStatus(`${selected.size} Events für die Frischeprüfung ausgewählt. Jedes Event braucht einen eigenen Beleg und eine eigene Bestätigung.`, "success");
+    return;
+  }
+  const editionIds = [...editionLifecycleElements.list.querySelectorAll("[data-freshness-select]:checked")].map(input => input.value);
+  if (!editionIds.length || editionIds.length > 25 || new Set(editionIds).size !== editionIds.length) {
+    setEditionLifecycleStatus("Bitte 1 bis 25 verschiedene Events für die Frischeprüfung auswählen.", "error");
+    return;
+  }
+  setButtonLoading(button, true, "Frischepaket öffnen ...");
+  try {
+    await import("./freshness-batch-review.js?v=20260908-v1");
+    const contexts = editionIds.map(getFreshnessBatchContext);
+    if (contexts.some(context => !context.eligible)) throw new Error("Mindestens ein Event ist nicht mehr für die Frischeprüfung freigegeben. Datenstand neu laden.");
+    const result = await window.SemFreshnessBatchReview.open({
+      contexts,
+      refreshContexts: async () => {
+        await loadDataOperations({ throwOnError: true });
+        return editionIds.map(getFreshnessBatchContext);
+      },
+      submit: async args => {
+        const { data, error } = await supabaseClient.rpc("verify_freshness_review_editions", args);
+        if (error) throw error;
+        return data;
+      }
+    });
+    if (result) {
+      try {
+        await loadDataOperations({ throwOnError: true });
+        setEditionLifecycleStatus(`${result.verified_count} Events mit vollständigen Feldbelegen gemeinsam bestätigt.`, "success");
+      } catch {
+        setEditionLifecycleStatus(`${result.verified_count} Events wurden bestätigt. Die Ansicht konnte danach nicht aktualisiert werden; bitte neu laden.`, "error");
+      }
+    }
+  } catch (error) {
+    setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Frischepaket konnte nicht geöffnet werden."), "error");
+  } finally {
+    setButtonLoading(button, false);
+    const focusTarget = button.isConnected ? button : document.querySelector('[data-lifecycle-action="review-freshness-selected"]');
+    focusTarget?.focus();
   }
 }
 
@@ -6740,8 +6808,11 @@ async function handleStageFourAction(button) {
   }
 }
 
-async function loadDataOperations() {
-  if (!dataOpsElements.panel) return;
+async function loadDataOperations({ throwOnError = false } = {}) {
+  if (!dataOpsElements.panel) {
+    if (throwOnError) throw new Error("Data Operations ist nicht verfügbar. Bitte neu laden.");
+    return;
+  }
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
   const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
@@ -6763,6 +6834,7 @@ async function loadDataOperations() {
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
+    if (throwOnError) throw new Error("Aktueller Datenstand konnte nicht vollständig geladen werden. Keine Freigabe möglich.");
     return;
   }
   dataOpsEvents = eventsResult.rows || [];
@@ -6985,6 +7057,13 @@ stageFourElements.section?.addEventListener("click", event => {
 editionLifecycleElements.section?.addEventListener("click", event => {
   const button = event.target.closest("[data-lifecycle-action]");
   if (button) handleEditionLifecycleAction(button);
+});
+editionLifecycleElements.list?.addEventListener("change", event => {
+  const input = event.target.closest("[data-freshness-select]");
+  if (input?.checked && editionLifecycleElements.list.querySelectorAll("[data-freshness-select]:checked").length > 25) {
+    input.checked = false;
+    setEditionLifecycleStatus("Ein Frischepaket darf höchstens 25 Events enthalten.", "error");
+  }
 });
 editionLifecycleElements.filter?.addEventListener("change", renderEditionLifecycleInbox);
 

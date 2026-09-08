@@ -316,6 +316,13 @@ Datenbereinigung abgeschlossen.
   bereits umgesetzt schließen; tatsächlichen RPC-Status darstellen.
   Vier Braunenberg-Vorschläge mit echter Admin-Sitzung abgeschlossen:
   Anmeldelink/EUR `superseded`, Mindestpreis/Streckenextrakt `rejected`.
+- [x] [Sammelprüfung für bis zu 25 Editionen](P0_FRESHNESS_BATCH_REVIEW_20260908.md)
+  implementiert: Belegimport, sichtbarer 14-Felder-Vergleich und bewusste
+  Bestätigung je Event. Strikter Datenabgleich vor genau einem atomaren RPC,
+  keine Zeitauffrischung oder automatische Faktenänderung. Weiterer
+  Datenaufbau bleibt ein gesonderter Arbeitsschritt.
+  Vollabnahme: technische Suite mit 117/117 Browserfällen, isolierte
+  Datenbankprobe mit 23/23 RLS-Fällen einschließlich echtem Batch-Rollback grün.
 - [ ] Braunenbergs Trail-Konflikt von 30/32/rund 32,5 km anhand einer
   eindeutigen offiziellen Korrektur klären. Keine Vollattestierung bis dahin.
   Termin 18.09.2027 als separat belegten Kandidaten weiterbearbeiten,

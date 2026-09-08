@@ -2302,6 +2302,173 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
   );
 }
 
+if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  await test("19b. A later invalid freshness review rolls back the complete batch", async () => {
+    assert.ok(["localhost", "127.0.0.1", "[::1]"].includes(new URL(baseUrl).hostname),
+      "The two-event atomicity fixture is restricted to a local test database.");
+    const fixtures = [];
+    const requiredFields = [
+      "event_name", "edition_year", "date", "city", "country", "address", "latitude",
+      "longitude", "sport", "distances", "description", "registration_status",
+      "official_event_page", "registration_link"
+    ];
+    const future = new Date(Date.now() + 180 * 86400000);
+    const isoDate = future.toISOString().slice(0, 10);
+    const legacyDate = `${String(future.getUTCDate()).padStart(2, "0")}.${String(future.getUTCMonth() + 1).padStart(2, "0")}.${future.getUTCFullYear()}`;
+    const checkedAt = new Date(Date.now() - 60000).toISOString();
+    async function rows(query) {
+      const response = await serviceRequest(query);
+      assert.equal(response.response.ok, true, JSON.stringify(response.data));
+      return response.data;
+    }
+    async function snapshot() {
+      const eventIds = fixtures.map(item => item.eventId).join(",");
+      const editionIds = fixtures.map(item => item.editionId).join(",");
+      return {
+        events: await rows(`events?select=*&id=in.(${eventIds})&order=id`),
+        editions: await rows(`event_editions?select=*&id=in.(${editionIds})&order=event_id,id`),
+        sources: await rows(`event_sources?select=*&event_id=in.(${eventIds})&order=event_id,id`),
+        audits: await rows(`event_audit_log?select=id,entity_id,field_name,new_value,changed_by&entity_type=eq.edition&entity_id=in.(${editionIds})&field_name=eq.__freshness_verification__&order=id`)
+      };
+    }
+    try {
+      for (let index = 0; index < 2; index += 1) {
+        const sourceUrl = `https://example.com/freshness-atomic-${runId}-${index}`;
+        const created = await restRequest("events", {
+          token: admin.token, method: "POST", prefer: "return=representation",
+          body: {
+            event_name: `[FRESHNESS ATOMIC TEST] ${runId}-${index}`,
+            sport: "Running", date: legacyDate, city: "Berlin", country: "Germany",
+            address: "Synthetic atomic review venue, Berlin", latitude: "52.5200", longitude: "13.4050",
+            distance: "10 km", event_url: sourceUrl, status: "pending", created_by: admin.user.id,
+            description: "A synthetic local review fixture with complete descriptive facts, an official test source and unchanged running formats to verify atomic metadata updates."
+          }
+        });
+        assert.equal(created.response.ok, true, JSON.stringify(created.data));
+        const fixture = { eventId: created.data[0].id, sourceUrl };
+        fixtures.push(fixture);
+        const approved = await restRequest(`events?id=eq.${fixture.eventId}`, {
+          token: admin.token, method: "PATCH", body: { status: "approved" }
+        });
+        assert.equal(approved.response.ok, true, JSON.stringify(approved.data));
+        const editions = await rows(`event_editions?select=id&event_id=eq.${fixture.eventId}`);
+        assert.equal(editions.length, 1);
+        fixture.editionId = editions[0].id;
+        const edition = await serviceRequest(`event_editions?id=eq.${fixture.editionId}`, {
+          method: "PATCH", prefer: "return=representation",
+          body: {
+            edition_year: future.getUTCFullYear(), start_date: isoDate, end_date: isoDate,
+            publication_status: "published", discovery_status: "active", edition_status: "scheduled",
+            verification_status: "stale", needs_review: true, review_priority: "high",
+            registration_status: "registration_open", registration_url: `${sourceUrl}/register`,
+            source_url: sourceUrl, race_formats: [{ label: "10 km", distance_km: 10 }],
+            next_check_at: new Date(Date.now() - 86400000).toISOString()
+          }
+        });
+        assert.equal(edition.response.ok, true, JSON.stringify(edition.data));
+        const source = await serviceRequest("event_sources", {
+          method: "POST", prefer: "return=representation",
+          body: {
+            event_id: fixture.eventId, edition_id: fixture.editionId,
+            source_type: "official_event_website", source_url: sourceUrl, parser_type: "html",
+            is_active: true, crawl_status: "not_modified", consecutive_failures: 0,
+            last_change_status: "unchanged", last_fetched_at: checkedAt,
+            next_fetch_at: new Date(Date.now() + 86400000).toISOString()
+          }
+        });
+        assert.equal(source.response.ok, true, JSON.stringify(source.data));
+        fixture.sourceId = source.data[0].id;
+      }
+      fixtures.sort((a, b) => Number(a.eventId) - Number(b.eventId));
+      assert.ok(Number(fixtures[0].eventId) < Number(fixtures[1].eventId));
+      const before = await snapshot();
+      assert.equal(before.audits.length, 0);
+      const evidence = Object.fromEntries(fixtures.map(fixture => {
+        const event = before.events.find(row => row.id === fixture.eventId);
+        const edition = before.editions.find(row => row.id === fixture.editionId);
+        return [fixture.editionId, {
+          source_id: fixture.sourceId, source_url: fixture.sourceUrl,
+          source_checked_at: checkedAt, confidence: 0.95,
+          confirmed_fields: requiredFields, uncertain_fields: [],
+          observed_values: {
+            event_name: event.canonical_name || event.event_name, edition_year: edition.edition_year,
+            date: edition.start_date, city: event.city, country: event.country, address: event.address,
+            latitude: event.latitude, longitude: event.longitude, sport: event.sport,
+            distances: edition.race_formats, description: event.description,
+            registration_status: edition.registration_status, official_event_page: fixture.sourceUrl,
+            registration_link: edition.registration_url
+          }
+        }];
+      }));
+      const editionIds = fixtures.map(fixture => fixture.editionId);
+      const invalidEvidence = structuredClone(evidence);
+      const laterEdition = fixtures[1].editionId;
+      invalidEvidence[laterEdition].observed_values.city = "Synthetic mismatched city";
+      // The RPC processes event_id order, not caller order. The valid earlier
+      // edition reaches its update before the later evidence raises an error.
+      const rejected = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token, method: "POST",
+        body: {
+          p_edition_ids: [...editionIds].reverse(),
+          p_notes: "Two independent local reviews; later factual mismatch must roll back both.",
+          p_evidence: invalidEvidence
+        }
+      });
+      assert.equal(rejected.response.ok, false);
+      assert.match(rejected.data.message, /official source differs from stored event data/,
+        "The rejection must come from the later factual comparison, not an earlier fixture/setup failure.");
+      assert.ok(rejected.data.message.includes(laterEdition), "The failing review must be the later edition.");
+      assert.deepEqual(await snapshot(), before,
+        "All event/source/edition rows and both audit trails must survive the failed transaction unchanged.");
+
+      const accepted = await restRequest("rpc/verify_freshness_review_editions", {
+        token: admin.token, method: "POST",
+        body: {
+          p_edition_ids: [...editionIds].reverse(),
+          p_notes: "Both complete official-source evidence objects reviewed in one local transaction.",
+          p_evidence: evidence
+        }
+      });
+      assert.equal(accepted.response.ok, true, JSON.stringify(accepted.data));
+      assert.equal(accepted.data.requested_count, 2);
+      assert.equal(accepted.data.verified_count, 2);
+      assert.deepEqual(new Set(accepted.data.verified_edition_ids), new Set(editionIds));
+      assert.equal(accepted.data.freshness_verified, true);
+      assert.equal(accepted.data.automatic_fact_changes, false);
+      const after = await snapshot();
+      assert.deepEqual(after.events, before.events, "Batch verification must not alter master facts.");
+      assert.deepEqual(after.sources, before.sources, "Batch verification must not alter official sources.");
+      const metadataFields = new Set([
+        "verification_status", "data_confidence", "needs_review", "review_priority",
+        "last_verified_at", "next_check_at", "last_verified_source_id", "updated_at"
+      ]);
+      const facts = edition => Object.fromEntries(Object.entries(edition).filter(([field]) => !metadataFields.has(field)));
+      assert.deepEqual(after.editions.map(facts), before.editions.map(facts),
+        "Even a successful two-edition batch may change verification metadata only.");
+      assert.equal(after.audits.length, 2);
+      for (const fixture of fixtures) {
+        const edition = after.editions.find(row => row.id === fixture.editionId);
+        assert.equal(edition.verification_status, "verified");
+        assert.equal(edition.needs_review, false);
+        assert.equal(edition.last_verified_source_id, fixture.sourceId);
+        assert.equal(Date.parse(edition.last_verified_at), Date.parse(checkedAt));
+        const audit = after.audits.filter(row => row.entity_id === fixture.editionId);
+        assert.equal(audit.length, 1);
+        assert.equal(audit[0].changed_by, admin.user.id);
+        assert.equal(audit[0].new_value.automatic_fact_changes, false);
+        assert.deepEqual(audit[0].new_value.observed_values, evidence[fixture.editionId].observed_values);
+      }
+    } finally {
+      for (const fixture of fixtures.reverse()) {
+        const cleanup = await restRequest(`events?id=eq.${fixture.eventId}`, {
+          token: admin.token, method: "DELETE"
+        });
+        assert.equal(cleanup.response.ok, true, JSON.stringify(cleanup.data));
+      }
+    }
+  });
+}
+
 // Cleanup rows created by the test.
 await restRequest(
   `favorites?event_id=eq.${encodeURIComponent(favoriteEventId)}`,

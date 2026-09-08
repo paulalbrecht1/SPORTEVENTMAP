@@ -372,7 +372,7 @@ assert.doesNotMatch(admin, /if \(action === "verify"\) patch/,
   "Unsafe event-master verification handler must remain removed.");
 assert.doesNotMatch(admin, /from\("events"\)\.update\(patch\)/,
   "Generic event-master update path must not return.");
-assert.ok(page.includes("20260904-p0-freshness-v126"),
+assert.ok(Number(page.match(/data-supabase-src="js\/supabase\.js\?v=[^"]+-v(\d+)"/)?.[1]) >= 126,
   "Admin runtime cache key was not advanced for the freshness workflow.");
 
 // The HTML form keeps the same evidence contract without native prompt/confirm.

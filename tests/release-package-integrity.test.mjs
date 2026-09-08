@@ -38,6 +38,7 @@ const release = {
 try {
   assert.ok(CRITICAL_PATHS.includes("css/mobile-discovery.css"));
   assert.ok(CRITICAL_PATHS.includes("js/mobile-discovery.js"));
+  assert.ok(CRITICAL_PATHS.includes("js/freshness-batch-review.js"));
   restoreFiles();
   fs.writeFileSync(path.join(directory, "release.json"), JSON.stringify(release));
   assert.doesNotThrow(() => verifyReleaseArtifacts(directory, release), "Verified archive count must replace the historic hard-coded 994 pages");
@@ -46,7 +47,7 @@ try {
   delete incompleteManifest.critical_files["js/mobile-discovery.js"];
   assert.throws(() => verifyReleaseArtifacts(directory, incompleteManifest), /Missing critical file checksum/);
 
-  for (const relativePath of ["js/mobile-discovery.js", "css/mobile-discovery.css"]) {
+  for (const relativePath of ["js/mobile-discovery.js", "css/mobile-discovery.css", "js/freshness-batch-review.js"]) {
     fs.appendFileSync(path.join(directory, relativePath), "unexpected change");
     assert.throws(() => verifyReleaseArtifacts(directory, release), /Hash mismatch/);
     restoreFiles();

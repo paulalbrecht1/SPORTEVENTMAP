@@ -47,6 +47,16 @@ sind ebenfalls grün. `npm run check` bleibt wegen des vorhandenen
 Datenpakets gesperrt. Die geprüften Frontend-/Backend-/Test-/Protokolldateien
 bilden den nächsten technischen GitHub-Stand, unabhängig vom Website-Gate.
 
+Nächster abgegrenzter Arbeitsschritt vom 8. September: Die
+[Sammelprüfung für bis zu 25 Events](P0_FRESHNESS_BATCH_REVIEW_20260908.md)
+ergänzt Belegimport und sichtbaren Vergleich aller 14 Felder mit eigener
+Bestätigung je Edition. Sie nutzt den vorhandenen atomaren Admin-RPC nach
+einem strikten Datenabgleich. Produktionsdaten und Website sind durch diese
+Implementierung nicht verändert; die weiteren P0-Datenschritte folgen separat.
+Abnahme: `npm run test:code` vollständig grün einschließlich **117/117
+Browserfällen**, isoliert **23/23 RLS-Fälle** sowie fünf lesende
+Frische-Zugriffsprüfungen bestanden. Die Website-Datensperre bleibt wirksam.
+
 ## Ergebnis
 
 Der Nutzer hat die Veröffentlichung fertiger Änderungen über Wrangler,

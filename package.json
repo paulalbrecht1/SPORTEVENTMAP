@@ -49,7 +49,7 @@
     "test:rls:local": "node tests/local-rls-security.test.mjs",
     "test:static": "node tests/static-beta-smoke.test.mjs",
     "test:catalog-loader": "node tests/event-catalog-loader.test.mjs",
-    "test:data-freshness": "node tests/data-freshness-health.test.mjs && node tests/data-quality-stabilization.test.mjs && node tests/freshness-review-verification.test.mjs",
+    "test:data-freshness": "node tests/data-freshness-health.test.mjs && node tests/data-quality-stabilization.test.mjs && node tests/freshness-review-verification.test.mjs && node tests/freshness-batch-review.test.mjs",
     "test:alert-dispatch": "node tests/data-alert-dispatch-core.test.mjs && node tests/data-alert-dispatch-security.test.mjs",
     "test:event-detail": "node tests/event-detail-toggle.test.mjs",
     "test:event-detail-foundation": "node tests/event-detail-foundation.test.mjs",

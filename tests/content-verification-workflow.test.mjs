@@ -74,6 +74,6 @@ for (const fragment of [
 ]) assert.ok(admin.includes(fragment), `Admin verification UI missing ${fragment}`);
 
 assert.ok(styles.includes(".admin-review-evidence"), "Evidence cards need responsive styling.");
-assert.ok(page.includes("20260904-p0-freshness-v126"), "Admin runtime cache key was not advanced.");
+assert.ok(Number(page.match(/data-supabase-src="js\/supabase\.js\?v=[^"]+-v(\d+)"/)?.[1]) >= 126, "Admin runtime cache key was not advanced.");
 
 console.log("Evidence-backed content verification queue and admin batch workflow verified.");

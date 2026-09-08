@@ -350,6 +350,13 @@ Datenbereinigung abgeschlossen.
   Kalendererkennung oder Datum-/URL-Bestätigung keine vollständige Verifikation
   erzeugen. Erst danach vollständig belegte Folgeeditionen veröffentlichen
   und ihren tatsächlichen Nettozuwachs nachprüfen.
+  Verbindliche Arbeitsreihenfolge im [Beschleunigungsplan](P0_THROUGHPUT_PLAN_20260908.md):
+  Paketgenerator und sichere Editionsfreigabe parallel vorbereiten, zwei
+  gemessene Pilotpakete abschließen und danach auf 10–25 vollständige Reviews
+  je Paket skalieren. Diese Technik ist geplant, noch nicht implementiert.
+  Lesende Prognose ohne neue Änderungen: in sieben Tagen nur 281 sichtbare
+  Events, in 14 Tagen 230. Restmengen deshalb auf den Releasehorizont beziehen;
+  die heute fehlenden 70 Nettozugänge sind keine feste Arbeitsmenge.
 - [ ] Die offenen Kinderlauf-Distanzen bei Brauereienlauf und Aerzener twinfit
   sowie den Streckenkonflikt in Balingen durch eindeutige offizielle Belege
   klären. Bis dahin bleiben vollständige Distanzpakete und Frischefreigaben

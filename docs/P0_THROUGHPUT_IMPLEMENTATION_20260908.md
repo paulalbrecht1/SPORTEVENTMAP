@@ -145,3 +145,8 @@ Crawl. Gleichzeitig muss eine breitere Auswahl vollständig belegbarer Fälle
 für die beiden Zehnerpakete entstehen. Die neue Technik verkürzt wiederholte
 Vorbereitung und Freigabe; eine höhere fachliche Stundenleistung ist erst nach
 diesen abgeschlossenen Pilotpaketen nachgewiesen.
+
+Die nachfolgenden Fach- und Produktionsschritte dokumentiert der
+[P0-Datenpilot 06](P0_DATA_PILOT06_20260908.md). Dort sind die acht tatsächlichen
+Adminattestierungen, die gesonderte Datumskorrektur und der abgeschlossene
+MidSummerRun-Produktionsschritt zeitlich getrennt vom hier beschriebenen Stand festgehalten.

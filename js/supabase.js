@@ -4929,6 +4929,7 @@ let adminStagingPreviewRows = [];
 let adminRefreshInProgress = false;
 let dataOpsEvents = [];
 let dataOpsEditions = [];
+let dataOpsSuccessionCandidates = [];
 let dataOpsIssues = [];
 let dataOpsSources = [];
 let dataOpsProposals = [];
@@ -5591,10 +5592,17 @@ function matchesFreshnessBlockerScope(record, row, sourceId, includeSource = tru
   return record?.edition_id == null && String(record?.event_id || "") === String(row?.event_id);
 }
 
-function hasFreshnessOpenReviewConflict(row, source) {
+function hasFreshnessOpenReviewConflict(row, source, publicationCandidate = null) {
   const sourceId = source?.id;
+  // Only the publisher closes its own exactly bound candidate task in the same
+  // transaction. Ordinary freshness reviews must keep every open task blocking.
+  const closesWithPublication = task => publicationCandidate &&
+    task.fingerprint === `succession:${publicationCandidate.id}` && task.task_type === "new_edition_candidate" &&
+    String(task.event_id) === String(publicationCandidate.event_id) &&
+    String(task.source_id) === String(publicationCandidate.source_id) &&
+    (task.edition_id == null || String(task.edition_id) === String(row.edition_id));
   return sourceMonitorReviews.some(task =>
-    task.status === "open" && matchesFreshnessBlockerScope(task, row, sourceId)
+    task.status === "open" && !closesWithPublication(task) && matchesFreshnessBlockerScope(task, row, sourceId)
   ) || dataOpsProposals.some(proposal =>
     proposal.proposal_status === "pending" && matchesFreshnessBlockerScope(proposal, row, sourceId)
   ) || dataOpsIssues.some(issue =>
@@ -6136,6 +6144,7 @@ function renderEditionLifecycleInbox() {
 
 async function approveEditionLifecycleItems(items) {
   const successorIds = items.filter(item => item.item_type === "new_edition").map(item => item.item_id);
+  if (successorIds.length) throw new Error("Neue Editionen benötigen das eigene vollständige Feldprüfungs- und Veröffentlichungspaket.");
   const resultIds = items.filter(item => item.item_type === "result").map(item => item.item_id);
   const verificationIds = items.filter(item => item.item_type === "content_verification").map(item => item.item_id);
   const freshnessEditionIds = items.filter(item => item.item_type === "freshness_review").map(item => item.edition_id || item.item_id);
@@ -6143,7 +6152,6 @@ async function approveEditionLifecycleItems(items) {
     throw new Error("Quellenpruefungen müssen wegen der Feld-Evidenz einzeln bestaetigt werden.");
   }
   const responses = [];
-  if (successorIds.length) responses.push(await supabaseClient.rpc("approve_edition_succession_candidates", { p_candidate_ids: successorIds, p_limit: successorIds.length }));
   if (resultIds.length) responses.push(await supabaseClient.rpc("approve_edition_result_candidates", { p_result_ids: resultIds, p_limit: resultIds.length }));
   if (verificationIds.length) responses.push(await supabaseClient.rpc("verify_content_change_tasks", {
     p_task_ids: verificationIds,
@@ -6172,9 +6180,9 @@ async function handleEditionLifecycleAction(button) {
   }
   if (action === "select-all") {
     const selectable = [...(editionLifecycleElements.list?.querySelectorAll("[data-lifecycle-select]") || [])];
-    selectable.forEach((input, index) => { input.checked = index < 50; });
-    setEditionLifecycleStatus(selectable.length > 50
-      ? "Die ersten 50 pruefbaren Eintraege wurden ausgewaehlt."
+    selectable.forEach((input, index) => { input.checked = index < 25; });
+    setEditionLifecycleStatus(selectable.length > 25
+      ? "Die ersten 25 pruefbaren Eintraege wurden ausgewaehlt."
       : "Alle pruefbaren Eintraege wurden ausgewaehlt.", "success");
     return;
   }
@@ -6193,6 +6201,14 @@ async function handleEditionLifecycleAction(button) {
   const evidenceVerificationItems = items.filter(item =>
     ["content_verification", "freshness_review"].includes(item.item_type)
   );
+  if (["approve-selected", "approve-one"].includes(action) && items.some(item => item.item_type === "new_edition")) {
+    if (items.some(item => item.item_type !== "new_edition")) {
+      setEditionLifecycleStatus("Neue Editionen bitte in einem eigenen Paket auswählen. Ergebnisse und andere Prüfungen werden separat abgeschlossen.", "error");
+      return;
+    }
+    await handleSuccessionBatchAction(button, items.map(item => String(item.item_id)));
+    return;
+  }
   if (evidenceVerificationItems.length) {
     if (items.length !== 1) {
       setEditionLifecycleStatus("Quellenpruefungen müssen mit eigener Feld-Evidenz einzeln bearbeitet werden.", "error");
@@ -6281,7 +6297,7 @@ async function handleFreshnessBatchAction(button) {
   }
   setButtonLoading(button, true, "Frischepaket öffnen ...");
   try {
-    await import("./freshness-batch-review.js?v=20260908-v1");
+    await import("./freshness-batch-review.js?v=20260908-v2");
     const contexts = editionIds.map(getFreshnessBatchContext);
     if (contexts.some(context => !context.eligible)) throw new Error("Mindestens ein Event ist nicht mehr für die Frischeprüfung freigegeben. Datenstand neu laden.");
     const result = await window.SemFreshnessBatchReview.open({
@@ -6309,6 +6325,110 @@ async function handleFreshnessBatchAction(button) {
   } finally {
     setButtonLoading(button, false);
     const focusTarget = button.isConnected ? button : document.querySelector('[data-lifecycle-action="review-freshness-selected"]');
+    focusTarget?.focus();
+  }
+}
+
+function getSuccessionBatchContext(candidateId) {
+  const candidate = dataOpsSuccessionCandidates.find(item => String(item.id) === candidateId);
+  const edition = dataOpsEditions.find(item => String(item.id) === String(candidate?.draft_edition_id || ""));
+  const event = dataOpsEvents.find(item => String(item.id) === String(candidate?.event_id || ""));
+  const sources = dataOpsSources.filter(source => edition &&
+    String(source.event_id) === String(candidate.event_id) && String(source.edition_id) === String(edition.id) &&
+    source.source_url === edition.source_url && source.source_type === "official_event_website" && source.is_active === true);
+  const source = sources.length === 1 ? sources[0] : null;
+  const sourceHealthy = source && /^https:\/\/\S+$/i.test(String(source.source_url || "")) &&
+    ["success", "not_modified"].includes(source.crawl_status) && Number(source.consecutive_failures || 0) === 0 &&
+    source.last_fetched_at && ["unchanged", "first_seen"].includes(source.last_change_status) &&
+    !sourceMonitorActiveJobs.some(job => String(job.source_id) === String(source.id) && ["queued", "processing", "retry_scheduled"].includes(job.status));
+  // Build exclusively from the concrete draft and current master facts. The
+  // historic inbox may carry stored_values belonging to the predecessor.
+  const storedValues = {
+    event_name: event?.canonical_name || event?.event_name || null,
+    edition_year: edition?.edition_year ?? null, date: edition?.start_date ?? null,
+    city: event?.city ?? null, country: event?.country ?? null, address: event?.address ?? null,
+    latitude: event?.latitude ?? null, longitude: event?.longitude ?? null, sport: event?.sport ?? null,
+    distances: Array.isArray(edition?.race_formats) && edition.race_formats.length ? edition.race_formats : edition?.legacy_distance ?? null,
+    description: event?.description ?? null, registration_status: edition?.registration_status ?? null,
+    official_event_page: source?.source_url || "", registration_link: edition?.registration_url ?? null
+  };
+  const row = { event_id: candidate?.event_id, edition_id: edition?.id, metadata: { source_url: source?.source_url, stored_values: storedValues } };
+  const eligible = Boolean(candidate && edition && event && sourceHealthy &&
+    ["detected", "draft_created"].includes(candidate.candidate_status) && candidate.validation_status === "validated" &&
+    Array.isArray(candidate.validation_reasons) && candidate.validation_reasons.length === 0 &&
+    event.status === "approved" && event.publication_status === "published" &&
+    String(edition.event_id) === String(candidate.event_id) && String(edition.generated_from_candidate_id) === candidateId &&
+    String(edition.generated_from_source_id || "") === String(candidate.source_id || "") && Boolean(candidate.source_id) &&
+    edition.publication_status === "draft" && edition.discovery_status === "suppressed" && edition.edition_status === "scheduled" &&
+    edition.edition_year === candidate.candidate_year && edition.start_date === candidate.candidate_start_date &&
+    edition.start_date > new Date().toISOString().slice(0, 10) &&
+    !dataOpsEditions.some(other => String(other.event_id) === String(candidate.event_id) && String(other.id) !== String(edition.id) &&
+      other.publication_status === "published" && other.discovery_status === "active" &&
+      !["cancelled", "inactive", "completed"].includes(other.edition_status) &&
+      (!other.start_date || (other.end_date || other.start_date) >= new Date().toISOString().slice(0, 10))) &&
+    hasCompleteFreshnessVerificationShape(row) && !hasFreshnessOpenReviewConflict(row, source, candidate));
+  return {
+    candidateId, eventId: String(candidate?.event_id || ""), editionId: String(edition?.id || ""),
+    sourceId: String(source?.id || ""), sourceUrl: source?.source_url || "", storedValues, eligible,
+    revision: JSON.stringify({ candidate, edition, source, event })
+  };
+}
+
+function getSuccessionInboxRows() {
+  return dataOpsSuccessionCandidates.filter(candidate => ["detected", "draft_created", "conflict"].includes(candidate.candidate_status)).map(candidate => {
+    const context = getSuccessionBatchContext(String(candidate.id));
+    return {
+      item_type: "new_edition", item_id: candidate.id, event_id: candidate.event_id,
+      edition_id: candidate.draft_edition_id, priority: context.eligible ? "high" : "medium",
+      title: `Ausgabe ${candidate.candidate_year} prüfen`,
+      description: context.eligible ? "Vorbereitete Edition mit allen 14 Feldbelegen prüfen und veröffentlichen." : "Aktuelle Ausgabe, vollständiger Entwurf und offizielle Quellenbelege müssen vor der Freigabe vorliegen.",
+      confidence: candidate.confirmed_confidence ?? candidate.confidence, status: candidate.candidate_status,
+      created_at: candidate.first_detected_at, batch_action: context.eligible ? "approve_successor" : "review",
+      metadata: { source_url: context.sourceUrl || candidate.source_url, validation_status: candidate.validation_status, validation_reasons: candidate.validation_reasons }
+    };
+  });
+}
+
+async function handleSuccessionBatchAction(button, candidateIds) {
+  if (candidateIds.length < 1 || candidateIds.length > 25 || new Set(candidateIds).size !== candidateIds.length) {
+    setEditionLifecycleStatus("Bitte 1 bis 25 verschiedene vorbereitete Editionen auswählen.", "error");
+    return;
+  }
+  setButtonLoading(button, true, "Editionspaket öffnen ...");
+  try {
+    await import("./freshness-batch-review.js?v=20260908-v2");
+    await loadDataOperations({ throwOnError: true });
+    const contexts = candidateIds.map(getSuccessionBatchContext);
+    if (contexts.some(context => !context.eligible)) throw new Error("Mindestens eine Edition oder ihre offizielle Quelle ist noch nicht vollständig vorbereitet. Keine Veröffentlichung möglich.");
+    const result = await window.SemFreshnessBatchReview.open({
+      operation: "publication", contexts,
+      refreshContexts: async () => {
+        await loadDataOperations({ throwOnError: true });
+        return candidateIds.map(getSuccessionBatchContext);
+      },
+      submit: async args => {
+        const selectedCandidateIds = args.p_edition_ids.map(id => contexts.find(context => context.editionId === id)?.candidateId);
+        const { data, error } = await supabaseClient.rpc("approve_edition_succession_candidates", {
+          p_candidate_ids: selectedCandidateIds, p_limit: selectedCandidateIds.length,
+          p_notes: args.p_notes, p_evidence: args.p_evidence
+        });
+        if (error) throw error;
+        return window.SemFreshnessBatchReview.assertPublicationOutcome(data, selectedCandidateIds, args.p_edition_ids);
+      }
+    });
+    if (result) {
+      try {
+        await loadDataOperations({ throwOnError: true });
+        setEditionLifecycleStatus(`${result.verified_count} Editionen mit vollständigen Feldbelegen veröffentlicht und frisch bestätigt.`, "success");
+      } catch {
+        setEditionLifecycleStatus(`${result.verified_count} Editionen wurden veröffentlicht und bestätigt. Die Ansicht konnte danach nicht aktualisiert werden; bitte neu laden.`, "error");
+      }
+    }
+  } catch (error) {
+    setEditionLifecycleStatus(getFriendlyErrorMessage(error, error?.message || "Editionspaket konnte nicht abgeschlossen werden."), "error");
+  } finally {
+    setButtonLoading(button, false);
+    const focusTarget = button.isConnected ? button : document.querySelector('[data-lifecycle-action="approve-selected"]');
     focusTarget?.focus();
   }
 }
@@ -6814,9 +6934,9 @@ async function loadDataOperations({ throwOnError = false } = {}) {
     return;
   }
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
-  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult] = await Promise.all([
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
-    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at,updated_at,race_formats,legacy_distance,predecessor_edition_id,generated_from_candidate_id,generated_from_source_id"),
     loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
     loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
     loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,crawl_id,entity_type,rule_code,field_name,old_value,proposed_value,normalized_value,applied_value,proposed_changes,observed_values,confidence,confidence_reasons,change_type,extraction_method,extractor_version,evidence,source_context,validation_warnings,priority,locked_field,reason,source_url,proposal_status,detected_at,reviewed_at,rejection_reason,next_review_at,created_at"),
@@ -6825,12 +6945,13 @@ async function loadDataOperations({ throwOnError = false } = {}) {
     loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
     loadSourceMonitorActiveJobs(),
     loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
-    loadAdminTablePages("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,created_at,reviewed_at", null, ["id"]),
+    loadAdminTablePages("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,fingerprint,created_at,reviewed_at", null, ["id"]),
     loadFreshnessBlockingFeedback(),
     loadAdminTablePages("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
-    loadAdminTablePages("admin_freshness_attestation_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"])
+    loadAdminTablePages("admin_freshness_attestation_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
+    loadAdminTablePages("edition_succession_candidates", "id,event_id,source_id,crawl_result_id,draft_edition_id,predecessor_edition_id,candidate_year,candidate_start_date,candidate_end_date,candidate_status,source_url,confidence,confirmed_confidence,validation_status,validation_reasons,validated_at,first_detected_at,updated_at")
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult].find(result => result.error);
   if (failed) {
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
@@ -6839,6 +6960,7 @@ async function loadDataOperations({ throwOnError = false } = {}) {
   }
   dataOpsEvents = eventsResult.rows || [];
   dataOpsEditions = editionsResult.rows || [];
+  dataOpsSuccessionCandidates = successionResult.rows || [];
   dataOpsIssues = (issuesResult.rows || []).filter(issue =>
     issue.status === "open" && ["error", "critical"].includes(issue.severity)
   );
@@ -6855,8 +6977,9 @@ async function loadDataOperations({ throwOnError = false } = {}) {
   dataOpsFreshnessBlockingFeedback = feedbackBlockersResult.rows || [];
   const seenInboxItems = new Set();
   editionLifecycleInbox = [
-    ...(lifecycleResult.rows || []),
-    ...(freshnessAttestationResult.rows || [])
+    ...(lifecycleResult.rows || []).filter(row => row.item_type !== "new_edition"),
+    ...(freshnessAttestationResult.rows || []),
+    ...getSuccessionInboxRows()
   ].filter(row => {
     const key = `${row.item_type}:${row.item_id}`;
     if (seenInboxItems.has(key)) return false;

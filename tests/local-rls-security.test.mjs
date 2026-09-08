@@ -281,10 +281,10 @@ runSupabase([
       'backfill-audit-${runId}', 'test'
     ) returning id into fixture_job_id;
     insert into public.source_crawl_results (
-      job_id, source_id, event_id, attempt_number, http_status, final_url,
+      job_id, source_id, event_id, edition_id, attempt_number, http_status, final_url,
       change_status, worker_version, processing_status
     ) values (
-      fixture_job_id, fixture_source_id, fixture_event_id, 1, 200,
+      fixture_job_id, fixture_source_id, fixture_event_id, predecessor_id, 1, 200,
       'https://example.com/backfill-audit-${runId}', 'changed',
       'backfill-audit-test', 'completed'
     ) returning id into fixture_crawl_id;
@@ -302,7 +302,7 @@ runSupabase([
       'backfill-audit-test'
     );
     candidate_2028_id := (register_result->>'candidate_id')::uuid;
-    if register_result->>'validation_status' <> 'validated' then
+    if register_result->>'validation_status' is distinct from 'validated' then
       raise exception 'Expected validated 2028 audit candidate: %', register_result;
     end if;
 
@@ -319,7 +319,7 @@ runSupabase([
       'backfill-audit-test'
     );
     candidate_2029_id := (register_result->>'candidate_id')::uuid;
-    if register_result->>'validation_status' <> 'validated' then
+    if register_result->>'validation_status' is distinct from 'validated' then
       raise exception 'Expected validated 2029 audit candidate: %', register_result;
     end if;
 
@@ -681,7 +681,7 @@ try {
       fixture_crawl_id bigint;
       candidate_id uuid;
       register_result jsonb;
-      approval_result jsonb;
+      legacy_approval_rejected boolean := false;
     begin
       perform set_config('request.jwt.claims', '{"role":"service_role"}', true);
 
@@ -720,10 +720,10 @@ try {
         'candidate-first-${runId}', 'test'
       ) returning id into fixture_job_id;
       insert into public.source_crawl_results (
-        job_id, source_id, event_id, attempt_number, http_status, final_url,
+        job_id, source_id, event_id, edition_id, attempt_number, http_status, final_url,
         change_status, worker_version, processing_status
       ) values (
-        fixture_job_id, fixture_source_id, fixture_event_id, 1, 200,
+        fixture_job_id, fixture_source_id, fixture_event_id, predecessor_id, 1, 200,
         'https://example.com/candidate-first-${runId}', 'changed',
         'candidate-first-test', 'completed'
       ) returning id into fixture_crawl_id;
@@ -753,7 +753,7 @@ try {
         'candidate-first-test'
       );
       candidate_id := (register_result->>'candidate_id')::uuid;
-      if register_result->>'validation_status' <> 'validated' then
+      if register_result->>'validation_status' is distinct from 'validated' then
         raise exception 'Expected validated candidate, got %', register_result;
       end if;
       if exists (
@@ -775,35 +775,18 @@ try {
         '{"role":"authenticated","sub":"${admin.id}"}',
         true
       );
-      approval_result := public.approve_edition_succession_candidates(
-        array[candidate_id], 1
-      );
-      if (approval_result->>'approved_count')::integer <> 1 then
-        raise exception 'Explicit candidate approval failed: %', approval_result;
+      begin
+        perform public.approve_edition_succession_candidates(array[candidate_id], 1);
+      exception when sqlstate '22023' then
+        legacy_approval_rejected := true;
+      end;
+      if not legacy_approval_rejected then
+        raise exception 'Legacy approval accepted a candidate without draft or 14-field evidence';
       end if;
-      if not exists (
-        select 1 from public.event_editions edition
-        where edition.event_id = fixture_event_id
-          and edition.edition_year = 2028
-          and edition.start_date = date '2028-06-04'
-          and edition.edition_status = 'scheduled'
-          and edition.publication_status = 'published'
-          and edition.race_formats = '[]'::jsonb
-          and edition.legacy_distance is null
-          and edition.generated_from_candidate_id = candidate_id
-      ) then
-        raise exception 'Approved edition missing or predecessor facts were copied';
-      end if;
-      if not exists (
-        select 1 from public.event_sources source
-        join public.event_editions edition on edition.id = source.edition_id
-        where edition.event_id = fixture_event_id
-          and edition.edition_year = 2028
-          and source.source_url = 'https://example.com/candidate-first-${runId}'
-          and source.crawl_status = 'pending'
-          and source.last_fetched_at is null
-      ) then
-        raise exception 'Edition-bound evidence source was not re-registered for the new edition';
+      if exists (select 1 from public.event_editions where event_id = fixture_event_id and edition_year = 2028)
+         or exists (select 1 from public.public_event_archive where event_id = fixture_event_id and edition_year = 2028)
+         or (select count(*) from public.event_sources where event_id = fixture_event_id) <> 1 then
+        raise exception 'Rejected legacy approval created an edition or a source';
       end if;
       if not exists (
         select 1 from public.event_editions
@@ -816,16 +799,16 @@ try {
       end if;
       if not exists (
         select 1 from public.edition_succession_candidates
-        where id = candidate_id and candidate_status = 'approved'
+        where id = candidate_id and candidate_status = 'detected' and draft_edition_id is null
       ) then
-        raise exception 'Approved candidate did not close';
+        raise exception 'Rejected legacy approval changed the pending candidate';
       end if;
 
       delete from public.events where id = fixture_event_id;
     end
     $candidate_first$;`
   ]);
-  console.log("Candidate-first detection, watching, explicit approval and immutable predecessor assertions passed.");
+  console.log("Candidate-first detection, watching, legacy rejection and immutable predecessor assertions passed.");
 
   const test = spawnSync(
     process.execPath,

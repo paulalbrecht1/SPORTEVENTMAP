@@ -90,7 +90,24 @@
     return data;
   }
 
-  function open({ contexts, refreshContexts, submit }) {
+  function assertPublicationOutcome(data, candidateIds, editionIds) {
+    const candidates = uniqueIds(candidateIds);
+    const editions = uniqueIds(editionIds);
+    const exactIds = (actual, expected) => Array.isArray(actual) && actual.length === expected.length &&
+      new Set(actual).size === expected.length && actual.every(id => expected.includes(id));
+    if (!isObject(data) || candidates.length !== editions.length ||
+        data.requested_count !== candidates.length || data.approved_count !== candidates.length ||
+        data.publication_verified !== true ||
+        !exactIds(data.approved_candidate_ids, candidates) || !exactIds(data.published_edition_ids, editions)) {
+      throw new Error("Der Server hat die Veröffentlichung der ausgewählten Editionen nicht eindeutig bestätigt.");
+    }
+    // The outer transaction publishes editions. Only its nested freshness review
+    // attests unchanged facts; never label the publication itself as read-only.
+    return assertOutcome(data.freshness, editions);
+  }
+
+  function open({ contexts, refreshContexts, submit, operation = "freshness" }) {
+    if (!["freshness", "publication"].includes(operation)) throw new Error("Unbekannte Freigabeaktion.");
     uniqueIds(contexts?.map(context => context.editionId));
     if (typeof refreshContexts !== "function" || typeof submit !== "function") throw new Error("Aktualisierung und Freigabe fehlen.");
     if (document.getElementById("freshnessBatchDialog")) throw new Error("Eine Sammelprüfung ist bereits geöffnet.");
@@ -111,7 +128,7 @@
     dialog.className = "content-verification-dialog freshness-batch-dialog";
     dialog.setAttribute("aria-labelledby", "freshnessBatchTitle");
     dialog.innerHTML = `<form class="content-verification-form" novalidate>
-      <h2 id="freshnessBatchTitle">Frische gemeinsam prüfen</h2>
+      <h2 id="freshnessBatchTitle">${operation === "publication" ? "Editionen prüfen und veröffentlichen" : "Frische gemeinsam prüfen"}</h2>
       <p>Bis zu 25 Events. Quelle öffnen, alle 14 Felder vergleichen und jedes Event einzeln bestätigen. Prüfzeitpunkt und Belege werden unverändert übernommen.</p>
       <section class="freshness-batch-import" aria-label="Belegimport">
         <label>Belegdatei (JSON)<input type="file" accept="application/json,.json"></label>
@@ -122,7 +139,7 @@
       <p class="freshness-batch-errors" role="alert"></p>
       <p class="freshness-batch-status" role="status" aria-live="polite"></p>
       <div class="freshness-batch-list"></div>
-      <div class="content-verification-actions"><button type="button" data-action="cancel">Abbrechen</button><button type="submit">Paket bestätigen</button></div>
+      <div class="content-verification-actions"><button type="button" data-action="cancel">Abbrechen</button><button type="submit">${operation === "publication" ? "Geprüfte Editionen veröffentlichen" : "Paket bestätigen"}</button></div>
     </form>`;
     const form = dialog.querySelector("form");
     const list = dialog.querySelector(".freshness-batch-list");
@@ -334,5 +351,5 @@
       dialog.querySelector('[data-action="cancel"]').focus();
     });
   }
-  return Object.freeze({ REQUIRED_FIELDS, parseImport, validateReview, preparePayload, assertOutcome, open });
+  return Object.freeze({ REQUIRED_FIELDS, parseImport, validateReview, preparePayload, assertOutcome, assertPublicationOutcome, open });
 });

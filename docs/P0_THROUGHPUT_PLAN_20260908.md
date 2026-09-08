@@ -1,9 +1,11 @@
 # P0-Plan: höhere Prüfleistung bei unveränderten Qualitätsanforderungen
 
 Stand: 8. September 2026, nach Commit `477439f` und Faktenbatch 05.
-Dieses Dokument plant die nächsten Umsetzungsschritte. Die beschriebenen neuen
-Werkzeuge und Freigabepfade sind noch nicht implementiert. Die Planerstellung
-hat Production ausschließlich gelesen und kein Deployment ausgelöst.
+Dieses Dokument bewahrt den ursprünglichen Umsetzungsplan. Inzwischen sind die
+ersten beiden Technikschritte implementiert und geprüft; die Backendabsicherung
+ist produktiv. Stand, Prüfungen und verbleibende Grenzen stehen im
+[Umsetzungsnachweis](P0_THROUGHPUT_IMPLEMENTATION_20260908.md).
+Der fachliche Pilot, die Qualitätsgrenze und der Website-Release bleiben offen.
 
 ## Ziel und belastbarer Ausgangspunkt
 

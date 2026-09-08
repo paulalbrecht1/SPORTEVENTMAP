@@ -14,8 +14,10 @@ function_definitions as (
       'public.register_edition_successor_candidate(uuid,bigint,jsonb,text)'
     ) as register_oid,
     to_regprocedure(
-      'public.approve_edition_succession_candidates(uuid[],integer)'
+      'public.approve_edition_succession_candidates(uuid[],integer,text,jsonb)'
     ) as approve_oid,
+    to_regprocedure('public.approve_edition_succession_candidates(uuid[],integer)') as legacy_approve_oid,
+    to_regprocedure('public.verify_freshness_review_editions(uuid[],text,jsonb)') as freshness_oid,
     to_regprocedure('private.run_edition_lifecycle(date)') as lifecycle_oid
 ),
 function_bodies as (
@@ -23,6 +25,7 @@ function_bodies as (
     definitions.*,
     lower(coalesce(pg_get_functiondef(definitions.register_oid), '')) as register_body,
     lower(coalesce(pg_get_functiondef(definitions.approve_oid), '')) as approve_body,
+    lower(coalesce(pg_get_functiondef(definitions.legacy_approve_oid), '')) as legacy_approve_body,
     lower(coalesce(pg_get_functiondef(definitions.lifecycle_oid), '')) as lifecycle_body
   from function_definitions definitions
 ),
@@ -61,11 +64,35 @@ schema_state as (
     'approval_requires_admin_and_explicit_ids',
       bodies.approve_oid is not null
       and position('private.is_admin()' in bodies.approve_body) > 0
-      and position('explicit candidate ids are required' in bodies.approve_body) > 0,
-    'approval_materializes_validated_candidate',
+      and position('requested_count not between 1 and 25' in bodies.approve_body) > 0
+      and position('p_limit is distinct from requested_count' in bodies.approve_body) > 0
+      and position('count(distinct id)' in bodies.approve_body) > 0
+      and position('skip locked' in bodies.approve_body) = 0,
+    'approval_admin_only_invoker',
       bodies.approve_oid is not null
-      and position('insert into public.event_editions' in bodies.approve_body) > 0
-      and position('validation_status = ''validated''' in bodies.approve_body) > 0,
+      and exists (select 1 from pg_proc p where p.oid = bodies.approve_oid and not p.prosecdef)
+      and coalesce(has_function_privilege('authenticated', bodies.approve_oid, 'execute'), false)
+      and not coalesce(has_function_privilege('anon', bodies.approve_oid, 'execute'), false)
+      and not coalesce(has_function_privilege('service_role', bodies.approve_oid, 'execute'), false),
+    'approval_publishes_reviewed_draft_atomically',
+      bodies.approve_oid is not null and bodies.freshness_oid is not null
+      and position('insert into public.event_editions' in bodies.approve_body) = 0
+      and position('update public.events' in bodies.approve_body) = 0
+      and position('validation_status is distinct from ''validated''' in bodies.approve_body) > 0
+      and position('generated_from_candidate_id is distinct from candidate_row.id' in bodies.approve_body) > 0
+      and position('publication_source.edition_id is distinct from draft_row.id' in bodies.approve_body) > 0
+      and position('jsonb_typeof(p_evidence)' in bodies.approve_body) > 0
+      and position('length(notes) < 12' in bodies.approve_body) > 0
+      and position('set publication_status = ''published''' in bodies.approve_body) > 0
+      and position('verify_freshness_review_editions(edition_ids, notes, p_evidence)' in bodies.approve_body)
+        > position('set publication_status = ''published''' in bodies.approve_body)
+      and position('exception when' in bodies.approve_body) = 0
+      and position('set_config(''app.freshness_verification''' in bodies.approve_body) = 0,
+    'legacy_approval_fails_closed',
+      bodies.legacy_approve_oid is not null
+      and position('raise exception ''publication requires' in bodies.legacy_approve_body) > 0
+      and position('update public.' in bodies.legacy_approve_body) = 0
+      and position('insert into public.' in bodies.legacy_approve_body) = 0,
     'postponed_not_auto_completed',
       bodies.lifecycle_oid is not null
       and position('edition.edition_status in (''scheduled'', ''cancelled'')' in bodies.lifecycle_body) > 0
@@ -158,7 +185,9 @@ gate_result as (
       and (schema_payload->>'register_service_only')::boolean
       and (schema_payload->>'detection_does_not_materialize_edition')::boolean
       and (schema_payload->>'approval_requires_admin_and_explicit_ids')::boolean
-      and (schema_payload->>'approval_materializes_validated_candidate')::boolean
+      and (schema_payload->>'approval_admin_only_invoker')::boolean
+      and (schema_payload->>'approval_publishes_reviewed_draft_atomically')::boolean
+      and (schema_payload->>'legacy_approval_fails_closed')::boolean
       and (schema_payload->>'postponed_not_auto_completed')::boolean
       and not (automation_payload->>'auto_publish_enabled')::boolean
       and not (automation_payload->>'auto_result_publish_enabled')::boolean

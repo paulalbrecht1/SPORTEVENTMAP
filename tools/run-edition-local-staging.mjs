@@ -42,6 +42,12 @@ function assertSafeStageRoot() {
   assert.equal(path.dirname(stageRoot), root, "Staging directory escaped the repository root.");
   assert.equal(path.basename(stageRoot), stageDirectoryName, "Unexpected staging directory target.");
   assert.notEqual(stageRoot, root, "Staging cleanup must never target the repository root.");
+  if (fs.existsSync(stageRoot)) {
+    assert.equal(fs.lstatSync(stageRoot).isSymbolicLink(), false, "Refusing a linked staging cleanup target.");
+    const resolvedStage = fs.realpathSync(stageRoot);
+    assert.equal(path.dirname(resolvedStage), fs.realpathSync(root), "Resolved staging target escaped the repository.");
+    assert.equal(path.basename(resolvedStage), stageDirectoryName, "Resolved staging target has an unexpected name.");
+  }
 }
 
 function replaceTopLevelValue(config, key, value) {
@@ -334,6 +340,39 @@ function runRlsAndCandidateSmoke() {
   assert.equal(extraction.status, 0, "Source Monitor schema and fact-review tests failed in disposable staging.");
 }
 
+function runSafeEditionPublication() {
+  // Use only the fixed, labelled disposable database container. The SQL file
+  // contains synthetic fixtures and ROLLBACK; no external DB URL is accepted.
+  const containerCli = ["C:\\Program Files\\RedHat\\Podman\\podman.exe", "docker", "podman"]
+    .find(candidate => spawnSync(candidate, ["--version"], {
+      encoding: "utf8", env: sanitizedEnvironment()
+    }).status === 0);
+  assert.ok(containerCli, "A local container CLI is required for publication acceptance tests.");
+  const containerName = `supabase_db_${stageProjectId}`;
+  const inspection = spawnSync(containerCli, ["inspect", "--format", "{{json .Config.Labels}}", containerName], {
+    encoding: "utf8", env: sanitizedEnvironment()
+  });
+  assert.equal(inspection.status, 0, "Disposable publication test database is missing.");
+  assert.equal(JSON.parse(inspection.stdout)?.["com.supabase.cli.project"], stageProjectId,
+    "Publication test container belongs to another project.");
+  const sql = "set sporteventmap.test_isolated_edition_publish = 'restore-clone';\n"
+    + fs.readFileSync(path.join(root, "tests", "safe-edition-publish.sql"), "utf8");
+  const result = spawnSync(containerCli, ["exec", "-i", containerName, "psql", "--quiet", "--no-psqlrc",
+    "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname", "postgres", "--no-align", "--tuples-only"], {
+    encoding: "utf8", env: sanitizedEnvironment(), input: sql, maxBuffer: 8 * 1024 * 1024
+  });
+  assert.equal(result.status, 0, `Safe edition publication SQL failed: ${result.stderr || result.error || "unknown error"}`);
+  const sqlChecks = Number(result.stdout.match(/(?:^|\n)(\d+)\|\[/)?.[1]);
+  assert.ok(sqlChecks >= 75, "Publication SQL assertion completion marker is missing.");
+  const [rollback] = queryJson(
+    "select not exists(select 1 from public.events where event_name like 'edition-publish-%') "
+    + "and not exists(select 1 from auth.users where email like 'edition-publish-%@example.invalid') as fixtures_rolled_back"
+  );
+  assert.equal(rollback.fixtures_rolled_back, true, "Synthetic publication fixtures survived ROLLBACK.");
+  console.log(JSON.stringify({ safeEditionPublication: "passed", sqlChecks, batchSizes: [1, 10, 25],
+    finalMemberRollback: true, fixturesRolledBack: true }));
+}
+
 let stageWasPrepared = false;
 let primaryError;
 
@@ -355,6 +394,7 @@ try {
   verifyProductionPreflight();
   await waitForLocalAuth();
   runRlsAndCandidateSmoke();
+  runSafeEditionPublication();
   console.log("Disposable, cost-free edition staging completed successfully.");
 } catch (error) {
   primaryError = error;

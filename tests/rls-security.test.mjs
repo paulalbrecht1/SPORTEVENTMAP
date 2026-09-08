@@ -1595,30 +1595,182 @@ if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
         method: "POST",
         body: { p_candidate_ids: [detected.data.candidate_id], p_limit: 1 }
       });
-      assert.equal(approved.response.ok, true, JSON.stringify(approved.data));
-      assert.equal(approved.data.approved_count, 1);
+      assert.equal(approved.response.ok, false, "The legacy two-argument approval must not publish without full evidence.");
+
+      for (const token of [undefined, userA.token, admin.token]) {
+        const incomplete = await restRequest("rpc/approve_edition_succession_candidates", {
+          token, method: "POST",
+          body: { p_candidate_ids: [detected.data.candidate_id], p_limit: 1, p_notes: "Incomplete synthetic candidate evidence must not publish.", p_evidence: {} }
+        });
+        assert.equal(incomplete.response.ok, false, "Candidate dates and empty evidence must remain private for every caller.");
+      }
 
       const publicArchive = await restRequest(
         `public_event_archive?select=edition_id,edition_year,discovery_status&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
       );
       assert.equal(publicArchive.response.ok, true, JSON.stringify(publicArchive.data));
-      assert.deepEqual(publicArchive.data.map(row => row.edition_year), [2028]);
-      assert.deepEqual(publicArchive.data.map(row => row.discovery_status), ["active"]);
+      assert.deepEqual(publicArchive.data, [], "An unsuccessful publication exposed a candidate.");
 
       const materializedEdition = await serviceRequest(
         `event_editions?select=race_formats,legacy_distance,generated_from_candidate_id&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_year=eq.2028`
       );
       assert.equal(materializedEdition.response.ok, true, JSON.stringify(materializedEdition.data));
-      assert.deepEqual(materializedEdition.data.map(row => row.race_formats), [[]]);
-      assert.deepEqual(materializedEdition.data.map(row => row.legacy_distance), [null]);
-      assert.deepEqual(materializedEdition.data.map(row => row.generated_from_candidate_id), [detected.data.candidate_id]);
+      assert.deepEqual(materializedEdition.data, [], "Candidate-only approval materialized an unreviewed edition.");
 
-      const successorSources = await serviceRequest(
-        `event_sources?select=source_url,crawl_status,last_fetched_at&event_id=eq.${encodeURIComponent(publicFixtureEventId)}&edition_id=eq.${encodeURIComponent(publicArchive.data[0].edition_id)}&source_url=eq.${encodeURIComponent(source.source_url)}`
-      );
-      assert.equal(successorSources.response.ok, true, JSON.stringify(successorSources.data));
-      assert.deepEqual(successorSources.data.map(row => row.crawl_status), ["pending"]);
-      assert.deepEqual(successorSources.data.map(row => row.last_fetched_at), [null]);
+      // A separate complete fixture proves the real four-argument PostgREST
+      // path with the administrator's actual Auth login, without reusing the
+      // shared event's intentionally conflicting workflow tasks.
+      let successorEventId = null;
+      try {
+        const year = new Date().getUTCFullYear() + 1;
+        const nextDate = `${year}-06-01`;
+        const detectionUrl = `https://example.com/publish-${runId}/detected`;
+        const officialUrl = `https://example.com/publish-${runId}/official`;
+        const fixtureName = `[SUCCESSOR PUBLISH TEST] ${runId}`;
+        const checkedAt = new Date(Date.now() - 3600000).toISOString();
+        const formats = [{ label: "5 km", distance_km: 5 }, { label: "Kinder 400 m", distance_km: 0.4 }];
+        const create = async (table, body) => {
+          const options = { method: "POST", prefer: "return=representation", body };
+          const response = table === "events"
+            ? await restRequest(table, { ...options, token: admin.token })
+            : await serviceRequest(table, options);
+          assert.equal(response.response.ok, true, JSON.stringify(response.data));
+          return response.data[0];
+        };
+        const patch = async (table, id, body) => {
+          const response = await serviceRequest(`${table}?id=eq.${encodeURIComponent(id)}`, {
+            method: "PATCH", prefer: "return=representation", body
+          });
+          assert.equal(response.response.ok, true, JSON.stringify(response.data));
+          return response.data[0];
+        };
+        const event = await create("events", {
+          event_name: fixtureName, date: `01.06.${year - 2}`, sport: "Running", city: "Berlin", country: "Deutschland",
+          address: "Synthetischer Startplatz 1", latitude: "52.52000", longitude: "13.40500", distance: "42 km",
+          description: "Diese vollständig synthetische Laufveranstaltung prüft ausschließlich die sichere Veröffentlichung einer Folgeedition mit vollständigen Quellenbelegen.",
+          event_url: detectionUrl, status: "pending", created_by: admin.user.id
+        });
+        successorEventId = event.id;
+        const approvedParent = await restRequest(`events?id=eq.${encodeURIComponent(event.id)}`, {
+          token: admin.token, method: "PATCH", body: { status: "approved" }
+        });
+        assert.equal(approvedParent.response.ok, true, JSON.stringify(approvedParent.data));
+        const predecessors = await serviceRequest(`event_editions?select=*&event_id=eq.${encodeURIComponent(event.id)}`);
+        assert.equal(predecessors.response.ok, true, JSON.stringify(predecessors.data));
+        assert.equal(predecessors.data.length, 1);
+        const predecessor = await patch("event_editions", predecessors.data[0].id, {
+          edition_status: "completed", discovery_status: "detail_only", publication_status: "published",
+          race_formats: [{ label: "Historischer Marathon", distance_km: 42.195 }], legacy_distance: "Historischer Marathon"
+        });
+        const detectionSource = await create("event_sources", {
+          event_id: event.id, edition_id: predecessor.id, source_type: "official_event_website", source_url: detectionUrl,
+          parser_type: "json_ld", is_active: true, crawl_status: "success", consecutive_failures: 0,
+          last_change_status: "unchanged", last_fetched_at: new Date().toISOString()
+        });
+        const job = await create("source_crawl_jobs", {
+          source_id: detectionSource.id, event_id: event.id, edition_id: predecessor.id,
+          status: "completed", idempotency_key: `publish-${runId}`, trigger_source: "test"
+        });
+        const crawl = await create("source_crawl_results", {
+          job_id: job.id, source_id: detectionSource.id, event_id: event.id, edition_id: predecessor.id,
+          attempt_number: 1, http_status: 200, final_url: detectionUrl, change_status: "unchanged",
+          processing_status: "completed", worker_version: "real-rest-publication-test"
+        });
+        const candidate = await serviceRequest("rpc/register_edition_successor_candidate", { method: "POST", body: {
+          p_source_id: detectionSource.id, p_crawl_result_id: crawl.id,
+          p_candidate: { start_date: nextDate, year, confidence: 0.99, evidence_type: "json_ld",
+            registration_url: `${officialUrl}/register`, evidence: { excerpt: "Synthetic official future edition" } },
+          p_worker_version: "real-rest-publication-test"
+        } });
+        assert.equal(candidate.response.ok, true, JSON.stringify(candidate.data));
+        assert.equal(candidate.data.validation_status, "validated", JSON.stringify(candidate.data));
+        assert.equal(candidate.data.draft_edition_id, null);
+        const candidateId = candidate.data.candidate_id;
+        const draft = await create("event_editions", {
+          event_id: event.id, edition_year: year, edition_slug: `publish-${runId}`, legacy_event_key: `publish-${runId}`,
+          start_date: nextDate, end_date: null, edition_status: "scheduled", publication_status: "draft", discovery_status: "suppressed",
+          registration_status: "registration_open", registration_url: `${officialUrl}/register`, race_formats: formats,
+          legacy_distance: "5 km / Kinder 400 m", source_url: officialUrl, predecessor_edition_id: predecessor.id,
+          generated_from_source_id: detectionSource.id, generated_from_candidate_id: candidateId
+        });
+        const publicationSource = await create("event_sources", {
+          event_id: event.id, edition_id: draft.id, source_type: "official_event_website", source_url: officialUrl,
+          parser_type: "json_ld", is_active: true, crawl_status: "success", consecutive_failures: 0,
+          last_change_status: "unchanged", last_fetched_at: new Date().toISOString()
+        });
+        await patch("edition_succession_candidates", candidateId, { draft_edition_id: draft.id });
+        const parentBefore = await serviceRequest(`events?select=*&id=eq.${encodeURIComponent(event.id)}`);
+        const predecessorBefore = await serviceRequest(`event_editions?select=*&id=eq.${encodeURIComponent(predecessor.id)}`);
+        for (const [snapshot, expectedId] of [[parentBefore, event.id], [predecessorBefore, predecessor.id]]) {
+          assert.equal(snapshot.response.ok, true, JSON.stringify(snapshot.data));
+          assert.ok(Array.isArray(snapshot.data));
+          assert.equal(snapshot.data.length, 1);
+          assert.equal(String(snapshot.data[0].id), String(expectedId));
+        }
+        const facts = parentBefore.data[0];
+        const observed = {
+          event_name: facts.canonical_name || facts.event_name, edition_year: year, date: nextDate,
+          city: facts.city, country: facts.country, address: facts.address, latitude: facts.latitude, longitude: facts.longitude,
+          sport: facts.sport, distances: formats, description: facts.description, registration_status: "registration_open",
+          official_event_page: officialUrl, registration_link: `${officialUrl}/register`
+        };
+        const publicationBody = { p_candidate_ids: [candidateId], p_limit: 1,
+          p_notes: "Alle vierzehn Felder der synthetischen offiziellen Quelle wurden vollständig geprüft.",
+          p_evidence: { [draft.id]: { source_id: publicationSource.id, source_url: officialUrl, source_checked_at: checkedAt,
+            confidence: 0.99, confirmed_fields: Object.keys(observed), uncertain_fields: [], observed_values: observed } } };
+        const privateBefore = await restRequest(`public_event_discovery?select=edition_id&event_id=eq.${encodeURIComponent(event.id)}`);
+        assert.deepEqual(privateBefore.data, []);
+        for (const token of [undefined, userA.token]) {
+          const forbidden = await restRequest("rpc/approve_edition_succession_candidates", {
+            token, method: "POST", body: publicationBody
+          });
+          assert.equal(forbidden.response.ok, false, "Complete evidence does not grant publication authority.");
+        }
+        const published = await restRequest("rpc/approve_edition_succession_candidates", {
+          token: admin.token, method: "POST", body: publicationBody
+        });
+        assert.equal(published.response.ok, true, JSON.stringify(published.data));
+        assert.deepEqual(published.data, {
+          requested_count: 1, approved_count: 1, approved_candidate_ids: [candidateId], published_edition_ids: [draft.id],
+          publication_verified: true, freshness: { requested_count: 1, verified_count: 1, verified_edition_ids: [draft.id],
+            freshness_verified: true, automatic_fact_changes: false }
+        });
+        const visible = await restRequest(`public_event_discovery?select=edition_id,race_formats&event_id=eq.${encodeURIComponent(event.id)}`);
+        assert.equal(visible.response.ok, true, JSON.stringify(visible.data));
+        assert.deepEqual(visible.data, [{ edition_id: draft.id, race_formats: formats }]);
+        const fresh = await restRequest("rpc/get_public_event_freshness_guard", {
+          method: "POST", body: { p_edition_ids: [draft.id] }
+        });
+        assert.equal(fresh.response.ok, true, JSON.stringify(fresh.data));
+        assert.equal(fresh.data.decisions[draft.id], true);
+        const audit = await restRequest(`event_audit_log?select=changed_by,new_value&entity_type=eq.edition&entity_id=eq.${encodeURIComponent(draft.id)}&field_name=eq.__freshness_verification__`,
+          { token: admin.token });
+        assert.equal(audit.response.ok, true, JSON.stringify(audit.data));
+        assert.equal(audit.data.length, 1);
+        assert.equal(audit.data[0].changed_by, admin.user.id);
+        assert.equal(new Date(audit.data[0].new_value.source_checked_at).toISOString(), checkedAt);
+        const repeated = await restRequest("rpc/approve_edition_succession_candidates", {
+          token: admin.token, method: "POST", body: publicationBody
+        });
+        assert.equal(repeated.response.ok, false, "An already approved candidate cannot be published twice.");
+        const parentAfter = await serviceRequest(`events?select=*&id=eq.${encodeURIComponent(event.id)}`);
+        const predecessorAfter = await serviceRequest(`event_editions?select=*&id=eq.${encodeURIComponent(predecessor.id)}`);
+        for (const [snapshot, expectedId] of [[parentAfter, event.id], [predecessorAfter, predecessor.id]]) {
+          assert.equal(snapshot.response.ok, true, JSON.stringify(snapshot.data));
+          assert.ok(Array.isArray(snapshot.data));
+          assert.equal(snapshot.data.length, 1);
+          assert.equal(String(snapshot.data[0].id), String(expectedId));
+        }
+        assert.deepEqual(parentAfter.data, parentBefore.data, "Publication overwrote historical master data.");
+        assert.deepEqual(predecessorAfter.data, predecessorBefore.data, "Publication overwrote the predecessor edition.");
+      } finally {
+        if (successorEventId != null) {
+          const cleanup = await restRequest(`events?id=eq.${encodeURIComponent(successorEventId)}`, {
+            token: admin.token, method: "DELETE"
+          });
+          assert.equal(cleanup.response.ok, true, JSON.stringify(cleanup.data));
+        }
+      }
     }
   );
 

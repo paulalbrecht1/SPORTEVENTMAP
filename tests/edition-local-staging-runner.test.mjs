@@ -34,6 +34,14 @@ for (const marker of [
   'http://127.0.0.1:55321/auth/v1/settings',
   'Local staging Auth readiness gate passed.',
   'volume.Labels?.["com.supabase.cli.project"]',
+  'fs.lstatSync(stageRoot).isSymbolicLink()',
+  'fs.realpathSync(stageRoot)',
+  'path.dirname(resolvedStage), fs.realpathSync(root)',
+  'function runSafeEditionPublication()',
+  '"safe-edition-publish.sql"',
+  'JSON.parse(inspection.stdout)?.["com.supabase.cli.project"], stageProjectId',
+  'sqlChecks >= 75',
+  'rollback.fixtures_rolled_back, true',
   'runSupabase(["stop"]'
 ]) assert.ok(runner.includes(marker), `Local staging runner missing safety marker: ${marker}`);
 
@@ -54,5 +62,7 @@ assert.equal(
   "node tools/run-edition-local-staging.mjs"
 );
 assert.match(gitignore, /^\.tmp-supabase-edition-staging\/$/m);
+assert.ok(runner.indexOf('  runSafeEditionPublication();') < runner.indexOf('} finally {'),
+  "Publication rollback tests must complete before disposable cleanup.");
 
 console.log("Cost-free disposable edition staging runner safety boundaries verified.");

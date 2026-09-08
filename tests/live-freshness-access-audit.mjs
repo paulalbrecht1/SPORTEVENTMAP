@@ -100,6 +100,22 @@ assert.ok(
 );
 report("anonymous verifier denial", verifier.response);
 
+// Unknown IDs and no field evidence cannot publish even if an ACL regresses.
+// Both overloads must still deny the anonymous caller at the permission boundary.
+for (const [label, body] of [
+  ["legacy edition publication", { p_candidate_ids: [unknownEditionId], p_limit: 1 }],
+  ["evidence-bound edition publication", {
+    p_candidate_ids: [unknownEditionId], p_limit: 1,
+    p_notes: "Anonymous publication access denial smoke test.", p_evidence: {}
+  }]
+]) {
+  const denied = await restRequest("rpc/approve_edition_succession_candidates", { method: "POST", body });
+  assert.ok(denied.response.status === 401 || denied.response.status === 403,
+    `Anonymous ${label} was not denied at the permission boundary (HTTP ${denied.response.status}).`);
+  assert.equal(denied.data?.code, "42501", `Unexpected ${label} denial; verify RPC schema and grants.`);
+  report(`anonymous ${label} denial`, denied.response);
+}
+
 const inbox = await restRequest("admin_freshness_attestation_inbox?select=item_id&limit=1");
 assert.ok(
   inbox.response.status === 401 || inbox.response.status === 403,

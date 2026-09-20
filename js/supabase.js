@@ -7542,12 +7542,15 @@ function normalizeKnowledgeDetailFromEvent(event) {
     date: event.date || "",
     city: event.city || "",
     country: event.country || "",
-    official_website: event.event_url || "",
-    registration_url: event.event_url || "",
-    event_status: event.verification_status || "draft",
+    official_website: event.official_url || "",
+    registration_url: event.registration_url || "",
+    event_status: event.edition_status || event.event_status || "",
+    knowledge_scope: "edition",
+    event_brand_id: event.event_id || null,
+    edition_id: event.edition_id || null,
     verification_status: "draft",
     is_public: false,
-    last_checked: normalizeKnowledgeDate(event.last_checked)
+    last_checked: ""
   };
 }
 
@@ -7558,13 +7561,38 @@ function normalizeKnowledgeDate(value) {
   const german =
     /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(text);
 
-  if (german) {
-    return `${german[3]}-${german[2]}-${german[1]}`;
-  }
+  const date = german ? `${german[3]}-${german[2]}-${german[1]}`
+    : /^\d{4}-\d{2}-\d{2}(?:$|T)/.test(text) ? text.slice(0, 10) : "";
+  const parsed = new Date(`${date}T00:00:00Z`);
+  return date && Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date &&
+    date <= new Date().toISOString().slice(0, 10) ? date : "";
+}
 
-  return /^\d{4}-\d{2}-\d{2}/.test(text)
-    ? text.slice(0, 10)
-    : "";
+async function resolveKnowledgeDetailIdentity(slug, supplied = {}, existing = null) {
+  if ((supplied.event_slug && supplied.event_slug !== slug) || (existing && existing.event_slug !== slug)) {
+    throw new Error("Knowledge slug does not match the selected record.");
+  }
+  const scope = existing?.knowledge_scope || supplied.knowledge_scope || "edition";
+  if (supplied.knowledge_scope && supplied.knowledge_scope !== scope) throw new Error("Knowledge scope cannot be reassigned during review.");
+  let identity = existing;
+  if (!existing) {
+    if (!["brand", "edition"].includes(scope)) throw new Error("New Knowledge records require an explicit brand or edition scope.");
+    const canonical = await supabaseClient.from(scope === "brand" ? "events" : "event_editions")
+      .select(scope === "brand" ? "id,slug" : "id,event_id,edition_slug")
+      .eq(scope === "brand" ? "slug" : "edition_slug", slug).maybeSingle();
+    if (canonical.error) throw canonical.error;
+    if (!canonical.data) throw new Error("Canonical Knowledge identity is missing. Refresh the catalog before reviewing.");
+    identity = {
+      event_brand_id: scope === "brand" ? canonical.data.id : canonical.data.event_id,
+      edition_id: scope === "brand" ? null : canonical.data.id
+    };
+  }
+  for (const field of ["event_brand_id", "edition_id"]) {
+    if (supplied[field] != null && String(supplied[field]) !== String(identity[field])) {
+      throw new Error(`Knowledge ${field} does not match the selected record.`);
+    }
+  }
+  return { event_slug: slug, knowledge_scope: scope, event_brand_id: identity.event_brand_id || null, edition_id: identity.edition_id || null };
 }
 
 function renderKnowledgeEventOptions() {
@@ -7689,6 +7717,7 @@ function getKnowledgeSourceTemplate(source = {}) {
     <article class="admin-knowledge-row" data-knowledge-source>
       <label>Label<input data-source-field="source_label" value="${escapeAdminHTML(source.source_label || "")}" /></label>
       <label>URL<input data-source-field="source_url" type="url" value="${escapeAdminHTML(source.source_url || "")}" /></label>
+      <label>Field<input data-source-field="field_path" value="${escapeAdminHTML(source.field_path || "")}" placeholder="race_day.start_time" /></label>
       <label>Type<select data-source-field="source_type">
         ${["official", "trusted", "community", "estimated", "unknown"].map(type =>
           `<option value="${type}" ${source.source_type === type ? "selected" : ""}>${type}</option>`
@@ -8140,6 +8169,30 @@ async function saveSelectedEventKnowledge() {
       throw new Error("Event name is required.");
     }
 
+    if (currentKnowledgeDetail?.event_slug && currentKnowledgeDetail.event_slug !== slug) {
+      throw new Error("Load the selected Knowledge record before saving a different slug.");
+    }
+    const existingResult = await supabaseClient.from("event_details").select("*").eq("event_slug", slug).maybeSingle();
+    if (existingResult.error) throw existingResult.error;
+    if (currentKnowledgeDetail?.id && currentKnowledgeDetail.id !== existingResult.data?.id) {
+      throw new Error("Knowledge identity changed. Reload the record before saving.");
+    }
+    const identityInput = existingResult.data ? {
+      event_slug: slug,
+      knowledge_scope: currentKnowledgeDetail?.knowledge_scope,
+      event_brand_id: currentKnowledgeDetail?.event_brand_id,
+      edition_id: currentKnowledgeDetail?.edition_id
+    } : { event_slug: slug, event_brand_id: selectedEvent?.event_id, edition_id: selectedEvent?.edition_id };
+    Object.assign(detailPayload, await resolveKnowledgeDetailIdentity(slug, identityInput, existingResult.data));
+    const requestedPublic = detailPayload.is_public;
+    const sources = collectKnowledgeSources();
+    if (requestedPublic && (!["verified_official_source", "partially_verified"].includes(detailPayload.verification_status) ||
+        !sources.some(source => source.source_url && source.field_path && normalizeKnowledgeDate(source.last_verified)))) {
+      throw new Error("Public Knowledge requires reviewed status and a dated source for a specific field.");
+    }
+    // Child tables have separate writes. Keep this snapshot private until every
+    // child and provenance write succeeded; a failed save must not be public.
+    detailPayload.is_public = false;
     const detailResult =
       await supabaseClient
         .from("event_details")
@@ -8167,7 +8220,7 @@ async function saveSelectedEventKnowledge() {
     await replaceKnowledgeRows(
       "event_detail_sources",
       eventDetailId,
-      collectKnowledgeSources()
+      sources
     );
 
     await replaceKnowledgeRows(
@@ -8175,6 +8228,13 @@ async function saveSelectedEventKnowledge() {
       eventDetailId,
       collectKnowledgeFaq()
     );
+
+    if (requestedPublic) {
+      const published = await supabaseClient.from("event_details").update({ is_public: true })
+        .eq("id", eventDetailId).select("*").single();
+      if (published.error) throw published.error;
+      detailResult.data = published.data;
+    }
 
     currentKnowledgeDetail =
       detailResult.data;
@@ -8187,6 +8247,7 @@ async function saveSelectedEventKnowledge() {
       "Knowledge entry saved. Run the Supabase export/build step before the static detail page changes go live.",
       "success"
     );
+    return true;
   } catch (error) {
     console.error(
       "Could not save Knowledge entry:",
@@ -8200,6 +8261,7 @@ async function saveSelectedEventKnowledge() {
       ),
       "error"
     );
+    return false;
   } finally {
     setButtonLoading(
       knowledgeElements.save,
@@ -8335,7 +8397,29 @@ async function ensureKnowledgeDetailForTask(task) {
   const details =
     task.supabase_payload?.details || {};
 
+  if (details.event_slug && details.event_slug !== task.event_slug) throw new Error("Task and payload Knowledge slugs do not match.");
+  for (const key of ["event_brand_id", "edition_id"]) {
+    if (task[key] != null && details[key] != null && String(task[key]) !== String(details[key])) {
+      throw new Error(`Task and payload Knowledge ${key} do not match.`);
+    }
+  }
+  const existing = await supabaseClient.from("event_details").select("*").eq("event_slug", task.event_slug).maybeSingle();
+  if (existing.error) throw existing.error;
+  const identity = await resolveKnowledgeDetailIdentity(task.event_slug, {
+    ...details,
+    event_slug: task.event_slug,
+    event_brand_id: details.event_brand_id ?? task.event_brand_id,
+    edition_id: details.edition_id ?? task.edition_id
+  }, existing.data);
+  if (existing.data) {
+    const review = await supabaseClient.from("event_details")
+      .update({ is_public: false, verification_status: "needs_review" })
+      .eq("id", existing.data.id).select("*").single();
+    if (review.error) throw review.error;
+    return review.data;
+  }
   const detailPayload = {
+    ...identity,
     event_slug: task.event_slug,
     event_name: task.event_name,
     sport_type: task.sport || details.sport_type || "",
@@ -8343,26 +8427,18 @@ async function ensureKnowledgeDetailForTask(task) {
     city: task.city || details.city || "",
     country: task.country || details.country || "",
     official_website:
-      details.official_website ||
-      task.research_sources?.[0] ||
-      "",
+      details.official_website || "",
     registration_url:
-      details.registration_url ||
-      task.research_sources?.[0] ||
-      "",
+      details.registration_url || "",
     verification_status: "needs_review",
     is_public: false,
-    last_checked:
-      normalizeKnowledgeDate(details.last_checked) ||
-      new Date().toISOString().slice(0, 10)
+    last_checked: null
   };
 
   const result =
     await supabaseClient
       .from("event_details")
-      .upsert(detailPayload, {
-        onConflict: "event_slug"
-      })
+      .insert([detailPayload])
       .select("*")
       .single();
 
@@ -8384,10 +8460,13 @@ async function saveKnowledgeReviewSource(eventDetailId, field, proposal) {
       proposal.source_title ||
       `${field} review source`,
     source_url: proposal.source_url,
-    source_type: "official",
+    source_type: ["official", "trusted", "community", "estimated", "unknown"].includes(proposal.source_type) ? proposal.source_type
+      : proposal.verification_status === "verified_official_source" ? "official" : "unknown",
+    field_path: KNOWLEDGE_REVIEW_FIELD_TARGETS[field]
+      ? `${KNOWLEDGE_REVIEW_FIELD_TARGETS[field].tableKey}.${KNOWLEDGE_REVIEW_FIELD_TARGETS[field].field}`
+      : field,
     last_verified:
-      proposal.last_checked ||
-      new Date().toISOString().slice(0, 10),
+      ["verified", "verified_official_source"].includes(proposal.verification_status) ? normalizeKnowledgeDate(proposal.last_checked) || null : null,
     confidence_score:
       Number.isFinite(proposal.confidence)
         ? proposal.confidence
@@ -8449,6 +8528,13 @@ async function acceptKnowledgeReviewField(task, field, proposal) {
 
   if (!String(proposal.value || "").trim() && field !== "sources") {
     throw new Error("Accepted Knowledge values need a value.");
+  }
+  if (["cutoff", "start_time", "registration_deadline"].includes(field) &&
+      /withdraw|refund|rücktritt|ruecktritt|storn|abmeld|\b\d+\s*(?:days?|tage?)\s*(?:before|vor)\b/i.test(proposal.value || "")) {
+    throw new Error("Withdrawal conditions cannot be stored as a race cutoff, start time or registration deadline.");
+  }
+  if (["cutoff", "start_time"].includes(field) && /registration|anmeld|meldeschluss/i.test(proposal.value || "")) {
+    throw new Error("Registration dates cannot be stored as race timing.");
   }
 
   const detail =
@@ -8702,7 +8788,7 @@ async function loadKnowledgeAuditAdmin() {
   );
 }
 
-function applyKnowledgeReviewToForm(task) {
+function applyKnowledgeReviewToForm(task, existingBundle = {}) {
   if (!task?.supabase_payload) {
     setKnowledgeAuditStatus(
       "No review payload available for this event.",
@@ -8712,13 +8798,22 @@ function applyKnowledgeReviewToForm(task) {
   }
 
   const payload = {
+    ...existingBundle,
     ...task.supabase_payload,
     details: {
+      ...(existingBundle.details || {}),
       ...(task.supabase_payload.details || {}),
+      event_slug: task.event_slug,
       verification_status: "needs_review",
-      is_public: false
+      is_public: false,
+      last_checked: existingBundle.details?.last_checked || null
     }
   };
+  for (const key of Object.keys(KNOWLEDGE_CHILD_TABLES)) {
+    payload[key] = { ...(existingBundle[key] || {}), ...(task.supabase_payload[key] || {}) };
+  }
+  payload.sources = [...(existingBundle.sources || []), ...(task.supabase_payload.sources || []).map(source => ({ ...source, last_verified: null }))];
+  payload.faq = [...(existingBundle.faq || []), ...(task.supabase_payload.faq || [])];
 
   fillKnowledgeForm(payload);
 
@@ -8740,20 +8835,21 @@ async function openKnowledgeReview(task) {
   await loadEventKnowledgeAdmin({
     selectSlug: task.event_slug
   });
-  applyKnowledgeReviewToForm(task);
+  const bundle = await fetchKnowledgeBundle(task.event_slug);
+  const identity = await resolveKnowledgeDetailIdentity(task.event_slug, {
+    ...task.supabase_payload?.details,
+    event_brand_id: task.event_brand_id || task.supabase_payload?.details?.event_brand_id,
+    edition_id: task.edition_id || task.supabase_payload?.details?.edition_id
+  }, bundle.details?.id ? bundle.details : null);
+  currentKnowledgeDetail = { ...bundle.details, ...identity };
+  applyKnowledgeReviewToForm(task, bundle);
 }
 
 async function applyKnowledgeReviewToSupabase(task) {
-  setAdminTab("knowledge");
-  await loadEventKnowledgeAdmin({
-    selectSlug: task.event_slug
-  });
+  if (!task?.supabase_payload) return;
+  await openKnowledgeReview(task);
 
-  if (!applyKnowledgeReviewToForm(task)) {
-    return;
-  }
-
-  await saveSelectedEventKnowledge();
+  if (!await saveSelectedEventKnowledge()) return;
 
   setKnowledgeStatus(
     "Review enrichment saved to Supabase as needs_review with Public disabled.",

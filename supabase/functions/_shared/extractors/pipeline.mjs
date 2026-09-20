@@ -5,7 +5,7 @@ import { extractKnownSelectors } from "./known-selectors-extractor.mjs";
 import { extractGenericHtml } from "./generic-html-extractor.mjs";
 import { nameSimilarity, valuesEqual, normalizeComparableText } from "./normalization.mjs";
 
-export const EXTRACTION_VERSION = "event-extraction-v1";
+export const EXTRACTION_VERSION = "event-extraction-v2-edition-scope";
 export { PLATFORM_ADAPTERS };
 
 const EVENT_FIELDS = new Set(["canonical_name", "sport", "country", "region", "city", "address", "latitude", "longitude", "event_status", "organizer_name", "description", "image"]);
@@ -74,6 +74,7 @@ function proposalPriority(type, field, score, locked) {
 function alreadyHandled(field, normalizedValue, context) {
   const now = new Date(context.now || Date.now()).getTime();
   return (context.previousProposals || []).some(proposal => {
+    if (EDITION_FIELDS.has(field) && proposal.edition_id != null && String(proposal.edition_id) !== String(context.edition?.id)) return false;
     if (proposal.field_name !== field || JSON.stringify(proposal.normalized_value) !== JSON.stringify(normalizedValue)) return false;
     if (["pending", "accepted", "edited_and_accepted"].includes(proposal.proposal_status)) return true;
     return proposal.proposal_status === "rejected" && now - Date.parse(proposal.reviewed_at || proposal.created_at || 0) < 30 * 86400000;
@@ -102,6 +103,7 @@ function possibleNewEdition(selected, context, now) {
   const eventNameMatch = !candidate.eventName || nameSimilarity(candidate.eventName, context.event?.canonical_name || context.event?.event_name) >= 0.35;
   if (!eventNameMatch) return null;
   const scored = scoreCandidate(candidate, dateGroup, context);
+  if (scored.score < 0.7 || candidate.warnings?.includes("date_context_not_explicit")) return null;
   return {
     entity_type: "event", field_name: "edition_year", old_value: latest.edition_year,
     proposed_value: { edition_year: year, start_date: candidate.normalizedValue }, normalized_value: year,
@@ -111,6 +113,21 @@ function possibleNewEdition(selected, context, now) {
     evidence: { raw_value: candidate.rawValue, context: candidate.context, alternatives: scored.conflicts.slice(0, 4).map(item => ({ value: item.rawValue, normalized: item.normalizedValue, method: item.method })) }, source_context: candidate.context,
     validation_warnings: [], priority: "high", locked_field: false
   };
+}
+
+function editionScopeWarnings(selected, context) {
+  if (!context.edition) return ["edition_context_missing"];
+  const dates = selected.get("start_date") || [];
+  const strongestRank = Math.max(0, ...dates.map(candidate => methodRank(candidate.method)));
+  const strongest = dates.filter(candidate => methodRank(candidate.method) === strongestRank);
+  const expectedYear = Number(context.edition.edition_year);
+  if (strongest.some(candidate => Number(String(candidate.normalizedValue).slice(0, 4)) !== expectedYear)) {
+    return ["source_dates_do_not_identify_target_edition"];
+  }
+  if (!strongest.length && context.edition.edition_status === "completed") {
+    return ["historical_edition_evidence_missing"];
+  }
+  return [];
 }
 
 export function extractEventChanges(content, options = {}) {
@@ -127,12 +144,23 @@ export function extractEventChanges(content, options = {}) {
   const selected = selectCandidates(candidates);
   const proposals = [];
   const newEdition = possibleNewEdition(selected, context, options.now || new Date());
+  const scopeWarnings = editionScopeWarnings(selected, context);
+  const diagnostics = [...layers.flatMap(layer => layer.diagnostics || []), ...scopeWarnings];
 
   for (const [field, group] of selected) {
     if (!EVENT_FIELDS.has(field) && !EDITION_FIELDS.has(field)) continue;
-    if (newEdition && ["start_date", "end_date"].includes(field)) continue;
+    // A successor page's prices, start times and registration belong to that
+    // successor, even when its candidate/draft already exists. Never attach
+    // them to the edition to which an older monitoring source was bound.
+    if (EDITION_FIELDS.has(field) && (newEdition || scopeWarnings.length)) continue;
     const ranked = [...group].sort((left, right) => methodRank(right.method) - methodRank(left.method) || Number(right.confidence) - Number(left.confidence));
     const winner = ranked[0];
+    if (["start_date", "end_date"].includes(field) && winner.warnings?.includes("date_context_not_explicit")) continue;
+    if (field === "registration_url" && winner.method === "generic_html" &&
+        group.some(candidate => !valuesEqual(field, candidate.normalizedValue, winner.normalizedValue))) {
+      diagnostics.push("ambiguous_registration_links");
+      continue;
+    }
     const baseline = baselineValue(field, context);
     if (valuesEqual(field, baseline.value, winner.normalizedValue) || alreadyHandled(field, winner.normalizedValue, context)) continue;
     const scored = scoreCandidate(winner, group, context);
@@ -156,7 +184,7 @@ export function extractEventChanges(content, options = {}) {
     version: EXTRACTION_VERSION,
     proposals,
     candidates,
-    diagnostics: layers.flatMap(layer => layer.diagnostics || []),
+    diagnostics,
     adapters: layers[2].adapter ? [{ id: layers[2].adapter, version: layers[2].version }] : []
   };
 }

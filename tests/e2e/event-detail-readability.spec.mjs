@@ -235,7 +235,7 @@ test("Berlin registration dates and fee context are clear", async ({ page }) => 
     "#registration .race-guide-fact-card.is-registration-period"
   );
   await expect(periodCard.locator("strong"))
-    .toHaveText("25.09.2025 – 06.11.2025");
+    .toHaveText("25.09.2025");
   await expect(page.locator(
     "#registration .race-guide-fact-card.is-registration-deadline strong"
   )).toHaveText("06.11.2025");

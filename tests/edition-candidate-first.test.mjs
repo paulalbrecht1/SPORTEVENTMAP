@@ -4,7 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   extractLifecycleSignals,
-  selectLifecycleSuccessors
+  selectLifecycleSuccessors,
+  selectLifecycleResults
 } from "../supabase/functions/_shared/source-monitor-core.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -120,6 +121,52 @@ const postponedSignals = extractLifecycleSignals(`
   }</script>
 `, "text/html", "https://example.com/event");
 assert.deepEqual(postponedSignals.editions[0].risk_signals, ["postponement"]);
+
+assert.equal(structuredSignals.editions[0].registration_url, null,
+  "Missing registration evidence must stay empty, never become the source homepage.");
+for (const deadline of [
+  "Registration deadline: 2027-03-01", "Registration opening: 2027-03-01",
+  "Withdrawal deadline: 01.03.2027", "Rücktritt bis 01.03.2027",
+  "Anmeldung öffnet am 01.03.2027", "Abmeldung: 1. März 2027"
+]) {
+  assert.deepEqual(extractLifecycleSignals(`<p>${deadline}</p>`).editions, [],
+    `A deadline must not become a successor edition: ${deadline}`);
+}
+assert.deepEqual(extractLifecycleSignals(`
+  <p>Race day: 6 May 2027.</p><p>Withdrawal deadline: 1 April 2027.</p>
+  <footer>News: 2027-06-01</footer>
+`).editions.map(candidate => candidate.start_date), ["2027-05-06"],
+"Lifecycle dates reuse the contextual date parser and ignore footer/deadline dates.");
+const weekend = extractLifecycleSignals("<p>Race day: 6–7 May 2027.</p>");
+assert.deepEqual(weekend.editions.map(candidate => [candidate.start_date, candidate.end_date]), [["2027-05-06", "2027-05-07"]],
+  "A race weekend is one edition range, not two conflicting start dates.");
+
+const calendarSignals = extractLifecycleSignals(`<script type="application/ld+json">[
+  {"@type":"SportsEvent","name":"IRONMAN Hamburg 2027","startDate":"2027-06-06"},
+  {"@type":"SportsEvent","name":"Berlin Halbmarathon 2027","startDate":"2027-04-04"}
+]</script>`, "text/html", "https://example.com/events");
+assert.deepEqual(selectLifecycleSuccessors(calendarSignals, { edition_year: 2026 }, "2026-09-20", {
+  source_type: "official_event_website", event_name: "IRONMAN Hamburg"
+}).map(candidate => candidate.start_date), ["2027-06-06"],
+"An organizer calendar must not attach another brand's event to the monitored series.");
+assert.deepEqual(selectLifecycleSuccessors(calendarSignals, { edition_year: 2026 }, "2026-09-20", {
+  source_type: "official_event_website", event_name: "Bodensee Triathlon"
+}), [], "Unrelated structured events must not fall back to arbitrary visible dates.");
+
+const resultsArchive = extractLifecycleSignals(`
+  <a href="/results/2027">Results 2027</a><a href="/results/2026">Results 2026</a>
+  <a href="/results">Results</a><a href="/results/2025">Results 2026</a>
+`, "text/html", "https://example.com/event");
+assert.deepEqual(selectLifecycleResults(resultsArchive, { edition_year: 2026 }).map(result => result.url),
+  ["https://example.com/results/2026"],
+  "Results from another or an unknown/conflicting year must not attach to the source's historical edition.");
+assert.deepEqual(selectLifecycleResults(resultsArchive, null), []);
+const duplicatedStatus = extractLifecycleSignals(`<script type="application/ld+json">[
+  {"@type":"SportsEvent","name":"Testlauf","startDate":"2027-06-06"},
+  {"@type":"SportsEvent","name":"Testlauf","startDate":"2027-06-06","eventStatus":"https://schema.org/EventCancelled"}
+]</script>`);
+assert.deepEqual(duplicatedStatus.editions[0].risk_signals, ["cancellation"],
+  "Deduplicating structured dates must preserve cancellation evidence from every matching entry.");
 
 for (const fragment of [
   "Legacy-Synchronisation",

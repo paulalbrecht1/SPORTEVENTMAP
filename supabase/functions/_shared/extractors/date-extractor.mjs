@@ -8,7 +8,7 @@ const MONTHS = new Map(Object.entries({
   november: 11, nov: 11, dezember: 12, december: 12, dec: 12
 }));
 
-const NEGATIVE_CONTEXT = /(?:meldeschluss|anmeldeschluss|registration deadline|registration opens?|anmeldestart|abholung|pickup|ergebnis|result|veroffentlich|published|copyright|training(?:scamp)?|camp|news|artikel|article)/i;
+const NEGATIVE_CONTEXT = /(?:meldeschluss|anmeldeschluss|registration (?:deadline|opens?|opening|closes?|closing)|entry deadline|anmeld(?:estart|ebeginn|efrist|ung.*(?:öffnet|oeffnet|schließt|schliesst))|withdraw(?:al)?|rücktritt|ruecktritt|rückerstattung|rueckerstattung|storn(?:o|ierung)|refund|abmeld|abholung|pickup|ergebnis|result|veroffentlich|published|copyright|training(?:scamp)?|camp|news|artikel|article)/i;
 const POSITIVE_CONTEXT = /(?:renntag|race day|event date|veranstaltungstag|wettkampf|start(?:datum| date)?|termin|findet statt|takes place|scheduled)/i;
 
 function validDate(year, month, day) {
@@ -67,7 +67,8 @@ export function extractDateCandidates(textValue, options = {}) {
       const negative = NEGATIVE_CONTEXT.test(context);
       const positive = POSITIVE_CONTEXT.test(context);
       const date = normalizeDate(match[0], { defaultYear });
-      if (!date || negative) continue;
+      const addressDate = /(?:stra(?:ß|ss)e|street|avenue|allee|platz)\s+(?:des\s+)?$/i.test(text.slice(Math.max(0, match.index - 30), match.index));
+      if (!date || negative || addressDate) continue;
       results.push({
         field: "start_date", rawValue: match[0], normalizedValue: date,
         context, confidence: positive ? 0.78 : 0.58,

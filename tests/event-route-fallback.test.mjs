@@ -371,7 +371,7 @@ test("actual browser resolves missing routes, preserves static pages and hides c
         await expect(page.locator('#liveDetailOfficial')).toBeHidden();
         await expect(page.locator('#liveDetailSource')).toHaveAttribute('href', publicRow.source_url);
         await expect(page.locator('#liveDetailFacts')).toContainText('5 km · 10 km');
-        await expect(page.locator('#liveDetailChecked')).toContainText('Noch nicht angegeben');
+        await expect(page.locator('#liveDetailChecked')).toBeHidden();
         await expect(page.locator('#liveDetailStatus')).toBeHidden();
         await page.locator('#eventDetailLanguageSelect').selectOption('en');
         await expect(page.locator('#liveDetailFacts')).toContainText('Date');

@@ -4,6 +4,22 @@
 
 Stufe 3 analysiert ausschließlich erfolgreich abgerufene, neue oder semantisch veränderte Quellen im serverseitigen Worker. Die Pipeline schreibt keine extrahierten Fakten direkt in `events` oder `event_editions`. Sie speichert pro Feld einen Vorschlag in `event_change_proposals`. Erst `review_event_change_proposal()` darf nach einer Admin-Entscheidung öffentliche Daten transaktional ändern.
 
+Der Worker bindet Editionsfakten an das Jahr der überwachten Edition. Beschreibt
+die Quelle einen anderen Jahrgang, werden auch Preise, Startzeiten, Distanzen und
+Anmeldedaten nicht als Änderungen der alten Edition vorgeschlagen. Dies gilt
+auch bei bereits vorhandenem Folgeentwurf. Undatierte Quelleninhalte dürfen
+abgeschlossene Editionen nicht anreichern; die Extraktionsdiagnostik nennt den
+fehlenden bzw. widersprüchlichen Editionsbezug. Bereits bearbeitete Vorschläge
+werden je Edition dedupliziert.
+
+Die Nachfolgeerkennung verwendet denselben kontextbezogenen Datumsparser wie die
+Faktextraktion. Anmelde- und Rücktrittstermine sowie Datumsbestandteile in
+Straßennamen sind keine Veranstaltungstermine. Unklare Registrierungslinks bleiben
+als Diagnose zurück; Navigationslinks zu anderen Veranstaltungen werden nicht
+übernommen. Ergebnislinks benötigen einen eindeutigen Jahresbezug zur überwachten
+Edition. Fehlende Registrierungslinks bleiben leer. Diese Beobachtungen ersetzen
+keine fachliche Quellenprüfung und setzen keinen Verifikationszeitpunkt.
+
 Absagen und Verschiebungen sind immer `critical`. Auch ein sehr hoher Confidence Score führt nie zu einer automatischen Veröffentlichung. Feldsperren und manuelle Overrides werden beim Vergleich berücksichtigt; ein abweichender Vorschlag bleibt sichtbar und erhält die Warnung `field_locked_or_manual_override`.
 
 ## Extraktionsreihenfolge
@@ -101,6 +117,19 @@ dieses Jahres existiert. Der Worker speichert dafür jedoch kein paralleles
 `event_change_proposal`: Die Succession-Engine ist der kanonische Pfad und legt
 ausschließlich einen validierten oder blockierten Candidate an. Eine Edition
 entsteht ausschließlich durch Adminfreigabe; Detection erzeugt keinen Draft.
+
+Seit der Absicherung vom 20. September 2026 blockiert Evidenz für ein anderes
+Editionsjahr auch Preis-, Startzeit-, Format- und Anmeldevorschläge für die alte
+Edition. Das gilt ebenso bei bereits vorhandenem Nachfolgerentwurf. Vergangene
+Editionen werden ohne Jahresbeleg nicht aus einer inzwischen undatierten
+Homepage angereichert. Die Vorschlagsunterdrückung berücksichtigt die konkrete
+`edition_id`; eine Freigabe für ein Vorjahr unterdrückt keine neue Jahresprüfung.
+
+Die Nachfolgersuche verwendet denselben kontextbezogenen Datumsextraktor wie
+die Faktenprüfung. Anmelde-/Rücktrittsfristen, Footer und Straßennamen sind keine
+Eventtermine. Fremde benannte Events sowie mehrdeutige Anmeldelinks werden
+zurückgehalten; fehlende Anmeldeziele bleiben leer. Ergebnisfunde brauchen einen
+passenden Jahresbeleg, damit neue Resultate nicht der Vorjahresedition zufallen.
 
 ## Manuelle Overrides und Feldsperren
 

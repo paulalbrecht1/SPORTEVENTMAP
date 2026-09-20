@@ -1,3 +1,7 @@
+import { extractDateCandidates } from "./extractors/date-extractor.mjs";
+import { htmlToVisibleText } from "./extractors/generic-html-extractor.mjs";
+import { nameSimilarity, normalizeComparableText } from "./extractors/normalization.mjs";
+
 export const DEFAULT_ALLOWED_CONTENT_TYPES = [
   "text/html",
   "application/xhtml+xml",
@@ -296,6 +300,7 @@ function jsonLdEntries(value) {
 }
 
 function absoluteHttpUrl(value, baseUrl) {
+  if (!String(value || "").trim()) return null;
   try {
     const url = new URL(String(value || ""), baseUrl || undefined);
     return ["http:", "https:"].includes(url.protocol) ? url.toString() : null;
@@ -310,7 +315,7 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
   const rememberEdition = candidate => {
     const startDate = normalizeLifecycleDate(candidate.start_date);
     if (!startDate) return;
-    const key = startDate;
+    const key = `${startDate}:${normalizeComparableText(candidate.name || "")}`;
     const normalized = { ...candidate, start_date: startDate, year: Number(startDate.slice(0, 4)) };
     if (candidate.end_date) normalized.end_date = normalizeLifecycleDate(candidate.end_date);
     if (Array.isArray(candidate.risk_signals) && candidate.risk_signals.length) {
@@ -319,7 +324,10 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
       delete normalized.risk_signals;
     }
     const previous = editionMap.get(key);
-    if (!previous || normalized.confidence > previous.confidence) editionMap.set(key, normalized);
+    const preferred = !previous || normalized.confidence > previous.confidence ? normalized : previous;
+    const combinedRisks = [...new Set([...(previous?.risk_signals || []), ...(normalized.risk_signals || [])])].sort();
+    if (combinedRisks.length) preferred.risk_signals = combinedRisks;
+    editionMap.set(key, preferred);
   };
   const rememberResult = candidate => {
     const url = absoluteHttpUrl(candidate.url, baseUrl);
@@ -355,14 +363,15 @@ export function extractLifecycleSignals(content, contentType = "text/html", base
   }
 
   if (!contentType.includes("json")) {
-    const visible = decodeEntities(raw
-      .replace(/<(script|style|noscript)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ")
-      .replace(/<[^>]+>/g, " "))
-      .replace(/\s+/g, " ");
+    const visible = htmlToVisibleText(raw);
     if (/\b(cancelled|canceled|abgesagt|annulliert)\b/i.test(visible)) riskSignals.add("cancellation");
     if (/\b(postponed|verschoben|verlegt)\b/i.test(visible)) riskSignals.add("postponement");
-    for (const match of visible.matchAll(/\b(?:19|20)\d{2}-\d{2}-\d{2}\b|\b\d{1,2}[./]\d{1,2}[./](?:19|20)\d{2}\b/g)) {
-      rememberEdition({ start_date: match[0], end_date: null, name: null, registration_url: null, confidence: 0.72, evidence_type: "visible_date" });
+    const visibleDates = extractDateCandidates(visible);
+    for (const date of visibleDates) {
+      if (date.field !== "start_date") continue;
+      const rangeEnd = visibleDates.find(item => item.field === "end_date" && item.context === date.context);
+      if (rangeEnd?.normalizedValue === date.normalizedValue) continue;
+      rememberEdition({ start_date: date.normalizedValue, end_date: rangeEnd?.normalizedValue || null, name: null, registration_url: null, confidence: Math.min(0.78, date.confidence), evidence_type: "visible_date" });
     }
     for (const match of raw.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a\s*>/gi)) {
       const label = decodeEntities(match[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
@@ -396,6 +405,7 @@ export function selectLifecycleSuccessors(
     typeof sourceContext === "string" ? sourceContext : sourceContext?.source_type || ""
   ).toLowerCase();
   const requiresStructuredNamedEvent = sourceType === "third_party_platform";
+  const expectedName = sourceContext?.event_name || sourceContext?.canonical_name || "";
   const candidates = (signals?.editions || []).filter(candidate =>
     Number(candidate.year) > latestYear &&
     String(candidate.start_date || "") > referenceDate &&
@@ -406,7 +416,12 @@ export function selectLifecycleSuccessors(
     ))
   );
   const structured = candidates.filter(candidate => candidate.evidence_type === "json_ld");
-  const selected = structured.length ? structured : candidates.length === 1 ? candidates : [];
+  const withoutYear = name => String(name || "").replace(/\b(?:19|20)\d{2}\b/g, "");
+  const matched = expectedName ? structured.filter(candidate =>
+    candidate.name && nameSimilarity(withoutYear(candidate.name), withoutYear(expectedName)) >= 0.5
+  ) : structured;
+  // A calendar's unrelated structured event must never fall back to a bare date.
+  const selected = structured.length ? matched : candidates.length === 1 ? candidates : [];
   return selected.slice(0, 4).map(candidate => ({
     ...candidate,
     alternative_dates: selected
@@ -414,6 +429,16 @@ export function selectLifecycleSuccessors(
       .map(alternative => alternative.start_date)
       .sort()
   }));
+}
+
+export function selectLifecycleResults(signals, edition) {
+  if (!edition?.edition_year) return [];
+  // Generic results landing pages can change year. Only retain a result whose
+  // visible label or URL explicitly identifies this edition, never another one.
+  return (signals?.results || []).filter(result => {
+    const years = [...new Set(`${result.title || ""} ${result.url || ""}`.match(/\b(?:19|20)\d{2}\b/g) || [])];
+    return years.length === 1 && Number(years[0]) === Number(edition.edition_year);
+  });
 }
 export async function sha256Hex(value) {
   const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;

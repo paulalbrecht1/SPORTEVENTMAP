@@ -2,14 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const { parseCsvFile } = require("./event-table-utils.js");
 const {
-  AUDIT_JSON_PATH,
   EVENTS_PATH,
-  FIELD_GROUPS,
   RESEARCH_STATUS_JSON_PATH,
   REVIEW_JSON_PATH,
   ROOT,
   buildAuditRows,
   cleanValue,
+  indexEventsBySlug,
+  isCurrentEdition,
   readJson,
   writeAuditFiles
 } = require("./event-knowledge-workflow.js");
@@ -83,10 +83,6 @@ function parseArgs(argv) {
   });
 }
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function writeStatus(status) {
   fs.writeFileSync(
     RESEARCH_STATUS_JSON_PATH,
@@ -96,13 +92,6 @@ function writeStatus(status) {
 }
 
 function loadAuditRows(events) {
-  const audit =
-    readJson(AUDIT_JSON_PATH, null);
-
-  if (audit && Array.isArray(audit.events)) {
-    return audit.events;
-  }
-
   const rows =
     buildAuditRows(events);
 
@@ -112,6 +101,7 @@ function loadAuditRows(events) {
 
 function getSourceUrl(event, auditRow) {
   return cleanValue(
+    event.official_url ||
     event.source_url ||
     event.event_url ||
     auditRow.source_url ||
@@ -127,6 +117,7 @@ function selectRows(auditRows, options) {
 
   let rows =
     auditRows.filter(row =>
+      (scope === "current" || isCurrentEdition(row)) &&
       Number(row.missing_count || 0) > 0
     );
 
@@ -232,6 +223,7 @@ async function fetchSource(sourceUrl) {
 
     return {
       html,
+      fetched_at: new Date().toISOString(),
       title: extractTitle(html, sourceUrl),
       segments: htmlToSegments(html)
     };
@@ -262,6 +254,8 @@ function createProposal(auditRow, field, suggestedValue, sourceUrl, sourceTitle,
   return {
     event_id: auditRow.event_slug,
     event_slug: auditRow.event_slug,
+    event_brand_id: auditRow.event_brand_id || null,
+    edition_id: auditRow.edition_id || null,
     field_name: field,
     suggested_value: suggestedValue,
     value: suggestedValue,
@@ -269,7 +263,7 @@ function createProposal(auditRow, field, suggestedValue, sourceUrl, sourceTitle,
     source_title: sourceTitle,
     confidence,
     verification_status: "needs_review",
-    last_checked: todayIso(),
+    last_checked: "",
     source_excerpt: excerpt,
     note: `Auto-researched candidate for ${field}. Manual review required before publishing.`
   };
@@ -318,7 +312,7 @@ function researchField(field, auditRow, sourceUrl, sourceTitle, segments) {
   if (field === "cutoff") {
     const segment =
       findSegment(
-        segments,
+        segments.filter(segment => !/withdraw|refund|deferral|registration|entry deadline|anmeld|abmeld|rücktritt|ruecktritt|storn|erstatt|\b\d+\s*(days?|tage[ns]?)\b/i.test(segment)),
         /cut[\s-]?off|time limit|zielschluss|zeitlimit|schlusszeit|kontrollschluss/i,
         /\b(?:\d{1,2}[:.]\d{2}|\d{1,2}\s?(?:h|std|stunden|hours))\b/i
       );
@@ -341,7 +335,7 @@ function researchField(field, auditRow, sourceUrl, sourceTitle, segments) {
   if (field === "start_time") {
     const segment =
       findSegment(
-        segments,
+        segments.filter(segment => !/registration|withdraw|refund|anmeld|abmeld|rücktritt|ruecktritt|storn/i.test(segment)),
         /startzeit|start time|startschuss|\bstart\b/i,
         /\b(?:[01]?\d|2[0-3])[:.]\d{2}\b/
       );
@@ -401,6 +395,37 @@ function fieldsForRow(row, options) {
     .filter(field => RESEARCHABLE_FIELDS.includes(field));
 }
 
+async function collectResearchProposals(row, event, sourceUrl, source, fields) {
+  const { extractEventChanges } = await import("../supabase/functions/_shared/extractors/pipeline.mjs");
+  const { parseEventDate } = require("./generate-event-pages.js");
+  const startDate = parseEventDate(event.start_date || event.date);
+  const endDate = parseEventDate(event.end_date) || startDate;
+  const status = event.edition_status || event.event_status || "";
+  const historicalScheduled = endDate && endDate < new Date().toISOString().slice(0, 10) &&
+    ["", "scheduled", "completed"].includes(status);
+  const edition = {
+    id: event.edition_id,
+    edition_year: Number(event.edition_year || startDate.slice(0, 4)),
+    start_date: startDate,
+    edition_status: historicalScheduled ? "completed" : status
+  };
+  const extraction = extractEventChanges(source.html, {
+    sourceUrl, event: { ...event, canonical_name: event.event_name },
+    edition, editions: [edition], source: { source_type: "manual" }
+  });
+  const scopeDiagnostics = extraction.diagnostics.filter(item => [
+    "edition_context_missing", "source_dates_do_not_identify_target_edition", "historical_edition_evidence_missing"
+  ].includes(item));
+  const wrongEdition = scopeDiagnostics.length || extraction.proposals.some(item => item.change_type === "new_edition");
+  return {
+    diagnostics: scopeDiagnostics,
+    proposals: fields.filter(field => !wrongEdition || field === "sources")
+      .map(field => researchField(field, row, sourceUrl, source.title, source.segments))
+      .filter(Boolean)
+      .map(proposal => ({ ...proposal, source_fetched_at: source.fetched_at || "" }))
+  };
+}
+
 function proposalToField(proposal) {
   return {
     value: proposal.suggested_value,
@@ -410,6 +435,7 @@ function proposalToField(proposal) {
     confidence: proposal.confidence,
     verification_status: "needs_review",
     last_checked: proposal.last_checked,
+    source_fetched_at: proposal.source_fetched_at || "",
     source_excerpt: proposal.source_excerpt,
     note: proposal.note
   };
@@ -426,6 +452,8 @@ function buildTask(row, event, proposals, sourceUrl) {
   return {
     event_slug: row.event_slug,
     event_id: row.event_slug,
+    event_brand_id: event.event_id || null,
+    edition_id: event.edition_id || null,
     event_name: row.event_name,
     date: row.date,
     city: row.city,
@@ -441,16 +469,19 @@ function buildTask(row, event, proposals, sourceUrl) {
     supabase_payload: {
       details: {
         event_slug: row.event_slug,
+        event_brand_id: event.event_id || null,
+        edition_id: event.edition_id || null,
+        knowledge_scope: "edition",
         event_name: row.event_name,
         sport_type: row.sport,
         date: row.date,
         city: row.city,
         country: row.country,
-        official_website: cleanValue(event.event_url || sourceUrl),
-        registration_url: cleanValue(event.event_url || sourceUrl),
+        official_website: cleanValue(event.official_url),
+        registration_url: cleanValue(event.registration_url),
         verification_status: "needs_review",
         is_public: false,
-        last_checked: todayIso()
+        last_checked: null
       },
       registration: {},
       course: {},
@@ -476,26 +507,27 @@ function mergeReviewTasks(existingReview, newTasks, status) {
   }
 
   function cleanTask(task = {}) {
+    function cleanProposal(proposal) {
+      return {
+        ...proposal,
+        suggested_value: proposal.suggested_value || proposal.value || "",
+        source_title: proposal.source_title || "Existing review source",
+        last_checked: ["verified_official_source", "partially_verified"].includes(proposal.verification_status)
+          ? proposal.last_checked || "" : ""
+      };
+    }
     const fields =
       Object.fromEntries(
         Object.entries(task.fields || {})
           .filter(([_field, proposal]) => hasReviewValue(proposal))
           .map(([field, proposal]) => [
             field,
-            {
-              ...proposal,
-              suggested_value: proposal.suggested_value || proposal.value || "",
-              source_title: proposal.source_title || "Existing review source"
-            }
+            cleanProposal(proposal)
           ])
       );
     const proposals =
       Array.isArray(task.proposals)
-        ? task.proposals.filter(hasReviewValue).map(proposal => ({
-          ...proposal,
-          suggested_value: proposal.suggested_value || proposal.value || "",
-          source_title: proposal.source_title || "Existing review source"
-        }))
+        ? task.proposals.filter(hasReviewValue).map(cleanProposal)
         : Object.entries(fields).map(([field, proposal]) => ({
           ...proposal,
           field_name: field,
@@ -521,6 +553,11 @@ function mergeReviewTasks(existingReview, newTasks, status) {
   newTasks.forEach(task => {
     const existing =
       cleanTask(taskMap.get(task.event_slug) || {});
+    for (const key of ["event_brand_id", "edition_id"]) {
+      if (existing[key] && task[key] && String(existing[key]) !== String(task[key])) {
+        throw new Error(`Research identity conflict for ${task.event_slug}: ${key}`);
+      }
+    }
     const existingProposals =
       Array.isArray(existing.proposals)
         ? existing.proposals
@@ -575,13 +612,7 @@ async function main() {
     parseCsvFile(EVENTS_PATH);
   const auditRows =
     loadAuditRows(events);
-  const eventsBySlug =
-    new Map(
-      auditRows.map((row, index) => [
-        row.event_slug,
-        events[index] || {}
-      ])
-    );
+  const eventsBySlug = indexEventsBySlug(events);
   const selected =
     selectRows(auditRows, options);
   const jobId =
@@ -595,6 +626,7 @@ async function main() {
     processed_events: 0,
     total_events: selected.length,
     found_fields: 0,
+    review_warnings: [],
     errors: [],
     started_at: new Date().toISOString(),
     completed_at: ""
@@ -624,12 +656,8 @@ async function main() {
 
       const source =
         await fetchSource(sourceUrl);
-      const proposals =
-        fields
-          .map(field =>
-            researchField(field, row, sourceUrl, source.title, source.segments)
-          )
-          .filter(Boolean);
+      const { proposals, diagnostics } = await collectResearchProposals(row, event, sourceUrl, source, fields);
+      if (diagnostics.length) status.review_warnings.push({ event_slug: row.event_slug, source_url: sourceUrl, diagnostics });
 
       if (proposals.length) {
         status.found_fields += proposals.length;
@@ -670,7 +698,7 @@ async function main() {
   console.log(`Wrote ${path.relative(ROOT, REVIEW_JSON_PATH)} and ${path.relative(ROOT, RESEARCH_STATUS_JSON_PATH)}.`);
 }
 
-main().catch(error => {
+if (require.main === module) main().catch(error => {
   const failedStatus = {
     job_id: `research-${Date.now()}`,
     status: "failed",
@@ -696,3 +724,5 @@ main().catch(error => {
   console.error(error);
   process.exit(1);
 });
+
+module.exports = { buildTask, collectResearchProposals, createProposal, fieldsForRow, mergeReviewTasks, researchField, selectRows };

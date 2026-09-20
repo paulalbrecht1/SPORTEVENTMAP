@@ -35,22 +35,38 @@ const SUPABASE_URL =
 const SUPABASE_KEY =
   clean(process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SPORT_EVENT_MAP_SUPABASE_PUBLISHABLE_KEY || configFallback.key);
 
-async function supabaseGet(table, query = "") {
-  const url =
-    `${SUPABASE_URL}/rest/v1/${table}${query}`;
-
-  const response =
-    await fetch(url, {
+async function supabaseGet(table, query = "", options = {}) {
+  const fetchPage = options.fetch || fetch;
+  const rows = [];
+  const seen = new Set();
+  const pageSize = 500;
+  const params = new URLSearchParams(query.replace(/^\?/, ""));
+  // A stable unique tie-breaker prevents rows moving between page boundaries.
+  params.set("order", [params.get("order"), "id.asc"].filter(Boolean).join(","));
+  for (;;) {
+    params.set("offset", String(rows.length));
+    params.set("limit", String(pageSize));
+    const url = `${options.url || SUPABASE_URL}/rest/v1/${table}?${params}`;
+    const response = await fetchPage(url, {
+      signal: AbortSignal.timeout(30000),
       headers: {
-        apikey: SUPABASE_KEY
+        apikey: options.key || SUPABASE_KEY
       }
     });
-
-  if (!response.ok) {
-    throw new Error(`${table} export failed with HTTP ${response.status}: ${await response.text()}`);
+    if (!response.ok) {
+      throw new Error(`${table} export failed with HTTP ${response.status}`);
+    }
+    const page = await response.json();
+    if (!Array.isArray(page)) throw new Error(`${table} export did not return rows`);
+    if (!page.length) break;
+    for (const row of page) {
+      if (!row.id || seen.has(row.id)) throw new Error(`${table} changed while paginating; retry the export`);
+      seen.add(row.id);
+    }
+    rows.push(...page);
+    // Continue even on a short page: a project's API cap may be below pageSize.
   }
-
-  return response.json();
+  return rows;
 }
 
 function stripSystemFields(row = {}) {
@@ -96,7 +112,7 @@ function byDetailId(rows = []) {
 
 function buildExportRecord(detail, groups) {
   const id = detail.id;
-  const knowledgeScope = clean(detail.knowledge_scope) || "edition";
+  const knowledgeScope = clean(detail.knowledge_scope) || "legacy_mixed";
   const scopedVerification = {
     status: detail.verification_status,
     last_verified_at: detail.last_checked
@@ -219,5 +235,6 @@ module.exports = {
   buildExportRecord,
   byDetailId,
   main,
-  stripSystemFields
+  stripSystemFields,
+  supabaseGet
 };

@@ -158,7 +158,7 @@ const separatedRegistrationSection =
 const separatedSourcesSection =
   /<section id="sources"[\s\S]*?<\/section>/.exec(separatedRegistrationStatusPage)?.[0] || "";
 assert.doesNotMatch(separatedRegistrationSection, /Source Unreachable|Verified/);
-assert.match(separatedRegistrationSection, /Not yet officially confirmed/);
+assert.doesNotMatch(separatedRegistrationSection, /race-guide-registration-status/);
 assert.match(separatedSourcesSection, /source unreachable/i);
 
 const mapped = mapDiscoveryRow({

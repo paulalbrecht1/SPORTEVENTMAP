@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -218,6 +219,37 @@ assert.deepEqual(
   "Local database hardening state is incomplete."
 );
 console.log("Local Supabase hardening assertions passed.");
+
+// Like the publication regression runner, use psql inside the verified local
+// container: CLI db query uses a prepared statement and cannot run BEGIN/ROLLBACK.
+const detailProjectId = fs.readFileSync(path.join(localSupabaseWorkdir, "supabase", "config.toml"), "utf8")
+  .match(/^project_id\s*=\s*"([^"]+)"/m)?.[1];
+assert.ok(["sport-event-map", "sport-event-map-edition-staging"].includes(detailProjectId),
+  "Knowledge integration requires the existing local or disposable staging project.");
+const detailContainerCli = ["C:\\Program Files\\RedHat\\Podman\\podman.exe", "docker", "podman"]
+  .find(candidate => spawnSync(candidate, ["--version"], { encoding: "utf8" }).status === 0);
+assert.ok(detailContainerCli, "A local container CLI is required for knowledge database integration.");
+const detailContainer = `supabase_db_${detailProjectId}`;
+const detailInspection = spawnSync(detailContainerCli,
+  ["inspect", "--format", "{{json .Config.Labels}}", detailContainer], { encoding: "utf8" });
+assert.equal(detailInspection.status, 0, "Local knowledge database container is missing.");
+assert.equal(JSON.parse(detailInspection.stdout)?.["com.supabase.cli.project"], detailProjectId,
+  "Knowledge database container belongs to another project.");
+const detailResult = spawnSync(detailContainerCli,
+  ["exec", "-i", detailContainer, "psql", "--quiet", "--no-psqlrc", "--set", "ON_ERROR_STOP=1",
+    "--username", "postgres", "--dbname", "postgres", "--no-align", "--tuples-only"], {
+    encoding: "utf8", maxBuffer: 1024 * 1024,
+    input: "set sporteventmap.test_local_detail = 'isolated';\n"
+      + fs.readFileSync(path.join(root, "tests", "event-detail-database.sql"), "utf8")
+  });
+assert.equal(detailResult.status, 0, `Knowledge database integration failed: ${detailResult.stderr || detailResult.error}`);
+assert.equal(Number(detailResult.stdout.trim()), 12, "Knowledge database integration completion marker is missing.");
+const [detailRollback] = queryLocal(
+  "select not exists(select 1 from public.events where event_name like 'detail-database-test-%') "
+  + "and not exists(select 1 from public.event_details where event_slug like 'detail-database-test-%') as rolled_back"
+);
+assert.equal(detailRollback.rolled_back, true, "Knowledge test fixtures survived ROLLBACK.");
+console.log("Knowledge database integration: 12 assertions passed; all fixtures rolled back.");
 
 const [stagingPostflightRow] = queryLocalFile("tools/edition-staging-postflight.sql");
 const stagingPostflight = stagingPostflightRow.edition_staging_postflight_report;

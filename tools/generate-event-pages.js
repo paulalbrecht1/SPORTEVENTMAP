@@ -35,7 +35,7 @@ function escapeHtml(value) {
 }
 
 function escapeJson(value) {
-  return JSON.stringify(value);
+  return JSON.stringify(value).replace(/</g, "\\u003c");
 }
 
 function slugPart(value) {
@@ -102,7 +102,7 @@ function createSlug(event, seenSlugs) {
 function safeWebsite(value) {
   try {
     const url = new URL(clean(value));
-    if (url.protocol === "https:" || url.protocol === "http:") {
+    if ((url.protocol === "https:" || url.protocol === "http:") && !url.username && !url.password) {
       return url.href;
     }
   } catch (_error) {
@@ -311,11 +311,11 @@ function buildEditionHistorySection(event) {
       <span class="event-detail-kicker">Edition archive</span>
       <h2>${escapeHtml(getEventYear(event) || "Historical edition")}</h2>
     </div>
-    ${isHistorical ? "<p>This edition has finished and is no longer shown on the discovery map. Its verified facts and results remain available for year-to-year comparison.</p>" : ""}
+    ${isHistorical ? "<p>This edition has finished and is no longer shown on the discovery map. Its recorded facts and available results remain here for year-to-year comparison.</p>" : ""}
     ${results.length ? `<div class="event-detail-result-links">${results.map(result => {
       const url = safeWebsite(result.url);
       return url ? `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(result.title || "Official results")}</a>` : "";
-    }).join("")}</div>` : "<p>Official results have not been published yet.</p>"}
+    }).join("")}</div>` : "<p>No verified results link is available for this edition.</p>"}
   </section>`;
 }
 
@@ -326,6 +326,11 @@ function loadEventDetailDatabase() {
 
   const rows =
     JSON.parse(fs.readFileSync(EVENT_DETAIL_DATABASE_PATH, "utf8"));
+
+  return indexRichDetailRecords(rows);
+}
+
+function indexRichDetailRecords(rows = []) {
 
   const rowsBySlug = rows
     .filter(row => clean(row.event_slug))
@@ -338,12 +343,25 @@ function loadEventDetailDatabase() {
       return map;
     }, new Map());
 
-  return new Map(
-    [...rowsBySlug.entries()].map(([slug, slugRows]) => [
-      slug,
-      composeRichDetailRecords(slugRows)
-    ])
+  const index = new Map(
+    [...rowsBySlug.entries()].map(([slug, slugRows]) => {
+      const edition = slugRows.find(row => row.knowledge_scope === "edition");
+      const matchingBrands = edition?.event_brand_id
+        ? rows.filter(row => row.knowledge_scope === "brand" && String(row.event_brand_id) === String(edition.event_brand_id))
+        : [];
+      const scopedRows = edition ? [...slugRows.filter(row => row.knowledge_scope !== "brand"), ...matchingBrands] : slugRows;
+      return [slug, composeRichDetailRecords(scopedRows)];
+    })
   );
+  const brandIds = [...new Set(rows.filter(row => row.knowledge_scope === "brand" && row.event_brand_id).map(row => String(row.event_brand_id)))];
+  for (const id of brandIds) {
+    index.set(`brand:${id}`, composeRichDetailRecords(rows.filter(row => row.knowledge_scope === "brand" && String(row.event_brand_id) === id)));
+  }
+  return index;
+}
+
+function findRichDetails(event, slug, index) {
+  return index.get(slug) || (event.event_id ? index.get(`brand:${event.event_id}`) : null) || null;
 }
 
 function mergeDetailObjects(base = {}, overlay = {}) {
@@ -359,11 +377,19 @@ function composeRichDetailRecords(rows = []) {
     return null;
   }
 
-  const brandRecord = usableRows.find(row => clean(row.knowledge_scope) === "brand");
-  const editionRecord = usableRows.find(row => clean(row.knowledge_scope) === "edition");
+  const brands = usableRows.filter(row => clean(row.knowledge_scope) === "brand");
+  const editions = usableRows.filter(row => clean(row.knowledge_scope) === "edition");
+  // A slug is a public route, not permission to join unrelated records.
+  if (brands.length > 1 || editions.length > 1) return null;
+  const brandRecord = brands[0];
+  const editionRecord = editions[0];
+  if (brandRecord && editionRecord && (
+    !brandRecord.event_brand_id ||
+    String(brandRecord.event_brand_id) !== String(editionRecord.event_brand_id)
+  )) return null;
 
   if (!brandRecord && !editionRecord) {
-    return usableRows.at(-1);
+    return usableRows.length === 1 ? usableRows[0] : null;
   }
 
   const brand = brandRecord || {};
@@ -378,6 +404,11 @@ function composeRichDetailRecords(rows = []) {
     event_brand_id: edition.event_brand_id || brand.event_brand_id,
     edition_id: edition.edition_id,
     knowledge_scope: "resolved",
+    // Preserve ownership while merging sections so a brand citation cannot
+    // verify a different value supplied by this year's edition.
+    field_scopes: Object.fromEntries(["registration", "course", "race_day", "travel", "weather", "statistics", "editorial"].flatMap(section =>
+      [...new Set([...Object.keys(brand[section] || {}), ...Object.keys(edition[section] || {})])].map(field =>
+        [`${section}.${field}`, Object.hasOwn(edition[section] || {}, field) ? "edition" : "brand"]))),
     brand: mergeDetailObjects(brand.basis, brand.brand),
     edition: mergeDetailObjects(edition.basis, edition.edition),
     verification_status: edition.verification_status,
@@ -392,20 +423,24 @@ function composeRichDetailRecords(rows = []) {
         last_verified_at: edition.last_checked
       } : undefined
     },
-    registration: mergeSection("registration"),
+    registration: mergeDetailObjects({}, edition.registration),
     course: mergeSection("course"),
-    race_day: mergeSection("race_day"),
+    race_day: mergeDetailObjects({}, edition.race_day),
     travel: mergeSection("travel"),
     weather: mergeSection("weather"),
     statistics: mergeSection("statistics"),
     editorial: mergeSection("editorial"),
     sources: [
-      ...(Array.isArray(brand.sources) ? brand.sources : []),
-      ...(Array.isArray(edition.sources) ? edition.sources : [])
+      ...(Array.isArray(brand.sources) ? brand.sources.map(source => ({ ...source, knowledge_scope: "brand" })) : []),
+      ...(Array.isArray(edition.sources) ? edition.sources.map(source => ({ ...source, knowledge_scope: "edition" })) : [])
     ],
     faq: [
       ...(Array.isArray(brand.faq) ? brand.faq : []),
       ...(Array.isArray(edition.faq) ? edition.faq : [])
+    ],
+    faq_scopes: [
+      ...(Array.isArray(brand.faq) ? brand.faq.map(() => "brand") : []),
+      ...(Array.isArray(edition.faq) ? edition.faq.map(() => "edition") : [])
     ]
   };
 }
@@ -557,12 +592,81 @@ function isRaceCutoffValue(value) {
     return false;
   }
 
-  if (/withdrawal|deferral|refund|registration|entry|deadline|cancel|cancellation|transfer/.test(normalized)) {
+  if (/withdrawal|deferral|refund|registration|entry|cancel|transfer|rücktritt|ruecktritt|abmeld|anmeld|erstatt|umbuch|storn|\b(?:days?|weeks?|months?|tage?n?|wochen?|monate?)\s+(?:before|prior|vor)\b|\b\d{4}-\d{2}-\d{2}\b|\b\d{2}\.\d{2}\.\d{4}\b/.test(normalized)) {
     return false;
   }
 
-  return /(\b\d{1,2}:\d{2}\b)|(\b\d{1,2}\s*(h|hr|hrs|hour|hours)\b)|(\b\d{1,3}\s*(min|mins|minutes)\b)|cut[-\s]?off|cutoff/i
+  return /(\b\d{1,2}:[0-5]\d\b)|(\b\d{1,3}(?:[.,]\d+)?\s*(h|hr|hrs|hours?|stunden?|std|min|mins|minutes?|minuten?)\b)/i
     .test(text);
+}
+
+function isStartTimeValue(value) {
+  return /\b(?:[01]?\d|2[0-3]):[0-5]\d\b|\b\d{1,2}\s*(?:am|pm|uhr)\b/i.test(clean(value)) &&
+    !/withdrawal|registration|refund|rücktritt|anmeld|abmeld|before|prior|\bvor\b|cutoff|cut-off/i.test(clean(value));
+}
+
+function isVerifiedStatus(value) {
+  return /^(verified|verified_official_source|confirmed)$/i.test(clean(value));
+}
+
+function isFieldVerifiedStatus(value) {
+  return isVerifiedStatus(value) || clean(value) === "partially_verified";
+}
+
+function sourceCovers(source, fieldPath) {
+  return Boolean(/^(official|trusted)(?:_|$)/i.test(clean(source.source_type)) &&
+    (!source.verification_status || isFieldVerifiedStatus(source.verification_status)) &&
+    safeWebsite(source.source_url || source.url) && parseEventDate(source.last_verified) && Date.parse(parseEventDate(source.last_verified)) <= Date.now()) &&
+    clean(source.field_path).split(/\s*,\s*/).some(field => field === fieldPath || fieldPath.startsWith(`${field}.`));
+}
+
+function prepareRichDetails(event, details) {
+  if (!details) return null;
+  if ((details.event_brand_id && event.event_id && String(details.event_brand_id) !== String(event.event_id)) ||
+      (details.edition_id && event.edition_id && String(details.edition_id) !== String(event.edition_id)) ||
+      (details.event_slug && event.edition_slug && (details.edition_id || !["brand", "resolved"].includes(details.knowledge_scope)) && details.event_slug !== event.edition_slug)) return null;
+  const result = { ...details };
+  const sources = Array.isArray(details.sources) ? details.sources : [];
+  for (const section of ["registration", "course", "race_day", "travel", "weather", "statistics", "editorial"]) {
+    const values = getRichDetailsSection(details, section);
+    result[section] = Object.fromEntries(Object.entries(values).filter(([field, value]) => {
+      const path = `${section}.${field}`;
+      const supported = sources.some(source => {
+        const status = details.verification?.[source.knowledge_scope]?.status || details.verification_status;
+        const annual = section === "registration" || section === "race_day" || (section === "course" && /^(distances|main_distance|swim_distance|bike_distance|run_distance|course_map_url|gpx_url|elevation_profile_url)$/.test(field));
+        return isFieldVerifiedStatus(status) && sourceCovers(source, path) &&
+          (!details.field_scopes?.[path] || details.field_scopes[path] === source.knowledge_scope) &&
+          (!annual || source.knowledge_scope !== "brand");
+      });
+      if (!supported) return false;
+      if (section === "race_day" && /^(total_cutoff|overall_cutoff|swim_cutoff|bike_cutoff|run_cutoff)$/.test(field)) return isRaceCutoffValue(value);
+      if (section === "race_day" && field === "start_time") return isStartTimeValue(value);
+      return true;
+    }));
+  }
+  result.faq = (Array.isArray(details.faq) ? details.faq : []).filter((item, index) =>
+    sources.some(source => isFieldVerifiedStatus(details.verification?.[source.knowledge_scope]?.status || details.verification_status) &&
+      (!details.faq_scopes?.[index] || details.faq_scopes[index] === source.knowledge_scope) &&
+      sourceCovers(source, `faq.${index}`)));
+  return result;
+}
+
+function prepareCategoryDetails(event, rows) {
+  const year = String(event.edition_year || getEventYear(event));
+  return rows.filter(row => {
+    const status = clean(row.verification_status);
+    const verifiedYear = status.match(/^verified\s+(\d{4})$/i)?.[1];
+    return (/^(verified|verified_core_fields|verified_official_source)$/i.test(status) || verifiedYear === year) &&
+      safeWebsite(row.source_url) && parseEventDate(row.last_checked) && Date.parse(parseEventDate(row.last_checked)) <= Date.now() &&
+      (!row.event_slug || !event.edition_slug || row.event_slug === event.edition_slug);
+  }).map(row => {
+    const result = { ...row };
+    if (year !== "2026") delete result.fee_2026;
+    for (const field of ["start_time", "race_cutoff", "overall_cutoff", "cutoff", "time_limit"]) {
+      if (/\b\d{4}\s+reference\b|previous\s+(?:year|edition)|vorjahr/i.test(clean(result[field]))) delete result[field];
+    }
+    return result;
+  });
 }
 
 function getValidatedRaceCutoff(row) {
@@ -1133,7 +1237,7 @@ function isUsefulRichValue(value) {
     return false;
   }
 
-  if (/^(not available|not yet verified|not verified|needs review|unknown|n\/a)\b/i.test(text)) {
+  if (/^(not available|not yet (?:verified|officially confirmed)|not verified|needs review|unknown|n\/a)\b/i.test(text)) {
     return false;
   }
 
@@ -1632,7 +1736,7 @@ function mapScript(event) {
   const lat = Number(event.latitude);
   const lng = Number(event.longitude);
 
-  if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+  if (!clean(event.latitude) || !clean(event.longitude) || !Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) {
     return "";
   }
 
@@ -1690,7 +1794,7 @@ function buildSchema(event, canonicalUrl, detailRows = [], richDetails = null) {
     "@type": "Event",
     name: clean(event.event_name),
     startDate: formatDateForSchema(event.date),
-    eventStatus: schemaStatus(event.verification_status),
+    eventStatus: schemaStatus(event.event_status),
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     url: canonicalUrl,
     location: {
@@ -1796,7 +1900,7 @@ function getVerificationContext(event, richDetails = null) {
   const brand = detailsVerification.brand || {};
   const edition = detailsVerification.edition || {};
 
-  return {
+  const context = {
     brand: {
       status: clean(firstUsefulValue(
         event.brand_verification_status,
@@ -1814,7 +1918,8 @@ function getVerificationContext(event, richDetails = null) {
         event.edition_verification_status,
         edition.status,
         edition.verification_status,
-        richDetails && richDetails.verification_status
+        richDetails && richDetails.verification_status,
+        event.verification_status
       )),
       lastVerifiedAt: clean(firstUsefulValue(
         event.edition_last_verified_at,
@@ -1825,22 +1930,25 @@ function getVerificationContext(event, richDetails = null) {
       ))
     }
   };
+  for (const scope of ["brand", "edition"]) {
+    if (!isVerifiedStatus(context[scope].status) || !parseEventDate(context[scope].lastVerifiedAt) ||
+        Date.parse(parseEventDate(context[scope].lastVerifiedAt)) > Date.now()) {
+      context[scope].lastVerifiedAt = "";
+    }
+  }
+  return context;
 }
 
 function parseEventDate(value) {
   const text = clean(value);
   const iso = text.match(/^(\d{4})-(\d{2})-(\d{2})(?:T.*)?$/);
   const german = text.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (iso && text.includes("T") && !Number.isFinite(Date.parse(text))) return "";
+  if (iso && text.includes("T") && !Number.isFinite(Date.parse(text))) return "";
 
-  if (iso) {
-    return `${iso[1]}-${iso[2]}-${iso[3]}`;
-  }
-
-  if (german) {
-    return `${german[3]}-${german[2]}-${german[1]}`;
-  }
-
-  return "";
+  const date = iso ? `${iso[1]}-${iso[2]}-${iso[3]}` : german ? `${german[3]}-${german[2]}-${german[1]}` : "";
+  const parsed = date ? new Date(`${date}T00:00:00Z`) : null;
+  return parsed && Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date ? date : "";
 }
 
 function formatVerificationDate(value, language = "en") {
@@ -1997,9 +2105,7 @@ function getPriceSummary(registration = {}, detailRows = []) {
       ? `${registration.entry_fee_min} - ${registration.entry_fee_max}`
       : "",
     registration.entry_fee_min,
-    registration.entry_fee_previous_year,
-    detailRows.map(row => getFee2026(row)).filter(Boolean).join(" / "),
-    detailRows.map(row => getFee2025(row)).filter(Boolean).join(" / ")
+    detailRows.map(row => getFee2026(row)).filter(Boolean).join(" / ")
   );
 }
 
@@ -2454,6 +2560,15 @@ const DETAIL_TRANSLATIONS = {
     "detail.weather": "Weather",
     "detail.rules": "Rules",
     "detail.faq": "FAQ",
+    "detail.registrationOpening": "Registration opens",
+    "detail.withdrawalDeadline": "Withdrawal deadline",
+    "detail.swim": "Swim distance",
+    "detail.bike": "Bike distance",
+    "detail.run": "Run distance",
+    "detail.courseMap": "Official course map",
+    "detail.gpx": "Official GPX route",
+    "detail.elevationProfile": "Elevation profile",
+    "detail.sourceCoverage": "Source covers",
     "detail.sources": "Sources",
     "detail.date": "Date",
     "detail.location": "Location",
@@ -2564,6 +2679,15 @@ const DETAIL_TRANSLATIONS = {
     "detail.weather": "Wetter",
     "detail.rules": "Regeln",
     "detail.faq": "FAQ",
+    "detail.registrationOpening": "Anmeldung ab",
+    "detail.withdrawalDeadline": "Rücktrittsfrist",
+    "detail.swim": "Schwimmstrecke",
+    "detail.bike": "Radstrecke",
+    "detail.run": "Laufstrecke",
+    "detail.courseMap": "Offizieller Streckenplan",
+    "detail.gpx": "Offizielle GPX-Route",
+    "detail.elevationProfile": "Höhenprofil",
+    "detail.sourceCoverage": "Angaben zu",
     "detail.sources": "Quellen",
     "detail.date": "Datum",
     "detail.location": "Ort",
@@ -3091,7 +3215,7 @@ function parseStartWaves(raceDay = {}) {
           time
         };
       })
-      .filter(row => hasUsefulValue(row));
+      .filter(row => row && isStartTimeValue(row.time));
   }
 
   const text =
@@ -3145,7 +3269,7 @@ function parseCutoffRows(raceDay = {}) {
     const key =
       `${cleanPoint}|${cleanDeadline}`.toLowerCase();
 
-    if (!cleanPoint || !cleanDeadline || seen.has(key)) {
+    if (!cleanPoint || !isRaceCutoffValue(`${cleanPoint} ${cleanDeadline}`) || seen.has(key)) {
       return;
     }
 
@@ -3154,6 +3278,10 @@ function parseCutoffRows(raceDay = {}) {
       point: cleanPoint,
       deadline: cleanDeadline
     });
+  }
+
+  for (const [field, label] of [["swim_cutoff", "Swim"], ["bike_cutoff", "Bike"], ["run_cutoff", "Run"]]) {
+    if (raceDay[field]) add(label, raceDay[field]);
   }
 
   const structured =
@@ -3247,7 +3375,7 @@ function renderCutoffTimes(raceDay = {}) {
       ${hasUsefulValue(overall) ? `
         <div class="race-guide-highlight">
           <span>${detailLabel("detail.overallCutoff")}</span>
-          <strong>${escapeHtml(compactFactValue(overall, { kind: "cutoff" }))}</strong>
+          <strong>${escapeHtml(overall)}</strong>
         </div>` : ""}
       ${rows.length ? `
         <div class="race-guide-timeline">
@@ -3441,7 +3569,7 @@ function getFeeRows(registration = {}, detailRows = []) {
   if (!rows.length) {
     detailRows.forEach(row => {
       const fee =
-        getFee2026(row) || getFee2025(row);
+        getFee2026(row);
 
       if (!hasUsefulValue(fee)) {
         return;
@@ -3541,13 +3669,13 @@ function buildRaceGuideKeyFacts(event, detailRows = [], richDetails = null, stat
   const cutoff =
     firstUsefulValue(
       raceDay.total_cutoff,
-      raceDay.swim_cutoff || raceDay.bike_cutoff || raceDay.run_cutoff,
+      raceDay.overall_cutoff,
       detailRows.map(row => getCutoff(row)).filter(Boolean).join(" / ")
     );
   const startTime =
     firstUsefulValue(
       raceDay.start_time,
-      detailRows.map(row => clean(row.start_time)).filter(hasUsefulValue).join(" / ")
+      detailRows.map(row => clean(row.start_time)).filter(isStartTimeValue).join(" / ")
     );
   const verification = getVerificationContext(event, richDetails);
   const lastChecked = parseEventDate(verification.edition.lastVerifiedAt);
@@ -3601,19 +3729,15 @@ function buildRaceGuideRegistration(event, detailRows = [], richDetails = null, 
     safeWebsite(registration.official_registration_url || registration.registration_url || event.registration_url);
   const feeRows =
     getFeeRows(registration, detailRows);
-  const period =
-    [
-      registration.registration_open_date,
-      registration.registration_close_date
-    ].filter(hasUsefulValue).map(formatDetailDate).join(" – ");
   const blocks = [
     renderRegistrationStatusCard(firstUsefulValue(
       registration.registration_status,
       detailRows.map(row => inferRegistrationStatus(row)).filter(hasUsefulValue).join(" / "),
       getRegistrationStatus(event, richDetails, detailRows)
     )),
-    renderFactCard("calendar", "detail.registrationPeriod", period, { tone: "registration-period" }),
+    renderFactCard("calendar", "detail.registrationOpening", formatDetailDate(registration.registration_open_date), { tone: "registration-period" }),
     renderFactCard("calendar", "detail.deadline", formatDetailDate(firstUsefulValue(registration.registration_close_date, registration.registration_deadline)), { kind: "date", tone: "registration-deadline" }),
+    renderFactCard("calendar", "detail.withdrawalDeadline", registration.withdrawal_deadline),
     renderFactCard("fee", "detail.entryFee", getPriceSummary(registration, detailRows)),
     registrationUrl ? `<a class="race-guide-registration-link" href="${registrationUrl}" target="_blank" rel="noopener noreferrer"><span ${detailI18nAttr("detail.openRegistration")}>${escapeHtml(detailTranslation("detail.openRegistration"))}</span></a>` : ""
   ].filter(Boolean).join("");
@@ -3660,14 +3784,14 @@ function buildRaceGuideRegistration(event, detailRows = [], richDetails = null, 
 function buildRaceGuideCourse(event, detailRows = [], richDetails = null) {
   const course =
     getRichDetailsSection(richDetails, "course");
-  const raceDay =
-    getRichDetailsSection(richDetails, "race_day");
   const elevation =
     firstUsefulValue(course.elevation_gain, course.bike_elevation, detailRows.map(row => getElevation(row)).filter(Boolean).join(" / "));
-  const mapUrl =
-    safeWebsite(course.course_map_url || course.gpx_url || course.elevation_profile_url);
+  const links = [["course_map_url", "detail.courseMap"], ["gpx_url", "detail.gpx"], ["elevation_profile_url", "detail.elevationProfile"]]
+    .filter(([field]) => safeWebsite(course[field]));
   const cards = [
-    renderFactCard("distance", "detail.distance", firstUsefulValue(course.main_distance, course.distances, formatDistanceSummary(event.distance)), { always: true }),
+    renderFactCard("distance", "detail.swim", course.swim_distance),
+    renderFactCard("distance", "detail.bike", course.bike_distance),
+    renderFactCard("distance", "detail.run", course.run_distance),
     renderFactCard("mountain", "detail.elevation", elevation),
     renderFactCard("map", "detail.routeType", firstUsefulValue(course.course_type, course.course_format)),
     renderFactCard("star", "detail.courseProfile", firstUsefulValue(course.personal_best_potential, course.difficulty_rating))
@@ -3676,24 +3800,18 @@ function buildRaceGuideCourse(event, detailRows = [], richDetails = null) {
     renderChipList("detail.surface", firstUsefulValue(course.surface, course.course_type)),
     renderChipList("detail.routeType", [course.course_format, course.loop_course === true ? "Loop" : "", course.point_to_point === true ? "Point-to-point" : ""].filter(Boolean))
   ].join("");
-  const content = [
-    cards,
-    chips,
-    renderInfoBox("detail.courseProfile", firstUsefulValue(course.course_character, course.risk_notes), "distance"),
-    mapUrl ? `<a class="event-detail-primary race-guide-inline-action" href="${mapUrl}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr("detail.mapGpx")}>${escapeHtml(detailTranslation("detail.mapGpx"))}</a>` : ""
-  ].filter(Boolean).join("");
-
-  if (!content) {
+  const profile = renderInfoBox("detail.courseProfile", firstUsefulValue(course.course_character, course.risk_notes), "distance");
+  if (!cards && !chips && !profile && !links.length) {
     return "";
   }
 
   return `
     <section id="course" class="event-detail-card race-guide-section">
       ${sectionHeading("detail.course", "detail.course")}
-      <div class="race-guide-fact-grid is-tight">${cards}</div>
+      ${cards ? `<div class="race-guide-fact-grid is-tight">${cards}</div>` : ""}
       ${chips}
-      ${renderInfoBox("detail.courseProfile", firstUsefulValue(course.course_character, course.risk_notes), "distance")}
-      ${mapUrl ? `<a class="event-detail-primary race-guide-inline-action" href="${mapUrl}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr("detail.mapGpx")}>${escapeHtml(detailTranslation("detail.mapGpx"))}</a>` : ""}
+      ${profile}
+      ${links.map(([field, label]) => `<a class="event-detail-secondary race-guide-inline-action" href="${escapeHtml(safeWebsite(course[field]))}" target="_blank" rel="noopener noreferrer" ${detailI18nAttr(label)}>${escapeHtml(detailTranslation(label))}</a>`).join(" ")}
     </section>`;
 }
 
@@ -3705,7 +3823,7 @@ function buildRaceGuideRaceDay(richDetails = null, detailRows = []) {
   const startTime =
     firstUsefulValue(
       raceDay.start_time,
-      detailRows.map(row => clean(row.start_time)).filter(hasUsefulValue).join(" / ")
+      detailRows.map(row => clean(row.start_time)).filter(isStartTimeValue).join(" / ")
     );
   const cutoff =
     firstUsefulValue(
@@ -3718,8 +3836,7 @@ function buildRaceGuideRaceDay(richDetails = null, detailRows = []) {
     renderFactCard("location", "detail.finish", firstUsefulValue(raceDay.finish_area, course.finish_location)),
     renderFactCard("info", "detail.bagDrop", raceDay.bag_drop),
     renderFactCard("info", "detail.toilets", raceDay.toilets),
-    renderFactCard("check", "detail.medical", firstUsefulValue(raceDay.medical, raceDay.medical_support)),
-    renderFactCard("check", "detail.bibPickup", compactFactValue(raceDay.bib_pickup_info))
+    renderFactCard("check", "detail.medical", firstUsefulValue(raceDay.medical, raceDay.medical_support))
   ].join("");
   const details = [
     renderStartWaves(raceDay),
@@ -3731,7 +3848,7 @@ function buildRaceGuideRaceDay(richDetails = null, detailRows = []) {
         <h3>${detailLabel("detail.cutoffTimes")}</h3>
         <div class="race-guide-highlight">
           <span>${detailLabel("detail.overallCutoff")}</span>
-          <strong>${escapeHtml(compactFactValue(cutoff, { kind: "cutoff" }))}</strong>
+          <strong>${escapeHtml(cutoff)}</strong>
         </div>
       </div>` : "",
     renderAidStations(raceDay, course),
@@ -3840,8 +3957,10 @@ function buildRaceGuideLogistics(event, richDetails = null) {
   const weather =
     getRichDetailsSection(richDetails, "weather");
   const hasMap =
+    Boolean(clean(event.latitude) && clean(event.longitude)) &&
     Number.isFinite(Number(event.latitude)) &&
-    Number.isFinite(Number(event.longitude));
+    Number.isFinite(Number(event.longitude)) &&
+    Math.abs(Number(event.latitude)) <= 90 && Math.abs(Number(event.longitude)) <= 180;
   const cards = [
     renderFactCard("location", "detail.train", travel.nearest_train_station),
     renderFactCard("location", "detail.airport", travel.nearest_airport),
@@ -3978,11 +4097,18 @@ function buildRaceGuideSources(event, richDetails = null) {
           ${fallbackSources.map(source => `
             <a href="${safeWebsite(source.source_url || source.url)}" target="_blank" rel="noopener noreferrer">
               <strong>${escapeHtml(source.source_label || source.source_type || "Official source")}</strong>
-              <span>${escapeHtml(source.source_type || "source")}${source.last_verified ? ` &middot; ${renderVerificationDate(source.last_verified)}` : ""}</span>
+              <span>${escapeHtml(source.source_type || "source")}${parseEventDate(source.last_verified) && Date.parse(parseEventDate(source.last_verified)) <= Date.now() ? ` &middot; ${renderVerificationDate(source.last_verified)}` : ""}</span>
+              ${renderSourceCoverage(source)}
               ${source.verification_note ? `<em>${escapeHtml(source.verification_note)}</em>` : ""}
             </a>`).join("")}
         </div>` : ""}
     </section>`;
+}
+
+function renderSourceCoverage(source) {
+  const labels = { basis: "detail.keyFacts", registration: "detail.registration", course: "detail.course", race_day: "detail.raceDay", travel: "detail.logistics", weather: "detail.weather", statistics: "detail.performance", editorial: "detail.overview", faq: "detail.faq" };
+  const keys = [...new Set(clean(source.field_path).split(",").map(field => labels[field.trim().split(".")[0]]).filter(Boolean))];
+  return keys.length ? `<span>${detailLabel("detail.sourceCoverage")}: ${keys.map(key => detailLabel(key)).join(" · ")}</span>` : "";
 }
 
 function buildRaceGuideNavigation(sections) {
@@ -3994,6 +4120,8 @@ function buildRaceGuideNavigation(sections) {
 }
 
 function buildEventPage(event, slug, detailRows = [], knowledge = null, richDetails = null) {
+  richDetails = prepareRichDetails(event, richDetails);
+  detailRows = prepareCategoryDetails(event, detailRows);
   const year = getEventYear(event);
   const canonicalUrl = `${SITE_URL}/event/${slug}/`;
   const website = getOfficialEventWebsite(event, richDetails);
@@ -4206,7 +4334,7 @@ function main() {
     const knowledge =
       eventKnowledge.get(slug) || null;
     const richDetails =
-      richEventDetails.get(slug) || null;
+      findRichDetails(event, slug, richEventDetails);
     const pageDir = path.join(EVENT_DIR, slug);
     fs.mkdirSync(pageDir, { recursive: true });
     const pageHtml = buildEventPage(
@@ -4257,6 +4385,8 @@ module.exports = {
   buildRaceGuideSources,
   buildSchema,
   composeRichDetailRecords,
+  indexRichDetailRecords,
+  findRichDetails,
   createSlug,
   editionFallbackKey,
   formatVerificationDate,
@@ -4266,6 +4396,8 @@ module.exports = {
   isFutureEdition,
   main,
   parseEventDate,
+  prepareRichDetails,
+  isRaceCutoffValue,
   resolveOrganizer
 };
 

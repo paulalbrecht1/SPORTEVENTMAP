@@ -440,7 +440,10 @@
       });
   }
 
+  let sectionObserver = null;
+  const boundSectionLinks = new WeakSet();
   function initSectionNavigation() {
+    sectionObserver?.disconnect();
     const links = [
       ...document.querySelectorAll(
         "[data-detail-section]"
@@ -461,6 +464,8 @@
         .filter(Boolean);
 
     links.forEach(link => {
+      if (boundSectionLinks.has(link)) return;
+      boundSectionLinks.add(link);
       link.addEventListener("click", event => {
         const target =
           document.getElementById(
@@ -498,7 +503,7 @@
       return;
     }
 
-    const observer =
+    sectionObserver =
       new IntersectionObserver(
         entries => {
           const visible =
@@ -520,7 +525,7 @@
       );
 
     sections.forEach(section =>
-      observer.observe(section)
+      sectionObserver.observe(section)
     );
   }
 
@@ -538,6 +543,7 @@
     }
   );
 
+  window.addEventListener("sport-event-map-detail-contentchange", initSectionNavigation);
   initSeasonToggle();
   initSectionNavigation();
 })();

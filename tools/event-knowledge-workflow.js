@@ -200,7 +200,9 @@ function isUsefulValue(value) {
       "unknown",
       "tbd",
       "to be confirmed",
-      "to be announced"
+      "to be announced",
+      "not yet officially confirmed",
+      "noch nicht offiziell bestätigt"
     ].includes(text);
 }
 
@@ -262,11 +264,35 @@ function loadDetailDatabase() {
   const rows =
     readJson(DETAIL_DATABASE_PATH, []);
 
-  return new Map(
-    (Array.isArray(rows) ? rows : [])
-      .filter(row => row && row.event_slug)
-      .map(row => [cleanValue(row.event_slug), row])
-  );
+  const { indexRichDetailRecords } = require("./generate-event-pages.js");
+  return indexRichDetailRecords(Array.isArray(rows) ? rows : []);
+}
+
+// Export manifests include historical editions and are not in CSV row order.
+// Never bind research, source URLs or audit results using array positions.
+function eventIdentityKey(event) {
+  return [event.event_name, event.date, event.city, event.country]
+    .map(value => cleanValue(value).toLowerCase()).join("|");
+}
+
+function indexEventsBySlug(events, pages = loadEventPages()) {
+  const pagesByIdentity = new Map();
+  for (const page of pages) {
+    const key = eventIdentityKey(page);
+    if (!pagesByIdentity.has(key)) pagesByIdentity.set(key, []);
+    pagesByIdentity.get(key).push(page);
+  }
+  const result = new Map();
+  for (const event of events) {
+    const matches = pagesByIdentity.get(eventIdentityKey(event)) || [];
+    if (matches.length > 1 && !cleanValue(event.edition_slug)) {
+      throw new Error(`Ambiguous detail-page identity: ${eventIdentityKey(event)}`);
+    }
+    const slug = cleanValue(event.edition_slug) || cleanValue(matches[0]?.slug) || fallbackSlug(event);
+    if (result.has(slug)) throw new Error(`Duplicate event slug in research input: ${slug}`);
+    result.set(slug, event);
+  }
+  return result;
 }
 
 function getPriority(event, completionScore, missingFields) {
@@ -302,18 +328,14 @@ function getPriority(event, completionScore, missingFields) {
 }
 
 function buildAuditRows(events) {
-  const pages =
-    loadEventPages();
+  const { findRichDetails, prepareRichDetails } = require("./generate-event-pages.js");
+  const eventsBySlug = indexEventsBySlug(events);
   const detailsBySlug =
     loadDetailDatabase();
 
-  return events.map((event, index) => {
-    const page =
-      pages[index] || {};
-    const slug =
-      page.slug || fallbackSlug(event);
+  return [...eventsBySlug].map(([slug, event]) => {
     const details =
-      detailsBySlug.get(slug) || null;
+      prepareRichDetails(event, findRichDetails(event, slug, detailsBySlug));
     const missingFields =
       KNOWLEDGE_FIELDS.filter(field =>
         !details || !hasAnyPath(details, field)
@@ -329,13 +351,19 @@ function buildAuditRows(events) {
 
     return {
       event_slug: slug,
+      event_brand_id: event.event_id || undefined,
+      edition_id: event.edition_id || undefined,
       event_name: cleanValue(event.event_name),
       date: cleanValue(event.date),
+      event_status: cleanValue(event.event_status),
+      edition_status: cleanValue(event.edition_status || event.event_status),
+      start_date: cleanValue(event.start_date),
+      end_date: cleanValue(event.end_date),
       city: cleanValue(event.city),
       country: cleanValue(event.country),
       sport: cleanValue(event.sport),
       distance: cleanValue(event.distance),
-      official_url: cleanValue(event.event_url),
+      official_url: cleanValue(event.official_url),
       source_url: cleanValue(event.source_url || event.event_url),
       csv_priority: cleanValue(event.priority),
       has_detail_record: Boolean(details),
@@ -348,6 +376,17 @@ function buildAuditRows(events) {
       verification_status: cleanValue(details?.verification_status || event.verification_status)
     };
   });
+}
+
+function isCurrentEdition(event, now = new Date()) {
+  const status = cleanValue(event.edition_status || event.event_status);
+  if (["completed", "cancelled", "inactive"].includes(status)) return false;
+  if (["postponed", "date_unconfirmed"].includes(status)) return true;
+  const date = cleanValue(event.end_date || event.start_date || event.date);
+  if (!date) return true; // Keep published, date-unconfirmed editions in the queue.
+  const { parseEventDate } = require("./generate-event-pages.js");
+  const iso = parseEventDate(date);
+  return Boolean(iso) && iso >= new Date(now).toISOString().slice(0, 10);
 }
 
 function csvEscape(value) {
@@ -435,6 +474,9 @@ module.exports = {
   csvEscape,
   fallbackSlug,
   getPriority,
+  eventIdentityKey,
+  indexEventsBySlug,
+  isCurrentEdition,
   isUsefulValue,
   loadDetailDatabase,
   loadEventPages,

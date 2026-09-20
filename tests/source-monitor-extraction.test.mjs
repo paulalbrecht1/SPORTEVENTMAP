@@ -37,6 +37,47 @@ assert.ok(jsonLd.candidates.some(item => item.field === "country" && item.normal
 assert.ok(jsonLd.candidates.some(item => item.field === "race_formats"));
 assert.ok(jsonLd.proposals.some(item => item.change_type === "new_edition" && item.normalized_value === 2027));
 assert.ok(!jsonLd.proposals.some(item => item.field_name === "start_date"), "A successor date must not overwrite the old edition.");
+assert.ok(!jsonLd.proposals.some(item => item.entity_type === "edition"),
+  "A successor page must not propose its registration, times, fees or distances for the predecessor.");
+assert.ok(jsonLd.diagnostics.includes("source_dates_do_not_identify_target_edition"));
+
+const knownSuccessor = extractEventChanges(fixture("jsonld-sports-event.html"), {
+  ...base,
+  editions: [...base.editions, { id: "edition-2027", edition_year: 2027, start_date: "2027-10-03", publication_status: "draft" }]
+});
+assert.ok(!knownSuccessor.proposals.some(item => item.entity_type === "edition"),
+  "An existing successor draft must not remove the predecessor's cross-year protection.");
+assert.ok(!knownSuccessor.proposals.some(item => item.change_type === "new_edition"),
+  "Existing successor editions remain deduplicated.");
+
+const historicalUnknownYear = extractEventChanges("<p>Registration open. Entry fee: 130 EUR.</p>", base);
+assert.ok(!historicalUnknownYear.proposals.some(item => item.entity_type === "edition"),
+  "Undated current content cannot be attached to a completed historical edition.");
+assert.ok(historicalUnknownYear.diagnostics.includes("historical_edition_evidence_missing"));
+
+const currentEdition = { id: "edition-2027", edition_year: 2027, start_date: "2027-10-03", edition_status: "scheduled", registration_status: "registration_not_open" };
+const currentFacts = extractEventChanges(fixture("jsonld-sports-event.html"), {
+  ...base, edition: currentEdition, editions: [...base.editions, currentEdition],
+  previousProposals: [{ edition_id: "edition-2026", field_name: "registration_status", normalized_value: "registration_open", proposal_status: "accepted" }]
+});
+assert.ok(currentFacts.proposals.some(item => item.field_name === "registration_status" && item.normalized_value === "registration_open"),
+  "A previous year's accepted value must not suppress review for the current edition.");
+assert.ok(currentFacts.proposals.some(item => item.field_name === "start_time" && item.normalized_value === "09:00:00"),
+  "Evidence for the exact current edition still produces useful fact proposals.");
+
+assert.deepEqual(extractDateCandidates("Location: The start is located on Straße des 17. Juni, between the Brandenburg Gate and the Victory Column.", { defaultYear: 2027 }), [],
+  "An address named after a calendar date is not the event date.");
+const ambiguousPage = extractEventChanges(`<nav><a href="https://other.example/kids/registration">Kids Skating</a></nav>
+  <p>The course must be completed within the time limit of 6:15 hours.</p>
+  <p>Registration must be completed by July 16, 2026.</p>
+  <a href="/register">Registration</a><a href="/register-2025">Registration 2025</a>`, { ...base, edition: currentEdition, editions: [currentEdition] });
+assert.ok(!ambiguousPage.candidates.some(candidate => String(candidate.normalizedValue).includes("kids/registration")),
+  "Navigation links to another event are not registration evidence.");
+assert.ok(!ambiguousPage.proposals.some(proposal => ["edition_status", "registration_url"].includes(proposal.field_name)),
+  "Instructional 'completed' and competing registration links must not create an arbitrary change.");
+const weakDatePage = extractEventChanges("<p>Archive: 23.01.2027</p>", base);
+assert.ok(!weakDatePage.proposals.some(proposal => proposal.change_type === "new_edition"),
+  "An unlabelled weak date cannot create a new-edition proposal.");
 
 const english = extractEventChanges(fixture("english-date.html"), { ...base, event: { ...base.event, canonical_name: "City Run" } });
 assert.ok(english.proposals.some(item => item.change_type === "new_edition" && item.proposed_changes.start_date === "2027-05-06"));

@@ -25,7 +25,7 @@ export function extractGenericHtml(content, options = {}) {
     /\b(abgesagt|fällt aus|faellt aus|cancelled|canceled)\b/gi,
     /\b(verschoben|postponed|rescheduled)\b/gi,
     /\b(date to be announced|termin noch nicht bestätigt|termin noch nicht bestaetigt|tba)\b/gi,
-    /\b(beendet|completed|finished)\b/gi,
+    /\b(?:event|race|rennen|wettkampf|veranstaltung)\s+(?:(?:is|has|ist|wurde)\s+)?(?:been\s+)?(?:beendet|completed|finished)\b/gi,
     /\b(geplant|scheduled|findet statt)\b/gi
   ];
   for (const pattern of statusPatterns) {
@@ -46,7 +46,8 @@ export function extractGenericHtml(content, options = {}) {
     }
   }
 
-  for (const match of raw.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a\s*>/gi)) {
+  const eventContent = raw.replace(/<(script|style|noscript|nav|footer)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, " ");
+  for (const match of eventContent.matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a\s*>/gi)) {
     const label = cleanText(match[2].replace(/<[^>]+>/g, " "));
     if (!/(anmeld|registr|register|startplatz|entry)/i.test(`${label} ${match[1]}`)) continue;
     const url = normalizeUrl(match[1], options.sourceUrl);

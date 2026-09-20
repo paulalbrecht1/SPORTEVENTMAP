@@ -11,6 +11,11 @@
     html, body.event-detail-page { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important; }
     [hidden] { display: none !important; }
     .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; }
+    .live-detail-sections a, .event-source-list a { overflow-wrap: anywhere; }
+    .live-detail-field { margin: 0; }
+    .live-detail-field dt { font-weight: 700; margin-top: 18px; }
+    .live-detail-field dd { margin: 4px 0 0; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
+    .live-detail-field dd a { display: inline-flex; min-height: 44px; align-items: center; }
     body.event-detail-page .live-detail-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .live-detail-facts .race-guide-fact-card { min-width: 0; overflow-wrap: anywhere; grid-template-columns: minmax(0, 1fr); grid-template-areas: "label" "value"; }
     .live-detail-notice { padding: 16px; border: 1px solid var(--border-color, #9ca3af); border-radius: 12px; line-height: 1.6; }
@@ -55,10 +60,11 @@
           <p class="event-detail-action-status" id="detailActionStatus" role="status" aria-live="polite"></p>
         </div>
       </section>
-      <nav class="event-detail-tabs race-guide-tabs" aria-label="Eventdetails"><a href="#key-facts" data-detail-section="key-facts" data-live-i18n="facts">Überblick</a><a href="#description" data-detail-section="description" data-live-i18n="description">Beschreibung</a><a href="#sources" data-detail-section="sources" data-live-i18n="sources">Quellen</a></nav>
+      <nav id="liveDetailNavigation" class="event-detail-tabs race-guide-tabs" aria-label="Eventdetails"><a href="#key-facts" data-detail-section="key-facts" data-live-i18n="facts">Überblick</a><a href="#description" data-detail-section="description" data-live-i18n="description">Beschreibung</a><a href="#sources" data-detail-section="sources" data-live-i18n="sources">Quellen</a></nav>
       <section id="key-facts" class="event-detail-card race-guide-section"><h2 data-live-i18n="facts">Überblick</h2><div id="liveDetailFacts" class="race-guide-fact-grid live-detail-facts"></div></section>
       <section id="description" class="event-detail-card race-guide-section"><h2 data-live-i18n="description">Beschreibung</h2><p id="liveDetailDescription" class="live-detail-copy"></p></section>
-      <section id="sources" class="event-detail-card race-guide-section"><h2 data-live-i18n="sources">Quellen</h2><p id="liveDetailChecked"></p><a id="liveDetailSource" class="event-detail-secondary" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="source">Quelle öffnen</a><p data-live-i18n="verify">Bitte prüfe die endgültigen Angaben vor der Anmeldung beim Veranstalter.</p></section>
+      <div id="liveDetailSections" class="live-detail-sections"></div>
+      <section id="sources" class="event-detail-card race-guide-section"><h2 data-live-i18n="sources">Quellen</h2><p id="liveDetailChecked" hidden></p><a id="liveDetailSource" class="event-detail-secondary" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="source">Quelle öffnen</a><div id="liveDetailSources" class="event-source-list"></div></section>
     </article>
     <footer class="live-detail-footer"><a href="/imprint.html" data-live-i18n="imprint">Impressum</a><a href="/privacy.html" data-live-i18n="privacy">Datenschutz</a></footer>
   </main>

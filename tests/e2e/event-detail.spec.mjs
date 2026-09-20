@@ -235,14 +235,15 @@ test("failed cloud save restores the previous state and reports the error", asyn
 test("section navigation has an active state and scrolls to the target", async ({ page }) => {
   await prepareDetailPage(page);
 
-  const courseLink =
-    page.locator('[data-detail-section="course"]');
+  await expect(page.locator('[data-detail-section="course"]')).toHaveCount(0);
+  const sourcesLink =
+    page.locator('[data-detail-section="sources"]');
 
-  await courseLink.click();
+  await sourcesLink.click();
 
-  await expect(courseLink).toHaveClass(/is-active/);
-  await expect(courseLink).toHaveAttribute("aria-current", "location");
-  await expect(page).toHaveURL(/#course$/);
+  await expect(sourcesLink).toHaveClass(/is-active/);
+  await expect(sourcesLink).toHaveAttribute("aria-current", "location");
+  await expect(page).toHaveURL(/#sources$/);
 });
 
 test("detail hero and action card remain within common viewport widths", async ({ page }) => {

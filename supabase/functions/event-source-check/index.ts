@@ -6,6 +6,7 @@ import {
   evaluateRobots,
   resolveHttpAllowance,
   selectLifecycleSuccessors,
+  selectLifecycleResults,
   SourceFetchError,
   fetchSource,
   validateSourceUrl
@@ -15,7 +16,7 @@ import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 import { cleanError, countAcceptedResultCandidate, loadSourceMonitorRuntimeCapabilities, runOptionalStageFourCall } from "../_shared/source-monitor-worker-outcomes.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.7-phase-a-shadow-http-framing";
+const WORKER_VERSION = "source-monitor-4.1.8-phase-a-shadow-edition-evidence-scope";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
@@ -294,22 +295,22 @@ async function recordLifecycleSignals(
     String(fetched.contentType || "text/html"),
     String(fetched.finalUrl || claim.source_url)
   );
-  const { data: latestEdition, error: editionError } = await admin
+  const [editionResult, eventResult] = await Promise.all([admin
     .from("event_editions")
     .select("id,edition_year,start_date,edition_status,publication_status")
     .eq("event_id", claim.event_id)
     .eq("publication_status", "published")
-    .order("edition_year", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (editionError) throw new Error(`Lifecycle edition context failed: ${cleanError(editionError)}`);
+    .order("edition_year", { ascending: false }), admin.from("events").select("canonical_name,event_name").eq("id", claim.event_id).single()]);
+  const { error: editionError } = editionResult;
+  if (editionError || eventResult.error) throw new Error(`Lifecycle edition context failed: ${cleanError(editionError || eventResult.error)}`);
+  const latestEdition = editionResult.data?.[0] || null;
 
   let editionCount = 0;
   const successors = selectLifecycleSuccessors(
     signals,
     latestEdition,
     new Date().toISOString().slice(0, 10),
-    { source_type: claim.source_type }
+    { source_type: claim.source_type, event_name: eventResult.data?.canonical_name || eventResult.data?.event_name }
   );
   for (const successor of successors) {
     const combinedRiskSignals = [...new Set([
@@ -338,8 +339,10 @@ async function recordLifecycleSignals(
   }
 
   let resultCount = 0;
-  if (claim.edition_id && signals.results.length) {
-    const result = signals.results[0];
+  const sourceEdition = (editionResult.data || []).find(edition => String(edition.id) === String(claim.edition_id));
+  const editionResults = selectLifecycleResults(signals, sourceEdition);
+  if (claim.edition_id && editionResults.length) {
+    const result = editionResults[0];
     const { data, error } = await admin.rpc("register_edition_result_candidate", {
       p_source_id: claim.source_id,
       p_crawl_result_id: crawlResultId,
@@ -372,7 +375,7 @@ async function recordExtractionSignals(
       .select("id,event_id,edition_year,start_date,end_date,start_time,registration_url,registration_status,edition_status,price_min,price_max,currency,participant_limit,race_formats")
       .eq("event_id", claim.event_id).order("edition_year", { ascending: false }),
     admin.from("event_change_proposals")
-      .select("field_name,normalized_value,proposal_status,reviewed_at,created_at")
+      .select("edition_id,field_name,normalized_value,proposal_status,reviewed_at,created_at")
       .eq("event_id", claim.event_id).order("created_at", { ascending: false }).limit(500),
     admin.from("event_field_controls")
       .select("edition_id,field_name,is_locked,manual_value,lock_reason,lock_expires_at,source_priority")

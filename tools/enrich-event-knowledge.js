@@ -2,15 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const { parseCsvFile } = require("./event-table-utils.js");
 const {
-  AUDIT_JSON_PATH,
   EVENTS_PATH,
   FIELD_GROUPS,
-  KNOWLEDGE_FIELDS,
   REVIEW_JSON_PATH,
   ROOT,
   buildAuditRows,
   cleanValue,
-  readJson,
+  indexEventsBySlug,
+  isCurrentEdition,
   writeAuditFiles
 } = require("./event-knowledge-workflow.js");
 
@@ -39,12 +38,9 @@ function parseArgs(argv) {
   });
 }
 
-function todayIso() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 function getSourceUrl(event, auditRow) {
   return cleanValue(
+    event.official_url ||
     event.source_url ||
     event.event_url ||
     auditRow.source_url ||
@@ -60,13 +56,13 @@ function fieldCandidateFromCsv(field, event, auditRow) {
     return null;
   }
 
-  if (field === "registration_status" && cleanValue(event.verification_status)) {
+  if (field === "registration_status" && cleanValue(event.registration_status)) {
     return {
-      value: cleanValue(event.verification_status),
+      value: cleanValue(event.registration_status),
       source_url: sourceUrl,
       confidence: sourceUrl === cleanValue(event.event_url) ? 0.65 : 0.7,
       verification_status: "needs_review",
-      last_checked: cleanValue(event.last_checked) || todayIso(),
+      last_checked: "",
       note: "Imported from data/events.csv registration status. Requires manual confirmation before publishing."
     };
   }
@@ -77,7 +73,7 @@ function fieldCandidateFromCsv(field, event, auditRow) {
       source_url: sourceUrl,
       confidence: 0.7,
       verification_status: "needs_review",
-      last_checked: cleanValue(event.last_checked) || todayIso(),
+      last_checked: "",
       note: "Seed source from data/events.csv. Use this as the first research source."
     };
   }
@@ -121,16 +117,19 @@ function buildSupabasePayload(event, auditRow, fields) {
   const payload = {
     details: {
       event_slug: auditRow.event_slug,
+      event_brand_id: event.event_id || null,
+      edition_id: event.edition_id || null,
+      knowledge_scope: "edition",
       event_name: auditRow.event_name,
       sport_type: auditRow.sport,
       date: auditRow.date,
       city: auditRow.city,
       country: auditRow.country,
-      official_website: cleanValue(event.event_url),
-      registration_url: cleanValue(event.event_url),
+      official_website: cleanValue(event.official_url),
+      registration_url: cleanValue(event.registration_url),
       verification_status: "needs_review",
       is_public: false,
-      last_checked: todayIso()
+      last_checked: null
     },
     registration: {},
     course: {},
@@ -157,8 +156,8 @@ function buildSupabasePayload(event, auditRow, fields) {
         payload.sources.push({
           source_label: "Research seed source",
           source_url: review.source_url,
-          source_type: "official",
-          last_verified: review.last_checked || todayIso(),
+          source_type: "unknown",
+          last_verified: null,
           confidence_score: review.confidence,
           verification_note: review.note
         });
@@ -179,10 +178,10 @@ function buildSupabasePayload(event, auditRow, fields) {
 
     if (sourceUrl) {
       payload.sources.push({
-        source_label: "Official event source",
+        source_label: "Research seed source",
         source_url: sourceUrl,
-        source_type: "official",
-        last_verified: cleanValue(event.last_checked) || todayIso(),
+        source_type: "unknown",
+        last_verified: null,
         confidence_score: 0.65,
         verification_note: "Seed source only. Manual review required before publishing."
       });
@@ -202,6 +201,8 @@ function createResearchTask(event, auditRow) {
 
   return {
     event_slug: auditRow.event_slug,
+    event_brand_id: event.event_id || null,
+    edition_id: event.edition_id || null,
     event_name: auditRow.event_name,
     date: auditRow.date,
     city: auditRow.city,
@@ -228,13 +229,7 @@ function createResearchTask(event, auditRow) {
 }
 
 function loadAuditRows(events) {
-  const audit =
-    readJson(AUDIT_JSON_PATH, null);
-
-  if (audit && Array.isArray(audit.events)) {
-    return audit.events;
-  }
-
+  // Derive from this input snapshot; an older audit may describe another edition.
   const rows =
     buildAuditRows(events);
 
@@ -249,18 +244,13 @@ function main() {
     parseCsvFile(EVENTS_PATH);
   const auditRows =
     loadAuditRows(events);
-  const eventsBySlug =
-    new Map(
-      auditRows.map((row, index) => [
-        row.event_slug,
-        events[index] || {}
-      ])
-    );
+  const eventsBySlug = indexEventsBySlug(events);
   const priority =
     options.priority || "high";
   const selected =
     auditRows
       .filter(row =>
+        isCurrentEdition(row) &&
         row.priority === priority &&
         Number(row.missing_count || 0) > 0
       )
@@ -301,4 +291,6 @@ function main() {
   console.log(`Wrote ${path.relative(ROOT, REVIEW_JSON_PATH)}.`);
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { buildSupabasePayload, createResearchTask, fieldCandidateFromCsv };

@@ -330,6 +330,7 @@ test("actual browser resolves missing routes, preserves static pages and hides c
         await expect(page.locator('body')).toHaveClass(/\bevent-detail-page\b/);
         await expect(page.locator('h1')).toHaveText(eventName);
         await expect(page.locator('h1')).toBeVisible();
+        assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).fontSize), '28px');
         await expect(page.locator('#liveDetailDescription')).toHaveText('Public race description.');
         await expect(page.locator('#liveDetailStatus')).toContainText('gespeicherte Datenstand');
         await expect(page.locator('#adminModal, #drawer')).toHaveCount(0);

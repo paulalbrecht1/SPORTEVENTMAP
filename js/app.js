@@ -507,12 +507,15 @@ function getPlatformHashRoute(hash = window.location.hash) {
   }
 
   if (cleanHash.startsWith("#/event/")) {
+    let slug;
+    try {
+      slug = decodeURIComponent(cleanHash.replace("#/event/", "").split("?")[0]);
+    } catch {
+      return { route: "discovery" };
+    }
     return {
       route: "event",
-      slug:
-        decodeURIComponent(
-          cleanHash.replace("#/event/", "").split("?")[0]
-        )
+      slug
     };
   }
 
@@ -717,6 +720,11 @@ function findEventByPlatformSlug(slug) {
 }
 
 function openEventRoute(slug, attempt = 0) {
+  // A delayed catalog response must never reopen an event after navigation.
+  const currentRoute = getPlatformHashRoute();
+  if (currentRoute.route !== "event" || currentRoute.slug !== slug) {
+    return;
+  }
   setPlatformRouteClasses("discovery");
   showPlatformPage("");
   document.body.classList.remove("landing-open");
@@ -729,7 +737,18 @@ function openEventRoute(slug, attempt = 0) {
     findEventByPlatformSlug(slug);
 
   if (!found) {
-    if (attempt < 12) {
+    if (
+      attempt === 0 &&
+      document.documentElement.dataset.supabaseLoaded !== "true" &&
+      typeof window.ensureSupabaseFeaturesLoaded === "function"
+    ) {
+      // New editions may exist only in the live public catalog. Start loading
+      // immediately instead of racing the idle-loaded SDK with the fallback CSV.
+      window.ensureSupabaseFeaturesLoaded("event_route");
+    }
+
+    // Allow the paginated public catalog to arrive on slower connections.
+    if (attempt < 90) {
       window.setTimeout(
         () => openEventRoute(slug, attempt + 1),
         220

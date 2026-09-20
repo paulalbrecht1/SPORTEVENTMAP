@@ -12,6 +12,7 @@ const DIST =
 
 const CRITICAL_PATHS = Object.freeze([
   "index.html",
+  "404.html",
   "css/style.css",
   "css/mobile-discovery.css",
   "js/app.js",
@@ -26,6 +27,7 @@ const CRITICAL_PATHS = Object.freeze([
 
 const COPY_ENTRIES = [
   "index.html",
+  "404.html",
   "RELEASE_VERSION.txt",
   "sitemap.xml",
   "robots.txt",

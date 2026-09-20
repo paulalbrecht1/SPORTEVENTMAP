@@ -7,7 +7,7 @@ const { execFileSync } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const OVERLAY_PATHS = Object.freeze([
-  'index.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
+  'index.html', '404.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
   'css/style.css', 'css/mobile-discovery.css',
   'js/app.js', 'js/events.js', 'js/freshness-batch-review.js', 'js/i18n.js',
   'js/mobile-discovery.js', 'js/supabase.js', 'RELEASE_VERSION.txt'

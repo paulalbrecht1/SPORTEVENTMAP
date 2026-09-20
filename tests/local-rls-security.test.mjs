@@ -243,13 +243,28 @@ const detailResult = spawnSync(detailContainerCli,
       + fs.readFileSync(path.join(root, "tests", "event-detail-database.sql"), "utf8")
   });
 assert.equal(detailResult.status, 0, `Knowledge database integration failed: ${detailResult.stderr || detailResult.error}`);
-assert.equal(Number(detailResult.stdout.trim()), 12, "Knowledge database integration completion marker is missing.");
+assert.equal(Number(detailResult.stdout.trim()), 14, "Knowledge database integration completion marker is missing.");
 const [detailRollback] = queryLocal(
   "select not exists(select 1 from public.events where event_name like 'detail-database-test-%') "
   + "and not exists(select 1 from public.event_details where event_slug like 'detail-database-test-%') as rolled_back"
 );
 assert.equal(detailRollback.rolled_back, true, "Knowledge test fixtures survived ROLLBACK.");
-console.log("Knowledge database integration: 12 assertions passed; all fixtures rolled back.");
+console.log("Knowledge database integration: 14 assertions passed; all fixtures rolled back.");
+
+const syncResult = spawnSync(detailContainerCli,
+  ["exec", "-i", detailContainer, "psql", "--quiet", "--no-psqlrc", "--set", "ON_ERROR_STOP=1",
+    "--username", "postgres", "--dbname", "postgres", "--no-align", "--tuples-only"], {
+    encoding: "utf8", maxBuffer: 1024 * 1024,
+    input: "set sporteventmap.test_local_detail = 'isolated';\n"
+      + fs.readFileSync(path.join(root, "tests", "legacy-edition-sync.sql"), "utf8")
+  });
+assert.equal(syncResult.status, 0, `Legacy edition integration failed: ${syncResult.stderr || syncResult.error}`);
+assert.equal(Number(syncResult.stdout.trim()), 18, "Legacy edition integration completion marker is missing.");
+const [syncRollback] = queryLocal(
+  "select not exists(select 1 from public.events where event_name like 'legacy-sync-test-%') as rolled_back"
+);
+assert.equal(syncRollback.rolled_back, true, "Legacy edition fixtures survived ROLLBACK.");
+console.log("Legacy edition integration: 18 assertions passed; all fixtures rolled back.");
 
 const [stagingPostflightRow] = queryLocalFile("tools/edition-staging-postflight.sql");
 const stagingPostflight = stagingPostflightRow.edition_staging_postflight_report;

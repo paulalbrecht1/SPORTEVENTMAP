@@ -213,6 +213,7 @@ select jsonb_build_object(
 
 $rolesPath = Join-Path $temporaryRoot "roles.sql"
 $schemaPath = Join-Path $temporaryRoot "schema.sql"
+$authApplicationSchemaPath = Join-Path $temporaryRoot "auth-application-schema.sql"
 $historySchemaPath = Join-Path $temporaryRoot "history-schema.sql"
 $dataPath = Join-Path $temporaryRoot "data.sql"
 $storageDataPath = Join-Path $temporaryRoot "storage-data.sql"
@@ -237,6 +238,12 @@ try {
   Invoke-SupabaseCli -RepoRoot $repoRoot -NodePath $cliPaths.Node -CliPath $cliPaths.Cli `
     -Arguments @("db", "dump", "--linked", "--file", $schemaPath) `
     -Label "Application schema dump" | Out-Null
+
+  # Managed Auth can be newer than the pinned local runtime. Preserve its actual
+  # schema with the application in one dependency-ordered pg_dump for drills.
+  Invoke-SupabaseCli -RepoRoot $repoRoot -NodePath $cliPaths.Node -CliPath $cliPaths.Cli `
+    -Arguments @("db", "dump", "--linked", "--file", $authApplicationSchemaPath, "--schema", "auth,public,private,extensions") `
+    -Label "Auth and application recovery schema dump" | Out-Null
 
   Invoke-SupabaseCli -RepoRoot $repoRoot -NodePath $cliPaths.Node -CliPath $cliPaths.Cli `
     -Arguments @("db", "dump", "--linked", "--file", $historySchemaPath, "--schema", "supabase_migrations") `
@@ -323,6 +330,8 @@ try {
     )
   Assert-FileContent -Path $historySchemaPath -Label "Migration history schema dump" -MinimumBytes 500 `
     -Patterns @('CREATE TABLE IF NOT EXISTS "supabase_migrations"\."schema_migrations"')
+  Assert-FileContent -Path $authApplicationSchemaPath -Label "Auth and application recovery schema" -MinimumBytes 10000 `
+    -Patterns @('CREATE TABLE IF NOT EXISTS "auth"\."users"', 'CREATE TABLE IF NOT EXISTS "public"\."events"')
   Assert-FileContent -Path $dataPath -Label "Data dump" -MinimumBytes 10000 `
     -Patterns @(
       'Data for Name: users; Type: TABLE DATA; Schema: auth',
@@ -341,7 +350,8 @@ try {
     $rolesPath, $schemaPath, $historySchemaPath, $dataPath,
     $storageDataPath, $historyDataPath
   )
-  $fileMetadata = foreach ($file in $dumpFiles) {
+  $archiveFiles = @($dumpFiles) + @($authApplicationSchemaPath)
+  $fileMetadata = foreach ($file in $archiveFiles) {
     $item = Get-Item -LiteralPath $file
     [ordered]@{
       name = $item.Name
@@ -351,7 +361,7 @@ try {
   }
 
   $metadata = [ordered]@{
-    format_version = 1
+    format_version = 2
     project_ref = $ProjectRef
     backup_name = $backupName
     dump_started_at_utc = $snapshotBefore.captured_at_utc
@@ -381,14 +391,14 @@ try {
   if (Test-Path -LiteralPath $archivePath) {
     Remove-Item -LiteralPath $archivePath -Force
   }
-  Compress-Archive -LiteralPath @($metadataPath, $restorePath, $rolesPath, $schemaPath, $historySchemaPath, $dataPath, $storageDataPath, $historyDataPath) `
+  Compress-Archive -LiteralPath (@($metadataPath, $restorePath) + $archiveFiles) `
     -DestinationPath $archivePath -CompressionLevel Optimal
 
   Add-Type -AssemblyName System.IO.Compression.FileSystem
   $zip = [System.IO.Compression.ZipFile]::OpenRead($archivePath)
   try {
     $entryNames = @($zip.Entries | ForEach-Object { $_.FullName })
-    foreach ($requiredEntry in @("backup-metadata.json", "restore.sql", "schema.sql", "data.sql")) {
+    foreach ($requiredEntry in @("backup-metadata.json", "restore.sql", "schema.sql", "auth-application-schema.sql", "data.sql")) {
       if ($requiredEntry -notin $entryNames) {
         throw "Backup archive is missing $requiredEntry."
       }

@@ -7650,7 +7650,8 @@ function setKnowledgeField(tableName, fieldName, value) {
   if (field.dataset.knowledgeArray === "true") {
     field.value =
       Array.isArray(value)
-        ? value.join("\n")
+        ? field.dataset.knowledgeJson === "true" || value.some(item => item && typeof item === "object")
+          ? JSON.stringify(value, null, 2) : value.join("\n")
         : String(value || "");
     return;
   }
@@ -7980,9 +7981,9 @@ function collectKnowledgeFields(tableName) {
 
       if (field.dataset.knowledgeArray === "true") {
         value =
-          value
-            ? value.split(/\n|,/).map(item => item.trim()).filter(Boolean)
-            : [];
+          !value ? [] : field.dataset.knowledgeJson === "true" || value.startsWith("[")
+            ? parseKnowledgeReviewValue(value, { type: "array", allowEmpty: true })
+            : value.split(/\n|,/).map(item => item.trim()).filter(Boolean);
       } else if (field.dataset.knowledgeBoolean === "true") {
         value =
           value === "true"
@@ -8051,9 +8052,7 @@ async function saveSingleKnowledgeChild(table, eventDetailId, payload) {
     Object.fromEntries(
       Object.entries(payload)
         .filter(([_key, value]) =>
-          value !== "" &&
-          value !== null &&
-          !(Array.isArray(value) && !value.length)
+          value !== undefined
         )
     );
 
@@ -8069,6 +8068,9 @@ async function saveSingleKnowledgeChild(table, eventDetailId, payload) {
   }
 
   if (existing.data?.id) {
+    // Explicit empty text, [] and null clear an existing fact. Omitted
+    // keys remain absent, so accepting one proposal cannot erase other facts.
+    if (!Object.keys(cleaned).length) return;
     const { error } =
       await supabaseClient
         .from(table)
@@ -8081,12 +8083,16 @@ async function saveSingleKnowledgeChild(table, eventDetailId, payload) {
     return;
   }
 
+  const initial = Object.fromEntries(Object.entries(cleaned).filter(([_key, value]) =>
+    value !== "" && value !== null && !(Array.isArray(value) && !value.length)
+  ));
+  if (!Object.keys(initial).length) return;
   const { error } =
     await supabaseClient
       .from(table)
       .insert([{
         event_detail_id: eventDetailId,
-        ...cleaned
+        ...initial
       }]);
 
   if (error) {
@@ -8342,7 +8348,7 @@ function getKnowledgeReviewFieldRows(task) {
         if (proposal.field_name) {
           map[proposal.field_name] = {
             ...proposal,
-            value: proposal.suggested_value || proposal.value || ""
+            value: proposal.suggested_value ?? proposal.value ?? ""
           };
         }
 
@@ -8360,10 +8366,46 @@ function getKnowledgeReviewFieldRows(task) {
         decision ||
         (
           (proposal.source_url || proposal.sourceUrl) &&
-          (proposal.suggested_value || proposal.value)
+          formatKnowledgeReviewValue(proposal.suggested_value ?? proposal.value).trim()
         )
       )
     );
+}
+
+function formatKnowledgeReviewValue(value) {
+  return value != null && typeof value === "object" ? JSON.stringify(value, null, 2) : String(value ?? "");
+}
+
+function resolveKnowledgeReviewTarget(field) {
+  const legacy = Object.hasOwn(KNOWLEDGE_REVIEW_FIELD_TARGETS, field) ? KNOWLEDGE_REVIEW_FIELD_TARGETS[field] : null;
+  const path = legacy ? [legacy.tableKey, legacy.field] : String(field).split(".");
+  if (path.length !== 2 || path.some(part => !/^[a-z][a-z_]*$/.test(part))) return null;
+  const [tableKey, name] = path;
+  if (tableKey !== "details" && !Object.hasOwn(KNOWLEDGE_CHILD_TABLES, tableKey)) return null;
+  if (["id", "event_id", "event_slug", "event_brand_id", "edition_id", "knowledge_scope", "verification_status", "is_public", "last_checked", "created_at", "updated_at"].includes(name)) return null;
+  const editor = knowledgeElements.form?.querySelector(`[data-knowledge-table="${tableKey}"][name="${name}"]`);
+  if (!editor && !legacy) return null;
+  return { tableKey, field: name, type: editor?.dataset.knowledgeArray === "true" ? "array"
+    : editor?.dataset.knowledgeBoolean === "true" ? "boolean" : "text" };
+}
+
+function parseKnowledgeReviewValue(value, target) {
+  if (target.type === "array") {
+    if (typeof value === "string") {
+      try { value = JSON.parse(value); } catch { throw new Error("Structured Knowledge values must be valid JSON arrays."); }
+    }
+    if (!Array.isArray(value) || (!value.length && !target.allowEmpty) || value.some(item => item == null || Array.isArray(item) || !["string", "object"].includes(typeof item))) {
+      throw new Error("Structured Knowledge values must be non-empty JSON arrays of text or objects.");
+    }
+    return value;
+  }
+  if (target.type === "boolean") {
+    if (value === true || value === "true") return true;
+    if (value === false || value === "false") return false;
+    throw new Error("Boolean Knowledge values must be true or false.");
+  }
+  if (!["string", "number"].includes(typeof value) || !String(value).trim()) throw new Error("Accepted Knowledge values need a text value.");
+  return String(value).trim();
 }
 
 function getKnowledgeFieldInput(card, field, name) {
@@ -8373,6 +8415,7 @@ function getKnowledgeFieldInput(card, field, name) {
 }
 
 function getKnowledgeEditedProposal(card, field) {
+  const confidence = getKnowledgeFieldInput(card, field, "confidence")?.value.trim() || "";
   return {
     value:
       getKnowledgeFieldInput(card, field, "value")?.value.trim() || "",
@@ -8383,7 +8426,7 @@ function getKnowledgeEditedProposal(card, field) {
     source_title:
       getKnowledgeFieldInput(card, field, "source_title")?.value.trim() || "",
     confidence:
-      Number(getKnowledgeFieldInput(card, field, "confidence")?.value || 0),
+      confidence ? Number(confidence) : null,
     verification_status:
       getKnowledgeFieldInput(card, field, "verification_status")?.value || "needs_review",
     last_checked:
@@ -8462,9 +8505,10 @@ async function saveKnowledgeReviewSource(eventDetailId, field, proposal) {
     source_url: proposal.source_url,
     source_type: ["official", "trusted", "community", "estimated", "unknown"].includes(proposal.source_type) ? proposal.source_type
       : proposal.verification_status === "verified_official_source" ? "official" : "unknown",
-    field_path: KNOWLEDGE_REVIEW_FIELD_TARGETS[field]
-      ? `${KNOWLEDGE_REVIEW_FIELD_TARGETS[field].tableKey}.${KNOWLEDGE_REVIEW_FIELD_TARGETS[field].field}`
-      : field,
+    field_path: (() => {
+      const target = resolveKnowledgeReviewTarget(field);
+      return target ? `${target.tableKey === "details" ? "basis" : target.tableKey}.${target.field}` : field;
+    })(),
     last_verified:
       ["verified", "verified_official_source"].includes(proposal.verification_status) ? normalizeKnowledgeDate(proposal.last_checked) || null : null,
     confidence_score:
@@ -8522,18 +8566,23 @@ async function saveKnowledgeReviewFaq(eventDetailId, proposal) {
 }
 
 async function acceptKnowledgeReviewField(task, field, proposal) {
-  if (!proposal.source_url) {
+  if (!/^https?:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(proposal.source_url || "")) {
     throw new Error("Accepted Knowledge values need a source URL.");
   }
-
-  if (!String(proposal.value || "").trim() && field !== "sources") {
-    throw new Error("Accepted Knowledge values need a value.");
+  const target = resolveKnowledgeReviewTarget(field);
+  if (!target && !["sources", "faq"].includes(field)) throw new Error(`No Supabase target mapping for ${field}.`);
+  const value = target ? parseKnowledgeReviewValue(proposal.value, target) : proposal.value;
+  if (proposal.confidence != null && (!Number.isFinite(proposal.confidence) || proposal.confidence < 0 || proposal.confidence > 1)) {
+    throw new Error("Knowledge confidence must be empty or a number from 0 to 1.");
   }
-  if (["cutoff", "start_time", "registration_deadline"].includes(field) &&
-      /withdraw|refund|rücktritt|ruecktritt|storn|abmeld|\b\d+\s*(?:days?|tage?)\s*(?:before|vor)\b/i.test(proposal.value || "")) {
+  const targetPath = target ? `${target.tableKey}.${target.field}` : field;
+  const raceTiming = /^race_day\.(?:start_time|total_cutoff|swim_cutoff|bike_cutoff|run_cutoff|intermediate_cutoffs)$/.test(targetPath);
+  const text = formatKnowledgeReviewValue(value);
+  if ((raceTiming || /^registration\.registration_(?:open|close)_date$/.test(targetPath)) &&
+      /withdraw|refund|rücktritt|ruecktritt|storn|abmeld|\b\d+\s*(?:days?|tage?)\s*(?:before|vor)\b/i.test(text)) {
     throw new Error("Withdrawal conditions cannot be stored as a race cutoff, start time or registration deadline.");
   }
-  if (["cutoff", "start_time"].includes(field) && /registration|anmeld|meldeschluss/i.test(proposal.value || "")) {
+  if (raceTiming && /registration|anmeld|meldeschluss/i.test(text)) {
     throw new Error("Registration dates cannot be stored as race timing.");
   }
 
@@ -8551,27 +8600,12 @@ async function acceptKnowledgeReviewField(task, field, proposal) {
     return;
   }
 
-  const target =
-    KNOWLEDGE_REVIEW_FIELD_TARGETS[field];
-
-  if (!target) {
-    throw new Error(`No Supabase target mapping for ${field}.`);
+  if (target.tableKey === "details") {
+    const { error } = await supabaseClient.from("event_details").update({ [target.field]: value }).eq("id", detail.id);
+    if (error) throw error;
+  } else {
+    await saveSingleKnowledgeChild(KNOWLEDGE_CHILD_TABLES[target.tableKey], detail.id, { [target.field]: value });
   }
-
-  const table =
-    KNOWLEDGE_CHILD_TABLES[target.tableKey];
-
-  if (!table) {
-    throw new Error(`Missing Supabase table for ${field}.`);
-  }
-
-  await saveSingleKnowledgeChild(
-    table,
-    detail.id,
-    {
-      [target.field]: proposal.value
-    }
-  );
 
   await saveKnowledgeReviewSource(detail.id, field, proposal);
 }
@@ -8685,7 +8719,7 @@ function renderKnowledgeAuditAdmin() {
             const sourceTitle =
               decision?.source_title ?? proposal.source_title ?? "";
             const confidence =
-              decision?.confidence ?? proposal.confidence ?? 0;
+              decision?.confidence ?? proposal.confidence ?? "";
             const verificationStatus =
               decision?.verification_status || proposal.verification_status || "needs_review";
             const lastChecked =
@@ -8707,7 +8741,7 @@ function renderKnowledgeAuditAdmin() {
                   </div>
                 </div>
                 <div class="admin-knowledge-review-field-grid">
-                  <label>Value<textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="value" rows="2">${escapeAdminHTML(value)}</textarea></label>
+                  <label>Value<textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="value" rows="2">${escapeAdminHTML(formatKnowledgeReviewValue(value))}</textarea></label>
                   <label>Source URL<input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_url" type="url" value="${escapeAdminHTML(sourceUrl)}" /></label>
                   <label>Source title<input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_title" value="${escapeAdminHTML(sourceTitle)}" /></label>
                   <label>Confidence<input data-review-field="${escapeAdminHTML(field)}" data-review-input="confidence" inputmode="decimal" value="${escapeAdminHTML(confidence)}" /></label>

@@ -117,6 +117,21 @@ begin
   end;
   perform pg_temp.detail_assert(rejected,'duplicate knowledge slug rejected');
 
+  perform pg_temp.detail_assert((select count(*) = 2 from pg_class
+    where oid in ('public.public_event_discovery'::regclass,'public.public_event_archive'::regclass)
+      and 'security_invoker=true' = any(reloptions)),
+    'detail projection preserves both security-invoker views');
+  perform pg_temp.detail_assert(exists(select 1 from public.public_event_archive v
+    join public.events e on e.id = v.event_id
+    join public.event_editions ed on ed.id = v.edition_id and ed.event_id = e.id
+    where ed.id = previous_id and
+      row(v.organizer_name,v.organizer_url,v.official_url,v.registration_url,
+        v.brand_verification_status,v.brand_last_verified_at,
+        v.edition_verification_status,v.edition_last_verified_at)
+      is not distinct from row(e.organizer_name,e.organizer_url,e.official_url,ed.registration_url,
+        e.verification_status,e.last_verified_at,ed.verification_status,ed.last_verified_at)),
+    'detail source and verification aliases resolve to the exact brand and edition');
+
   perform set_config('request.jwt.claims','{"role":"anon"}',true);
   execute 'set local role anon';
   perform pg_temp.detail_assert((select count(*) = 2 from public.event_details

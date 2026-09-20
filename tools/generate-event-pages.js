@@ -2930,13 +2930,8 @@ function compactFactValue(value, options = {}) {
   }
 
   if (options.kind === "cutoff") {
-    const duration =
-      text.match(/\b\d{1,2}:\d{2}\s*h\b/i) ||
-      text.match(/\b\d{1,2}(?:[.,]\d+)?\s*(?:h|hr|hrs|hours|Stunden)\b/i);
-
-    if (duration) {
-      return duration[0];
-    }
+    // Minutes, category labels and cumulative limits are part of the fact.
+    return text;
   }
 
   if (options.kind === "status") {
@@ -3173,18 +3168,22 @@ function renderTable(headers, rows, className = "") {
   if (!cleanRows.length) {
     return "";
   }
+  const columns = headers.map((header, index) => ({ ...header, index }))
+    .filter(column => cleanRows.some(row => hasUsefulValue(row[column.index]?.value)));
 
   return `
       <div class="race-guide-table-wrap ${className}">
         <table class="race-guide-table">
           <thead>
-            <tr>${headers.map(header => `<th ${detailI18nAttr(header.key)}>${escapeHtml(detailTranslation(header.key))}</th>`).join("")}</tr>
+            <tr>${columns.map(header => `<th ${detailI18nAttr(header.key)}>${escapeHtml(detailTranslation(header.key))}</th>`).join("")}</tr>
           </thead>
           <tbody>
             ${cleanRows.map(row => `
               <tr>
-                ${row.map((cell, index) => `
-                  <td ${detailDataLabelAttr(headers[index].key)}>${hasUsefulValue(cell.value) ? cell.html || escapeHtml(publicValueText(cell.value)) : ""}</td>`).join("")}
+                ${columns.map(column => {
+                  const cell = row[column.index];
+                  return `<td ${detailDataLabelAttr(column.key)}>${hasUsefulValue(cell?.value) ? cell.html || escapeHtml(publicValueText(cell.value)) : ""}</td>`;
+                }).join("")}
               </tr>`).join("")}
           </tbody>
         </table>
@@ -3384,18 +3383,7 @@ function renderCutoffTimes(raceDay = {}) {
               <span>${escapeHtml(row.point)}</span>
               <strong>${escapeHtml(row.deadline)}</strong>
             </article>`).join("")}
-        </div>
-        ${renderTable(
-          [
-            { key: "detail.point" },
-            { key: "detail.deadlineTime" }
-          ],
-          rows.map(row => [
-            { value: row.point },
-            { value: row.deadline }
-          ]),
-          "is-compact"
-        )}` : ""}
+        </div>` : ""}
     </div>`;
 }
 
@@ -4000,12 +3988,8 @@ function buildRaceGuideRules(richDetails = null) {
     getRichDetailsSection(richDetails, "race_day");
   const rules = [
     renderInfoBox("detail.minimumAge", registration.minimum_age, "check"),
-    renderInfoBox("detail.qualification", registration.qualification_required, "check"),
     renderInfoBox("detail.medicalCertificate", registration.medical_certificate, "check"),
     renderInfoBox("detail.mandatoryGear", registration.mandatory_gear || raceDay.mandatory_gear, "check"),
-    renderAccordion("detail.refundPolicy", registration.refund_policy),
-    renderAccordion("detail.transferPolicy", registration.transfer_possible),
-    renderAccordion("detail.cutoff", firstUsefulValue(raceDay.total_cutoff, raceDay.cutoff_consequence)),
     renderAccordion("detail.athleteGuide", firstUsefulValue(raceDay.athlete_guide_notes, registration.athlete_guide_notes))
   ].join("");
 

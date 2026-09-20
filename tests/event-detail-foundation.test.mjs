@@ -231,6 +231,67 @@ assert.equal(createSlug(event({ edition_slug: "stable-public-slug-2027" }), seen
 assert.match(brandedPage, /<link rel="canonical" href="https:\/\/sporteventmap\.com\/event\/test-city-marathon-2027\/"/);
 assert.match(brandedPage, /window\.sportEventMapDetailConfig/);
 
+for (const cutoff of [
+  "6 hours 15 minutes from crossing the start line",
+  "3 hours 15 minutes",
+  "1 hour 50 minutes",
+  "6 Stunden 15 Minuten ab dem Überqueren der Startlinie",
+  "6,25 Stunden",
+  "6.25 hours",
+  "6:15 h",
+  "Individual: 15 h 00; relay: 13 h 50",
+  "Swim and bike combined: 9 h 10 for individual athletes; 8 h 25 for relay teams"
+]) {
+  const cutoffPage = buildEventPage(event(), "test-city-marathon-2027", [], null, {
+    verification_status: "partially_verified",
+    race_day: { total_cutoff: cutoff },
+    sources: [{
+      field_path: "race_day.total_cutoff",
+      source_type: "official",
+      source_url: "https://event.example/race-guide-2027",
+      last_verified: "2026-08-18"
+    }]
+  });
+  const cutoffCard = [...cutoffPage.matchAll(/<article class="race-guide-fact-card[\s\S]*?<\/article>/g)]
+    .find(match => match[0].includes('data-detail-i18n="detail.cutoff"'))?.[0];
+  assert.ok(cutoffCard, `Verified cutoff must render: ${cutoff}`);
+  const visibleCutoff = /<strong[^>]*>([^<]*)<\/strong>/.exec(cutoffCard)?.[1];
+  assert.equal(visibleCutoff, cutoff, "Visible cutoff must preserve minutes, categories and cumulative context");
+}
+
+const reviewedRules = {
+  verification_status: "partially_verified",
+  registration: {
+    refund_policy: "Refund terms belong with registration.",
+    transfer_possible: "Name changes require organizer approval.",
+    qualification_required: "A qualifying result is required."
+  },
+  race_day: {
+    total_cutoff: "6 hours 15 minutes",
+    cutoff_consequence: "The course closes after the official deadline."
+  },
+  sources: ["registration", "race_day"].map(field_path => ({
+    field_path,
+    source_type: "official",
+    source_url: "https://event.example/race-guide-2027",
+    last_verified: "2026-08-18"
+  }))
+};
+const duplicateFreePage = buildEventPage(event(), "test-city-marathon-2027", [], null, reviewedRules);
+assert.doesNotMatch(duplicateFreePage, /<section id="rules"/, "Rules must be hidden when every fact is already in its useful section");
+for (const value of [...Object.values(reviewedRules.registration), reviewedRules.race_day.cutoff_consequence]) {
+  assert.equal(duplicateFreePage.split(value).length - 1, 1, `Detailed facts must appear once: ${value}`);
+}
+const uniqueRulesPage = buildEventPage(event(), "test-city-marathon-2027", [], null, {
+  ...reviewedRules,
+  registration: { ...reviewedRules.registration, minimum_age: "18 years", mandatory_gear: "Carry the organizer-issued emergency blanket." },
+  race_day: { ...reviewedRules.race_day, athlete_guide_notes: "Bring the published athlete guide to packet pickup." }
+});
+const uniqueRulesSection = /<section id="rules"[\s\S]*?<\/section>/.exec(uniqueRulesPage)?.[0] || "";
+for (const value of ["18 years", "Carry the organizer-issued emergency blanket.", "Bring the published athlete guide to packet pickup."]) {
+  assert.ok(uniqueRulesSection.includes(value), `Unique official rules must remain available: ${value}`);
+}
+
 const knowledgeGroups = Object.fromEntries([
   "registration", "course", "race_day", "travel", "weather",
   "statistics", "editorial", "sources", "faq"

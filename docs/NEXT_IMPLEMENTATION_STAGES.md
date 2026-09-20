@@ -2,6 +2,12 @@
 
 Stand: 8. September 2026
 
+Fortschritt vom 20.09.2026: P0 bleibt aktiv. Der
+[Umsetzungsnachweis für Detaildaten und Editionsschutz](DETAIL_DATA_ROLLOUT_20260920.md)
+dokumentiert den aktuellen Live-Messstand, zwei vorbereitete Datenbankkorrekturen
+und fünf konkrete Quellen-/Reviewpakete. Die folgenden Ausgangszahlen vom
+03./04.09. sind historische Baseline, kein aktueller Bestandsnachweis.
+
 Dieses Dokument ist die verbindliche Reihenfolge für die nächsten
 Produkt- und Entwicklungsarbeiten an SportEventMap. Es übersetzt die
 Produktvision in abnehmbare Arbeitsstufen. Bei einem Zielkonflikt haben

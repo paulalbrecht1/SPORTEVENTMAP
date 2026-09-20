@@ -5,6 +5,13 @@ import path from "node:path";
 
 const projectId = process.argv[2];
 const sqlPath = path.resolve(process.argv[3] || "");
+const managedAuthRestore = process.argv[4] === "--managed-auth-restore";
+assert.ok(process.argv[4] === undefined || managedAuthRestore, "Unexpected local SQL import option.");
+if (managedAuthRestore) {
+  assert.equal(path.basename(sqlPath), "restore-local.sql", "Managed schema restore requires the guarded restore script.");
+  assert.match(path.basename(path.dirname(sqlPath)), /^sport-event-map-recovery-drill-[a-f0-9]{8}-[a-f0-9]{32}$/,
+    "Managed schema restore must use an isolated recovery directory.");
+}
 
 assert.match(
   projectId || "",
@@ -130,7 +137,7 @@ const execCreate = parseJson(await dockerRequest(
     AttachStderr: true,
     Cmd: [
       "sh", "-c",
-      `psql --quiet --set ON_ERROR_STOP=1 --username postgres --dbname postgres --file /tmp/${inContainerName} > /tmp/${logName} 2>&1`
+      `psql --quiet --set ON_ERROR_STOP=1 --username ${managedAuthRestore ? "supabase_admin" : "postgres"} --dbname postgres --file /tmp/${inContainerName} > /tmp/${logName} 2>&1`
     ]
   })),
   { "Content-Type": "application/json" }

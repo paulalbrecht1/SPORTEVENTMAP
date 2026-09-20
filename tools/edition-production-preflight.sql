@@ -66,7 +66,9 @@ deployment_sequence(ordinal, version, name) as (
     (13, '20260907205727', 'source_monitor_extraction_schema_alignment'),
     (14, '20260907205741', 'source_monitor_runtime_capabilities'),
     (15, '20260908070046', 'public_race_formats_contract'),
-    (16, '20260908090111', 'safe_successor_edition_publication')
+    (16, '20260908090111', 'safe_successor_edition_publication'),
+    (17, '20260920174425', 'event_detail_foundation_schema_alignment'),
+    (18, '20260920174737', 'preserve_edition_facts_from_legacy_sync')
 ),
 expected_pending(version, name) as (
   select sequence.version, sequence.name

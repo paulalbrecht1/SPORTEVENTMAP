@@ -2788,6 +2788,9 @@
               <label>Fee min<input name="entry_fee_min" data-knowledge-table="registration" /></label>
               <label>Fee max<input name="entry_fee_max" data-knowledge-table="registration" /></label>
               <label>Currency<input name="currency" data-knowledge-table="registration" /></label>
+              <label>Price tiers (JSON array)<textarea name="price_tiers" rows="4" data-knowledge-table="registration" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
+              <label>Lottery<select name="lottery_available" data-knowledge-table="registration" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label>Transfer policy<textarea name="transfer_possible" rows="2" data-knowledge-table="registration"></textarea></label>
               <label>Qualification<textarea name="qualification_required" rows="2" data-knowledge-table="registration"></textarea></label>
               <label>Refund policy<textarea name="refund_policy" rows="2" data-knowledge-table="registration"></textarea></label>
             </div>
@@ -2802,6 +2805,14 @@
               <label>Surface<input name="surface" data-knowledge-table="course" /></label>
               <label>Start<input name="start_location" data-knowledge-table="course" /></label>
               <label>Finish<input name="finish_location" data-knowledge-table="course" /></label>
+              <label>Same start / finish<select name="start_finish_same_place" data-knowledge-table="course" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label>Official course map<input name="course_map_url" type="url" data-knowledge-table="course" /></label>
+              <label>Swim distance<input name="swim_distance" data-knowledge-table="course" /></label>
+              <label>Swim location<input name="swim_location" data-knowledge-table="course" /></label>
+              <label>Bike distance<input name="bike_distance" data-knowledge-table="course" /></label>
+              <label>Bike laps<input name="bike_laps" data-knowledge-table="course" /></label>
+              <label>Run distance<input name="run_distance" data-knowledge-table="course" /></label>
+              <label>Run course<textarea name="run_character" rows="2" data-knowledge-table="course"></textarea></label>
               <label>Elevation gain<input name="elevation_gain" data-knowledge-table="course" /></label>
               <label>Difficulty<input name="difficulty_rating" data-knowledge-table="course" /></label>
               <label>PB potential<input name="personal_best_potential" data-knowledge-table="course" /></label>
@@ -2818,6 +2829,10 @@
               <label>Swim cutoff<input name="swim_cutoff" data-knowledge-table="race_day" /></label>
               <label>Bike cutoff<input name="bike_cutoff" data-knowledge-table="race_day" /></label>
               <label>Run cutoff<input name="run_cutoff" data-knowledge-table="race_day" /></label>
+              <label>Intermediate cutoffs (JSON array)<textarea name="intermediate_cutoffs" rows="4" data-knowledge-table="race_day" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
+              <label>Wave starts<textarea name="wave_start" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label>Timing system<input name="timing_system" data-knowledge-table="race_day" /></label>
+              <label>Baggage<textarea name="bag_drop" rows="2" data-knowledge-table="race_day"></textarea></label>
               <label>Aid stations<textarea name="aid_stations" rows="2" data-knowledge-table="race_day"></textarea></label>
               <label>Bib pickup<textarea name="bib_pickup_info" rows="2" data-knowledge-table="race_day"></textarea></label>
               <label>Medical support<textarea name="medical_support" rows="2" data-knowledge-table="race_day"></textarea></label>
@@ -2830,6 +2845,7 @@
               <label>Airport<input name="nearest_airport" data-knowledge-table="travel" /></label>
               <label>Train station<input name="nearest_train_station" data-knowledge-table="travel" /></label>
               <label>Public transport<textarea name="public_transport_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label>Parking<textarea name="parking_info" rows="2" data-knowledge-table="travel"></textarea></label>
               <label>Accommodation<textarea name="accommodation_info" rows="2" data-knowledge-table="travel"></textarea></label>
               <label>Typical weather<textarea name="typical_weather" rows="2" data-knowledge-table="weather"></textarea></label>
               <label>Temperature<input name="average_temperature" data-knowledge-table="weather" /></label>

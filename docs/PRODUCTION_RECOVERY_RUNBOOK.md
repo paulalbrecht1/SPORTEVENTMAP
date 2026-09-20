@@ -1,6 +1,6 @@
 # Production Recovery Runbook
 
-Stand: 8. September 2026
+Stand: 20. September 2026
 
 ## Schutzstandard
 
@@ -90,6 +90,17 @@ npm run backup:restore-drill
 Berichte liegen unter `backups/production/restore-reports/` und werden nicht
 committed. Den Drill mindestens monatlich und nach relevanten Schemaänderungen
 ausführen.
+
+Backups ab Format 2 enthalten zusätzlich `auth-application-schema.sql`: den
+gemeinsamen, von `pg_dump` nach Abhängigkeiten sortierten Auth-/Anwendungsschema-
+Stand. Ein aktueller Production-Auth-Stand kann Tabellen enthalten, die der
+lokal gepinnte Auth-Container noch nicht kennt. Der Drill stellt deshalb dieses
+Schema vor den Daten wieder her; er überspringt keine unbekannten Auth-Daten.
+Das Ersetzen des lokalen Auth-Schemas ist auf den zufällig benannten,
+ausschließlich lokalen Restore-Container beschränkt und scheitert, sobald
+bereits Auth-Benutzer oder die Anwendungstabelle `public.events` existieren.
+Der Auth-Dienst bleibt während und nach dem Restore ausgeschaltet. Das ist
+keine Anleitung, ein verwaltetes Production-Auth-Schema zu ersetzen.
 
 Der Drill schlägt fehl, wenn zentrale Tabellen, Views, Funktionen, RLS,
 Policies, Constraints oder Fremdschlüssel fehlen, Counts abweichen, Editionen

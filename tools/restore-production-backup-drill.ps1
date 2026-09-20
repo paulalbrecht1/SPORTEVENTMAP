@@ -165,15 +165,40 @@ try {
   $localRestoreHeader = @(
     '\set ON_ERROR_STOP on',
     'BEGIN;',
-    'ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated;'
+    'ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON TABLES FROM anon, authenticated, service_role;',
+    'ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON FUNCTIONS FROM anon, authenticated, service_role;',
+    'ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE ALL ON SEQUENCES FROM anon, authenticated, service_role;'
   ) -join [Environment]::NewLine
   [System.IO.File]::WriteAllText(
     $localRestoreSql,
     "$localRestoreHeader$([Environment]::NewLine)"
   )
-  foreach ($localDumpName in @(
-    "schema.sql", "history-schema.sql", "data.sql", "history-data.sql"
-  )) {
+  $localSchemaName = "schema.sql"
+  if (Test-Path -LiteralPath (Join-Path $extractedRoot "auth-application-schema.sql") -PathType Leaf) {
+    # Only the fresh, random local container may replace its empty managed Auth
+    # schema. Auth is never started against the restored production sessions.
+    $emptyLocalAuthGuard = @'
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM auth.users) OR to_regclass('public.events') IS NOT NULL THEN
+    RAISE EXCEPTION 'Auth schema restore requires an empty isolated database';
+  END IF;
+END $$;
+DROP SCHEMA auth CASCADE;
+'@
+    [System.IO.File]::AppendAllText($localRestoreSql, $emptyLocalAuthGuard + [Environment]::NewLine)
+    # Explicit --schema dumps omit extension declarations. Keep the established
+    # application dump's declarations before its dependency-ordered full schema.
+    $extensionSql = [regex]::Matches(
+      [System.IO.File]::ReadAllText((Join-Path $extractedRoot "schema.sql")),
+      '(?m)^CREATE EXTENSION IF NOT EXISTS [^\r\n]+;\r?$'
+    ) | ForEach-Object { $_.Value }
+    if (@($extensionSql).Count -eq 0) {
+      throw "Application schema is missing its extension declarations."
+    }
+    [System.IO.File]::AppendAllText($localRestoreSql, ($extensionSql -join [Environment]::NewLine) + [Environment]::NewLine)
+    $localSchemaName = "auth-application-schema.sql"
+  }
+  foreach ($localDumpName in @($localSchemaName, "history-schema.sql", "data.sql", "history-data.sql")) {
     $localDumpPath = Join-Path $extractedRoot $localDumpName
     [System.IO.File]::AppendAllText(
       $localRestoreSql,
@@ -234,10 +259,15 @@ try {
     }
   }
 
+  $managedSchemaArguments = @()
+  if ($localSchemaName -eq "auth-application-schema.sql") {
+    $managedSchemaArguments = @("--managed-auth-restore")
+  }
   & $cliPaths.Node `
     (Join-Path $repoRoot "tools\import-sql-into-local-supabase.mjs") `
     $drillProjectId `
-    $localRestoreSql
+    $localRestoreSql `
+    @managedSchemaArguments
   if ($LASTEXITCODE -ne 0) {
     throw "Local psql restore exited with code $LASTEXITCODE."
   }

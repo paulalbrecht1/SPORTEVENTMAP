@@ -10,13 +10,26 @@
   <style>
     html, body.event-detail-page { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important; }
     [hidden] { display: none !important; }
-    .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; }
-    .live-detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; }
+    body.event-detail-page .live-detail-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .live-detail-facts .race-guide-fact-card { min-width: 0; overflow-wrap: anywhere; grid-template-columns: minmax(0, 1fr); grid-template-areas: "label" "value"; }
     .live-detail-notice { padding: 16px; border: 1px solid var(--border-color, #9ca3af); border-radius: 12px; line-height: 1.6; }
-    .event-detail-header { flex-wrap: wrap; gap: 12px; }
-    .event-detail-hero h1 { overflow-wrap: anywhere; }
-    @media (max-width: 480px) { .live-detail-facts { grid-template-columns: 1fr; } }
+    #liveDetailHeader { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px; }
+    #liveDetailHeader .event-detail-brand { min-width: 0; text-decoration: none; color: inherit; }
+    #liveDetailHeader .brand-name { display: inline; font-size: 15px; }
+    #liveDetailName { font-size: clamp(28px, 5vw, 48px); line-height: 1.12; overflow-wrap: anywhere; }
+    .live-detail-footer { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
+    .live-detail-footer a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; }
+    @media (max-width: 768px) {
+      body.event-detail-page .live-detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #liveDetailHeader { grid-template-columns: minmax(0, 1fr) auto; }
+      #liveDetailHeader .event-detail-brand { grid-column: 1 / -1; grid-row: 1; }
+      #liveDetailBack { grid-column: 1; grid-row: 2; }
+      #liveDetailHeader .global-theme-toggle { grid-column: 2; grid-row: 2; }
+      #liveDetailHeader .event-detail-language-control { grid-column: 1 / -1; grid-row: 3; }
+      #liveDetailName { font-size: 28px; }
+    }
+    @media (max-width: 480px) { body.event-detail-page .live-detail-facts { grid-template-columns: 1fr; } }
   </style>
   <script src="/js/theme.js?v=20260725-publish-runtime-v96"></script>
   <script src="/js/config.js"></script>
@@ -25,7 +38,7 @@
 </head>
 <body class="event-detail-page">
   <main class="event-detail-shell">
-    <header class="event-detail-header">
+    <header class="event-detail-header" id="liveDetailHeader">
       <a class="event-detail-back" id="liveDetailBack" href="/index.html#/discovery" data-live-i18n="back">Zur Karte</a>
       <a class="event-detail-brand brand" href="/index.html#/discovery"><img class="brand-icon" src="/assets/brand/sport-event-map-icon.svg" alt=""><span class="brand-name">Sport Event Map</span></a>
       <label class="event-detail-language-control"><span data-live-i18n="language">Sprache</span><select id="eventDetailLanguageSelect" aria-label="Sprache"><option value="de">DE</option><option value="en">EN</option></select></label>
@@ -47,7 +60,7 @@
       <section id="description" class="event-detail-card race-guide-section"><h2 data-live-i18n="description">Beschreibung</h2><p id="liveDetailDescription" class="live-detail-copy"></p></section>
       <section id="sources" class="event-detail-card race-guide-section"><h2 data-live-i18n="sources">Quellen</h2><p id="liveDetailChecked"></p><a id="liveDetailSource" class="event-detail-secondary" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="source">Quelle öffnen</a><p data-live-i18n="verify">Bitte prüfe die endgültigen Angaben vor der Anmeldung beim Veranstalter.</p></section>
     </article>
-    <footer class="event-detail-header"><a href="/imprint.html" data-live-i18n="imprint">Impressum</a><a href="/privacy.html" data-live-i18n="privacy">Datenschutz</a></footer>
+    <footer class="live-detail-footer"><a href="/imprint.html" data-live-i18n="imprint">Impressum</a><a href="/privacy.html" data-live-i18n="privacy">Datenschutz</a></footer>
   </main>
 </body>
 </html>

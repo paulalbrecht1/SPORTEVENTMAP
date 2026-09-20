@@ -7,17 +7,17 @@ const { execFileSync } = require('node:child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const OVERLAY_PATHS = Object.freeze([
-  'index.html', '404.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
+  'index.html', '404.html', 'event-detail.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
   'css/style.css', 'css/mobile-discovery.css',
   'js/app.js', 'js/events.js', 'js/freshness-batch-review.js', 'js/i18n.js',
-  'js/mobile-discovery.js', 'js/supabase.js', 'RELEASE_VERSION.txt'
+  'js/mobile-discovery.js', 'js/supabase.js', 'js/event-detail-live.js', 'RELEASE_VERSION.txt'
 ]);
 const RUNTIME_PATHS = Object.freeze([
   'css/style.css', 'css/mobile-discovery.css', 'css/data-operations.css', 'css/source-monitor.css',
   'js/theme.js', 'js/app.js', 'js/mobile-discovery.js', 'js/i18n.js', 'js/supabase-loader.js',
   'js/freshness-batch-review.js', 'js/data-freshness-health.js', 'js/event-catalog-loader.js',
   'js/events.js', 'js/event-marker-types.js', 'js/event-detail.js', 'js/event-detail-supabase.js',
-  'js/map.js', 'js/search.js', 'js/supabase.js'
+  'js/map.js', 'js/search.js', 'js/supabase.js', 'js/event-detail-live.js'
 ]);
 const BASE_CRITICAL_PATHS = Object.freeze([
   'index.html', 'css/style.css', 'js/app.js', 'js/supabase.js', 'data/events.csv',
@@ -244,7 +244,7 @@ function normalizedOptions(options, mode) {
   const directory = path.resolve(root, mode === 'build' ? options.out || '' : options.package || '');
   assertUnder(root, baseDir); assertUnder(root, directory);
   const relative = path.relative(root, directory).replaceAll('\\', '/');
-  assert.match(relative, /^exports\/ui-release-\d{8}\/package$/, 'UI package must use a separate exports/ui-release-YYYYMMDD/package directory');
+  assert.match(relative, /^exports\/ui-release-\d{8}(?:-v\d+)?\/package$/, 'UI package must use a separate exports/ui-release-YYYYMMDD[-vN]/package directory');
   assert.notEqual(baseDir, directory); assert.ok(!baseDir.startsWith(directory + path.sep) && !directory.startsWith(baseDir + path.sep), 'Base and output may not contain one another');
   validateBaseUrl(options.baseUrl); assert.match(options.baseReleaseSha256 || '', SHA); assert.match(options.sourceCommit || '', COMMIT);
   assert.match(options.version || '', /^\d{8}-ui-only-v\d+$/);

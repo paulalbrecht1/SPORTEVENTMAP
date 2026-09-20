@@ -612,7 +612,9 @@ function getEventDetailSlug(event) {
 
 function getEventDetailUrl(event) {
   const slug =
-    getEventDetailSlug(event);
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(event.edition_slug || "")
+      ? event.edition_slug
+      : getEventDetailSlug(event);
 
   return slug
     ? `event/${slug}/`

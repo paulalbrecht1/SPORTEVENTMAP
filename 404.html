@@ -21,7 +21,7 @@
       const pathname = window.location.pathname;
       const event = /^\/event\/([a-z0-9]+(?:-[a-z0-9]+)*)(?:\/|\/index\.html)?$/.exec(pathname);
       if (event) {
-        window.location.replace('/index.html#/event/' + encodeURIComponent(event[1]));
+        window.location.replace('/event-detail.html?event=' + encodeURIComponent(event[1]));
       } else if (/^\/admin(?:\.html|\/)?$/.test(pathname)) {
         window.location.replace('/index.html#/admin');
       }

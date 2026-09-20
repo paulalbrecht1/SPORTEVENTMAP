@@ -37,6 +37,16 @@ function runFallback(pathname, { search = "", hash = "" } = {}) {
   return redirects;
 }
 
+test('detail links use the published edition slug, with safe legacy fallback', () => {
+  const source = read('js/events.js').split('function getEventDetailUrl(event) {')[1].split('function getPendingSeasonAdd')[0];
+  const context = vm.createContext({ getEventDetailSlug: () => 'legacy-name-2030' });
+  vm.runInContext('function getEventDetailUrl(event) {' + source, context);
+  assert.equal(context.getEventDetailUrl({ edition_slug: 'canonical-edition-2030' }), 'event/canonical-edition-2030/');
+  for (const edition_slug of ['', undefined, '../admin', 'https://example.test', 'bad?query']) {
+    assert.equal(context.getEventDetailUrl({ edition_slug }), 'event/legacy-name-2030/');
+  }
+});
+
 test("404 is a standalone public document, with no app/admin markup or external runtime", () => {
   const html = read("404.html");
   assert.match(html, /<!doctype html>/i);
@@ -48,8 +58,8 @@ test("404 is a standalone public document, with no app/admin markup or external 
 });
 
 for (const pathname of [eventPath, eventPath.slice(0, -1), `${eventPath}index.html`]) {
-  test(`missing event route ${pathname} redirects once to the root hash route`, () => {
-    assert.deepEqual(runFallback(pathname), [`/index.html#/event/${eventSlug}`]);
+  test(`missing event route ${pathname} redirects once to a standalone detail page`, () => {
+    assert.deepEqual(runFallback(pathname), [`/event-detail.html?event=${eventSlug}`]);
   });
 }
 
@@ -57,7 +67,7 @@ test("event redirect cannot inherit query/hash navigation or an external return 
   assert.deepEqual(runFallback(eventPath, {
     search: "?next=https://evil.example/admin&redirect=//evil.example",
     hash: "#/admin"
-  }), [`/index.html#/event/${eventSlug}`]);
+  }), [`/event-detail.html?event=${eventSlug}`]);
 });
 
 for (const pathname of ["/admin", "/admin.html", "/admin/"]) {
@@ -232,6 +242,7 @@ async function startPagesServer() {
     if (request.method !== "GET") return send(405, "text/plain", "Read-only fixture");
     if (pathname === "/js/config.js") return send(200, "text/javascript", "// No real credentials in this test.");
     if (pathname === "/data/events.csv") return send(200, "text/csv", fixtureCsv);
+    if (pathname === "/data/event-editions-public.json") return send(200, "application/json", JSON.stringify({ exported_at: "2026-08-27T07:41:01Z", editions: [{ ...fixtureEvents[0], edition_slug: eventSlug, event_name: eventName, date: "20.09.2030", description: "Public race description." }] }));
     let relative;
     try { relative = decodeURIComponent(pathname).replace(/^\/+/, ""); }
     catch { return send(404, "text/html", read("404.html")); }
@@ -240,7 +251,7 @@ async function startPagesServer() {
     }
     if (relative === "js/config.js") return send(200, "text/javascript", "// No real credentials in this test.");
     if (!relative) relative = "index.html";
-    const permitted = /^(?:(?:css|js|assets|event)\/|(?:index|404)\.html$|(?:favicon[^/]*|apple-touch-icon\.png|site\.webmanifest)$)/.test(relative);
+    const permitted = /^(?:(?:css|js|assets|event)\/|(?:index|404|event-detail)\.html$|(?:favicon[^/]*|apple-touch-icon\.png|site\.webmanifest)$)/.test(relative);
     let file = path.resolve(root, relative);
     if (permitted && file.startsWith(`${root}${path.sep}`) && fs.existsSync(file)) {
       if (fs.statSync(file).isDirectory()) file = path.join(file, "index.html");
@@ -307,21 +318,85 @@ test("actual browser resolves missing routes, preserves static pages and hides c
       return { context, page };
     }
 
-    await t.test("new public event gets root assets and opens its real app drawer", async () => {
+    await t.test("clicking detail opens a standalone page, supports reload/back, and never returns to the drawer", async () => {
       const { page, context } = await newPage();
       const failures = [];
       page.on("pageerror", error => failures.push(error.message));
       try {
-        await page.goto(server.url + eventPath);
-        await expect(page).toHaveURL(`${server.url}/index.html#/event/${eventSlug}`);
+        await page.goto(`${server.url}/index.html#/event/${eventSlug}`);
         await expect(page.getByTestId("event-drawer")).toHaveClass(/open/, { timeout: 15_000 });
-        await expect(page.getByTestId("drawer-event-name")).toContainText(eventName);
-        await expect(page.locator("#adminModal")).toBeHidden();
+        await page.locator('.drawer-detail-button').click();
+        await expect(page).toHaveURL(`${server.url}/event-detail.html?event=${eventSlug}`);
+        await expect(page.locator('body')).toHaveClass(/\bevent-detail-page\b/);
+        await expect(page.locator('h1')).toHaveText(eventName);
+        await expect(page.locator('h1')).toBeVisible();
+        await expect(page.locator('#liveDetailDescription')).toHaveText('Public race description.');
+        await expect(page.locator('#liveDetailStatus')).toContainText('gespeicherte Datenstand');
+        await expect(page.locator('#adminModal, #drawer')).toHaveCount(0);
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), true);
+        await page.reload();
+        await expect(page.locator('h1')).toHaveText(eventName);
+        await page.goBack();
+        await expect(page.getByTestId('event-drawer')).toHaveClass(/open/);
+        await page.goForward();
+        await expect(page.locator('h1')).toHaveText(eventName);
         assert.equal(await page.locator('link[href*="css/style.css"]').evaluate(link => link.sheet !== null), true);
         assert.ok(server.requests.some(request => request.pathname === "/js/app.js"));
         assert.equal(server.requests.some(request => /^\/event\/[^/]+\/(?:css|js)\//.test(request.pathname)), false);
         assert.deepEqual(failures, []);
       } finally { await context.close(); }
+    });
+
+    await t.test('live detail uses anonymous public data, escapes content, validates links and preserves Season identity', async () => {
+      const { page, context } = await newPage();
+      const publicRow = { ...fixtureEvents[0], event_name: '<img src=x onerror=alert(1)> Public Run', edition_slug: eventSlug, date: '20.09.2030', city: 'Hamburg', description: '<script>unsafe()</script>', event_url: 'javascript:alert(1)', source_url: 'https://organizer.example/race', race_formats: [{ label: '5 km' }, { label: '10 km' }], last_checked: null };
+      let requests = 0;
+      await context.route('**/js/config.js', route => route.fulfill({ contentType: 'text/javascript', body: 'window.SPORT_EVENT_MAP_CONFIG={supabaseUrl:"https://public-detail.test",supabasePublishableKey:"public-fixture"};' }));
+      await context.route('https://public-detail.test/rest/v1/public_event_archive?**', route => {
+        const request = route.request(), url = new URL(request.url());
+        assert.equal(request.method(), 'GET');
+        assert.equal(request.headers().authorization, undefined);
+        assert.equal(url.searchParams.get('edition_slug'), 'eq.' + eventSlug);
+        assert.equal(url.searchParams.get('limit'), '2');
+        assert.ok(!url.searchParams.get('select').includes('*'));
+        requests++;
+        return route.fulfill({ contentType: 'application/json', body: JSON.stringify([publicRow]) });
+      });
+      try {
+        await page.goto(server.url + eventPath);
+        await expect(page.locator('h1')).toHaveText(publicRow.event_name);
+        await expect(page.locator('#liveDetailDescription')).toHaveText(publicRow.description);
+        await expect(page.locator('#liveDetailDescription script, #liveDetailName img, #adminModal')).toHaveCount(0);
+        await expect(page.locator('#liveDetailOfficial')).toBeHidden();
+        await expect(page.locator('#liveDetailSource')).toHaveAttribute('href', publicRow.source_url);
+        await expect(page.locator('#liveDetailFacts')).toContainText('5 km · 10 km');
+        await expect(page.locator('#liveDetailChecked')).toContainText('Noch nicht angegeben');
+        await expect(page.locator('#liveDetailStatus')).toBeHidden();
+        await page.locator('#eventDetailLanguageSelect').selectOption('en');
+        await expect(page.locator('#liveDetailFacts')).toContainText('Date');
+        await expect(page.locator('#addDetailEventToSeason')).toBeEnabled();
+        await page.locator('#addDetailEventToSeason').click();
+        await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
+        await page.reload();
+        await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
+        assert.equal(requests, 2);
+      } finally { await context.close(); }
+    });
+
+    await t.test('absent, malformed and unavailable public editions show explicit errors without a drawer or invented data', async () => {
+      for (const kind of ['missing', 'malformed', 'outage', 'invalid']) {
+        const { page, context } = await newPage();
+        await context.route('**/js/config.js', route => route.fulfill({ contentType: 'text/javascript', body: 'window.SPORT_EVENT_MAP_CONFIG={supabaseUrl:"https://public-detail.test",supabasePublishableKey:"public-fixture"};' }));
+        await context.route('https://public-detail.test/rest/v1/public_event_archive?**', route => kind === 'outage' ? route.abort() : route.fulfill({ contentType: 'application/json', body: kind === 'malformed' ? '[null]' : '[]' }));
+        await context.route('**/data/event-editions-public.json', route => route.abort());
+        try {
+          await page.goto(`${server.url}/event-detail.html?event=${kind === 'invalid' ? '%2Fbad' : eventSlug}`);
+          await expect(page.locator('#liveDetailStatus')).toContainText(kind === 'outage' ? 'nicht geladen' : kind === 'invalid' ? 'ungültig' : 'nicht öffentlich');
+          await expect(page.locator('#liveDetailContent')).toBeHidden();
+          await expect(page.locator('#adminModal, #drawer')).toHaveCount(0);
+          if (kind === 'outage') await expect(page.locator('#liveDetailRetry')).toBeVisible();
+        } finally { await context.close(); }
+      }
     });
 
     await t.test("existing static event never enters the fallback or full app", async () => {

@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260920-ui-only-v86
+Version: 20260920-ui-only-v87
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: Safe recovery for missing event detail pages, root-relative asset resolution and an inline Admin visibility guard. UI-only release preserves the exact v85 published catalog, existing static event pages, sitemap and public runtime configuration. No data export or database migration is included. Stage 4 and automatic publication remain disabled.
+Includes: Standalone public detail pages for published editions without a static export; safe links, explicit loading/error states and existing Season Planner actions. Preserves v86 Admin visibility guard and exact published data, static pages, sitemap and runtime configuration. No data export or database migration is included. Stage 4 and automatic publication remain disabled.

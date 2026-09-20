@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Eventdetails · Sport Event Map</title>
+  <link rel="icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/style.css?v=20260920-detail-v87">
+  <style>
+    html, body.event-detail-page { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important; }
+    [hidden] { display: none !important; }
+    .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; }
+    .live-detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .live-detail-facts .race-guide-fact-card { min-width: 0; overflow-wrap: anywhere; grid-template-columns: minmax(0, 1fr); grid-template-areas: "label" "value"; }
+    .live-detail-notice { padding: 16px; border: 1px solid var(--border-color, #9ca3af); border-radius: 12px; line-height: 1.6; }
+    .event-detail-header { flex-wrap: wrap; gap: 12px; }
+    .event-detail-hero h1 { overflow-wrap: anywhere; }
+    @media (max-width: 480px) { .live-detail-facts { grid-template-columns: 1fr; } }
+  </style>
+  <script src="/js/theme.js?v=20260725-publish-runtime-v96"></script>
+  <script src="/js/config.js"></script>
+  <script defer src="/js/supabase-loader.js" data-supabase-src="/js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
+  <script defer src="/js/event-detail-live.js?v=20260920-v87"></script>
+</head>
+<body class="event-detail-page">
+  <main class="event-detail-shell">
+    <header class="event-detail-header">
+      <a class="event-detail-back" id="liveDetailBack" href="/index.html#/discovery" data-live-i18n="back">Zur Karte</a>
+      <a class="event-detail-brand brand" href="/index.html#/discovery"><img class="brand-icon" src="/assets/brand/sport-event-map-icon.svg" alt=""><span class="brand-name">Sport Event Map</span></a>
+      <label class="event-detail-language-control"><span data-live-i18n="language">Sprache</span><select id="eventDetailLanguageSelect" aria-label="Sprache"><option value="de">DE</option><option value="en">EN</option></select></label>
+    </header>
+    <div id="liveDetailStatus" class="live-detail-notice" role="status" aria-live="polite"><span data-live-i18n="loading">Eventdetails werden geladen …</span></div>
+    <noscript><p>Bitte aktiviere JavaScript, um die aktuellen Eventdetails anzuzeigen. <a href="/index.html#/discovery">Zur Eventsuche</a></p></noscript>
+    <button id="liveDetailRetry" class="event-detail-secondary" type="button" hidden data-live-i18n="retry">Erneut versuchen</button>
+    <article id="liveDetailContent" hidden>
+      <section class="event-detail-hero race-guide-hero">
+        <div class="event-detail-hero-main"><span id="liveDetailSport" class="event-detail-kicker"></span><h1 id="liveDetailName"></h1><p id="liveDetailLocation"></p></div>
+        <div class="event-detail-cta-card">
+          <p class="event-detail-status-note" data-live-i18n="verify">Bitte prüfe die endgültigen Angaben vor der Anmeldung beim Veranstalter.</p>
+          <div class="event-detail-action-group"><button class="event-detail-secondary" id="addDetailEventToSeason" type="button" disabled data-live-i18n="detail.addSeason">Zur Saison hinzufügen</button><a class="event-detail-primary" id="liveDetailOfficial" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="official">Offizielle Website / Anmeldung</a></div>
+          <p class="event-detail-action-status" id="detailActionStatus" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+      <nav class="event-detail-tabs race-guide-tabs" aria-label="Eventdetails"><a href="#key-facts" data-detail-section="key-facts" data-live-i18n="facts">Überblick</a><a href="#description" data-detail-section="description" data-live-i18n="description">Beschreibung</a><a href="#sources" data-detail-section="sources" data-live-i18n="sources">Quellen</a></nav>
+      <section id="key-facts" class="event-detail-card race-guide-section"><h2 data-live-i18n="facts">Überblick</h2><div id="liveDetailFacts" class="race-guide-fact-grid live-detail-facts"></div></section>
+      <section id="description" class="event-detail-card race-guide-section"><h2 data-live-i18n="description">Beschreibung</h2><p id="liveDetailDescription" class="live-detail-copy"></p></section>
+      <section id="sources" class="event-detail-card race-guide-section"><h2 data-live-i18n="sources">Quellen</h2><p id="liveDetailChecked"></p><a id="liveDetailSource" class="event-detail-secondary" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="source">Quelle öffnen</a><p data-live-i18n="verify">Bitte prüfe die endgültigen Angaben vor der Anmeldung beim Veranstalter.</p></section>
+    </article>
+    <footer class="event-detail-header"><a href="/imprint.html" data-live-i18n="imprint">Impressum</a><a href="/privacy.html" data-live-i18n="privacy">Datenschutz</a></footer>
+  </main>
+</body>
+</html>

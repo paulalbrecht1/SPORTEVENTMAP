@@ -2,13 +2,17 @@
 
 Stand: 21. September 2026
 
-P0 bleibt aktiv. Der [aktuelle Review- und Datenfortschritt](P0_REVIEW_RECOVERY_20260921.md)
+P0 bleibt aktiv. Der [aktuelle Umsetzungsstand](P0_SOURCE_REVIEW_OPERATIONS_20260921.md)
 führt die tatsächlichen Produktionsänderungen, Prüfungen und verbleibenden
-Freigabesperren zusammen. Beide Editionsschutz-Migrationen vom 20.09. sind
-bereits produktiv; fünf Detailpakete wurden am 21.09. privat übernommen.
-Köhlbrand und Ratzeburg sind nach Faktenkorrektur und vollständigem Adminreview
-wieder streng frisch bestätigt. Aktuell bleiben 230 Discovery-Editionen und
-neun vollständige Frischenachweise unter den unveränderten Freigabegrenzen.
+Freigabesperren zusammen. Der Source Monitor ist mit geprüftem CORS-Vertrag
+produktiv; ein echter Adminlauf bestätigt den Browseraufruf. Nach Köhlbrand
+und Ratzeburg ist auch FSV-Lauf vollständig geprüft und streng frisch bestätigt.
+Aktuell bleiben 230 Discovery-Editionen und zehn vollständige Frischenachweise
+(4,35 %) unter den unveränderten Freigabegrenzen. Allgäu 2027 ist als geprüftes
+privates Quellenpaket vorbereitet; Datumsabgleich, Quellenbindung, Klonprüfung
+und tatsächliche Editionsfreigabe stehen noch aus. Beide Editionsschutz-Migrationen
+vom 20.09. und die fünf zuvor privat übernommenen Detailpakete sind im
+[vorherigen Bericht](P0_REVIEW_RECOVERY_20260921.md) dokumentiert.
 Die folgenden datierten Abschnitte dokumentieren historische Zwischenstände,
 keinen aktuellen Bestandsnachweis. Insbesondere sind der Paketgenerator und
 die sichere Editionsfreigabe bereits implementiert und produktiv geprüft;

@@ -601,14 +601,32 @@ function bindMobileMenuKeyboard(menu, closeMenu) {
 }
 
 function focusMobileMenuCloseButton(menu, button) {
-  // Let visibility transitions enter their first visible frame before focus.
-  window.requestAnimationFrame(() => {
-    window.requestAnimationFrame(() => {
-      if (menu.classList.contains("open")) {
-        button?.focus({ preventScroll: true });
-      }
-    });
-  });
+  const initialFocus = document.activeElement;
+  const deadline = performance.now() + 1000;
+  const focusWhenVisible = () => {
+    if (
+      !menu.isConnected || !button?.isConnected || menu.inert ||
+      !menu.classList.contains("open") ||
+      document.activeElement !== initialFocus
+    ) {
+      return;
+    }
+
+    // Visibility transitions can still be hidden after two animation frames.
+    if (
+      getComputedStyle(button).visibility === "visible" &&
+      button.getClientRects().length > 0
+    ) {
+      button.focus({ preventScroll: true });
+      if (document.activeElement === button) return;
+    }
+
+    if (performance.now() < deadline) {
+      window.requestAnimationFrame(focusWhenVisible);
+    }
+  };
+
+  window.requestAnimationFrame(focusWhenVisible);
 }
 
 let platformMenuReturnFocus = null;

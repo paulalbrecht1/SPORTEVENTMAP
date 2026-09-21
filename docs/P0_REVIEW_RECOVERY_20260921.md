@@ -122,8 +122,10 @@ abgerufen. Run 6433 verarbeitete genau eine Quelle, ohne weitere Jobs oder Fehle
 Das tatsächliche Ergebnis war `not_modified` / `unchanged`, HTTP 200, um
 08:06:55 UTC; es entstanden keine neuen Vorschläge oder Prüfaufgaben.
 Quellenzustände wurden nicht direkt überschrieben und Secrets nicht ausgegeben.
-Der CORS-Fehler bleibt als eigener technischer Folgepunkt offen; der normale
-Scheduler funktioniert und der Worker wurde hier nicht verändert oder deployt.
+Der CORS-Fehler blieb in diesem Arbeitsschritt offen; der normale Scheduler
+funktionierte und der Worker wurde hier nicht verändert oder deployt. Der
+[anschließende Umsetzungsblock](P0_SOURCE_REVIEW_OPERATIONS_20260921.md) behebt
+ihn produktiv und dokumentiert den echten Admin-Crawl sowie den FSV-Abschluss.
 
 Private Arbeitsnachweise: `exports/p0-continue-20260921/core-recovery/`,
 insbesondere `final-independent-postflight.json`,

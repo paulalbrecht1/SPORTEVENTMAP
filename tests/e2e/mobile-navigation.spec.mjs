@@ -103,6 +103,54 @@ for (const navigation of menus) {
     }
   });
 
+  test(`${navigation.route} mobile menu waits for visible close control and cancels stale focus`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await prepareApp(page, { route: navigation.route, openDiscoveryPanel: false });
+    const menu = page.locator(navigation.menu);
+    const opener = page.locator(navigation.opener);
+    const closer = page.locator(navigation.closer);
+    const lastLink = menu.locator('a[href="legal.html"]');
+    const nextFrames = () => page.evaluate(() => new Promise(resolve => {
+      let frames = 4;
+      const tick = () => --frames ? requestAnimationFrame(tick) : resolve();
+      requestAnimationFrame(tick);
+    }));
+    const deferVisibility = () => page.addStyleTag({
+      content: `${navigation.closer} { visibility: hidden !important; }`
+    });
+
+    // Visibility may lag the open state for more than two animation frames.
+    const openingStyle = await deferVisibility();
+    await opener.click();
+    await expect(menu).toHaveAttribute("aria-hidden", "false");
+    await nextFrames();
+    await expect(closer).not.toBeFocused();
+    await openingStyle.evaluate(style => style.remove());
+    await expect(closer).toBeFocused();
+    await closer.click();
+    await expect(opener).toBeFocused();
+
+    // A user choosing another control while visibility settles keeps focus.
+    const selectedStyle = await deferVisibility();
+    await opener.click();
+    await lastLink.focus();
+    await nextFrames();
+    await selectedStyle.evaluate(style => style.remove());
+    await nextFrames();
+    await expect(lastLink).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(opener).toBeFocused();
+
+    // Closing before deferred focus runs must not move focus back inside.
+    const closedStyle = await deferVisibility();
+    await opener.click();
+    await opener.evaluate(button => button.click());
+    await expect(menu).toHaveAttribute("aria-hidden", "true");
+    await closedStyle.evaluate(style => style.remove());
+    await nextFrames();
+    await expect(opener).toBeFocused();
+  });
+
   test(`${navigation.route} mobile information links translate and keyboard navigation stays within the menu`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await prepareApp(page, {

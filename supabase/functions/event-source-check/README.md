@@ -50,3 +50,35 @@ SUPABASE_URL=... SUPABASE_PUBLISHABLE_KEY=... SUPABASE_EDGE_JWT=... SOURCE_MONIT
 ```
 
 Keep `SOURCE_MONITOR_REQUIRE_PINNED_TRANSPORT=true` in production.
+
+## Browser preflight
+
+Worker `source-monitor-4.1.9-phase-a-shadow-browser-cors` handles `OPTIONS`
+before reading keys, authenticating or touching the queue/database. A successful
+preflight returns HTTP 204. The CORS wrapper retains the existing POST handler,
+Admin/profile lookup, Cron-secret verification, gateway JWT configuration and
+server-side credentials. CORS permits a browser response; it does not authorize
+a crawl. All worker responses, including failures, carry the matching CORS
+headers for an allowed origin.
+
+Allowed origins are `https://sporteventmap.com`,
+`https://sporteventmap.pages.dev`, the repository's exact eight-hex immutable
+deployment origins (`https://<8hex>.sporteventmap.pages.dev`), and HTTP
+`localhost`/`127.0.0.1` ports 5500, 4173 and 4174. The existing local Admin
+review origin `http://127.0.0.1:4187` is also allowed. No arbitrary Pages
+subdomains, opaque `null` origin, unknown local ports or wildcard origin are
+accepted. `www.sporteventmap.com` has no established repository/host contract
+and is not included. Unrecognized origins receive 403 without an origin grant.
+
+Browser requests allow only `POST, OPTIONS` and the four headers used by the
+pinned supabase-js 2.57.4 client: `authorization`, `x-client-info`, `apikey`,
+`content-type`. Cron/smoke secrets and cookie credentials are not enabled for
+browser preflights. Originless server/Cron invocations remain supported.
+The manual header approach follows the [Supabase CORS documentation](https://supabase.com/docs/guides/functions/cors)
+for SDK versions before 2.95.0; no SDK upgrade is needed for this fix.
+
+`npm run test:source-monitor` includes the local CORS regression suite. It runs
+the actual worker handler with stubbed external clients and verifies that
+preflights perform no auth/database work, ordinary users remain forbidden,
+admin/cron paths retain their checks, and success/error responses use the
+correct origin without leaking it across concurrent requests.

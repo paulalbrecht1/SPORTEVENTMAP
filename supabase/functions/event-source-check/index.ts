@@ -14,9 +14,10 @@ import {
 import { createDenoPinnedFetch } from "../_shared/pinned-http.mjs";
 import { extractEventChanges } from "../_shared/extractors/pipeline.mjs";
 import { cleanError, countAcceptedResultCandidate, loadSourceMonitorRuntimeCapabilities, runOptionalStageFourCall } from "../_shared/source-monitor-worker-outcomes.mjs";
+import { withSourceMonitorCors } from "../_shared/source-monitor-cors.mjs";
 
 const BOT_NAME = "SportEventMapSourceMonitor";
-const WORKER_VERSION = "source-monitor-4.1.8-phase-a-shadow-edition-evidence-scope";
+const WORKER_VERSION = "source-monitor-4.1.9-phase-a-shadow-browser-cors";
 const DEFAULT_BATCH_SIZE = 5;
 const DEFAULT_USER_AGENT = "SportEventMapSourceMonitor/4.1-phase-a-shadow (+mailto:kontakt@sporteventmap.com)";
 const jsonHeaders = { "Content-Type": "application/json; charset=utf-8" };
@@ -630,7 +631,7 @@ async function runProductionSmoke(admin: ReturnType<typeof createClient>, supaba
   };
 }
 
-Deno.serve(async request => {
+Deno.serve(withSourceMonitorCors(async (request: Request) => {
   if (request.method !== "POST") return response({ error: "Method not allowed" }, 405);
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
   const { publishableKey, serviceKey } = runtimeKeys();
@@ -707,4 +708,4 @@ Deno.serve(async request => {
     }).eq("id", run.id);
     return response({ run_id: run.id, error: cleanError(error) }, 500);
   }
-});
+}));

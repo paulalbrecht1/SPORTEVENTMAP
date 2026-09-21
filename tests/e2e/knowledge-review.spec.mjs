@@ -98,3 +98,43 @@ test("Knowledge per-field review accepts edited JSON and false; invalid fields c
   expect(result.error).toContain("No Supabase target");
   expect(result.after).toBe(result.before);
 });
+
+test("a review-only edition can be found and opened from a stale audit without writing or attesting", async ({ page }) => {
+  await openKnowledge(page);
+  await page.evaluate(() => document.body.insertAdjacentHTML("beforeend", '<select id="auditPriority"><option>all</option><option>high</option></select><input id="auditSearch"><div id="auditList"></div><span id="auditAverage"></span>'));
+  await page.addScriptTag({ content: `
+    let knowledgeAuditRows = [], knowledgeReviewTasks = [];
+    const knowledgeAuditElements = { list: document.getElementById("auditList"), priority: document.getElementById("auditPriority"), search: document.getElementById("auditSearch"), average: document.getElementById("auditAverage") };
+    const adminKnowledgeAuditTabCount = null;
+    const loadKnowledgeReviewDecisions = () => {};
+    const setAdminTab = () => {};
+    const fetchKnowledgeBundle = async () => ({ details: window.db.event_details });
+    window.db.event_editions = { id: "edition", event_id: 7, edition_slug: "testlauf-2027" };
+    window.db.events = { id: 7, slug: "testlauf" };
+    window.auditFixture = { events: [{ event_slug: "testlauf-2026", event_name: "Testlauf", date: "2026-06-07", completion_score: 80, priority: "high", missing_fields: [] }] };
+    const reviewFixture = { tasks: [{ event_slug: "testlauf-2027", event_name: "Testlauf", date: "2027-06-06", event_brand_id: 7, edition_id: "edition", priority: "high", fields: {}, supabase_payload: { ...window.fixture, details: { ...window.fixture.details, date: "2027-06-06", is_public: false, last_checked: null } } }] };
+    const fetchKnowledgeWorkflowJson = async name => name.includes("audit.json") ? window.auditFixture : reviewFixture;
+    ${section("function getKnowledgeReviewTask(", "function loadKnowledgeReviewDecisions(")}
+    ${section("function mergeKnowledgeAuditRows(", "function applyKnowledgeReviewToForm(")}
+    ${section("async function openKnowledgeReview(", "async function applyKnowledgeReviewToSupabase(")}
+    ${section("knowledgeAuditElements.refresh\r\n", "[\r\n  knowledgeElements.sources,")}
+    window.loadAudit = loadKnowledgeAuditAdmin;
+  ` });
+  await page.evaluate(() => window.loadAudit());
+  await expect(page.locator("#auditAverage")).toHaveText("80.0%");
+  const oldEdition = page.locator('[data-knowledge-audit-slug="testlauf-2026"]');
+  await expect(oldEdition.getByRole("button", { name: "Review enrichment" })).toBeDisabled();
+  await page.locator("#auditSearch").fill("testlauf-2027");
+  await expect(oldEdition).toHaveCount(0);
+  const newEdition = page.locator('[data-knowledge-audit-slug="testlauf-2027"]');
+  await expect(newEdition).toContainText("Not audited");
+  await expect(newEdition).toContainText("Private review task; completeness not audited");
+  await newEdition.getByRole("button", { name: "Review enrichment" }).click();
+  await expect(page.locator('[data-knowledge-table="details"][name="date"]')).toHaveValue("2027-06-06");
+  expect(await page.evaluate(() => window.writes)).toEqual([]);
+  await expect(page.locator("#public")).not.toBeChecked();
+  await expect(page.locator('[data-knowledge-table="details"][name="last_checked"]')).toHaveValue("");
+  await page.evaluate(async () => { window.auditFixture = null; await window.loadAudit(); });
+  await expect(newEdition.getByRole("button", { name: "Review enrichment" })).toBeEnabled();
+  await expect(page.locator("#auditAverage")).toHaveText("Not audited");
+});

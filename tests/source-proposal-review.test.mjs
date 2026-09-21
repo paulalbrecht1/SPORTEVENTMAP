@@ -33,4 +33,34 @@ for (const response of [null, {}, [], [{ id: proposal.id }, { id: proposal.id }]
 const handler = admin.slice(admin.indexOf('if (["reject-proposal", "supersede-proposal"].includes(action)'), admin.indexOf('if (action === "defer-proposal"'));
 assert.ok(handler.includes("openProposalCloseDialog"));
 assert.doesNotMatch(handler, /window\.(prompt|confirm)|\.from\(/);
+const editNote = "Distanz mit der offiziellen Ausschreibung abgeglichen.";
+for (const [format, input, expected] of [
+  ["text", " false ", "false"], ["text", "42", "42"], ["text", "https://race.example/register", "https://race.example/register"],
+  ["json", "false", false], ["json", "0", 0],
+  ["json", '[{"label":"10 km","distance_km":10},{"label":"5 km","distance_km":5}]', [{ label: "10 km", distance_km: 10 }, { label: "5 km", distance_km: 5 }]],
+  ["json", '{"confirmed":false}', { confirmed: false }]
+]) {
+  assert.deepEqual(plain(runtime.buildProposalEditRequest(proposal, input, format, ` ${editNote} `)), {
+    p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: editNote, p_edited_value: expected
+  });
+}
+for (const [input, format, pattern] of [
+  ["", "text", /Wert eintragen/], ["   ", "json", /Wert eintragen/],
+  ['[{"distance_km":10}', "json", /gültiges JSON/], ["null", "json", /null/],
+  ["1e999", "json", /endlich/], ['{"distance_km":1e999}', "json", /endlich/],
+  ["value", "unknown", /Text oder JSON/]
+]) assert.throws(() => runtime.buildProposalEditRequest(proposal, input, format, editNote), pattern);
+assert.throws(() => runtime.buildProposalEditRequest(proposal, "text", "text", "zu kurz"), /mindestens 12/);
+for (const status of ["accepted", "edited_and_accepted", "rejected", "superseded", "expired"]) {
+  assert.throws(() => runtime.buildProposalEditRequest({ ...proposal, proposal_status: status }, "text", "text", editNote), /nicht mehr offen/);
+}
+assert.throws(() => runtime.buildProposalEditRequest(null, "text", "text", editNote), /nicht mehr offen/);
+const context = { ...proposal, event_id: 39, edition_id: "edition", field_name: "race_formats", old_value: [{ label: "5 km" }] };
+for (const [key, changed] of [["event_id", 429], ["edition_id", "other"], ["field_name", "description"], ["old_value", [{ label: "10 km" }]], ["normalized_value", false], ["source_url", "https://changed.example"]]) {
+  assert.notEqual(runtime.getProposalEditContext(context), runtime.getProposalEditContext({ ...context, [key]: changed }));
+}
+const editHandler = admin.slice(admin.indexOf('if (action === "edit-proposal" && proposal)'), admin.indexOf('if (["reject-proposal", "supersede-proposal"].includes(action)'));
+assert.match(editHandler, /openProposalEditDialog/);
+assert.match(editHandler, /submitDataOpsProposalReview/);
+assert.doesNotMatch(editHandler, /window\.(prompt|confirm)|\.from\(/);
 console.log("Individual proposal closure, auditable reasons and exact RPC outcomes verified.");

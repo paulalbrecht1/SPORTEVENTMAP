@@ -1,12 +1,18 @@
 # Nächste Umsetzungsstufen
 
-Stand: 8. September 2026
+Stand: 21. September 2026
 
-Fortschritt vom 20.09.2026: P0 bleibt aktiv. Der
-[Umsetzungsnachweis für Detaildaten und Editionsschutz](DETAIL_DATA_ROLLOUT_20260920.md)
-dokumentiert den aktuellen Live-Messstand, zwei vorbereitete Datenbankkorrekturen
-und fünf konkrete Quellen-/Reviewpakete. Die folgenden Ausgangszahlen vom
-03./04.09. sind historische Baseline, kein aktueller Bestandsnachweis.
+P0 bleibt aktiv. Der [aktuelle Review- und Datenfortschritt](P0_REVIEW_RECOVERY_20260921.md)
+führt die tatsächlichen Produktionsänderungen, Prüfungen und verbleibenden
+Freigabesperren zusammen. Beide Editionsschutz-Migrationen vom 20.09. sind
+bereits produktiv; fünf Detailpakete wurden am 21.09. privat übernommen.
+Köhlbrand und Ratzeburg sind nach Faktenkorrektur und vollständigem Adminreview
+wieder streng frisch bestätigt. Aktuell bleiben 230 Discovery-Editionen und
+neun vollständige Frischenachweise unter den unveränderten Freigabegrenzen.
+Die folgenden datierten Abschnitte dokumentieren historische Zwischenstände,
+keinen aktuellen Bestandsnachweis. Insbesondere sind der Paketgenerator und
+die sichere Editionsfreigabe bereits implementiert und produktiv geprüft;
+die frühere Kennzeichnung als noch geplante Technik ist überholt.
 
 Dieses Dokument ist die verbindliche Reihenfolge für die nächsten
 Produkt- und Entwicklungsarbeiten an SportEventMap. Es übersetzt die

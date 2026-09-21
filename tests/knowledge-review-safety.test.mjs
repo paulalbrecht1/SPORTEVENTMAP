@@ -302,3 +302,40 @@ test("actual child persistence keeps omitted fields and skips empty new records 
   await context.saveSingleKnowledgeChild("event_registration", detail.id, { lottery_available: false });
   assert.equal(rows.event_registration.lottery_available, false);
 });
+
+test("a stale audit cannot hide an edition review or borrow the prior edition's completeness", () => {
+  const context = vm.createContext({});
+  vm.runInContext(admin.slice(admin.indexOf("function mergeKnowledgeAuditRows("), admin.indexOf("function getKnowledgeAuditFilteredRows(")), context);
+  const audit = [{ event_slug: "race-2026", event_name: "Race", date: "2026-07-05", completion_score: 90, priority: "low" }];
+  const task = { event_slug: "race-2027", event_name: "Race", date: "2027-07-04", event_brand_id: 42, edition_id: "edition-2027", priority: "high",
+    supabase_payload: { details: { event_slug: "race-2027", event_brand_id: 42, edition_id: "edition-2027", is_public: false } } };
+  const before = plain({ audit, task });
+  const rows = plain(context.mergeKnowledgeAuditRows(audit, [task, task]));
+  assert.equal(rows.length, 2);
+  assert.deepEqual(rows[0], audit[0]);
+  assert.equal(rows[1].event_slug, "race-2027");
+  assert.equal(rows[1].date, "2027-07-04");
+  assert.equal(rows[1].completion_score, null);
+  assert.equal(rows[1].review_only, true);
+  assert.deepEqual(plain({ audit, task }), before);
+  assert.equal(context.mergeKnowledgeAuditRows([], [task]).length, 1, "review works when no catalog audit exists");
+  for (const details of [{ event_slug: "race-2026" }, { edition_id: "edition-2026" }, { event_brand_id: 99 }]) {
+    assert.equal(context.mergeKnowledgeAuditRows([], [{ ...task, supabase_payload: { details } }]).length, 0, "conflicting payload identity must not create a review card");
+  }
+});
+
+test("all five prepared source packages remain reachable alongside the frozen catalog audit", () => {
+  const context = vm.createContext({});
+  vm.runInContext(admin.slice(admin.indexOf("function mergeKnowledgeAuditRows("), admin.indexOf("function getKnowledgeAuditFilteredRows(")), context);
+  const audit = JSON.parse(fs.readFileSync(new URL("../data/event-knowledge-audit.json", import.meta.url), "utf8")).events;
+  const tasks = JSON.parse(fs.readFileSync(new URL("../data/event-knowledge-review.json", import.meta.url), "utf8")).tasks;
+  const selected = tasks.filter(task => [39, 429, 262, 46, 43].includes(task.event_brand_id));
+  assert.equal(selected.length, 5);
+  const rows = context.mergeKnowledgeAuditRows(audit, tasks);
+  for (const task of selected) assert.equal(rows.filter(row => row.event_slug === task.event_slug).length, 1);
+  const roth = rows.find(row => row.event_slug === "challenge-roth-2027");
+  assert.equal(roth.date, "2027-07-04");
+  assert.equal(roth.completion_score, null);
+  assert.equal(roth.review_only, true);
+  assert.ok(rows.some(row => row.event_slug === "challenge-roth-2026"), "the historical audit remains separate");
+});

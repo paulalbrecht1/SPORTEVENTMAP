@@ -5787,6 +5787,38 @@ function buildProposalCloseRequest(proposal, action, notes) {
   };
 }
 
+function buildProposalEditRequest(proposal, entered, valueFormat, notes) {
+  if (!proposal?.id || proposal.proposal_status !== "pending") {
+    throw new Error("Der Vorschlag ist nicht mehr offen. Bitte die Übersicht neu laden.");
+  }
+  const reason = String(notes || "").trim();
+  if (reason.length < 12) throw new Error("Bitte eine nachvollziehbare Begründung mit mindestens 12 Zeichen eintragen.");
+  const input = String(entered ?? "").trim();
+  if (!input) throw new Error("Bitte den tatsächlich zu übernehmenden Wert eintragen.");
+  let editedValue;
+  if (valueFormat === "text") {
+    editedValue = input;
+  } else if (valueFormat === "json") {
+    try { editedValue = JSON.parse(input); } catch {
+      throw new Error("Der bearbeitete Wert ist kein gültiges JSON. Bitte die Eingabe korrigieren.");
+    }
+    if (editedValue === null) throw new Error("Bitte einen konkreten Wert eintragen; null kann hier nicht übernommen werden.");
+    JSON.stringify(editedValue, (_key, value) => {
+      if (typeof value === "number" && !Number.isFinite(value)) throw new Error("JSON-Zahlen müssen endlich sein.");
+      return value;
+    });
+  } else {
+    throw new Error("Bitte Text oder JSON als Wertformat auswählen.");
+  }
+  return { p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: reason, p_edited_value: editedValue };
+}
+
+function getProposalEditContext(proposal) {
+  return JSON.stringify([proposal?.id, proposal?.event_id, proposal?.edition_id,
+    proposal?.source_id, proposal?.source_url, proposal?.field_name, proposal?.old_value,
+    proposal?.normalized_value, proposal?.proposed_value, proposal?.proposed_changes]);
+}
+
 function getProposalReviewOutcome(data, proposalId, requestedAction) {
   const row = Array.isArray(data) && data.length === 1 ? data[0] : data;
   if (!row || String(row.id) !== String(proposalId)) {
@@ -5888,6 +5920,93 @@ function openProposalCloseDialog(proposal, action) {
     try {
       dialog.showModal();
       dialog.querySelector("[data-proposal-close-cancel]").focus();
+    } catch (error) {
+      dialog.remove();
+      reject(error);
+    }
+  });
+}
+
+function openProposalEditDialog(proposal) {
+  if (document.getElementById("proposalEditDialog") || document.getElementById("proposalCloseDialog")) {
+    throw new Error("Eine Vorschlagsentscheidung ist bereits geöffnet.");
+  }
+  if (!proposal?.id || proposal.proposal_status !== "pending") {
+    throw new Error("Der Vorschlag ist nicht mehr offen. Bitte die Übersicht neu laden.");
+  }
+  const originalContext = getProposalEditContext(proposal);
+  const proposalId = proposal.id;
+  const event = dataOpsEvents.find(row => String(row.id) === String(proposal.event_id));
+  const source = dataOpsSources.find(row => String(row.id) === String(proposal.source_id));
+  const sourceValue = proposal.source_url || source?.source_url || "";
+  const sourceUrl = safeAdminUrl(sourceValue);
+  const value = proposal.normalized_value ?? proposal.proposed_value ?? proposal.proposed_changes ?? "";
+  const valueFormat = typeof value === "string" ? "text" : "json";
+  const dialog = document.createElement("dialog");
+  dialog.id = "proposalEditDialog";
+  dialog.className = "content-verification-dialog";
+  dialog.style.overflowWrap = "anywhere";
+  dialog.setAttribute("aria-labelledby", "proposalEditTitle");
+  dialog.setAttribute("aria-describedby", "proposalEditHelp");
+  dialog.innerHTML = `
+    <form class="content-verification-form" novalidate>
+      <h2 id="proposalEditTitle">Quellenvorschlag bearbeiten und übernehmen</h2>
+      <p class="content-verification-event">${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</p>
+      <p><strong>Feld:</strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
+      <p><strong>Bisheriger Wert:</strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</p>
+      <p><strong>Quelle:</strong> ${sourceUrl !== "#" ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">${escapeAdminHTML(sourceValue)}</a>` : "Keine sichere Quellen-URL hinterlegt"}</p>
+      <p id="proposalEditHelp">Vergleiche den bearbeiteten Wert mit der Quelle und begründe die Korrektur. Mit dem Absenden wird genau dieser Vorschlag geprüft und übernommen.</p>
+      <label for="proposalEditFormat">Wertformat</label>
+      <select id="proposalEditFormat" name="valueFormat"><option value="text">Text</option><option value="json">JSON</option></select>
+      <label for="proposalEditValue">Zu übernehmender Wert</label>
+      <textarea id="proposalEditValue" name="editedValue" rows="6" required></textarea>
+      <label for="proposalEditNotes">Begründung (mindestens 12 Zeichen)</label>
+      <textarea id="proposalEditNotes" name="notes" rows="3" minlength="12" required></textarea>
+      <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
+      <div class="content-verification-actions">
+        <button type="button" data-proposal-edit-cancel>Abbrechen</button>
+        <button type="submit">Bearbeiteten Wert übernehmen</button>
+      </div>
+    </form>`;
+  const form = dialog.querySelector("form");
+  form.elements.valueFormat.value = valueFormat;
+  form.elements.editedValue.value = valueFormat === "text" ? value : JSON.stringify(value, null, 2);
+  const errorMessage = dialog.querySelector('[role="alert"]');
+  const previousFocus = document.activeElement;
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    const finish = value => {
+      if (settled) return;
+      settled = true;
+      if (dialog.open) dialog.close();
+      dialog.remove();
+      if (previousFocus?.isConnected) previousFocus.focus();
+      resolve(value);
+    };
+    dialog.addEventListener("cancel", event => { event.preventDefault(); finish(null); });
+    dialog.addEventListener("close", () => finish(null));
+    dialog.querySelector("[data-proposal-edit-cancel]").addEventListener("click", () => finish(null));
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      if (settled) return;
+      errorMessage.hidden = true;
+      try {
+        const current = dataOpsProposals.find(row => String(row.id) === String(proposalId));
+        const request = buildProposalEditRequest(current, form.elements.editedValue.value, form.elements.valueFormat.value, form.elements.notes.value);
+        if (getProposalEditContext(current) !== originalContext) {
+          throw new Error("Der Vorschlag wurde inzwischen geändert. Bitte abbrechen und erneut öffnen.");
+        }
+        finish(request);
+      } catch (error) {
+        errorMessage.textContent = error.message;
+        errorMessage.hidden = false;
+        errorMessage.focus();
+      }
+    });
+    document.body.append(dialog);
+    try {
+      dialog.showModal();
+      dialog.querySelector("[data-proposal-edit-cancel]").focus();
     } catch (error) {
       dialog.remove();
       reject(error);
@@ -7080,11 +7199,12 @@ async function handleDataOpsAction(button) {
   }
   const proposal = dataOpsProposals.find(item => String(item.id) === String(button.dataset.proposalId));
   if (action === "edit-proposal" && proposal) {
-    const entered = window.prompt("Tatsächlich zu übernehmender Wert (Text oder JSON):", formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value));
-    if (entered == null) return;
-    let editedValue;
-    try { editedValue = JSON.parse(entered); } catch { editedValue = entered; }
-    await submitDataOpsProposalReview(button, { p_proposal_id: proposal.id, p_action: "edited_and_accepted", p_review_notes: "Im Admin-Dashboard bearbeitet und freigegeben.", p_edited_value: editedValue });
+    try {
+      const request = await openProposalEditDialog(proposal);
+      if (request) await submitDataOpsProposalReview(button, request);
+    } catch (error) {
+      setDataOpsStatus(getFriendlyErrorMessage(error, "Der Quellenvorschlag konnte nicht zur Bearbeitung geöffnet werden."), "error");
+    }
     return;
   }
   if (["reject-proposal", "supersede-proposal"].includes(action) && proposal) {
@@ -8610,6 +8730,40 @@ async function acceptKnowledgeReviewField(task, field, proposal) {
   await saveKnowledgeReviewSource(detail.id, field, proposal);
 }
 
+function mergeKnowledgeAuditRows(auditRows, reviewTasks) {
+  const rows = [...auditRows];
+  const slugs = new Set(rows.map(row => row.event_slug));
+
+  for (const task of reviewTasks) {
+    const details = task?.supabase_payload?.details;
+    if (!task?.event_slug || !details || slugs.has(task.event_slug)) continue;
+    if (details.event_slug && details.event_slug !== task.event_slug) continue;
+    if (["event_brand_id", "edition_id"].some(key =>
+      task[key] != null && details[key] != null && String(task[key]) !== String(details[key])
+    )) continue;
+
+    // A frozen catalog audit may predate this edition. Keep its exact review
+    // identity and leave completeness unknown until a real audit exists.
+    rows.push({
+      event_slug: task.event_slug,
+      event_name: task.event_name || details.event_name || "",
+      date: task.date || details.date || "",
+      city: task.city || details.city || "",
+      country: task.country || details.country || "",
+      sport: task.sport || details.sport_type || "",
+      distance: task.distance || "",
+      official_url: details.official_website || "",
+      priority: ["high", "medium", "low"].includes(task.priority) ? task.priority : "high",
+      completion_score: null,
+      missing_fields: [],
+      review_only: true
+    });
+    slugs.add(task.event_slug);
+  }
+
+  return rows;
+}
+
 function getKnowledgeAuditFilteredRows() {
   const priority =
     knowledgeAuditElements.priority?.value || "high";
@@ -8629,6 +8783,7 @@ function getKnowledgeAuditFilteredRows() {
       }
 
       return [
+        row.event_slug,
         row.event_name,
         row.city,
         row.country,
@@ -8666,17 +8821,18 @@ function renderKnowledgeAuditAdmin() {
   }
 
   if (knowledgeAuditElements.average) {
+    const auditedRows = knowledgeAuditRows.filter(row => !row.review_only);
     const average =
-      knowledgeAuditRows.length
+      auditedRows.length
         ? (
-          knowledgeAuditRows.reduce((sum, row) =>
+          auditedRows.reduce((sum, row) =>
             sum + Number(row.completion_score || 0), 0
-          ) / knowledgeAuditRows.length
+          ) / auditedRows.length
         ).toFixed(1)
-        : 0;
+        : null;
 
     knowledgeAuditElements.average.textContent =
-      `${average}%`;
+      average === null ? "Not audited" : `${average}%`;
   }
 
   if (knowledgeAuditElements.high) {
@@ -8766,12 +8922,12 @@ function renderKnowledgeAuditAdmin() {
               <p>${escapeAdminHTML([row.date, row.city, row.country, row.sport, row.distance].filter(Boolean).join(" · "))}</p>
             </div>
             <div class="admin-knowledge-audit-score" style="--score:${score}">
-              <strong>${score}%</strong>
-              <span>complete</span>
+              <strong>${row.review_only ? "–" : `${score}%`}</strong>
+              <span>${row.review_only ? "Not audited" : "complete"}</span>
             </div>
           </div>
           <div class="admin-knowledge-audit-missing">
-            ${missing || "<span>Complete</span>"}
+            ${row.review_only ? "<span>Private review task; completeness not audited</span>" : missing || "<span>Complete</span>"}
           </div>
           <div class="admin-knowledge-audit-actions">
             <a href="${escapeAdminHTML(row.official_url || "#")}" target="_blank" rel="noopener noreferrer">Official source</a>
@@ -8797,14 +8953,14 @@ async function loadKnowledgeAuditAdmin() {
       fetchKnowledgeWorkflowJson("data/event-knowledge-review.json", null)
     ]);
 
-  knowledgeAuditRows =
-    Array.isArray(audit?.events)
-      ? audit.events
-      : [];
   knowledgeReviewTasks =
     Array.isArray(review?.tasks)
       ? review.tasks
       : [];
+  knowledgeAuditRows = mergeKnowledgeAuditRows(
+    Array.isArray(audit?.events) ? audit.events : [],
+    knowledgeReviewTasks
+  );
   loadKnowledgeReviewDecisions();
 
   renderKnowledgeAuditAdmin();
@@ -8818,7 +8974,7 @@ async function loadKnowledgeAuditAdmin() {
   }
 
   setKnowledgeAuditStatus(
-    `${knowledgeAuditRows.length} audited events loaded. ${knowledgeReviewTasks.length} review task(s) available.`
+    `${knowledgeAuditRows.filter(row => !row.review_only).length} audited events loaded. ${knowledgeReviewTasks.length} review task(s) available.`
   );
 }
 

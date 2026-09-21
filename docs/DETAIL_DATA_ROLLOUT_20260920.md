@@ -1,5 +1,11 @@
 # Detaildaten und Editionsschutz – Umsetzungsnachweis 20.09.2026
 
+**Nachtrag 21.09.:** Beide unten beschriebenen Migrationen wurden bereits am
+20.09. um 18:49 UTC produktiv angewendet und anschließend unabhängig geprüft.
+Der folgende Text bewahrt den ursprünglichen Vorbereitungsstand. Aussagen zu
+noch ausstehendem Rollout und leerem Knowledge-Bestand sind durch den
+[aktuellen P0-Nachweis](P0_REVIEW_RECOVERY_20260921.md) ersetzt.
+
 Die nächste Stufe bleibt P0: vorhandene Editionen mit offiziellen Quellen prüfen,
 konkrete Detaildaten durch den bestehenden Review führen und erst anschließend
 skalieren. Dies ergänzt den bestehenden Durchsatzplan; es ersetzt ihn nicht.

@@ -65,7 +65,7 @@ const leafletStub = `
     marker(coords) {
       return {
         addTo() { return this; },
-        bindPopup() { return this; },
+        bindPopup(content) { this.popupContent = content; return this; },
         on() { return this; },
         openPopup() {},
         getLatLng() {

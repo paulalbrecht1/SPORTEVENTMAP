@@ -74,10 +74,19 @@ werden nach der tatsächlichen Durchführung unten ergänzt.
 Die neue Regression prüft 32 kanonische und ältere Statuskombinationen sowie
 CSV-Kompatibilität und getrennte Normalisierung. Ein Browsertest lädt die
 Katalogdatei wirklich neu und kontrolliert die sichtbare Liste auf Deutsch und
-Englisch. Die vollständige technische Suite `npm run test:code` ist bestanden,
-einschließlich **172 Browsertests**, Layout- und Paketprüfungen. Das lokale
-Leaflet-Testdouble stellt keinen echten Popup dar; diesen prüft der anschließende
+Englisch. Die vollständige technische Suite `npm run test:code` ist am Quellstand
+`648f5da` bestanden, einschließlich **172 Browsertests**, Layout- und
+Paketprüfungen. In der echten Vorschau fiel anschließend ein gecachter englischer
+Popup nach Sprachwechsel auf. Die zusätzliche Korrektur beschränkt sich auf eine
+Zeile: Leaflet erhält eine Inhaltsfunktion und rendert den Popup beim Öffnen in
+der aktuellen Sprache. Der neue Regressionstest war mit dem alten Aufruf rot
+und nach der Korrektur grün. Das lokale Leaflet-Testdouble speichert die echte
+Popupbindung, rendert aber keinen echten Popup; diesen prüft der anschließende
 Live-Nachtest. Für die reine Anzeigekorrektur ist keine Migration erforderlich.
+Nach dem Einzeilenfix sind alle **13 gezielten Browserprüfungen** für Discovery,
+Marker und Sprachsteuerung erneut bestanden. Der gesamte 172er-Lauf wurde
+anschließend nicht nochmals ausgeführt; die abschließende Prüfung konzentriert
+sich auf die tatsächlich veränderten Pfade.
 
 ## Grenzen der aktuellen Liveprüfung
 

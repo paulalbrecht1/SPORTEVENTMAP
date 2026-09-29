@@ -37,6 +37,25 @@ test("Public list displays canonical registration after a fresh catalog load in 
     await expect(page.getByTestId("event-card").filter({ hasText: run.event_name })
       .locator(".event-status-text")).toHaveText(sample.label);
   }
+
+  // A reopened popup uses its existing marker binding after a language switch.
+  // The stub records that binding; Leaflet evaluates function content on display.
+  for (const sample of [
+    { language: "de", label: "Anmeldung offen" },
+    { language: "en", label: "Registration open" }
+  ]) {
+    const popupLabel = await page.evaluate(({ name, language }) => {
+      const marker = allMarkers.find(item => item.data.event_name === name).marker;
+      setAppLanguage(language);
+      const content = typeof marker.popupContent === "function"
+        ? marker.popupContent(marker) : marker.popupContent;
+      return new DOMParser().parseFromString(content, "text/html")
+        .querySelector(".event-status-badge").textContent.trim();
+    }, { name: run.event_name, language: sample.language });
+    expect(popupLabel).toBe(sample.label);
+    await expect(page.getByTestId("event-card").filter({ hasText: run.event_name })
+      .locator(".event-status-text")).toHaveText(sample.label);
+  }
 });
 
 test("Discovery search, drawer and filters remain usable", async ({ page }) => {

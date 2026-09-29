@@ -772,7 +772,7 @@ function addMarker(event) {
     riseOnHover: true
   });
 
-  marker.bindPopup(createPopup(event));
+  marker.bindPopup(() => createPopup(event));
 
   marker.on("click", () => {
     highlightCard(getEventKey(event));

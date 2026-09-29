@@ -147,3 +147,26 @@ Unbekannte Angaben wurden nicht erfunden. Die Berliner ungeprüften Inhalte
 benötigen vor einer öffentlichen Anzeige weiterhin echte Quellenprüfung.
 
 Bedienung: [Events manuell pflegen](MANUAL_EVENT_MAINTENANCE.md).
+
+## Nachtrag v98: „Karte öffnen“ führt zu Google Maps
+
+Auf ausdrücklichen Nutzerwunsch öffnet nur der externe Standortbutton jetzt
+`https://www.google.com/maps/search/?api=1&query=<lat>,<lon>` mit URL-kodierten
+Koordinaten des vorhandenen Pins. Das folgt der
+[offiziellen Maps-URL-Dokumentation](https://developers.google.com/maps/documentation/urls/get-started#search).
+Eingebettete Leaflet-/OSM-Karte, Pin, Beschriftung und CSS sind unverändert.
+
+Die zwei vorhandenen Browserprüfungen für statische und dynamische Details
+bestanden einschließlich geänderter Standortkoordinaten; die 28 UI-Paketprüfungen
+ebenfalls. Der reale Klick bei Mainz öffnete Google Maps mit dem korrekten
+Standort und sichtbarem Routenplaner. Nach normalem Neuladen zeigte auch die
+Hauptdomain den Google-Maps-Link, weiterhin genau einen Pin und OSM-Kacheln.
+Ein Wechsel in native Smartphone-Apps wurde nicht auf einem Gerät geprüft.
+
+Veröffentlicht als `20260929-ui-only-v98` aus
+`3c42056c6f8474446208e2a2db8f7551ac1a2199`, Vorschau
+<https://66546b23.sporteventmap.pages.dev>, Produktion
+<https://145d7481.sporteventmap.pages.dev>. Release-SHA-256:
+`60bc7485200f10b1d8ec5e72cec2d2e71348d6b9a3e9f2738593e4fd87e069f4`.
+Je 58 Paketdateien gegen Vorschau, Deploy und Hauptdomain verifiziert. Lokale
+Nachweise: `exports/google-maps-audit-20260929/`. Keine Migration oder Datenänderung.

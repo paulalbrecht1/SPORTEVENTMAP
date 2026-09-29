@@ -402,14 +402,14 @@
       subsection = node('div', 'race-guide-subsection'); subsection.id = 'liveDetailLocationMap';
       const target = node('div', 'event-detail-map'); target.id = 'eventDetailMap'; target.setAttribute('role', 'region');
       subsection.append(node('h3'), node('p', 'live-detail-map-address'), target, node('p', 'event-detail-map-note'));
-      const link = externalLink('https://www.openstreetmap.org/', '', 'event-detail-secondary'); link.id = 'liveDetailMapLink'; subsection.append(link);
+      const link = externalLink('https://www.google.com/maps/', '', 'event-detail-secondary'); link.id = 'liveDetailMapLink'; subsection.append(link);
       ensureSection('logistics').append(subsection); mapCoordinates = '';
     }
     subsection.querySelector('h3').textContent = t('eventLocation');
     subsection.querySelector('.live-detail-map-address').textContent = text(event.address) || [event.city, event.country].map(text).filter(Boolean).join(', ');
     subsection.querySelector('.event-detail-map-note').textContent = t('approxLocation');
     byId('eventDetailMap').setAttribute('aria-label', t('eventLocation'));
-    byId('liveDetailMapLink').href = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=14/${lat}/${lon}`;
+    byId('liveDetailMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coordinates)}`;
     byId('liveDetailMapLink').textContent = t('mapLink');
     if (mapCoordinates === coordinates && detailMap) { detailMap.invalidateSize?.(); return; }
     mapCoordinates = coordinates;
@@ -584,7 +584,7 @@
     render();
     if (!staticPage) {
       const script = document.createElement('script');
-      script.src = '/js/event-detail.js?v=20260929-public-description-v132';
+      script.src = '/js/event-detail.js?v=20260929-google-maps-v133';
       script.onerror = () => { byId('detailActionStatus').textContent = t('detail.saveUnavailable'); };
       document.head.append(script);
     }

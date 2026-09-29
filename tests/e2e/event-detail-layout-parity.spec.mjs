@@ -128,8 +128,10 @@ for (const mode of ['static', 'dynamic']) {
     for (const value of ['1,5 km', '40 km', '10 km', '320 m']) await expect(formats.nth(3)).toContainText(value);
     await expect(page.locator('#eventDetailMap')).toBeVisible();
     await expect(page.locator('#liveDetailMapLink')).toBeVisible();
-    const href = await page.locator('#liveDetailMapLink').getAttribute('href');
-    expect(href).toContain('52.51467'); expect(href).toContain('13.35019');
+    const mapLink = new URL(await page.locator('#liveDetailMapLink').getAttribute('href'));
+    expect(mapLink.origin + mapLink.pathname).toBe('https://www.google.com/maps/search/');
+    expect(mapLink.searchParams.get('api')).toBe('1');
+    expect(mapLink.searchParams.get('query')).toBe('52.51467,13.35019');
     expect(await page.locator('main').innerText()).not.toContain('52.51467');
     expect(await page.locator('main').innerText()).not.toContain('13.35019');
     await expect.poll(() => page.evaluate(() => window.__detailMarkers.at(-1))).toEqual([52.51467, 13.35019]);
@@ -151,6 +153,7 @@ for (const mode of ['static', 'dynamic']) {
     await expect(time).toHaveText('10:05');
     await expect(page.locator('#liveDetailDescription')).toHaveText(state.event.description);
     await expect.poll(() => page.evaluate(() => window.__detailMarkers.at(-1))).toEqual([52.52091, 13.40123]);
+    expect(new URL(await page.locator('#liveDetailMapLink').getAttribute('href')).searchParams.get('query')).toBe('52.52091,13.40123');
     await page.locator('#eventDetailLanguageSelect').selectOption('en');
     await expect(time).toHaveText('10:05');
     await expect(formats.nth(2)).toContainText('21.097 km');

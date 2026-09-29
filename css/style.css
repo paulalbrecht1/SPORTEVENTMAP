@@ -46949,3 +46949,23 @@ body[data-theme="dark"] #adminEventMaintenancePanel .is-error { color: #fecaca; 
 body[data-theme="dark"] #adminEventMaintenancePanel .maintenance-history a { color: #86efac; }
 #adminEventMaintenancePanel [data-maintenance-status].is-error { color: #991b1b !important; }
 body[data-theme="dark"] #adminEventMaintenancePanel [data-maintenance-status].is-error { color: #fecaca !important; }
+
+/* Shared live/static race guide: use the existing Berlin guide components. */
+html:has(body.event-detail-page), body.event-detail-page { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important; }
+.event-detail-page [hidden] { display: none !important; }
+.event-detail-page .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; }
+.event-detail-page :is(.live-detail-sections a, .event-source-list a) { overflow-wrap: anywhere; }
+.event-detail-page .live-detail-notice { padding: 16px; border: 1px solid var(--detail-border, #9ca3af); border-radius: 12px; line-height: 1.6; }
+.event-detail-page .live-detail-sections { display: grid; gap: 24px; min-width: 0; }
+.event-detail-page #liveDetailContent { min-width: 0; }
+.event-detail-page #liveDetailName { overflow-wrap: anywhere; }
+.event-detail-page .live-detail-competitions { list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; margin: 0; }
+.event-detail-page .live-detail-competitions > li { display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow-wrap: anywhere; }
+.event-detail-page .live-detail-competitions > li > strong { color: var(--detail-text); }
+.event-detail-page :is(.live-detail-facts, [data-knowledge-field]) strong { display: block; overflow: visible; -webkit-line-clamp: unset; }
+body.event-detail-page .race-guide-fact-card > strong { font-size: max(1rem, 16px) !important; }
+.event-detail-page .live-detail-map-address { margin: 0; color: var(--detail-text); overflow-wrap: anywhere; }
+.event-detail-page #liveDetailMapLink { width: fit-content; }
+.event-detail-page .live-detail-footer { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
+.event-detail-page .live-detail-footer a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; }
+@media (max-width: 620px) { .event-detail-page .live-detail-competitions { grid-template-columns: minmax(0, 1fr); } }

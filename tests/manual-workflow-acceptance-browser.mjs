@@ -145,6 +145,40 @@ export async function runBrowserAcceptance({root,baseURL,apiUrl,publishableKey,f
     record('Actual public read failure preserves DB commit and shows retryable publication failure; retry uses real public path');
     record('Catalog preparation failure cannot claim publication success; restored actual function and explicit retry succeed');
 
+    // Exercise the new Knowledge fields through the actual form and Auth/API
+    // chain, then inspect a separate anonymous regular detail page.
+    const knowledge=adminPage.locator('[data-maintenance-knowledge] > details');
+    await knowledge.locator(':scope > summary').click();
+    await adminPage.locator('[data-knowledge-section="registration"] > summary').click();
+    await adminPage.locator('[data-knowledge-add="registration.price_tiers"]').click();
+    const tier=adminPage.locator('[data-knowledge-array="registration.price_tiers"]').first();
+    await tier.locator('[data-knowledge-cell="tier"]').fill('Geprüfte Testgebühr');
+    await tier.locator('[data-knowledge-cell="price"]').fill('31');
+    await adminPage.locator('[data-knowledge-confirm="registration.price_tiers"]').check();
+    await adminPage.locator('[data-knowledge-section="faq"] > summary').click();
+    await adminPage.locator('[data-knowledge-add-faq]').click();
+    const faq=adminPage.locator('[data-knowledge-faq]').first(),faqId=await faq.getAttribute('data-knowledge-faq');
+    await faq.locator('[data-knowledge-question]').fill('Wo ist das geprüfte Startbüro?');
+    await faq.locator('[data-knowledge-answer]').fill('Am ausdrücklich geprüften Testbahnhof.');
+    await faq.locator('[data-knowledge-confirm]').check();
+    await adminPage.locator('[data-maintenance-source]').fill(fixture.official);
+    await preview(adminPage);await save(adminPage);
+    await expect(adminPage.locator('[data-maintenance-publication]')).toContainText('Öffentlich aktualisiert',{timeout:25000});
+    const savedKnowledge=parse(sql(`select jsonb_build_object('tiers',r.price_tiers,'faq',to_jsonb(q)) from public.event_details d join public.event_registration r on r.event_detail_id=d.id join public.event_faq q on q.event_detail_id=d.id where d.edition_id=${literal(fixture.edition_id)} and q.id=${literal(faqId)};`));
+    assert.equal(savedKnowledge.tiers[0].tier,'Geprüfte Testgebühr');assert.equal(savedKnowledge.faq.answer,'Am ausdrücklich geprüften Testbahnhof.');
+    await visitor.reload();await expect(visitor.locator('html')).toHaveAttribute('data-sem-public-detail-knowledge-state','verified',{timeout:25000});
+    await expect(visitor.locator('#registration .race-guide-table')).toContainText('Geprüfte Testgebühr');
+    await visitor.locator('#faq details > summary').click();await expect(visitor.locator('#faq')).toContainText(savedKnowledge.faq.answer);
+    const renderedKnowledge=JSON.parse(await visitor.locator('#sem-public-detail-knowledge-data').textContent());
+    assert.ok(renderedKnowledge.some(row=>row.rendered_fields?.includes('registration.price_tiers')));
+    await visitor.locator('#eventDetailLanguageSelect').selectOption('en');
+    await expect(visitor.locator('#registration .race-guide-table')).toContainText('Geprüfte Testgebühr');
+    await expect(visitor.locator('#faq')).toContainText(savedKnowledge.faq.question);
+    await adminPage.reload();await expect(adminPage.locator('#adminBtn')).toBeVisible();await openEditor(adminPage);
+    await knowledge.locator(':scope > summary').click();await adminPage.locator('[data-knowledge-section="faq"] > summary').click();
+    await expect(adminPage.locator(`[data-knowledge-faq="${faqId}"] [data-knowledge-answer]`)).toHaveValue(savedKnowledge.faq.answer);
+    record('Actual form saves verified tier and stable FAQ via Auth/PostgREST; separate anonymous regular page renders both after reload and language change');
+
     const history=fixture.historical,old=readEdition(history.edition_id);
     const oldLinks=parse(sql(`select jsonb_build_object('planner',(select jsonb_agg(to_jsonb(p) order by id) from public.season_planner_events p where edition_id=${literal(history.edition_id)}),'results',(select jsonb_agg(to_jsonb(r) order by id) from public.edition_results r where edition_id=${literal(history.edition_id)}));`));
     await openEditor(adminPage,history);await adminPage.locator('[data-maintenance-action]').selectOption('create');

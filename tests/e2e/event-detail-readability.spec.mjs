@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import fs from 'node:fs';
 const archive = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions;
+const richRecords = JSON.parse(fs.readFileSync(new URL('../../data/event-detail-database.json', import.meta.url), 'utf8'));
 
 const detailPages = [
   {
@@ -10,6 +11,10 @@ const detailPages = [
   {
     name: "Berlin Marathon knowledge page",
     path: "/event/bmw-berlin-marathon-2026/"
+  },
+  {
+    name: "Paderborner Osterlauf standard page",
+    path: "/event/paderborner-osterlauf-2026/"
   },
   {
     name: "London Marathon knowledge page",
@@ -89,12 +94,14 @@ async function preparePage(page, detailPath) {
   await page.addInitScript(() => localStorage.setItem('sportEventMapLanguage', 'en'));
   await page.route('https://detail-readability.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([row]) }));
   await page.route('https://detail-readability.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [row.edition_id]: false } }) }));
+  await page.route('https://detail-readability.test/rest/v1/rpc/get_public_event_detail_bundle', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(richRecords.filter(item =>
+    item.edition_id === row.edition_id || (item.knowledge_scope === 'brand' && String(item.event_brand_id) === String(row.event_id)))) }));
   await page.goto(detailPath);
   await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
 }
 
 for (const detail of detailPages) {
-  test(`${detail.name} keeps facts readable in both themes`, async ({ page }) => {
+  test(`${detail.name} keeps facts readable in both themes`, async ({ page }, testInfo) => {
     await preparePage(page, detail.path);
 
     await expect(
@@ -174,44 +181,33 @@ for (const detail of detailPages) {
             `${detail.name}: "${pair.text}" lacks contrast in ${theme} mode`
           ).toBeGreaterThanOrEqual(4.5);
         }
+        if (/Berlin|Paderborner/.test(detail.name) && theme === 'light' && [390, 1280].includes(viewport.width)) {
+          const file = testInfo.outputPath(`${detail.path.split('/').filter(Boolean).at(-1)}-${viewport.width}.png`);
+          await page.screenshot({ path: file, fullPage: true });
+          await testInfo.attach(`public-detail-${viewport.width}`, { path: file, contentType: 'image/png' });
+        }
       }
     }
   });
 }
 
-test("unconfirmed canonical registration status stays readable without a stale global badge", async ({ page }) => {
+test("unconfirmed canonical registration status is omitted without a stale global badge", async ({ page }) => {
   await preparePage(page, "/event/bmw-berlin-marathon-2026/");
-  const card = page.locator('[data-public-detail-field="registration"]');
-  await expect(card).toHaveText('RegistrationCheck with the organizer');
+  await expect(page.locator('[data-public-detail-field="registration"]')).toHaveCount(0);
+  await expect(page.locator('#liveDetailFacts')).not.toContainText('Registration open');
   await expect(page.locator('.race-guide-status-panel > .event-detail-badge.pending')).toHaveCount(0);
-  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
-    await page.setViewportSize(viewport);
-    for (const theme of ['light', 'dark']) {
-      await page.evaluate(value => document.documentElement.dataset.theme = value, theme);
-      const result = await card.evaluate(node => ({
-        background: getComputedStyle(node).backgroundColor,
-        color: getComputedStyle(node.querySelector('strong')).color,
-        label: getComputedStyle(node.querySelector('span')).color,
-        overflows: node.scrollWidth > node.clientWidth + 1 || node.scrollHeight > node.clientHeight + 1
-      }));
-      expect(result.overflows).toBe(false);
-      expect(contrastRatio(result.color, result.background), theme + ' status value').toBeGreaterThanOrEqual(4.5);
-      expect(contrastRatio(result.label, result.background), theme + ' status label').toBeGreaterThanOrEqual(4.5);
-    }
-  }
+  await page.locator('#eventDetailLanguageSelect').selectOption('de');
+  await expect(page.locator('[data-public-detail-field="registration"]')).toHaveCount(0);
+  await expect(page.locator('#liveDetailFacts')).not.toContainText('Anmeldung offen');
 });
 
 test("Berlin registration dates and fee context are clear", async ({ page }) => {
   await preparePage(page, "/event/bmw-berlin-marathon-2026/");
 
-  const periodCard = page.locator(
-    "#registration .race-guide-fact-card.is-registration-period"
-  );
+  const periodCard = page.locator('#registration .race-guide-fact-card').filter({ has: page.getByText('Registration opens', { exact: true }) });
   await expect(periodCard.locator("strong"))
-    .toHaveText("25.09.2025");
-  await expect(page.locator(
-    "#registration .race-guide-fact-card.is-registration-deadline strong"
-  )).toHaveText("06.11.2025");
+    .toHaveText('25 Sept 2025');
+  await expect(page.locator('#registration .race-guide-fact-card').filter({ has: page.getByText('Registration deadline', { exact: true }) }).locator('strong')).toHaveText('6 Nov 2025');
 
   const typography = await periodCard.locator("strong")
     .evaluate(value => {
@@ -227,16 +223,16 @@ test("Berlin registration dates and fee context are clear", async ({ page }) => 
     });
   expect(typography.fontSize).toBeGreaterThanOrEqual(16);
   expect(typography.fontWeight).toBeGreaterThanOrEqual(700);
-  expect(typography.wordBreak).toBe("keep-all");
   expect(
     contrastRatio(typography.color, typography.background)
   ).toBeGreaterThanOrEqual(4.5);
 
-  // Dates remain distinct editorial knowledge; the editable canonical fee wins.
+  // A scalar old annual fee must not become a fictitious price tier or override
+  // the canonical price. Genuine structured tiers are covered by parity tests.
   const price = page.locator('[data-public-detail-field="price"]');
   await expect(price.locator('strong')).toHaveText('210 – 230 EUR');
   await expect(page.locator('#registration .race-guide-table')).toHaveCount(0);
-  await expect(page.locator('#registration')).not.toContainText('EUR 205');
+  await expect(page.locator('#registration')).not.toContainText('205 EUR');
   for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
     await page.setViewportSize(viewport);
     for (const theme of ['light', 'dark']) {
@@ -252,7 +248,7 @@ test("Berlin registration dates and fee context are clear", async ({ page }) => 
   }
 });
 
-test("detail accordions and green chips stay readable in both themes", async ({ page }) => {
+test("detail accordions and rich fact cards stay readable in both themes", async ({ page }) => {
   await preparePage(page, "/event/bmw-berlin-marathon-2026/");
 
   const accordion = page.locator(
@@ -279,10 +275,9 @@ test("detail accordions and green chips stay readable in both themes", async ({ 
         );
         const summary = content.parentElement.querySelector("summary");
         const toggleStyle = getComputedStyle(summary, "::after");
-        const chip = document.querySelector("#course .race-guide-chip");
-        const chipGroup = chip.closest(".race-guide-chip-group");
-        const label = chipGroup.querySelector(":scope > span");
-        const section = chip.closest(".event-detail-card");
+        const card = document.querySelector("#course .race-guide-fact-card");
+        const value = card.querySelector("strong");
+        const label = card.querySelector("span:not(.event-detail-icon)");
         const readStyle = element => {
           const style = getComputedStyle(element);
 
@@ -294,10 +289,11 @@ test("detail accordions and green chips stay readable in both themes", async ({ 
 
         return {
           content: readStyle(content),
-          chip: readStyle(chip),
+          fact: { color: getComputedStyle(value).color, background: getComputedStyle(card).backgroundColor },
+          factFontSize: parseFloat(getComputedStyle(value).fontSize),
           label: {
             color: getComputedStyle(label).color,
-            background: getComputedStyle(section).backgroundColor
+            background: getComputedStyle(card).backgroundColor
           },
           toggle: {
             background: toggleStyle.backgroundColor,
@@ -306,15 +302,15 @@ test("detail accordions and green chips stay readable in both themes", async ({ 
           accordionOverflows:
             content.scrollWidth > content.clientWidth + 1 ||
             content.scrollHeight > content.clientHeight + 1,
-          chipOverflows:
-            chip.scrollWidth > chip.clientWidth + 1 ||
-            chip.scrollHeight > chip.clientHeight + 1
+          factOverflows:
+            value.scrollWidth > value.clientWidth + 1 ||
+            value.scrollHeight > value.clientHeight + 1
         };
       });
 
       for (const component of [
         styles.content,
-        styles.chip,
+        styles.fact,
         styles.label,
         styles.toggle
       ]) {
@@ -324,35 +320,8 @@ test("detail accordions and green chips stay readable in both themes", async ({ 
         ).toBeGreaterThanOrEqual(4.5);
       }
       expect(styles.accordionOverflows).toBe(false);
-      expect(styles.chipOverflows).toBe(false);
-
-      if (theme === "light") {
-        expect(styles.content).toEqual({
-          background: "rgb(255, 255, 255)",
-          color: "rgb(64, 86, 74)"
-        });
-        expect(styles.chip).toEqual({
-          background: "rgb(231, 248, 237)",
-          color: "rgb(20, 83, 45)"
-        });
-        expect(styles.toggle).toEqual({
-          background: "rgb(233, 248, 238)",
-          color: "rgb(22, 101, 52)"
-        });
-      } else {
-        expect(styles.content).toEqual({
-          background: "rgb(18, 37, 31)",
-          color: "rgb(212, 222, 216)"
-        });
-        expect(styles.chip).toEqual({
-          background: "rgb(23, 61, 42)",
-          color: "rgb(220, 252, 231)"
-        });
-        expect(styles.toggle).toEqual({
-          background: "rgb(25, 55, 42)",
-          color: "rgb(187, 247, 208)"
-        });
-      }
+      expect(styles.factOverflows).toBe(false);
+      expect(styles.factFontSize).toBeGreaterThanOrEqual(16);
     }
   }
 });

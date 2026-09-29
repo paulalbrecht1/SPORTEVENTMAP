@@ -1,6 +1,32 @@
 # Datenmodell der Event-Detailseiten
 
-Stand: 24. August 2026
+Stand: 29. September 2026
+
+## Live-Darstellung und manuelle Zusatzpflege (v95)
+
+`js/event-detail-live.js` rendert reguläre statische und dynamische Detailseiten
+im gemeinsamen Berlin-Race-Guide-Aufbau. Kernfakten kommen weiterhin aus dem
+öffentlichen Editionskatalog. `get_public_event_detail_bundle(p_edition_id)` lädt
+die bestehenden `event_details`-Kindtabellen und `event_detail_sources` live für
+genau diese Ausgabe und deren Event-Wiki. Ein Export bleibt nur Ausfallfallback
+und erhält keinen neuen Prüfzeitpunkt.
+
+`save_manual_event_maintenance` speichert erlaubte Zusatzfelder atomar mit
+Quellen, Audit und Idempotenzbeleg. Die bestehende Versionsprüfung schließt
+Zusatzdetails ein. Feldbestätigungen schützen editions- bzw. brandbezogene Werte;
+gewöhnliches Speichern bestätigt keine ungeprüften Felder. Jahresdaten dürfen
+nicht in allgemeine Brand-Datensätze geschrieben werden.
+
+`owned_fields` und `cleared_fields` werden aus vorhandenen Werten und Feldaudits
+abgeleitet: nie gesetzte leere Editionswerte erlauben bestätigtes Brand-Wissen
+als Fallback. Ein ausdrücklich gelöschter oder neu bearbeiteter ungeprüfter
+Editionswert blockiert dagegen den alten Fallback. Es entsteht keine zweite
+Datenhaltung. Unbestätigte Werte werden nicht als verifiziert ausgegeben.
+
+Die öffentliche Speicherkontrolle vergleicht neben Kernfakten den im DOM
+tatsächlich gerenderten Feldsatz und die Werte. Ein erfolgreicher Datenbankabruf
+allein bestätigt keine öffentliche Veröffentlichung. Uhrzeiten, Distanzen und
+Gebühren werden lokalisiert; Rohkoordinaten dienen ausschließlich der Standortkarte.
 
 ## Zielbild
 

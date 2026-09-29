@@ -33,7 +33,7 @@ function fixture() {
   const exportedAt = '2026-08-27T07:41:01.290Z';
   put(baseDir, 'data/catalog-export-manifest.json', JSON.stringify({ exported_at: exportedAt, metrics: { archive_rows: 2 } }));
   put(baseDir, 'data/event-editions-public.json', JSON.stringify({ exported_at: exportedAt, editions: [{ edition_slug: 'first' }, { edition_slug: 'second' }] }));
-  for (const [relative, text] of Object.entries({ 'data/events.csv': 'Original exported catalog', 'data/event-knowledge.json': '{"original":true}', 'event/first/index.html': '<html>Original static event A<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'event/second/index.html': '<html>Original static event B<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'sitemap.xml': '<urlset>Original sitemap</urlset>', 'js/config.js': 'window.PUBLIC_CONFIG={siteUrl:"https://sporteventmap.com"};', 'robots.txt': 'Original robots', 'docs/NO_CODE_DATA_IMPORT.md': 'Original docs', 'RELEASE_VERSION.txt': 'Version: 20260901-mobile-stability-v84\n' })) put(baseDir, relative, text);
+  for (const [relative, text] of Object.entries({ 'data/events.csv': 'Original exported catalog', 'data/event-knowledge.json': '{"original":true}', 'event/first/index.html': '<html><link rel="stylesheet" href="../../css/style.css?v=old-v96">Original static event A<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'event/second/index.html': '<html><link rel="stylesheet" href="../../css/style.css?v=old-v96">Original static event B<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'sitemap.xml': '<urlset>Original sitemap</urlset>', 'js/config.js': 'window.PUBLIC_CONFIG={siteUrl:"https://sporteventmap.com"};', 'robots.txt': 'Original robots', 'docs/NO_CODE_DATA_IMPORT.md': 'Original docs', 'RELEASE_VERSION.txt': 'Version: 20260901-mobile-stability-v84\n' })) put(baseDir, relative, text);
   const entries = ui.artifactInventory(baseDir), byPath = new Map(entries.map(e => [e.path, e.sha256]));
   const release = { schema_version: 1, version: '20260901-mobile-stability-v84', git_commit: '8'.repeat(40), built_at: '2026-09-01T11:25:56.965Z', source_dirty: false, critical_files: Object.fromEntries(ui.BASE_CRITICAL_PATHS.map(p => [p, byPath.get(p)])), event_pages: { count: 2, aggregate_sha256: ui.inventoryDigest(entries.filter(e => /^event\//.test(e.path))) }, artifacts: { count: entries.length, aggregate_sha256: ui.inventoryDigest(entries) } };
   put(baseDir, 'release.json', `${JSON.stringify(release, null, 2)}\n`);
@@ -74,7 +74,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     for (const name of ['first', 'second']) {
       const before = fs.readFileSync(path.join(f.baseDir, 'event/'+name+'/index.html'), 'utf8');
       const after = fs.readFileSync(path.join(f.output, 'event/'+name+'/index.html'), 'utf8');
-      assert.equal(after, before.replace('?v=old-v96', '?v=' + f.options.version), 'Only the shared runtime query is changed');
+      assert.equal(after, before.replaceAll('?v=old-v96', '?v=' + f.options.version), 'Only the shared script and stylesheet queries are changed');
     }
     assert.equal(built.detail_runtime_references.count, 2);
     for (const entry of f.entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path) && !e.path.startsWith('event/'))) assert.equal(ui.sha256(fs.readFileSync(path.join(f.output, entry.path))), entry.sha256, entry.path);
@@ -134,6 +134,24 @@ test('new dependencies and committed credentials fail before output creation', a
     await t.test('missing dynamically required module is rejected', async () => { const source = ui.sourceSnapshot(f.root, f.options.sourceCommit), base = ui.validateBaseRelease(f.baseDir, f.options.baseReleaseSha256), overlay = ui.makeOverlay(source, { version: f.options.version, git_commit: f.options.sourceCommit, built_at: BUILD_TIME.toISOString() }); overlay.set('index.html', Buffer.from('<html><head><script src="js/unreviewed-module.js"></script></head></html>')); assert.throws(() => ui.assertRuntime(base, source, overlay), /Missing UI dependency/); });
     await t.test('committed secret rejected by real build, not merely dirty-tree check', async () => { fs.appendFileSync(path.join(f.root, 'js/app.js'), '\nconst client_secret="this-is-a-realistic-secret-value";'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /Potential private credential/); assert.equal(fs.existsSync(f.output), false); });
   } finally { dispose(f.root); }
+});
+
+test('static detail cache refresh requires exactly one existing script and stylesheet and preserves facts', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sem-ui-release-unit-'));
+  try {
+    const file = 'event/first/index.html';
+    const style = '<link rel="stylesheet" href="../../css/style.css?v=old">';
+    const script = '<script src="../../js/event-detail.js?v=old"></script>';
+    const render = html => {
+      put(root, file, html);
+      const overlay = new Map();
+      ui.addDetailRuntimeReferences(overlay, {eventPages:[{path:file,sha256:ui.sha256(Buffer.from(html))}]}, root, 'new');
+      return overlay.get(file).toString();
+    };
+    assert.equal(render(style + '<p>27.03.2027 · 09:30 Uhr</p>' + script), style.replace('?v=old','?v=new') + '<p>27.03.2027 · 09:30 Uhr</p>' + script.replace('?v=old','?v=new'));
+    for (const html of [script, style + style + script]) assert.throws(() => render(html), /Exactly one existing detail stylesheet/);
+    for (const html of [style, style + script + script]) assert.throws(() => render(html), /Exactly one existing detail runtime/);
+  } finally { dispose(root); }
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {

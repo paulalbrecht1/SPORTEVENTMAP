@@ -201,7 +201,7 @@ function makeOverlay(source, identity) {
     assertOverlaySafe(bytes, relative); return [relative, bytes];
   }));
 }
-// Only the shared detail runtime URL changes in existing event HTML. All data,
+// Only the shared detail script and stylesheet version URLs change in existing HTML. All data,
 // markup and export timestamps are copied from the verified production base.
 // Verification derives these bytes again; static pages are never free overlays.
 function addDetailRuntimeReferences(overlay, base, baseDir, version) {
@@ -212,7 +212,9 @@ function addDetailRuntimeReferences(overlay, base, baseDir, version) {
     assert.ok(Buffer.from(text).equals(bytes), `Static page is not lossless UTF-8: ${entry.path}`);
     const reference = /(<script\b[^>]*\bsrc=["'](?:\.\.\/\.\.\/|\/)js\/event-detail\.js)\?v=[a-zA-Z0-9-]+(["'][^>]*>)/g;
     assert.equal([...text.matchAll(reference)].length, 1, `Exactly one existing detail runtime reference required: ${entry.path}`);
-    overlay.set(entry.path, Buffer.from(text.replace(reference, `$1?v=${version}$2`)));
+    const stylesheet = /(<link\b[^>]*\bhref=["'](?:\.\.\/\.\.\/|\/)css\/style\.css)\?v=[a-zA-Z0-9-]+(["'][^>]*>)/g;
+    assert.equal([...text.matchAll(stylesheet)].length, 1, `Exactly one existing detail stylesheet reference required: ${entry.path}`);
+    overlay.set(entry.path, Buffer.from(text.replace(reference, `$1?v=${version}$2`).replace(stylesheet, `$1?v=${version}$2`)));
   }
 }
 function assertRuntime(base, source, overlay) {
@@ -247,7 +249,7 @@ function makeRelease(base, baseUrl, identity, source, overlay, entries) {
     data_updated: false, full_data_quality_release: false,
     base_release: { url: validateBaseUrl(baseUrl), release_json_sha256: sha256(base.bytes), version: base.release.version, git_commit: base.release.git_commit, built_at: base.release.built_at, artifacts: base.release.artifacts, event_pages: base.release.event_pages, original_data_timestamps: base.dataTimestamps },
     overlay_files: Object.fromEntries(OVERLAY_PATHS.map(relative => [relative, { source_sha256: source.get(relative).sha256, source_git_blob: source.get(relative).git_blob, artifact_sha256: byPath.get(relative) }])),
-    detail_runtime_references: { transformation: 'event-detail-script-version-only', count: base.eventPages.length, base_pages_sha256: inventoryDigest(base.eventPages), artifact_pages_sha256: inventoryDigest(entries.filter(e => /^event\/[^/]+\/index\.html$/.test(e.path))) },
+    detail_runtime_references: { transformation: 'event-detail-script-and-stylesheet-versions-only', count: base.eventPages.length, base_pages_sha256: inventoryDigest(base.eventPages), artifact_pages_sha256: inventoryDigest(entries.filter(e => /^event\/[^/]+\/index\.html$/.test(e.path))) },
     protected_artifacts: { count: protectedEntries.length, aggregate_sha256: inventoryDigest(protectedEntries) },
     critical_files: Object.fromEntries(criticalPaths.map(relative => [relative, byPath.get(relative)])),
     event_pages: { count: base.eventPages.length, aggregate_sha256: inventoryDigest(entries.filter(e => /^event\/[^/]+\/index\.html$/.test(e.path))) },

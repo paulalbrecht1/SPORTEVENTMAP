@@ -82,6 +82,15 @@ try {
   assert.match(sqlRegression,/MANUAL_MAINTENANCE_ASSERTIONS=\d+/);
   report.sql_assertions = Number(sqlRegression.match(/MANUAL_MAINTENANCE_ASSERTIONS=(\d+)/)[1]);
   console.log('SQL assertions passed: '+report.sql_assertions);
+  const knowledgeRegression = sql("set sporteventmap.test_manual_maintenance='isolated';\n" + fs.readFileSync(path.join(root,'tests/manual-event-knowledge.sql'),'utf8'));
+  fs.writeFileSync(path.join(stage,'knowledge-regression.log'),knowledgeRegression);
+  assert.match(knowledgeRegression,/MANUAL_KNOWLEDGE_ASSERTIONS=\d+/);
+  report.knowledge_sql_assertions = Number(knowledgeRegression.match(/MANUAL_KNOWLEDGE_ASSERTIONS=(\d+)/)[1]);
+  console.log('Knowledge SQL assertions passed: '+report.knowledge_sql_assertions);
+  if(args.includes('--prepare-only')) {
+    report.prepared_only=true;
+    report.browser_acceptance_pending=true;
+  } else {
   for (const field of ['end_date','start_time','price_min','price_max','currency','participant_limit']) {
     assert.equal(sql(`select count(*) from information_schema.columns where table_schema='public' and table_name='public_event_archive' and column_name=${literal(field)};`).trim(), '1', `Acceptance backend migration missing ${field}`);
   }
@@ -146,11 +155,12 @@ try {
   });
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(4189,'127.0.0.1',resolve);});
   report.browser = await runBrowserAcceptance({root,baseURL:'http://127.0.0.1:4189',apiUrl,publishableKey,fixture,sql,parse,literal,outputDir:stage});
+  }
   report.passed = true;
 } catch (error) { report.passed=false; report.failure={name:error.name,message:error.message};process.exitCode=1; }
 finally {
   if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));report.web_server_stopped=true;}
-  if(started&&report.passed===false&&args.includes('--retain-on-failure')){
+  if(started&&(report.prepared_only||(report.passed===false&&args.includes('--retain-on-failure')))){
     report.retained_isolated_stage=stage;report.resume_command='node tests/run-manual-workflow-acceptance-local.mjs --resume '+path.relative(root,stage)+' --retain-on-failure';
   }else if(started){try{
     run(process.execPath,[cli,'--workdir',stage,'stop']);

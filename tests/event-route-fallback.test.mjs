@@ -330,7 +330,16 @@ test("actual browser resolves missing routes, preserves static pages and hides c
         await expect(page.locator('body')).toHaveClass(/\bevent-detail-page\b/);
         await expect(page.locator('h1')).toHaveText(eventName);
         await expect(page.locator('h1')).toBeVisible();
-        assert.equal(await page.locator('h1').evaluate(el => getComputedStyle(el).fontSize), '28px');
+        const headingLayout = await page.locator('h1').evaluate(el => {
+          const bounds = el.getBoundingClientRect();
+          return { fontSize: parseFloat(getComputedStyle(el).fontSize), left: bounds.left,
+            right: bounds.right, viewport: innerWidth, clipped: el.scrollWidth > el.clientWidth + 1 };
+        });
+        assert.ok(headingLayout.fontSize >= 28 && headingLayout.fontSize <= 48,
+          'the mobile heading must remain readable without oversized type');
+        assert.ok(headingLayout.left >= 0 && headingLayout.right <= headingLayout.viewport + 1,
+          'the complete heading must fit the mobile viewport');
+        assert.equal(headingLayout.clipped, false, 'the event name must wrap without clipping');
         await expect(page.locator('#liveDetailDescription')).toHaveText('Public race description.');
         await expect(page.locator('#liveDetailStatus')).toContainText('gespeicherte Datenstand');
         await expect(page.locator('#adminModal, #drawer')).toHaveCount(0);
@@ -370,7 +379,10 @@ test("actual browser resolves missing routes, preserves static pages and hides c
         await expect(page.locator('#liveDetailDescription script, #liveDetailName img, #adminModal')).toHaveCount(0);
         await expect(page.locator('#liveDetailOfficial')).toBeHidden();
         await expect(page.locator('#liveDetailSource')).toHaveAttribute('href', publicRow.source_url);
-        await expect(page.locator('#liveDetailFacts')).toContainText('5 km · 10 km');
+        const competitions = page.locator('#competitions [data-public-race-format]');
+        await expect(competitions).toHaveCount(2);
+        await expect(competitions.nth(0)).toHaveText('5 km');
+        await expect(competitions.nth(1)).toHaveText('10 km');
         await expect(page.locator('#liveDetailChecked')).toBeHidden();
         await expect(page.locator('#liveDetailStatus')).toBeHidden();
         await page.locator('#eventDetailLanguageSelect').selectOption('en');

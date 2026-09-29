@@ -13,14 +13,16 @@ Ein UI-Release verwendet ausschließlich ein nachgewiesenes bestehendes
 Cloudflare-Produktionspaket als Basis. Seine Datendateien einschließlich
 Exportzeit, Sitemap, Runtimekonfiguration und alle nicht ausdrücklich
 freigegebenen Dateien bleiben bytegleich. Seit der Workflowkorrektur v92 gilt
-für bestehende statische Eventseiten genau eine kontrollierte Ausnahme:
-Der Versionsparameter des bereits vorhandenen `js/event-detail.js`-Skripts
-wird auf die neue Releasekennung gesetzt. Alle übrigen HTML-Bytes, insbesondere
+für bestehende statische Eventseiten eine kontrollierte Ausnahme, seit v95
+einschließlich des gemeinsamen Stylesheets: Die Versionsparameter der bereits
+vorhandenen Referenzen auf `js/event-detail.js` und `css/style.css`
+werden auf die neue Releasekennung gesetzt. Alle übrigen HTML-Bytes, insbesondere
 Eventfakten und Quellenstände, bleiben unverändert. Das verhindert, dass ein
 vier Stunden gecachtes altes Skript die aktuelle Datenanzeige verhindert.
 
-Es gibt keinen Datenexport, keine Seitengenerierung, keine Migration, keinen
-Admin-Datenwrite und kein Zurücksetzen von Prüfzeiten. Bereits produktive
+Der Paketbau führt keinen Datenexport, keine Seitengenerierung, keine Migration,
+keinen Admin-Datenwrite und kein Zurücksetzen von Prüfzeiten aus. Erforderliche
+Datenbankmigrationen werden vorher separat geprüft und ausgerollt. Bereits produktive
 P0-Korrekturen werden weiterhin aus der laufenden Datenbank geladen; der
 beibehaltene Fallback erhält keinen neuen Frischenachweis. Seine bekannten
 fachlichen Grenzen bestehen fort.
@@ -42,7 +44,8 @@ trennt die neue Buildzeit vom ursprünglichen Datenstand.
 
 Die Runtimeverknüpfung in Eventseiten ist keine frei beschreibbare Overlaydatei.
 Build und Verify leiten die zulässigen Bytes unabhängig aus der hashgeprüften
-Produktionsbasis ab; genau eine passende Skriptreferenz je Seite ist erforderlich.
+Produktionsbasis ab; genau eine passende Skript- und Stylesheetreferenz je Seite
+ist erforderlich. Nur die beiden Versionsparameter dürfen sich ändern.
 Jede zusätzliche Änderung an diesen Seiten lässt die Prüfung fehlschlagen.
 `detail_runtime_references` dokumentiert Anzahl sowie alte und neue Seitenhashes.
 Die feste Oberflächenliste umfasst außerdem `js/map.js`, dessen bestehender

@@ -13,6 +13,11 @@ async function isolate(page) {
   await page.route('**/js/config.js', route => route.fulfill({ contentType: 'text/javascript', body: 'window.SPORT_EVENT_MAP_CONFIG = {supabaseUrl:"https://detail-data.test",supabasePublishableKey:"public-test"};' }));
   await page.route('https://unpkg.com/**', route => route.fulfill({ contentType: route.request().resourceType() === 'stylesheet' ? 'text/css' : 'text/javascript', body: '' }));
   await page.route('https://detail-data.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: '{}' }));
+  await page.route('https://detail-data.test/rest/v1/rpc/get_public_event_detail_bundle', route => {
+    const event = archive.find(item => item.edition_id === route.request().postDataJSON()?.p_edition_id);
+    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(records.filter(row => event &&
+      (row.edition_id === event.edition_id || (row.knowledge_scope === 'brand' && String(row.event_brand_id) === String(event.event_id))))) });
+  });
   // Static-layout cases deliberately exercise the labelled saved-page fallback.
   // Live cases override the API route below with their exact public fixture.
   await page.route('https://detail-data.test/rest/v1/public_event_archive?**', route => route.abort());
@@ -105,7 +110,7 @@ test('live page loads exact edition details lazily, keeps genuine source dates s
   await page.route('https://detail-data.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ ...event, description: '', organizer_name: 'SCC EVENTS', start_time: null }]) }));
   await page.goto(`/event-detail.html?event=${slug}`);
   await expect(page.locator('#registration')).toBeVisible();
-  await expect(page.locator('#race_day')).toBeVisible();
+  await expect(page.locator('#race-day')).toBeVisible();
   await expect(page.locator('#liveDetailFacts')).toContainText('SCC EVENTS');
   await expect(page.locator('#description')).toBeHidden();
   await expect(page.locator('#liveDetailNavigation a[href="#description"]')).toHaveCount(0);
@@ -116,7 +121,7 @@ test('live page loads exact edition details lazily, keeps genuine source dates s
   await page.locator('#addDetailEventToSeason').click();
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#eventDetailLanguageSelect').selectOption('en');
-  await expect(page.locator('#race_day h2')).toHaveText('Race day');
+  await expect(page.locator('#race-day h2')).toHaveText('Race day');
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#liveDetailNavigation [data-detail-section="registration"]').click();
   await expect(page.locator('#liveDetailNavigation [data-detail-section="registration"]')).toHaveAttribute('aria-current', 'location');
@@ -136,16 +141,18 @@ test('live page hides unsupported or conflicting annual facts and requires an ex
   await page.route('https://detail-data.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([event]) }));
   await page.route('https://detail-data.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [event.edition_id]: true } }) }));
   await page.route('**/data/event-detail-database.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(scoped) }));
+  await page.route('https://detail-data.test/rest/v1/rpc/get_public_event_detail_bundle', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify(scoped) }));
   await page.goto(`/event-detail.html?event=${slug}`);
   await expect(page.locator('#liveDetailChecked')).toBeVisible();
   await expect(page.locator('#liveDetailSources')).toContainText('2026');
-  await expect(page.locator('#race_day')).toHaveCount(0);
+  await expect(page.locator('#race-day')).toHaveCount(0);
   await expect(page.locator('#liveDetailSections')).not.toContainText('999 km');
   await expect(page.locator('#liveDetailSections')).not.toContainText('45 days');
   edition.event_brand_id = -1;
   await page.reload();
   await expect(page.locator('#liveDetailContent')).toBeVisible();
-  await expect(page.locator('#liveDetailSections > section')).toHaveCount(0);
+  await expect(page.locator('#liveDetailSections > section:not(#logistics)')).toHaveCount(0);
+  await expect(page.locator('#logistics')).not.toContainText('999 km');
 });
 
 test('regular static URL renders current canonical fields and a settled anonymous readback, preserving edition and Season identity', async ({ page }) => {
@@ -181,7 +188,9 @@ test('regular static URL renders current canonical fields and a settled anonymou
   await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
   await expect(page).toHaveURL(new RegExp(`/event/${slug}/$`));
   await expect(page.locator('#liveDetailName')).toHaveText(event.event_name);
-  for (const value of ['07.08.2027', '08.08.2027', '09:15:00', '25 – 65 EUR', '750', 'Schwimmen 1,5 km', 'Radfahren 40 km', 'Laufen 10 km', '320 m', '21,097 km', 'Aktuelle Startstraße 8']) await expect(page.locator('#liveDetailFacts')).toContainText(value);
+  for (const value of ['07.08.2027', '08.08.2027', '09:15', '25 – 65 EUR', '750']) await expect(page.locator('#liveDetailFacts')).toContainText(value);
+  await expect(page.locator('#logistics')).toContainText('Aktuelle Startstraße 8');
+  for (const value of [/Schwimmen:?\s*1,5 km/, /Radfahren:?\s*40 km/, /Laufen:?\s*10 km/, '320 m', '21,097 km']) await expect(page.locator('#competitions')).toContainText(value);
   await expect(page.locator('#liveDetailDescription')).toHaveText(event.description);
   await expect(page.locator('#liveDetailOfficial')).toHaveAttribute('href', event.official_url);
   await expect(page.locator('#liveDetailRegistration')).toHaveAttribute('href', event.registration_url);
@@ -195,8 +204,8 @@ test('regular static URL renders current canonical fields and a settled anonymou
   await page.locator('#addDetailEventToSeason').click();
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
   await page.locator('#eventDetailLanguageSelect').selectOption('en');
-  await expect(page.locator('#liveDetailFacts')).toContainText('Entry fee');
-  await expect(page.locator('#liveDetailFacts')).toContainText('21.097 km');
+  await expect(page.locator('[data-public-detail-field="price"]')).toContainText('Price');
+  await expect(page.locator('#competitions')).toContainText('21.097 km');
   await checkWidths(page);
   expect(requests).toBe(1);
 });
@@ -230,20 +239,23 @@ test('static hydration removes conflicting rich core facts but keeps distinct lo
     official_url: null, organizer_name: null, organizer_url: null, registration_url: 'https://entries.example/current', registration_status: 'sold_out', event_status: 'scheduled',
     race_formats: [{ label: 'Aktueller Triathlon', swim_km: 1.5, bike_km: 40, run_km: 10 }] };
   const rich = { event_slug: slug, event_brand_id: event.event_id, edition_id: event.edition_id, knowledge_scope: 'edition', verification_status: 'verified',
-    registration: { registration_status: 'Old opened status', entry_fee_min: '999 EUR', official_registration_url: 'https://entries.example/old', price_tiers: [{ tier: 'Old price', price: '999 EUR' }] },
+    registration: { registration_status: 'Old opened status', entry_fee_min: '999 EUR', official_registration_url: 'https://entries.example/old', price_tiers: [{ tier: 'Early entry', price: '25 EUR' }, { tier: 'Regular entry', price: '65 EUR' }] },
     race_day: { start_time: '04:44', total_cutoff: '16 h' }, course: { swim_distance: '99 km', course_character: 'Distinct preserved course note' },
     travel: { public_transport_info: 'Distinct preserved train advice' },
     sources: [{ source_url: 'https://official.example/old-guide', source_type: 'official', field_path: 'registration,race_day,course,travel', last_verified: '2026-09-01' }] };
   await isolate(page);
   await page.route(`**/event/${slug}/`, route => route.fulfill({ contentType: 'text/html', body: buildEventPage({ ...event, date: '04.07.2027' }, slug, [], null, indexRichDetailRecords([rich]).get(slug)) }));
+  await page.route('https://detail-data.test/rest/v1/rpc/get_public_event_detail_bundle', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([rich]) }));
   await page.route('https://detail-data.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([event]) }));
   await page.goto(`/event/${slug}/`);
   await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
-  await page.locator('#logistics details summary').first().click();
+  await expect(page.locator('#logistics')).toBeVisible();
   const visible = await page.locator('main').innerText();
   for (const stale of ['999 EUR', '04:44', '99 km', 'Old opened status']) expect(visible).not.toContain(stale);
   expect(visible).toContain('Distinct preserved train advice');
   expect(visible).toContain('Distinct preserved course note');
+  await expect(page.locator('#registration .race-guide-table')).toContainText('Early entry');
+  await expect(page.locator('#registration .race-guide-table')).toContainText('Regular entry');
   await expect(page.locator('#race-day')).toContainText('16 h');
   await expect(page.locator('[data-public-detail-field="price"], [data-public-detail-field="start_time"]')).toHaveCount(0);
   await expect(page.locator('#liveDetailRegistration')).toHaveAttribute('href', event.registration_url);

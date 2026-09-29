@@ -1,6 +1,7 @@
 # Events manuell pflegen
 
-Stand: Workflowkorrektur v92 und Anzeige-/Cachekorrekturen v94 vom 29. September
+Stand: Workflowkorrektur v92, Anzeige-/Cachekorrekturen v94 und gemeinsame
+Detaildarstellung mit Zusatzfeldern v95 vom 29. September
 2026. Der [echte Browserdurchlauf](MANUAL_BROWSER_AUDIT_20260929.md) dokumentiert
 den vollständigen Pflegeweg am Paderborner Osterlauf 2027. Weitere Rollout- und
 Prüfnachweise stehen im [Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md). Die frühere
@@ -45,6 +46,31 @@ auf **Aktuellen Stand laden** klicken, vergleichen und erneut prüfen.
 Bearbeitete Werte und Notizen bleiben erhalten; Prüfhäkchen müssen neu gesetzt
 werden. Ist die Antwort unklar, denselben **Verbindlich speichern**-Vorgang
 wiederholen. Er erzeugt keine zweite Ausgabe.
+
+## Wie ergänze ich Gebührenstaffeln, Anreise und Event-Wiki?
+
+Unter **Zusatzdetails für Detailseite und Event-Wiki** die passende Ebene
+wählen: **Nur diese Ausgabe** für jährliche Angaben, oder **Allgemeines
+Event-Wiki – alle Ausgaben** für dauerhaft gültige Informationen. Gebühren,
+Startwellen und Renntag sind nur bei einer konkreten Ausgabe verfügbar.
+
+Die benötigte Gruppe aufklappen. Gebührenstaffeln haben eigene Zeilen für
+Bezeichnung, Betrag, Währung, Gültigkeit/Kontingent und Hinweis. Unterschiedliche
+Wettbewerbe eindeutig in der Bezeichnung benennen. FAQ bestehen aus Frage und
+Antwort. Unbekannte Werte leer lassen; zum Löschen ausdrücklich die betreffende
+Angabe oder Zeile entfernen. Bei neuen Ausgaben werden jährliche Zusatzdetails
+nicht aus dem Vorjahr übernommen.
+
+Nur selbst geprüfte Zusatzangaben anhaken, offizielle Quelle und Prüfnotiz
+eintragen, **Änderungen prüfen** und **Verbindlich speichern**. Für unterschiedliche
+Quellen getrennte Speichervorgänge verwenden. Gespeicherte ungeprüfte Änderungen
+erscheinen nicht als bestätigte öffentliche Angaben. Eine Zusatzbestätigung
+erneuert nicht automatisch die Aktualität sämtlicher Kernangaben.
+
+Die Veröffentlichungskontrolle prüft auch, ob die gerade bearbeiteten Zusatzfelder
+auf der normalen Detailseite dargestellt sind. Die Darstellung folgt für alle
+Ausgaben demselben Aufbau: Uhrzeiten ohne Sekunden, geordnete Wettbewerbe,
+Gebührentabellen und Standortkarte mit Pin. Koordinaten stehen nur im Adminformular.
 
 ## Wie kläre ich einen offenen Hinweis?
 

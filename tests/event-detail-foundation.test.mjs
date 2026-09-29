@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
+import vm from "node:vm";
 import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 
@@ -333,5 +334,25 @@ const generatorSource = fs.readFileSync(
   "utf8"
 );
 assert.doesNotMatch(generatorSource, /firstUsefulValue\(basis\.organizer, event\.data_source\)/);
+
+// Every editable canonical Knowledge field needs a public rendering route.
+// Compare the renderer declaration with the real server whitelist so additions
+// cannot silently save successfully while remaining invisible to athletes.
+const knowledgeMigration = fs.readFileSync(path.join(root,
+  "supabase/migrations/20260929190137_manual_event_knowledge_fields.sql"), "utf8");
+const knowledgeFieldList = knowledgeMigration.match(/as \$fields\$ select '([\s\S]+?)'::jsonb \$fields\$/);
+assert.ok(knowledgeFieldList, 'the canonical Knowledge whitelist must remain inspectable');
+const editableFields = JSON.parse(knowledgeFieldList[1]);
+const liveDetailSource = fs.readFileSync(path.join(root, 'js/event-detail-live.js'), 'utf8');
+const richSectionsLiteral = liveDetailSource.match(/const richSections = (\[[\s\S]*?\n  \]);/);
+const basisLiteral = liveDetailSource.match(/const richBasisFields = (\[[^\]]+\]);/);
+assert.ok(richSectionsLiteral && basisLiteral, 'the shared renderer must declare its section and brand fields');
+const publicFieldPaths = new Set(vm.runInNewContext(richSectionsLiteral[1])
+  .flatMap(([, group, fields]) => fields.map(field => `${group}.${field}`)));
+for (const field of vm.runInNewContext(basisLiteral[1])) publicFieldPaths.add(`basis.${field}`);
+for (const [group, fields] of Object.entries(editableFields)) {
+  for (const field of fields) assert.ok(publicFieldPaths.has(`${group}.${field}`),
+    `Editable Knowledge field has no public renderer: ${group}.${field}`);
+}
 
 console.log("PASS event detail Brand/Edition/verification foundation and static URL regressions");

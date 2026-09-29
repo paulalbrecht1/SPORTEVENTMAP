@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260929-ui-only-v94
+Version: 20260929-ui-only-v95
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: Correct canonical event and registration status on discovery cards, map popups and drawers, popup language refresh on open, and explicit new asset URLs for cached browsers. Preserves the verified admin workflow and public details. Existing static HTML changes only the shared detail runtime script URL; all facts, export timestamps and sitemap remain unchanged. No database migration, data export or automatic candidate approval.
+Includes: Shared Berlin-style event details with formatted times, ordered competitions, location maps and verified live Wiki fields. Admin maintenance supports scoped fee tiers, race-day, travel and Wiki information with field-specific confirmations and rendered-publication checks. Existing static HTML changes only shared detail script and stylesheet version URLs; static facts, export timestamps and sitemap remain unchanged. The separately tested manual_event_knowledge_fields database migration is a deployment prerequisite. No data export or automatic candidate approval.

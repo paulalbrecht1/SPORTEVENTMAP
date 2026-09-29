@@ -6,40 +6,11 @@
   <meta name="robots" content="noindex">
   <title>Eventdetails · Sport Event Map</title>
   <link rel="icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/css/style.css?v=20260929-ui-runtime-v128">
-  <style>
-    html, body.event-detail-page { height: auto !important; min-height: 100% !important; overflow-x: hidden !important; overflow-y: auto !important; }
-    [hidden] { display: none !important; }
-    .live-detail-copy { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.7; }
-    .live-detail-sections a, .event-source-list a { overflow-wrap: anywhere; }
-    .live-detail-field { margin: 0; }
-    .live-detail-field dt { font-weight: 700; margin-top: 18px; }
-    .live-detail-field dd { margin: 4px 0 0; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
-    .live-detail-field dd a { display: inline-flex; min-height: 44px; align-items: center; }
-    body.event-detail-page .live-detail-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .live-detail-facts .race-guide-fact-card { min-width: 0; overflow-wrap: anywhere; grid-template-columns: minmax(0, 1fr); grid-template-areas: "label" "value"; }
-    .live-detail-notice { padding: 16px; border: 1px solid var(--border-color, #9ca3af); border-radius: 12px; line-height: 1.6; }
-    #liveDetailHeader { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 12px; }
-    #liveDetailHeader .event-detail-brand { min-width: 0; text-decoration: none; color: inherit; }
-    #liveDetailHeader .brand-name { display: inline; font-size: 15px; }
-    #liveDetailName { font-size: clamp(28px, 5vw, 48px) !important; line-height: 1.12 !important; overflow-wrap: anywhere; }
-    .live-detail-footer { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
-    .live-detail-footer a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; }
-    @media (max-width: 768px) {
-      body.event-detail-page .live-detail-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      #liveDetailHeader { grid-template-columns: minmax(0, 1fr) auto; }
-      #liveDetailHeader .event-detail-brand { grid-column: 1 / -1; grid-row: 1; }
-      #liveDetailBack { grid-column: 1; grid-row: 2; }
-      #liveDetailHeader .global-theme-toggle { grid-column: 2; grid-row: 2; }
-      #liveDetailHeader .event-detail-language-control { grid-column: 1 / -1; grid-row: 3; }
-      #liveDetailName { font-size: 28px !important; }
-    }
-    @media (max-width: 480px) { body.event-detail-page .live-detail-facts { grid-template-columns: 1fr; } }
-  </style>
+  <link rel="stylesheet" href="/css/style.css?v=20260929-detail-layout-v130">
   <script src="/js/theme.js?v=20260725-publish-runtime-v96"></script>
   <script src="/js/config.js"></script>
   <script defer src="/js/supabase-loader.js" data-supabase-src="/js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
-  <script defer src="/js/event-detail-live.js?v=20260929-public-detail-v129"></script>
+  <script defer src="/js/event-detail-live.js?v=20260929-detail-layout-v130"></script>
 </head>
 <body class="event-detail-page">
   <main class="event-detail-shell">
@@ -61,7 +32,7 @@
         </div>
       </section>
       <nav id="liveDetailNavigation" class="event-detail-tabs race-guide-tabs" aria-label="Eventdetails"><a href="#key-facts" data-detail-section="key-facts" data-live-i18n="facts">Überblick</a><a href="#description" data-detail-section="description" data-live-i18n="description">Beschreibung</a><a href="#sources" data-detail-section="sources" data-live-i18n="sources">Quellen</a></nav>
-      <section id="key-facts" class="event-detail-card race-guide-section"><h2 data-live-i18n="facts">Überblick</h2><div id="liveDetailFacts" class="race-guide-fact-grid live-detail-facts"></div></section>
+      <section id="key-facts" class="event-detail-card race-guide-section"><div class="race-guide-section-heading"><span data-live-i18n="facts">Überblick</span><h2 data-live-i18n="facts">Überblick</h2></div><div id="liveDetailFacts" class="race-guide-fact-grid live-detail-facts"></div></section>
       <section id="description" class="event-detail-card race-guide-section"><h2 data-live-i18n="description">Beschreibung</h2><p id="liveDetailDescription" class="live-detail-copy"></p></section>
       <div id="liveDetailSections" class="live-detail-sections"></div>
       <section id="sources" class="event-detail-card race-guide-section"><h2 data-live-i18n="sources">Quellen</h2><p id="liveDetailChecked" hidden></p><a id="liveDetailSource" class="event-detail-secondary" target="_blank" rel="noopener noreferrer" hidden data-live-i18n="source">Quelle öffnen</a><div id="liveDetailSources" class="event-source-list"></div></section>

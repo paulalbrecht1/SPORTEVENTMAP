@@ -52,7 +52,7 @@
     "test:data-freshness": "node tests/data-freshness-health.test.mjs && node tests/data-quality-stabilization.test.mjs && node tests/freshness-review-verification.test.mjs && node tests/freshness-batch-review.test.mjs",
     "test:p0-fact-batch": "node --test tests/p0-fact-batch.test.mjs",
     "test:edition-publication": "node --test tests/edition-publication-ui.test.mjs tests/safe-edition-publish.test.mjs",
-    "test:manual-maintenance": "node --test tests/manual-event-maintenance.test.mjs",
+    "test:manual-maintenance": "node --test tests/manual-event-maintenance.test.mjs tests/manual-event-knowledge.test.mjs",
     "test:manual-maintenance:local": "node tests/run-manual-event-maintenance-local.mjs",
     "test:manual-workflow:local": "node tests/run-manual-workflow-acceptance-local.mjs",
     "test:alert-dispatch": "node tests/data-alert-dispatch-core.test.mjs && node tests/data-alert-dispatch-security.test.mjs",

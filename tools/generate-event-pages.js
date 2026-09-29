@@ -4209,7 +4209,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260929-ui-runtime-v128" />
+  <link rel="stylesheet" href="../../css/style.css?v=20260929-detail-layout-v130" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,
@@ -4263,7 +4263,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   </script>
   <script src="../../js/config.js"></script>
   <script defer src="../../js/supabase-loader.js" data-supabase-src="../../js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
-  <script defer src="../../js/event-detail.js?v=20260929-ui-runtime-v128"></script>
+  <script defer src="../../js/event-detail.js?v=20260929-detail-layout-v130"></script>
   ${mapScript(event)}
 </body>
 </html>

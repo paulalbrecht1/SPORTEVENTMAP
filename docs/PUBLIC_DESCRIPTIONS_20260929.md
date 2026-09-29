@@ -50,5 +50,31 @@ gerendert. Der spätere reguläre Katalogrelease behält seine bestehenden Gates
 - 23 Admin-/Knowledge-Browsertests bestanden. Die Rohwerte im Formular bleiben
   editierbar; Speichern und öffentliche Erfolgskontrolle bleiben getrennt.
 
-Die veröffentlichten URLs werden nach Abschluss ergänzt. Releasebelege liegen lokal unter
-`exports/public-description-audit-20260929/`.
+Releasebelege liegen lokal unter `exports/public-description-audit-20260929/`.
+
+## Ausgerollt und öffentlich nachgeprüft
+
+- Release: `20260929-ui-only-v97`, Quellcommit
+  `af0b8f2dc2554370cc4bc24bc56817c18c374247`, Buildzeit
+  `2026-09-29T20:10:23.536Z`.
+- Vorschau: <https://82d60378.sporteventmap.pages.dev>.
+- Unveränderlicher produktiver Deploy: <https://eddf8212.sporteventmap.pages.dev>.
+- Release-SHA-256:
+  `2f98e8846b5fca02c3c1856e576a5ed7085b0dea4209c2462dfcd450da3c2ae2`.
+- Je 58 Dateien gegen Vorschau, produktiven Deploy und Hauptdomain geprüft:
+  alle 46 Nicht-HTML-Dateien, 8 kritische HTML-Einstiegsseiten und 4 statische
+  Eventseiten. Cloudflare-Änderungen auf der Hauptdomain sind ausschließlich die
+  bereits streng definierten Middleware-Einfügungen. Nicht alle 994 Seiten
+  einzeln über das Netz abgerufen; ihr gesamtes Paketinventar ist geprüft.
+- Reale Browsersteuerung nach dem Rollout, ohne Daten-Schreibvorgang:
+  <https://sporteventmap.com/event/gutenberg-halbmarathon-mainz-2027/> nach normalem
+  Neuladen der vorherigen v96-Sitzung und
+  <https://sporteventmap.com/event-detail?event=gutenberg-halbmarathon-mainz-2027>.
+  Beide: öffentliche Liveanzeige bestätigt, keine Import-/Listingnotiz im
+  sichtbaren Text, keine solche Meta-/JSON-LD-Beschreibung, leerer
+  Beschreibungsabschnitt ausgeblendet, genau ein Karten-Pin, keine sichtbaren
+  Rohkoordinaten. DE/EN und gemischte echte Beschreibungstexte zusätzlich lokal
+  mit kontrollierten Browserfixtures geprüft.
+- `mainz-production-browser.json` und `mainz-public-v97.png` dokumentieren die
+  öffentliche Nachprüfung. Datenexportdatum bleibt `2026-08-27T07:41:01.290Z`;
+  keine zusätzliche Freshness, Migration oder produktive Eventdatenänderung.

@@ -69,11 +69,13 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.release_scope, 'ui_only'); assert.equal(built.data_updated, false); assert.equal(built.full_data_quality_release, false);
     assert.equal(built.built_at, BUILD_TIME.toISOString()); assert.equal(built.base_release.built_at, '2026-09-01T11:25:56.965Z');
     assert.equal(built.base_release.original_data_timestamps.catalog_exported_at, '2026-08-27T07:41:01.290Z');
-    assert.equal(Object.keys(built.overlay_files).length, 19);
+    assert.equal(Object.keys(built.overlay_files).length, 20);
     assert.deepEqual(ui.artifactInventory(f.baseDir), f.entries, 'Build never changes dist');
     for (const entry of f.entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path))) assert.equal(ui.sha256(fs.readFileSync(path.join(f.output, entry.path))), entry.sha256, entry.path);
     assert.equal(built.overlay_files['js/app.js'].source_sha256, ui.sha256(fs.readFileSync(path.join(f.root, 'js/app.js'))));
     assert.equal(built.overlay_files['js/app.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/app.js'));
+    assert.equal(built.overlay_files['js/event-detail.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/event-detail.js'));
+    assert.ok(fs.readFileSync(path.join(f.output, 'js/event-detail.js')).equals(fs.readFileSync(path.join(f.root, 'js/event-detail.js'))), 'Reviewed detail navigation code must be overlaid from the exact committed source');
     assert.ok(fs.readFileSync(path.join(f.output, 'index.html'), 'utf8').includes('content="ui_only"'));
     assert.ok(fs.readFileSync(path.join(f.output, 'RELEASE_VERSION.txt'), 'utf8').includes('20260908-ui-only-v85'));
     await ui.verifyUiRelease(f.options, f.dependencies);
@@ -129,8 +131,9 @@ test('new dependencies and committed credentials fail before output creation', a
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {
-  assert.equal(ui.OVERLAY_PATHS.length, 19);
-  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
+  assert.equal(ui.OVERLAY_PATHS.length, 20);
+  assert.equal(ui.OVERLAY_PATHS.includes('js/event-detail.js'), true);
+  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/event-catalog-loader.js', 'js/map.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
   assert.equal(ui.validateBaseUrl(`${BASE_URL}/`), BASE_URL);
   for (const url of ['http://1547ae47.sporteventmap.pages.dev', 'https://sporteventmap.com', 'https://sporteventmap.pages.dev', 'https://123456789.sporteventmap.pages.dev', `${BASE_URL}:443`, `${BASE_URL}/path`, `${BASE_URL}?x=1`, `${BASE_URL}#x`, 'https://user@1547ae47.sporteventmap.pages.dev', 'https://1547ae47.sporteventmap.pages.dev.evil.invalid']) assert.throws(() => ui.validateBaseUrl(url));
   const jwt = role => `${Buffer.from('{"alg":"HS256"}').toString('base64url')}.${Buffer.from(JSON.stringify({ role })).toString('base64url')}.signature`;

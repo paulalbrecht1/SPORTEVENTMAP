@@ -121,13 +121,6 @@ begin
   definition:=replace(original,replace(needle,chr(13),''),replace(replacement,chr(13),''));
   if definition=original then raise exception 'Public freshness source gate changed; inspect migration before applying'; end if;
   execute definition;
-  original:=replace(pg_get_functiondef('public.evaluate_change_proposal_automation(uuid,boolean)'::regprocedure),chr(13),'');
-  needle:='c.event_id=proposal.event_id and c.field_name=proposal.field_name';
-  replacement:='c.event_id=proposal.event_id and c.field_name=proposal.field_name
-      and (c.edition_id is null or c.edition_id=proposal.edition_id)';
-  definition:=replace(original,replace(needle,chr(13),''),replace(replacement,chr(13),''));
-  if definition=original then raise exception 'Automation field-control lookup changed; inspect migration before applying'; end if;
-  execute definition;
   original:=replace(pg_get_functiondef('private.invalidate_freshness_from_source_health()'::regprocedure),chr(13),'');
   needle:=$find$and coalesce(old.last_change_status, '') in ('unchanged', 'first_seen');$find$;
   replacement:=$replace$and coalesce(old.last_change_status, '') in ('unchanged', 'first_seen')
@@ -148,6 +141,24 @@ begin
   execute definition;
 end;
 $upgrade$;
+
+-- Stage Four is intentionally absent on the production baseline. Only patch
+-- it when installed; an unexpected installed definition still fails closed.
+do $upgrade_optional_automation$
+declare definition text; original text; needle text; replacement text; evaluator regprocedure;
+begin
+  evaluator:=to_regprocedure('public.evaluate_change_proposal_automation(uuid,boolean)');
+  if evaluator is not null then
+    original:=replace(pg_get_functiondef(evaluator),chr(13),'');
+    needle:='c.event_id=proposal.event_id and c.field_name=proposal.field_name';
+    replacement:='c.event_id=proposal.event_id and c.field_name=proposal.field_name
+      and (c.edition_id is null or c.edition_id=proposal.edition_id)';
+    definition:=replace(original,replace(needle,chr(13),''),replace(replacement,chr(13),''));
+    if definition=original then raise exception 'Automation field-control lookup changed; inspect migration before applying'; end if;
+    execute definition;
+  end if;
+end;
+$upgrade_optional_automation$;
 
 -- All automated direct writers, including legacy imports, obey existing field
 -- controls. Source Monitor can still record a review proposal for a conflict.

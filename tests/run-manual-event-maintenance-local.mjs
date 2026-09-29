@@ -45,6 +45,40 @@ if (/podman/i.test(containerCli)) {
     assert.ok(endpoint.protocol === 'unix:' || ['127.0.0.1', 'localhost', '[::1]'].includes(endpoint.hostname), 'Remote container engines are forbidden.');
   }
 }
+function testOptionalAutomationMigration() {
+  const migration = fs.readFileSync(path.join(root, 'supabase/migrations/20260929104600_manual_event_maintenance.sql'), 'utf8');
+  const block = migration.match(/do \$upgrade_optional_automation\$[\s\S]*?\$upgrade_optional_automation\$;/)?.[0];
+  assert.ok(block, 'Test executes the optional automation patch from the real migration.');
+  const literal = value => `'${value.replaceAll("'", "''")}'`;
+  const output = sql(`begin;
+    do $assert$ begin
+      if position('and (c.edition_id is null or c.edition_id=proposal.edition_id)' in
+        pg_get_functiondef('public.evaluate_change_proposal_automation(uuid,boolean)'::regprocedure))=0 then
+        raise exception 'Installed optional automation must receive edition-scoped controls';
+      end if;
+    end $assert$;
+    alter function public.evaluate_change_proposal_automation(uuid,boolean) rename to manual_maintenance_test_original_automation;
+    ${block}
+    do $assert$ begin
+      if to_regprocedure('public.evaluate_change_proposal_automation(uuid,boolean)') is not null then
+        raise exception 'Missing optional automation must remain absent';
+      end if;
+    end $assert$;
+    create function public.evaluate_change_proposal_automation(uuid,boolean) returns jsonb
+      language sql as $stub$ select '{}'::jsonb $stub$;
+    do $assert$ begin
+      begin
+        execute ${literal(block)};
+        raise exception 'Unexpected optional automation must fail closed';
+      exception when raise_exception then
+        if sqlerrm <> 'Automation field-control lookup changed; inspect migration before applying' then raise; end if;
+      end;
+    end $assert$;
+    rollback;
+    select 'OPTIONAL_AUTOMATION_MIGRATION=installed_scoped,absent_skipped,drift_rejected';`);
+  assert.match(output, /OPTIONAL_AUTOMATION_MIGRATION=installed_scoped,absent_skipped,drift_rejected/);
+  console.log('Real migration block: installed optional automation scoped, missing subsystem skipped, unexpected definition rejected; changes rolled back.');
+}
 async function testCommittedReadback() {
   const actor = randomUUID(), requestId = randomUUID(), marker = `manual-maintenance-commit-${randomUUID()}`;
   const literal = value => `'${String(value).replaceAll("'", "''")}'`;
@@ -119,6 +153,7 @@ try {
   const actual = sql('select version from supabase_migrations.schema_migrations order by version;').trim().split(/\r?\n/);
   assert.deepEqual(actual, expected, 'All current migrations must apply on a clean database.');
   console.log(`Applied ${actual.length} migrations to fresh database.`);
+  testOptionalAutomationMigration();
   const output = sql("set sporteventmap.test_manual_maintenance = 'isolated';\n" + fs.readFileSync(path.join(root, 'tests/manual-event-maintenance.sql'), 'utf8'));
   process.stdout.write(output);
   assert.match(output, /MANUAL_MAINTENANCE_ASSERTIONS=\d+/);

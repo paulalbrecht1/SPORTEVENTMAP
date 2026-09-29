@@ -10,7 +10,7 @@ const OVERLAY_PATHS = Object.freeze([
   'index.html', '404.html', 'event-detail.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
   'css/style.css', 'css/mobile-discovery.css',
   'js/app.js', 'js/events.js', 'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/i18n.js',
-  'js/mobile-discovery.js', 'js/supabase.js', 'js/event-detail-live.js', 'RELEASE_VERSION.txt'
+  'js/mobile-discovery.js', 'js/supabase.js', 'js/event-detail-live.js', 'js/event-detail.js', 'RELEASE_VERSION.txt'
 ]);
 const RUNTIME_PATHS = Object.freeze([
   'css/style.css', 'css/mobile-discovery.css', 'css/data-operations.css', 'css/source-monitor.css',

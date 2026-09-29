@@ -1,22 +1,37 @@
 # Nächste Umsetzungsstufen
 
-Stand: 21. September 2026
+Stand: 29. September 2026
 
-Entwicklungsnachtrag vom 29. September 2026: Der
-[manuelle Admin-Pflegeweg](MANUAL_EVENT_MAINTENANCE.md) ergänzt die bestehende
-P0-Quellenprüfung um feldweise Bestätigungen, Editionskorrekturen und neue
-Editionsentwürfe ohne LLM-Aufruf. Produktionsmigration und Website-Deployment
-stehen separat an. Die folgenden Bestandszahlen bleiben historische
-Produktionsnachweise; diese Codeänderung erhöht sie nicht und lockert keine
-Freigabegrenzen.
+**P0 bleibt aktiv.** Die lesende Produktionsmessung vom 29.09., 11:33 UTC,
+ergibt 210 Discovery-Einträge (160 Deutschland), 990 Archiv-Editionen,
+vier gültige Vollnachweise (1,90 %) und 110 vollständige Einträge (52,38 %).
+Der [aktuelle P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) führt die verbleibende
+Arbeit zusammen: manuellen Pflegeweg abnehmen und ausrollen, einen kurzen Pilot
+mit gemessener Pflegezeit abschließen, länger nutzbare Nettozugänge und vorhandene
+Reviewpakete bearbeiten, danach den regulären Export mit allen Gates bestehen.
 
-P0 bleibt aktiv. Der [aktuelle Umsetzungsstand](P0_SOURCE_REVIEW_OPERATIONS_20260921.md)
+Der [manuelle Admin-Pflegeweg](MANUAL_EVENT_MAINTENANCE.md) ist implementiert und
+benötigt im täglichen Betrieb keine LLM-Aufrufe. Frontend und beide Migrationen
+sind zu diesem Dokumentstand noch nicht produktiv. Die aktuelle Produktionskopie
+hat die beiden Migrationen und 64 anwendbare SQL-Prüfungen erfolgreich bestanden;
+bestehende Fakten und Nutzerverknüpfungen bleiben unverändert. Der Rollout bleibt
+offen. Die Grenzen bleiben unverändert: mindestens 400
+Discovery-Einträge, 55 % Frische, 45 % Vollständigkeit, effektiver Archivbestand
+mindestens 974 und ein höchstens 24 Stunden alter Export mit gebundenen Audits.
+Momentan fehlen mindestens 190 Nettozugänge und 216 zusätzliche Vollnachweise;
+zeitbedingte Abgänge und auslaufende Prüfungen sind vor dem Release neu zu messen.
+P1 verlangt 1.000+ verifizierte deutsche Event-Editionen im operativen Katalog;
+die 990 historischen und aktuellen Archiv-Editionen erfüllen
+dieses Ziel nicht.
+
+**Historischer Nachweis vom 21. September 2026:** Der
+[damalige Umsetzungsstand](P0_SOURCE_REVIEW_OPERATIONS_20260921.md)
 führt die tatsächlichen Produktionsänderungen, Prüfungen und verbleibenden
 Freigabesperren zusammen. Der Source Monitor ist mit geprüftem CORS-Vertrag
 produktiv; ein echter Adminlauf bestätigt den Browseraufruf. Nach Köhlbrand
 und Ratzeburg ist auch FSV-Lauf vollständig geprüft und streng frisch bestätigt.
-Aktuell bleiben 230 Discovery-Editionen und zehn vollständige Frischenachweise
-(4,35 %) unter den unveränderten Freigabegrenzen. Allgäu 2027 ist als geprüftes
+Damals blieben 230 Discovery-Editionen und zehn vollständige Frischenachweise
+(4,35 %) unter den unveränderten Freigabegrenzen. Allgäu 2027 war als geprüftes
 privates Quellenpaket vorbereitet; Datumsabgleich, Quellenbindung, Klonprüfung
 und tatsächliche Editionsfreigabe stehen noch aus. Beide Editionsschutz-Migrationen
 vom 20.09. und die fünf zuvor privat übernommenen Detailpakete sind im

@@ -187,7 +187,17 @@ seine eigenen Testressourcen anschließend auf.
   Dublettenkandidaten. Die bestehenden Gates wurden nicht abgesenkt. Dieser
   Befund ist keine neue Abfrage des aktuellen produktiven Datenbestands.
 
+Nachtrag zur P0-Fortsetzung: Die tatsächliche Produktionsbasis besitzt das
+optionale Stage-4-Subsystem nicht. Der entsprechende Migrationsabschnitt
+prüft jetzt dessen Vorhandensein, ohne die übrigen Schema-Prüfungen zu lockern.
+Ein frischer Produktions-Restore mit 44 historischen Migrationen besteht beide
+neuen Migrationen und 64 anwendbare SQL-Prüfungen. Nur zwei Stage-4-Prüfungen
+sind dort ausdrücklich nicht anwendbar. Die Hashes von 14 bestehenden
+Tabellen/Ansichten und bisherige Frischeentscheidungen bleiben unverändert.
+Der vollständige lokale Stand besteht zusätzlich alle 66 SQL-Prüfungen.
+
 Keine Produktionsmigration, Produktionsschreibtests oder Veröffentlichung
-wurden ausgeführt. Damit sind die produktive Schema-Kompatibilität und der
-aktuelle Stand der öffentlich gehosteten Seiten noch nicht nachgewiesen.
+wurden ausgeführt. Der produktive Rollout und die Bereitstellung der neuen
+Pflegeoberfläche sind damit noch nicht nachgewiesen. Den aktuellen Stand führt
+der [P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
 Testdatensätze, lokale Testcontainer und deren Volumes wurden entfernt.

@@ -159,9 +159,13 @@ export async function runBrowserAcceptance({root,baseURL,apiUrl,publishableKey,f
     assert.notEqual(nextId,history.edition_id);assert.equal(readEdition(nextId).publication_status,'draft');assert.deepEqual(readEdition(history.edition_id),old);
     assert.equal((await publicRead('public_event_archive',nextId)).length,0);
     const nextSource=parse(sql(`select to_jsonb(s) from public.event_sources s where edition_id=${literal(nextId)} and source_url=${literal(nextOfficial)};`));
+    // Preserve the crawler's historical HTTP/www spelling while the same source
+    // and the explicit human evidence now use HTTPS without www.
+    const historicalCandidateUrl=nextOfficial.replace(/^https:\/\//,'http://www.');
+    assert.notEqual(historicalCandidateUrl,nextSource.source_url);
     // Simulate one independent crawler observation in the owned local database.
     const candidate=parse(sql(`insert into public.edition_succession_candidates(event_id,source_id,predecessor_edition_id,draft_edition_id,candidate_year,candidate_start_date,source_url,confidence,fingerprint,candidate_status,validation_status,validation_reasons)
-      values(${history.event_id},${literal(nextSource.id)},${literal(history.edition_id)},${literal(nextId)},${history.year},${literal(history.year+'-08-08')},${literal(nextOfficial)},0.99,${literal('acceptance-'+nextId)},'conflict','conflict',array['edition_year_date_conflict']) returning to_jsonb(edition_succession_candidates);`));
+      values(${history.event_id},${literal(nextSource.id)},${literal(history.edition_id)},${literal(nextId)},${history.year},${literal(history.year+'-08-08')},${literal(historicalCandidateUrl)},0.99,${literal('acceptance-'+nextId)},'conflict','conflict',array['edition_year_date_conflict']) returning to_jsonb(edition_succession_candidates);`));
     sql(`update public.event_editions set generated_from_candidate_id=${literal(candidate.id)} where id=${literal(nextId)};`);
     await adminPage.locator('[data-maintenance-reload]').click();await adminPage.locator('[data-maintenance-reset-form]').click();
     if(!await field(adminPage,'edition.end_date').isVisible())await optional(adminPage);
@@ -180,8 +184,10 @@ export async function runBrowserAcceptance({root,baseURL,apiUrl,publishableKey,f
     await save(adminPage);
     const reviewed=parse(sql(`select to_jsonb(c) from public.edition_succession_candidates c where id=${literal(candidate.id)};`));
     assert.equal(reviewed.candidate_start_date,candidate.candidate_start_date);assert.equal(reviewed.candidate_year,candidate.candidate_year);assert.equal(reviewed.source_id,candidate.source_id);assert.equal(reviewed.fingerprint,candidate.fingerprint);
+    assert.equal(reviewed.source_url,historicalCandidateUrl);
+    assert.equal(parse(sql(`select to_jsonb(s) from public.event_sources s where id=${literal(nextSource.id)};`)).source_url,nextOfficial);
     assert.notEqual(reviewed.validation_status,'conflict');assert.equal(readEdition(nextId).publication_status,'draft');
-    record('Real unresolved candidate prevents publication; explicit audited in-form range review preserves original observed facts and leaves draft private');
+    record('Real unresolved candidate prevents publication; explicit in-form HTTPS review accepts the same bound source with historical HTTP/www URL, preserves original URL and observed facts, and leaves draft private');
     if(!await field(adminPage,'event.address').isVisible())await optional(adminPage);
     for(const name of required)await adminPage.locator(`[data-maintenance-confirm="${name}"]`).check();
     await adminPage.locator('[data-maintenance-publish]').check();await preview(adminPage);const published=await save(adminPage);assert.equal(published.publication.status,'database_public');

@@ -72,7 +72,8 @@ deployment_sequence(ordinal, version, name) as (
     (19, '20260929104600', 'manual_event_maintenance'),
     (20, '20260929104628', 'manual_edition_import_compatibility'),
     (21, '20260929130903', 'manual_maintenance_conflict_http_status'),
-    (22, '20260929150626', 'manual_workflow_publication_and_review')
+    (22, '20260929150626', 'manual_workflow_publication_and_review'),
+    (23, '20260929155111', 'manual_candidate_source_url_alias')
 ),
 expected_pending(version, name) as (
   select sequence.version, sequence.name

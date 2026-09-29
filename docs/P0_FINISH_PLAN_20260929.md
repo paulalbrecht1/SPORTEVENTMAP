@@ -1,11 +1,49 @@
 # P0-Abschlussplan – 29. September 2026
 
-**Nachtrag aus der erneuten Workflow-Abnahme:** Vor der vollständigen Freigabe
-des eigenständigen Pflegewegs müssen die verlinkten Detailseiten aktuelle Werte
-zeigen, sämtliche öffentlichen Formularfelder nachgeprüft werden und Konflikte
-im neuen Adminbereich lösbar sein. Auch die dynamische Frischeanzeige liest
-derzeit das RPC-Antwortformat falsch. Diese Fehler sind unabhängig von den
-Bestandsgrenzen; [Befunde und Abnahmereihenfolge](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md).
+## Aktueller Stand nach der Workflowkorrektur – 16:02 UTC
+
+Der eigenständige Pflegeweg ist mit **v92 und zwei Backendergänzungen produktiv
+repariert und vollständig geprüft**. Alle vier früheren Befunde sind behoben;
+zusätzlich wurde die historische HTTP-/WWW-Quellenvariante berücksichtigt.
+Allgäu 2027 wurde ausschließlich über „Events pflegen“ am vorhandenen Entwurf
+geklärt, gezielt bestätigt und veröffentlicht. Die normale öffentliche Seite,
+Karte und Liste zeigen die Änderung. Alte Edition, Quellen, Ergebnisse und
+Saisonplanerverknüpfungen sind nachweislich unverändert.
+[Korrekturbericht und Nachweise](MANUAL_WORKFLOW_FIX_20260929.md).
+
+| Kennzahl | Gemessener Stand 16:01 UTC | Unveränderte Releasegrenze |
+| --- | ---: | ---: |
+| Discovery | 211, davon 161 in Deutschland | mindestens 400 |
+| Archiv | 991 | effektiv mindestens 974 |
+| Gültige vollständige Frischenachweise | 7 von 211 = 3,32 % | mindestens 55 % |
+| Vollständige Discovery-Einträge | 111 von 211 = 52,61 % | mindestens 45 % |
+| Reviewbedarf | 204 | gezielt abarbeiten |
+
+**P0 bleibt offen.** Bis genau 400 Einträgen fehlen rechnerisch mindestens
+189 Nettozugänge und 213 zusätzliche Vollnachweise. Wenn alle 189 Zugänge frisch
+veröffentlicht werden und die sieben bisherigen Nachweise gültig bleiben,
+braucht es zusätzlich mindestens 24 Bestandsreviews. Abgänge und ablaufende
+Nachweise können diese Untergrenze erhöhen.
+
+Die nächsten Schritte:
+
+1. Vorhandene künftige deutsche Kandidaten in kleinen, belegbaren Gruppen über
+   den reparierten Admin bearbeiten; vorhandene Editionen weiterverwenden.
+   Allgäu ist abgeschlossen und darf nicht noch einmal als Zugang gezählt werden.
+2. Quellenprüfungen im bestehenden Bestand nach Fälligkeit und kurzfristigem
+   Veranstaltungsdatum priorisieren. Nur ausdrücklich geprüfte Angaben
+   bestätigen; keine pauschale Frischeerhöhung durch Speichern.
+3. Fehlende Bestandszugänge gezielt recherchieren. Erst sobald Bestand und
+   Frische tragen, den regulären Export mit gebundenen Dubletten-, Datums-
+   und Geo-Audits sowie den bestehenden Releaseprüfungen veröffentlichen.
+4. P1 erst nach bestandenem regulärem Datenrelease beginnen. Der alte
+   Ausfallexport bleibt bis dahin ausdrücklich als alter Datenstand gekennzeichnet.
+
+Die folgende Momentaufnahme von 13:26 UTC ist **historisch**. Ihre Aussagen
+„Allgäu privat“ und „Konfliktschritt fehlt“ sind durch den obigen Abschluss
+überholt; Bestandsanalysen und Kriterien bleiben als Ausgangsnachweis erhalten.
+
+## Historischer Ausgangspunkt vor v92
 
 Stand der folgenden Bestandsmessung: **29.09.2026, 13:26 UTC, nach dem Pilot**.
 P0 bleibt offen. Pflege-Migrationen, Konflikt-Hotfix und Frontend **v91 sind produktiv

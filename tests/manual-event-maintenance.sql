@@ -72,6 +72,20 @@ declare
   candidate_date date:=make_date(extract(year from current_date)::integer+3,5,1);
 begin
   official_url:='https://example.invalid/'||marker;
+  perform pg_temp.mm_assert(private.manual_candidate_source_url_matches('http://www.example.invalid/2027?race=run#date','https://example.invalid/2027?race=run#date')
+    and private.manual_candidate_source_url_matches('https://www.example.invalid/','https://example.invalid/'),
+    'source aliases allow only HTTPS upgrade and one www prefix with an exact suffix');
+  perform pg_temp.mm_assert(not private.manual_candidate_source_url_matches('http://www.example.invalid.evil.invalid/','https://example.invalid/')
+    and not private.manual_candidate_source_url_matches('http://example.invalid@evil.invalid/','https://example.invalid/')
+    and not private.manual_candidate_source_url_matches('http://www.example.invalid:80/','https://example.invalid/')
+    and not private.manual_candidate_source_url_matches('http://www.1.2.3.4/','https://1.2.3.4/')
+    and not private.manual_candidate_source_url_matches('https://example.invalid/','http://example.invalid/'),
+    'source alias comparison rejects different hosts credentials ports and HTTPS downgrade');
+  perform pg_temp.mm_assert(not private.manual_candidate_source_url_matches('http://www.example.invalid/2026','https://example.invalid/2027')
+    and not private.manual_candidate_source_url_matches('http://www.example.invalid/?year=2026','https://example.invalid/?year=2027')
+    and not private.manual_candidate_source_url_matches('http://www.example.invalid/#2026','https://example.invalid/#2027')
+    and not private.manual_candidate_source_url_matches('http://www.example.invalid/race/','https://example.invalid/race'),
+    'source alias comparison preserves path query fragment and trailing slash distinctions');
   insert into auth.users(id,aud,role,email,created_at,updated_at)
   values(admin_id,'authenticated','authenticated',marker||'-admin@example.invalid',now(),now()),
         (user_id,'authenticated','authenticated',marker||'-user@example.invalid',now(),now());
@@ -442,7 +456,7 @@ begin
   execute 'reset role';
   select id into fresh_source_id from public.event_sources where event_sources.edition_id=conflict_edition_id and source_url=official_url||'/conflict';
   update public.event_editions set start_date=candidate_date,end_date=candidate_date+1 where id=conflict_edition_id;
-  update public.edition_succession_candidates set source_id=fresh_source_id,source_url=official_url||'/conflict',
+  update public.edition_succession_candidates set source_id=fresh_source_id,source_url=replace(official_url,'https://','http://www.')||'/conflict',
     candidate_start_date=candidate_date+1,validation_reasons=array['edition_year_date_conflict'] where id=conflict_candidate_id;
   insert into public.event_editions(event_id,edition_year,edition_key,edition_slug,legacy_event_key,start_date,publication_status)
     values(event_id,extract(year from candidate_date),'autumn',marker||'-separate-autumn',marker||'-separate-autumn',make_date(extract(year from candidate_date)::integer,11,1),'draft')
@@ -475,6 +489,18 @@ begin
     'candidate resolution blocks an overlapping competing observation',array['23514']);
   execute 'reset role';
   update public.edition_succession_candidates set candidate_start_date=make_date(extract(year from candidate_date)::integer,11,1) where id=separate_candidate_id;
+  foreach operation in array array[
+    replace(official_url,'example.invalid','unrelated.invalid')||'/conflict',
+    official_url||'/different-edition',official_url||'/conflict?year=2099'] loop
+    update public.edition_succession_candidates set source_url=operation where id=conflict_candidate_id;
+    execute 'set local role authenticated';
+    context:=public.admin_manual_event_context(event_id);
+    payload:=jsonb_set(payload,'{expected_version}',context->'version');
+    perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',payload),
+      'candidate source binding rejects unsafe alias '||operation,array['23514']);
+    execute 'reset role';
+  end loop;
+  update public.edition_succession_candidates set source_url=replace(official_url,'https://','http://www.')||'/conflict' where id=conflict_candidate_id;
   execute 'set local role authenticated';
   context:=public.admin_manual_event_context(event_id);
   payload:=jsonb_set(payload,'{expected_version}',context->'version');
@@ -490,6 +516,15 @@ begin
   perform pg_temp.mm_assert((select to_jsonb(c)-array['updated_at','candidate_status','validation_status','validation_reasons','validated_at','reviewed_at','reviewed_by','review_notes']
     from public.edition_succession_candidates c where id=conflict_candidate_id)=candidate_observation,
     'candidate resolution preserves all original observations evidence and identity');
+  perform pg_temp.mm_assert(exists(select 1 from public.event_audit_log a where a.entity_id=conflict_edition_id::text
+    and a.field_name='__manual_candidate_resolution__'
+    and a.old_value->>'source_url'=replace(official_url,'https://','http://www.')||'/conflict'
+    and a.new_value->'observation'->>'source_url'=a.old_value->>'source_url'
+    and a.new_value->'observation'->>'fingerprint'=a.old_value->>'fingerprint'
+    and a.new_value->'source_url_comparison'->>'policy'='https_www_same_source_exact_path_v1'
+    and a.new_value->'source_url_comparison'->>'same_source_id'='true'
+    and a.new_value->'source_url_comparison'->>'confirmed_url'=official_url||'/conflict'),
+    'explicit alias review audits both URLs while retaining raw source observation and fingerprint');
   replay:=public.save_manual_event_maintenance(payload);
   perform pg_temp.mm_assert(replay->>'replayed'='true' and
     (select count(*)=1 from public.event_audit_log where entity_id=conflict_edition_id::text and field_name='__manual_candidate_resolution__'),

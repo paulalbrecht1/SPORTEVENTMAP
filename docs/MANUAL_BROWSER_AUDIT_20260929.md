@@ -88,6 +88,18 @@ Marker und Sprachsteuerung erneut bestanden. Der gesamte 172er-Lauf wurde
 anschließend nicht nochmals ausgeführt; die abschließende Prüfung konzentriert
 sich auf die tatsächlich veränderten Pfade.
 
+Der Nachtest in der bereits geöffneten Produktionssitzung deckte außerdem eine
+Auslieferungslücke auf: Die v93-Dateien waren auf dem Server korrekt, doch die
+HTML-Einstiegsseiten referenzierten noch die alten Versionsadressen für
+`events.js`, `map.js` und `i18n.js`. Der Browser durfte deshalb alte Skripte aus
+seinem Cache verwenden. v94 vergibt für diese drei Assets ausdrücklich neue
+Adressen, auch in den betroffenen Rechtstext-Einstiegsseiten. Die Abnahme muss
+in derselben bestehenden Browsersitzung mit normalem Neuladen erfolgen;
+ein Datei-Hashvergleich oder ein neuer, leerer Browser allein genügt nicht.
+Der zusätzliche Cache-Regressionstest war vor der Korrektur rot; danach sind
+alle 15 Tests der manuellen Pflege sowie der Release-Einstiegspunktlauf
+einschließlich seiner 72 Paket- und Routingtests bestanden.
+
 ## Grenzen der aktuellen Liveprüfung
 
 Die lesende Nachkontrolle um 18:07 UTC bestätigt genau eine Edition 2027, einen

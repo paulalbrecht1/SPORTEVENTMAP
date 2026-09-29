@@ -49,6 +49,13 @@ Die feste Oberflächenliste umfasst außerdem `js/map.js`, dessen bestehender
 Refresh jetzt ein überprüfbares Ergebnis zurückgibt. Unveränderte übrige
 Runtimeabhängigkeiten bleiben geschützt. Die Kataloggates bleiben unverändert.
 
+Bei geänderten Runtime-Dateien auch deren Versionsadressen in den freigegebenen
+HTML-Einstiegsseiten erneuern. Der Builder kopiert diese Referenzen aus dem
+Quellstand; er aktualisiert sie nicht automatisch. Für `events.js`, `map.js` und
+`i18n.js` wurde dies nach dem realen Cachebefund in v94 abgesichert. Den Release
+zusätzlich in einer bereits zuvor geöffneten Sitzung nach normalem Neuladen
+prüfen, damit ein alter Browsercache keine korrigierten Dateien verdeckt.
+
 ```powershell
 node tools/ui-release.js build --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --out exports/<release>/package
 node tools/ui-release.js verify --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --package exports/<release>/package

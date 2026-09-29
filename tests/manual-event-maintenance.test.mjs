@@ -31,6 +31,25 @@ test('all changed v90 UI assets use advanced URLs in overlay pages, dynamic impo
   }
 });
 
+test('status and popup runtime references leave the cached pre-v94 assets behind in every overlay HTML source', () => {
+  const assets = ['js/events.js', 'js/map.js', 'js/i18n.js'];
+  const seen = new Set();
+  const { OVERLAY_PATHS } = require('../tools/ui-release.js');
+  // makeOverlay preserves these source URLs; a new release identity alone does
+  // not invalidate the four-hour browser cache of an unchanged asset URL.
+  for (const file of OVERLAY_PATHS.filter(file => file.endsWith('.html'))) {
+    const source = fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    for (const [, reference] of source.matchAll(/\bsrc=["']([^"']+)["']/g)) {
+      const url = new URL(reference, 'https://sporteventmap.com/');
+      const asset = url.pathname.slice(1);
+      if (!assets.includes(asset)) continue;
+      assert.equal(url.searchParams.get('v'), '20260929-ui-only-v94', `${file}: ${asset} must bypass the old cached runtime`);
+      seen.add(asset);
+    }
+  }
+  assert.deepEqual([...seen].sort(), [...assets].sort(), 'All three changed runtime assets remain referenced');
+});
+
 test('patch contains only changed explicitly touched allowed values; blank and collapsed fields preserve data', () => {
   const before = { city: 'Berlin', description: 'Existing description', price_min: 25, participant_limit: 200 };
   const values = { city: 'Hamburg', description: '', price_min: 0, participant_limit: undefined, role: 'admin' };

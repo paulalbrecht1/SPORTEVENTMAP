@@ -4964,6 +4964,7 @@ let stageFourGoldenCases = [];
 
 const ADMIN_TAB_PANEL_IDS = {
   analytics: "adminAnalyticsPanel",
+  eventMaintenance: "adminEventMaintenancePanel",
   dataOperations: "adminDataOperationsPanel",
   feedback: "adminFeedbackPanel"
 };
@@ -5043,6 +5044,26 @@ function setAdminTab(tabName) {
 }
 
 async function loadAdminTab(tabName, options = {}) {
+  if (tabName === "eventMaintenance") {
+    const panel = document.getElementById("adminEventMaintenancePanel");
+    if (!panel || panel.dataset.maintenanceMounted === "true") return;
+    try {
+      if (!await isCurrentUserAdmin()) throw new Error("Für die Eventpflege ist eine Adminanmeldung erforderlich.");
+      await import("./manual-event-maintenance.js?v=20260929-v1");
+      window.SemManualEventMaintenance.mount({
+        root: panel,
+        client: supabaseClient,
+        verifyPublication: ({ event, edition }) => window.SemManualEventMaintenance.verifyPublicEdition({
+          supabaseUrl: SUPABASE_URL, publishableKey: SUPABASE_PUBLISHABLE_KEY, event, edition
+        }),
+        onOpenReview: async () => { setAdminTab("dataOperations"); await loadDataOperations({ force: true }); }
+      });
+      panel.dataset.maintenanceMounted = "true";
+    } catch (error) {
+      panel.textContent = getFriendlyErrorMessage(error, "Die Eventpflege konnte nicht geladen werden. Bitte erneut öffnen.");
+    }
+    return;
+  }
   if (tabName === "review") {
     await Promise.all([
       loadAdminSummary(),

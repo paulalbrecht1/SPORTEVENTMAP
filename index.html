@@ -2335,6 +2335,13 @@
       <button
         type="button"
         class="admin-tab"
+        data-admin-tab="eventMaintenance"
+        role="tab"
+        aria-selected="false"
+      >Events pflegen</button>
+      <button
+        type="button"
+        class="admin-tab"
         data-admin-tab="dataOperations"
         role="tab"
         aria-selected="false"
@@ -3097,6 +3104,7 @@
 
     </div>
 
+    <div class="admin-tab-panel" id="adminEventMaintenancePanel" hidden></div>
     <div class="admin-tab-panel" id="adminDataOperationsPanel" hidden>
       <div class="admin-table-section admin-data-operations">
         <div class="admin-data-operations-header">

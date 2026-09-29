@@ -793,7 +793,10 @@ test("Light mode keeps Analytics and Admin Feedback readable", async ({ page }) 
   await expect(page.locator("#adminModal .admin-card"))
     .toHaveCSS("background-color", "rgb(244, 247, 244)");
   await expect(page.locator("#adminModal [data-admin-tab]"))
-    .toHaveCount(3);
+    .toHaveCount(4);
+  expect(await page.locator("#adminModal [data-admin-tab]")
+    .evaluateAll(tabs => tabs.map(tab => tab.dataset.adminTab)))
+    .toEqual(["analytics", "eventMaintenance", "dataOperations", "feedback"]);
 
   await expectReadable(page, "#adminModal .admin-dashboard-header h2");
   await expectReadable(page, "#adminModal .admin-dashboard-header p");

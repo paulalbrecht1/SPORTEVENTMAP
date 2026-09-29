@@ -19,7 +19,7 @@ assert.equal(scripts["prepare-package"], "node tools/create-publish-package.js")
 assert.equal(scripts["verify-package"], "node tools/verify-release-package.js");
 const technicalGroups = [
   "test:release-entrypoints", "test:catalog-release", "test:catalog-loader",
-  "test:data-freshness", "test:alert-dispatch", "test:static", "test:quality",
+  "test:data-freshness", "test:manual-maintenance", "test:alert-dispatch", "test:static", "test:quality",
   "test:quality-review", "test:germany-expansion", "test:data-workflow",
   "test:event-automation", "test:source-monitor", "test:stage-four",
   "test:edition-lifecycle", "audit:layout", "test:e2e"

@@ -52,6 +52,8 @@
     "test:data-freshness": "node tests/data-freshness-health.test.mjs && node tests/data-quality-stabilization.test.mjs && node tests/freshness-review-verification.test.mjs && node tests/freshness-batch-review.test.mjs",
     "test:p0-fact-batch": "node --test tests/p0-fact-batch.test.mjs",
     "test:edition-publication": "node --test tests/edition-publication-ui.test.mjs tests/safe-edition-publish.test.mjs",
+    "test:manual-maintenance": "node --test tests/manual-event-maintenance.test.mjs",
+    "test:manual-maintenance:local": "node tests/run-manual-event-maintenance-local.mjs",
     "test:alert-dispatch": "node tests/data-alert-dispatch-core.test.mjs && node tests/data-alert-dispatch-security.test.mjs",
     "test:event-detail": "node tests/event-detail-toggle.test.mjs",
     "test:event-detail-foundation": "node tests/event-detail-foundation.test.mjs && node tests/event-detail-integrity.test.mjs && node --test tests/knowledge-data-integrity.test.mjs && node tests/knowledge-review-safety.test.mjs",
@@ -77,7 +79,7 @@
     "test:e2e:debug": "node tests/e2e/run-playwright.mjs --debug",
     "test:catalog-release": "node tests/catalog-release-gate.test.mjs && node tests/catalog-export-policy.test.mjs",
     "test:release-entrypoints": "node tests/release-entrypoints.test.mjs && node tests/release-package-integrity.test.mjs && node --test tests/ui-release.test.mjs tests/event-route-fallback.test.mjs",
-    "test:code": "npm run test:release-entrypoints && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:germany-expansion && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
+    "test:code": "npm run test:release-entrypoints && npm run test:catalog-release && npm run test:catalog-loader && npm run test:data-freshness && npm run test:manual-maintenance && npm run test:alert-dispatch && npm run test:static && npm run test:quality && npm run test:quality-review && npm run test:germany-expansion && npm run test:data-workflow && npm run test:event-automation && npm run test:source-monitor && npm run test:stage-four && npm run test:edition-lifecycle && npm run audit:layout && npm run test:e2e",
     "test:all": "npm run check && npm run test:code",
     "test:gate": "npm run check && npm run test:catalog-loader && npm run test:data-freshness && npm run test:alert-dispatch && npm run test:static && npm run audit:layout && npm run test:e2e && npm run test:rls:local && npm run audit:anon"
   },

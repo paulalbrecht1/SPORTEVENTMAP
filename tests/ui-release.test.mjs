@@ -26,7 +26,7 @@ function fixture() {
   put(root, 'data/events.csv', 'Committed but unreleased newer data must never be copied.');
   const sourceCommit = commit(root), baseDir = path.join(root, 'dist'); fs.mkdirSync(baseDir);
   for (const relative of ui.RUNTIME_PATHS) {
-    if (['js/freshness-batch-review.js', 'js/mobile-discovery.js', 'css/mobile-discovery.css'].includes(relative)) continue;
+    if (['js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/mobile-discovery.js', 'css/mobile-discovery.css'].includes(relative)) continue;
     put(baseDir, relative, ui.OVERLAY_PATHS.includes(relative) ? `/* old deployed ${relative} */\n` : fs.readFileSync(path.join(root, relative)));
   }
   for (const relative of ['index.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html']) put(baseDir, relative, '<html><head></head><body>Original v84</body></html>');
@@ -69,7 +69,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.release_scope, 'ui_only'); assert.equal(built.data_updated, false); assert.equal(built.full_data_quality_release, false);
     assert.equal(built.built_at, BUILD_TIME.toISOString()); assert.equal(built.base_release.built_at, '2026-09-01T11:25:56.965Z');
     assert.equal(built.base_release.original_data_timestamps.catalog_exported_at, '2026-08-27T07:41:01.290Z');
-    assert.equal(Object.keys(built.overlay_files).length, 18);
+    assert.equal(Object.keys(built.overlay_files).length, 19);
     assert.deepEqual(ui.artifactInventory(f.baseDir), f.entries, 'Build never changes dist');
     for (const entry of f.entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path))) assert.equal(ui.sha256(fs.readFileSync(path.join(f.output, entry.path))), entry.sha256, entry.path);
     assert.equal(built.overlay_files['js/app.js'].source_sha256, ui.sha256(fs.readFileSync(path.join(f.root, 'js/app.js'))));
@@ -129,7 +129,7 @@ test('new dependencies and committed credentials fail before output creation', a
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {
-  assert.equal(ui.OVERLAY_PATHS.length, 18);
+  assert.equal(ui.OVERLAY_PATHS.length, 19);
   for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
   assert.equal(ui.validateBaseUrl(`${BASE_URL}/`), BASE_URL);
   for (const url of ['http://1547ae47.sporteventmap.pages.dev', 'https://sporteventmap.com', 'https://sporteventmap.pages.dev', 'https://123456789.sporteventmap.pages.dev', `${BASE_URL}:443`, `${BASE_URL}/path`, `${BASE_URL}?x=1`, `${BASE_URL}#x`, 'https://user@1547ae47.sporteventmap.pages.dev', 'https://1547ae47.sporteventmap.pages.dev.evil.invalid']) assert.throws(() => ui.validateBaseUrl(url));

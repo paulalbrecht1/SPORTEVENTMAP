@@ -4,6 +4,57 @@
   box-sizing: border-box;
 }
 
+/* Manual maintenance shares the existing admin cards and remains usable on phones. */
+.event-maintenance { color: #172033; min-width: 0; }
+.event-maintenance p { margin: 10px 0; line-height: 1.55; }
+.event-maintenance h4 { margin: 18px 0 10px; }
+.event-maintenance label { display: grid; gap: 6px; font-size: 14px; font-weight: 600; min-width: 0; }
+.event-maintenance input:not([type="checkbox"]), .event-maintenance select, .event-maintenance textarea {
+  width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px;
+  border: 1px solid #bdc9c1; border-radius: 9px; background: #fff; color: #172033; font: inherit;
+}
+.event-maintenance textarea { resize: vertical; }
+.event-maintenance button, .event-maintenance .maintenance-source {
+  min-height: 44px; padding: 10px 14px; border: 1px solid #bbd8c5;
+  border-radius: 10px; background: #f0faf4; color: #14532d; font: inherit; font-weight: 650; cursor: pointer;
+  overflow-wrap: anywhere;
+}
+.event-maintenance input[type="checkbox"] { width: 19px; height: 19px; flex: 0 0 auto; accent-color: #15803d; }
+.event-maintenance button:disabled { opacity: .55; cursor: wait; }
+.event-maintenance :focus-visible { outline: 3px solid #4ade80; outline-offset: 2px; }
+.maintenance-search, .maintenance-selection, .maintenance-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 16px 0; }
+.maintenance-search { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+.maintenance-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+.maintenance-results button { display: grid; text-align: left; gap: 4px; }
+.maintenance-results small, .maintenance-help, .maintenance-field small { color: #52605b; font-weight: 400; font-size: 13px; line-height: 1.55; }
+.maintenance-field { display: grid; gap: 7px; align-content: start; min-width: 0; }
+.maintenance-field-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.maintenance-field-actions label, .maintenance-check, .maintenance-format-options label, .maintenance-field > label:has(input[type="checkbox"]) { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 400; min-height: 32px; }
+.event-maintenance fieldset { border: 1px solid #d5dfd8; border-radius: 12px; padding: 16px; margin: 18px 0; min-width: 0; }
+.event-maintenance legend { font-weight: 700; padding: 0 6px; }
+.maintenance-format { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 8px 12px; padding: 12px 0; border-bottom: 1px solid #e0e8e2; }
+.maintenance-format-options { grid-column: 1 / -1; display: flex; gap: 12px; flex-wrap: wrap; }
+.maintenance-formats > button { margin: 12px 0; }
+.maintenance-evidence { display: grid; gap: 12px; }
+.maintenance-source { justify-self: start; text-decoration: none; }
+.maintenance-notice, .maintenance-preview { padding: 16px; margin: 16px 0; background: #f0f9f4; border: 1px solid #afd4ba; border-radius: 12px; overflow-wrap: anywhere; }
+.maintenance-notice li, .maintenance-preview li { margin: 8px 0 8px 18px; }
+.maintenance-notice button, .maintenance-preview button { margin: 8px 8px 0 0; }
+.maintenance-preview li div { margin-top: 4px; }
+.maintenance-preview [data-maintenance-save], .maintenance-actions [data-maintenance-preview] { background: #166534; color: #fff; border-color: #166534; }
+.maintenance-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.event-maintenance .is-error { color: #991b1b; }
+.event-maintenance .admin-secondary-details > summary { min-height: 44px; padding: 10px; cursor: pointer; }
+.event-maintenance .admin-secondary-details .maintenance-grid { padding: 0 12px; }
+@media (max-width: 640px) {
+  .event-maintenance { padding: 12px; }
+  .maintenance-selection, .maintenance-grid, .maintenance-format, .maintenance-results { grid-template-columns: minmax(0, 1fr); }
+  .maintenance-format-options { grid-column: 1; }
+  .maintenance-search { grid-template-columns: minmax(0, 1fr); }
+  .maintenance-actions > button { flex: 1 1 100%; }
+  .maintenance-preview, .maintenance-notice, .event-maintenance fieldset { padding: 12px; }
+}
+
 @supports (content-visibility: auto) {
   .landing-feature,
   .landing-return-section,
@@ -46880,3 +46931,21 @@ body.legal-page.legal-page--polished :is(a, button):focus-visible {
     padding: 10px;
   }
 }
+
+body[data-theme="dark"] #adminEventMaintenancePanel .event-maintenance { color: #e2e8f0; }
+body[data-theme="dark"] #adminEventMaintenancePanel :is(.maintenance-help, .maintenance-results small, .maintenance-field small) { color: #b9c9c0; }
+body[data-theme="dark"] #adminEventMaintenancePanel :is(input:not([type="checkbox"]), select, textarea) { background: #12231d; color: #f1f5f9; border-color: #435c4e; }
+body[data-theme="dark"] #adminEventMaintenancePanel :is(.maintenance-notice, .maintenance-preview) { background: #102d21; border-color: #3d7152; }
+body[data-theme="dark"] #adminEventMaintenancePanel :is(button, .maintenance-source) { background: #183f2b; color: #dcfce7; border-color: #497b5b; }
+body[data-theme="dark"] #adminEventMaintenancePanel .is-error { color: #fecaca; }
+#adminEventMaintenancePanel input:disabled, #adminEventMaintenancePanel select:disabled, #adminEventMaintenancePanel textarea:disabled { opacity: .7; cursor: default; }
+#adminEventMaintenancePanel :is(.maintenance-check, .maintenance-field-actions label, .maintenance-format-options label, .maintenance-field > label:has(input[type="checkbox"])) { display: flex; align-items: center; gap: 7px; font-weight: 400; }
+.maintenance-format-details { grid-column: 1 / -1; }
+.maintenance-format-details > summary { cursor: pointer; padding: 8px 0; min-height: 44px; }
+.maintenance-format-details > summary > small { display: block; margin-top: 6px; line-height: 1.5; }
+.maintenance-history ul { padding: 8px 20px; }
+.maintenance-history li { margin: 10px 0; overflow-wrap: anywhere; }
+.maintenance-history a { color: #166534; }
+body[data-theme="dark"] #adminEventMaintenancePanel .maintenance-history a { color: #86efac; }
+#adminEventMaintenancePanel [data-maintenance-status].is-error { color: #991b1b !important; }
+body[data-theme="dark"] #adminEventMaintenancePanel [data-maintenance-status].is-error { color: #fecaca !important; }

@@ -2,6 +2,14 @@
 
 Stand: 21. September 2026
 
+Entwicklungsnachtrag vom 29. September 2026: Der
+[manuelle Admin-Pflegeweg](MANUAL_EVENT_MAINTENANCE.md) ergänzt die bestehende
+P0-Quellenprüfung um feldweise Bestätigungen, Editionskorrekturen und neue
+Editionsentwürfe ohne LLM-Aufruf. Produktionsmigration und Website-Deployment
+stehen separat an. Die folgenden Bestandszahlen bleiben historische
+Produktionsnachweise; diese Codeänderung erhöht sie nicht und lockert keine
+Freigabegrenzen.
+
 P0 bleibt aktiv. Der [aktuelle Umsetzungsstand](P0_SOURCE_REVIEW_OPERATIONS_20260921.md)
 führt die tatsächlichen Produktionsänderungen, Prüfungen und verbleibenden
 Freigabesperren zusammen. Der Source Monitor ist mit geprüftem CORS-Vertrag

@@ -64,6 +64,7 @@ pass("HTML ids are unique");
   "adminReviewPanel",
   "adminQualityPanel",
   "adminDataOperationsPanel",
+  "adminEventMaintenancePanel",
   "runDataValidationBtn",
   "dataOpsEventsList",
   "dataOpsIssuesList",
@@ -102,8 +103,8 @@ const adminTabNames =
 
 assert.deepEqual(
   adminTabNames,
-  ["analytics", "dataOperations", "feedback"],
-  "Admin navigation must expose Analytics, Data Operations and Feedback"
+  ["analytics", "eventMaintenance", "dataOperations", "feedback"],
+  "Admin navigation must expose Analytics, manual event maintenance, Data Operations and Feedback"
 );
 
 [

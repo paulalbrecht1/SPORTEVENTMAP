@@ -308,6 +308,9 @@ async function applyMigration(prepared) {
 
   const editions = prepared.editions.map(row => ({
     ...row,
+    // Curated legacy imports address the primary edition only. Additional
+    // manually maintained editions in the same year have their own identity.
+    edition_key: "main",
     event_id: eventIds.get(row.canonical_key)
   })).map(row => {
     const payload = { ...row };
@@ -319,7 +322,7 @@ async function applyMigration(prepared) {
     throw new Error("At least one edition could not be mapped to a stable event id.");
   }
 
-  await upsertBatches(config, "event_editions", editions, "event_id,edition_year");
+  await upsertBatches(config, "event_editions", editions, "event_id,edition_year,edition_key");
   await restRequest(config, "rpc/run_event_validation", {
     method: "POST",
     body: {}

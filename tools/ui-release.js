@@ -9,14 +9,14 @@ const ROOT = path.resolve(__dirname, '..');
 const OVERLAY_PATHS = Object.freeze([
   'index.html', '404.html', 'event-detail.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
   'css/style.css', 'css/mobile-discovery.css',
-  'js/app.js', 'js/events.js', 'js/map.js', 'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/i18n.js',
+  'js/app.js', 'js/event-description.js', 'js/events.js', 'js/map.js', 'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/i18n.js',
   'js/mobile-discovery.js', 'js/supabase.js', 'js/event-detail-live.js', 'js/event-detail.js', 'RELEASE_VERSION.txt'
 ]);
 const RUNTIME_PATHS = Object.freeze([
   'css/style.css', 'css/mobile-discovery.css', 'css/data-operations.css', 'css/source-monitor.css',
   'js/theme.js', 'js/app.js', 'js/mobile-discovery.js', 'js/i18n.js', 'js/supabase-loader.js',
   'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/data-freshness-health.js', 'js/event-catalog-loader.js',
-  'js/events.js', 'js/event-marker-types.js', 'js/event-detail.js', 'js/event-detail-supabase.js',
+  'js/event-description.js', 'js/events.js', 'js/event-marker-types.js', 'js/event-detail.js', 'js/event-detail-supabase.js',
   'js/map.js', 'js/search.js', 'js/supabase.js', 'js/event-detail-live.js'
 ]);
 const BASE_CRITICAL_PATHS = Object.freeze([

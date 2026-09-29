@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { expect, test } from '@playwright/test';
 const script = fs.readFileSync(new URL('../../js/manual-event-maintenance.js', import.meta.url), 'utf8');
+const descriptions = fs.readFileSync(new URL('../../js/event-description.js', import.meta.url), 'utf8');
 const styles = fs.readFileSync(new URL('../../css/style.css', import.meta.url), 'utf8');
 const editionId = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 async function fixture(page) {
@@ -8,6 +9,7 @@ async function fixture(page) {
   await page.route('**/knowledge-maintenance-fixture', route => route.fulfill({ contentType: 'text/html', body: '<html lang="de"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><main id="root"></main></body></html>' }));
   await page.goto('/knowledge-maintenance-fixture');
   await page.addStyleTag({ content: styles });
+  await page.addScriptTag({ content: descriptions });
   await page.addScriptTag({ content: script });
   await page.evaluate(async id => {
     window.db = { event: { id: 7, canonical_name: 'Pflegebeispiel', sport: 'Running', city: 'Paderborn', country: 'Germany', official_url: 'https://example.test/' }, editions: [{ id, edition_year: 2027, start_date: '2027-03-27', end_date: '2027-03-27', start_time: '09:30:00', registration_status: 'registration_open', edition_status: 'scheduled', publication_status: 'published', source_url: 'https://example.test/2027', race_formats: [{ label: 'Halbmarathon', distance_km: 21.0975 }] }], knowledge: [{ knowledge_scope: 'edition', event_brand_id: 7, edition_id: id, registration: { price_tiers: [{ tier: 'Halbmarathon · Phase 1', price: '30', currency: 'EUR', note: 'Erste 500 Meldungen' }] }, race_day: { wave_start: 'Halbmarathon 12:00 Uhr' }, faq: [], sources: [] }], version: 'one', sources: [], candidates: [] };

@@ -185,7 +185,7 @@ function normalizeEvent(rawEvent) {
     race_formats:
       normalizeRaceFormats(rawEvent.race_formats),
     description:
-      cleanValue(rawEvent.description),
+      window.SportEventMapDescriptions?.cleanPublicEventDescription(rawEvent.description) || "",
     image:
       cleanValue(rawEvent.image || rawEvent["image "]),
     event_url:

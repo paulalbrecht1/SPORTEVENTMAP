@@ -108,14 +108,6 @@
     sources.append(checked, source, oldSources);
     let official = assign('.event-detail-action-group > a.event-detail-primary', 'liveDetailOfficial');
     if (!official) { official = document.createElement('a'); official.id = 'liveDetailOfficial'; official.className = 'event-detail-primary'; official.target = '_blank'; official.rel = 'noopener noreferrer'; document.querySelector('.event-detail-action-group').append(official); }
-    // The old JSON-LD is a frozen export too; update it only from this anonymous row.
-    document.querySelectorAll('script[type="application/ld+json"]').forEach(node => node.remove());
-    const schema = document.createElement('script'); schema.type = 'application/ld+json';
-    const isoDate = value => /^\d{4}-\d{2}-\d{2}$/.test(text(value)) ? value : text(value).replace(/^(\d{2})\.(\d{2})\.(\d{4})$/, '$3-$2-$1');
-    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: event.event_name, description: event.description || undefined, startDate: isoDate(event.date), endDate: event.end_date || undefined, url: location.origin + location.pathname, eventStatus: 'https://schema.org/' + ({ cancelled: 'EventCancelled', postponed: 'EventPostponed' }[event.event_status] || 'EventScheduled'), location: { '@type': 'Place', name: text(event.city), address: text(event.address), geo: event.latitude != null && event.longitude != null ? { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } : undefined } });
-    document.head.append(schema);
-    document.querySelectorAll('meta[name="description"], meta[property="og:description"]').forEach(node => node.content = text(event.description));
-    document.querySelector('meta[property="og:title"]')?.setAttribute('content', text(event.event_name));
   }
   staticNotice();
   markPublicState();
@@ -434,6 +426,21 @@
       } else { detailMap.setView([lat, lon], 13); detailMarker?.setLatLng?.([lat, lon]); }
     });
   }
+  function renderMetadata() {
+    // Both entry points publish the same cleaned projection, including SEO data.
+    let schema = byId('liveDetailSchema');
+    if (!schema) {
+      document.querySelectorAll('script[type="application/ld+json"]').forEach(node => node.remove());
+      schema = node('script'); schema.id = 'liveDetailSchema'; schema.type = 'application/ld+json'; document.head.append(schema);
+    }
+    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: event.event_name, description: event.description || undefined, startDate: isoDate(event.date), endDate: event.end_date || undefined, url: location.origin + location.pathname + location.search, eventStatus: 'https://schema.org/' + ({ cancelled: 'EventCancelled', postponed: 'EventPostponed' }[event.event_status] || 'EventScheduled'), location: { '@type': 'Place', name: text(event.city), address: text(event.address), geo: event.latitude != null && event.longitude != null ? { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } : undefined } });
+    for (const [attribute, key, value] of [['name', 'description', event.description], ['property', 'og:description', event.description], ['property', 'og:title', event.event_name]]) {
+      const existing = [...document.querySelectorAll(`meta[${attribute}="${key}"]`)];
+      if (!text(value)) { existing.forEach(item => item.remove()); continue; }
+      if (!existing.length) { const item = node('meta'); item.setAttribute(attribute, key); document.head.append(item); existing.push(item); }
+      existing.forEach(item => { item.content = text(value); });
+    }
+  }
   function render() {
     if (event) prepareStaticPage();
     document.documentElement.lang = language;
@@ -444,6 +451,7 @@
     byId('liveDetailStatus').textContent = notice ? t(notice) + (notice === 'snapshot' ? displayDate(snapshotDate) : '') : '';
     if (byId('liveDetailKnowledgeNotice')) byId('liveDetailKnowledgeNotice').textContent = language === 'de' ? 'Zusätzliche Detailangaben: Gespeicherter Quellenstand. Aktuelle Detailangaben konnten nicht geladen werden.' : 'Additional details: saved source information. Current details could not be loaded.';
     if (!event) return;
+    renderMetadata();
     document.title = `${text(event.event_name)} · ${text(event.edition_year) || text(event.date)} | Sport Event Map`;
     byId('liveDetailName').textContent = text(event.event_name);
     byId('liveDetailSport').textContent = text(event.sport);
@@ -563,14 +571,20 @@
       if (staticPage) document.querySelectorAll('.event-detail-shell > section, .event-detail-shell > nav').forEach(node => { node.hidden = true; });
       render(); return;
     }
-    event = rows[0];
+    // Never render a raw import note while the shared display policy is loading.
+    let publicDescription = '';
+    try {
+      await import('./event-description.js?v=20260929-public-description-v132');
+      publicDescription = window.SportEventMapDescriptions?.cleanPublicEventDescription(rows[0].description) || '';
+    } catch { /* Missing description policy fails closed without hiding other facts. */ }
+    event = { ...rows[0], description: text(publicDescription) };
     notice = snapshotDate ? 'snapshot' : '';
     // Reuse the existing detail-page Season Planner behavior and identity.
     window.sportEventMapDetailConfig = { event: { ...event, event_slug: slug, event_key: staticConfig?.edition_id === event.edition_id && staticConfig?.event_key ? staticConfig.event_key : [event.event_name, event.date, event.city].map(text).filter(Boolean).join('|').toLowerCase() } };
     render();
     if (!staticPage) {
       const script = document.createElement('script');
-      script.src = '/js/event-detail.js?v=20260929-detail-layout-v131';
+      script.src = '/js/event-detail.js?v=20260929-public-description-v132';
       script.onerror = () => { byId('detailActionStatus').textContent = t('detail.saveUnavailable'); };
       document.head.append(script);
     }

@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { expect, test } from "@playwright/test";
 
 const script = fs.readFileSync(new URL("../../js/manual-event-maintenance.js", import.meta.url), "utf8");
+const descriptions = fs.readFileSync(new URL("../../js/event-description.js", import.meta.url), "utf8");
 const styles = fs.readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
 const adminSource = fs.readFileSync(new URL("../../js/supabase.js", import.meta.url), "utf8");
 const indexSource = fs.readFileSync(new URL("../../index.html", import.meta.url), "utf8");
@@ -15,6 +16,7 @@ async function fixture(page, mode = "success", viewport) {
   await page.route("**/maintenance-fixture", route => route.fulfill({ contentType: "text/html", body: '<html lang="de" data-theme="light"><head><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><main id="root"></main></body></html>' }));
   await page.goto("/maintenance-fixture");
   await page.addStyleTag({ content: styles });
+  await page.addScriptTag({ content: descriptions });
   await page.addScriptTag({ content: script });
   await page.evaluate(async ({ mode, editionId, nextId }) => {
     window.db = { event: { id: 7, canonical_name: "Berliner Prüflauf", event_name: "Berliner Prüflauf", sport: "Running", city: "Berlin", country: "Germany", address: "Startstraße 10", latitude: 52.52, longitude: 13.4, description: "Offizieller Lauf über mehrere angebotene Distanzen in Berlin.", official_url: "https://example.test/event", organizer_name: "Laufverein", organizer_url: "https://example.test" }, editions: [{ id: editionId, event_id: 7, edition_year: 2026, edition_key: "main", start_date: "2026-10-10", end_date: "2026-10-10", edition_status: "scheduled", registration_status: "registration_open", registration_url: "https://example.test/register", source_url: "https://example.test/2026", publication_status: mode === "publication" ? "draft" : "published", race_formats: [{ label: "10 km", distance_km: 10, surface: "road" }], legacy_distance: "10 km" }], sources: [], candidates: [], version: "one" };

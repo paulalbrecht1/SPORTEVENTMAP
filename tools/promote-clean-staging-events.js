@@ -137,8 +137,7 @@ function mapStagingToPublicEvent(row) {
     distance:
       row.distance,
     description:
-      row.description ||
-      `Official endurance event in ${cleanValue(row.city)}. Imported from verified staging batch.`,
+      cleanValue(row.description),
     event_url:
       eventUrl,
     data_source:
@@ -157,7 +156,10 @@ function mapStagingToPublicEvent(row) {
     next_check:
       "",
     source_note:
-      `Promoted from clean staging batch${row.import_batch ? ` ${cleanValue(row.import_batch)}` : ""}.`,
+      [
+        cleanValue(row.source_note),
+        `Promoted from clean staging batch${row.import_batch ? ` ${cleanValue(row.import_batch)}` : ""}.`
+      ].filter(Boolean).join(" "),
     image:
       ""
   });
@@ -234,8 +236,8 @@ function main() {
     if (issues.length) {
       review.push({
         ...event,
-        description:
-          `Not promoted: ${issues.join(", ")}`
+        source_note:
+          `${event.source_note} Not promoted: ${issues.join(", ")}`
       });
       return;
     }
@@ -277,4 +279,8 @@ function main() {
   console.log(`Events before: ${existing.length}, after: ${merged.length}.`);
 }
 
-main();
+if (require.main === module) {
+  main();
+}
+
+module.exports = { mapStagingToPublicEvent };

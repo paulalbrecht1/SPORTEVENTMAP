@@ -271,4 +271,68 @@ for (const mode of ['static', 'dynamic']) {
     await expect(page.locator('#competitions [data-public-race-format]')).toHaveCount(4);
     expect(errors).toEqual([]);
   });
+
+  test(`${mode} public description omits import placeholders and preserves genuine mixed prose in body and metadata`, async ({ page }) => {
+    const state = { event: { ...canonical(), description: 'Official endurance event in Mainz. Imported from verified staging batch.' }, details: [] };
+    const { url, errors } = await setup(page, state, mode);
+    await page.goto(url); await settled(page);
+    await expect(page.locator('#description')).toBeHidden();
+    await expect(page.locator('#liveDetailNavigation a[href="#description"]')).toHaveCount(0);
+    await expect(page.locator('meta[name="description"], meta[property="og:description"]')).toHaveCount(0);
+    expect(JSON.parse(await page.locator('#liveDetailSchema').textContent())).not.toHaveProperty('description');
+    expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).description).toBe('');
+    expect(await page.evaluate(() => window.sportEventMapDetailConfig.event.description)).toBe('');
+    await expect(page.locator('main')).not.toContainText('Imported from');
+
+    const genuine = 'Ein flacher Lauf am Rhein mit stimmungsvoller Zielgeraden.';
+    state.event.description = `${genuine} Imported from verified staging batch.`;
+    await page.reload(); await settled(page);
+    for (const language of ['de', 'en']) {
+      await page.locator('#eventDetailLanguageSelect').selectOption(language);
+      await expect(page.locator('#description')).toBeVisible();
+      await expect(page.locator('#liveDetailDescription')).toHaveText(genuine);
+      await expect(page.locator('#liveDetailNavigation a[href="#description"]')).toHaveCount(1);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', genuine);
+      await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', genuine);
+      expect(JSON.parse(await page.locator('#liveDetailSchema').textContent()).description).toBe(genuine);
+      expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).description).toBe(genuine);
+      expect(await page.evaluate(() => window.sportEventMapDetailConfig.event.description)).toBe(genuine);
+      await expect(page.locator('main')).not.toContainText('Imported from');
+    }
+    expect(errors).toEqual([]);
+  });
+
+  test(`${mode} public description fails closed when its shared policy cannot load`, async ({ page }) => {
+    const state = { event: { ...canonical(), description: 'Official endurance event in Mainz. Imported from verified staging batch.' }, details: [] };
+    const { url, errors } = await setup(page, state, mode);
+    await page.route('**/js/event-description.js?**', route => route.abort());
+    await page.goto(url); await settled(page);
+    await expect(page.locator('#description')).toBeHidden();
+    await expect(page.locator('#liveDetailFacts')).toContainText('07.08.2027');
+    await expect(page.locator('main')).not.toContainText('Imported from');
+    await expect(page.locator('meta[name="description"], meta[property="og:description"]')).toHaveCount(0);
+    expect(JSON.parse(await page.locator('#liveDetailSchema').textContent())).not.toHaveProperty('description');
+    expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).description).toBe('');
+    expect(await page.evaluate(() => window.sportEventMapDetailConfig.event.description)).toBe('');
+    expect(errors).toEqual([]);
+  });
 }
+
+test('dynamic public description also cleans the explicitly unverified archive fallback', async ({ page }) => {
+  const state = { event: { ...canonical(), description: 'Official endurance event in Mainz. Imported from verified staging batch.' }, details: [] };
+  const { url, errors } = await setup(page, state, 'dynamic');
+  await page.route('https://detail-parity.test/rest/v1/public_event_archive?**', route => route.abort());
+  await page.route('**/data/event-editions-public.json', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ exported_at: '2026-09-29T12:00:00Z', editions: [state.event] }) }));
+  await page.goto(url);
+  await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'unavailable');
+  await expect(page.locator('#liveDetailContent')).toBeVisible();
+  await expect(page.locator('#liveDetailStatus')).toContainText('gespeicherte Datenstand');
+  await expect(page.locator('#description')).toBeHidden();
+  await expect(page.locator('#liveDetailChecked')).toBeHidden();
+  await expect(page.locator('main')).not.toContainText('Imported from');
+  await expect(page.locator('meta[name="description"], meta[property="og:description"]')).toHaveCount(0);
+  expect(JSON.parse(await page.locator('#liveDetailSchema').textContent())).not.toHaveProperty('description');
+  await expect(page.locator('#sem-public-detail-data')).toHaveCount(0);
+  expect(await page.evaluate(() => window.sportEventMapDetailConfig.event.description)).toBe('');
+  expect(errors).toEqual([]);
+});

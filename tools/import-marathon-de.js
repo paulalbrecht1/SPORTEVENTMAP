@@ -333,10 +333,11 @@ function parseEventCard(card) {
       country: location.country,
       address: `${location.city}, ${location.country}`,
       distance,
-      description:
-        "Imported from marathon.de Laufkalender.",
+      description: "",
       event_url: eventUrl,
       data_source: "marathon.de",
+      source_url: eventUrl,
+      source_note: "Imported from marathon.de Laufkalender.",
       image
     }
   );
@@ -429,10 +430,13 @@ async function enrichOfficialUrls(events) {
         findOfficialEventUrl(html);
 
       if (officialUrl) {
-        event.description =
+        event.source_note =
           cleanValue(
-            `${event.description} Source listing: ${event.event_url}`
+            `${event.source_note} Source listing: ${event.event_url}`
           );
+
+        event.source_url =
+          event.source_url || event.event_url;
 
         event.event_url =
           officialUrl;
@@ -555,7 +559,11 @@ async function main() {
   );
 }
 
-main().catch(error => {
-  console.error(error);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch(error => {
+    console.error(error);
+    process.exit(1);
+  });
+}
+
+module.exports = { parseEventCard, enrichOfficialUrls };

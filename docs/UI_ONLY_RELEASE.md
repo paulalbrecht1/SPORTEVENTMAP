@@ -52,6 +52,13 @@ Die feste Oberflächenliste umfasst außerdem `js/map.js`, dessen bestehender
 Refresh jetzt ein überprüfbares Ergebnis zurückgibt. Unveränderte übrige
 Runtimeabhängigkeiten bleiben geschützt. Die Kataloggates bleiben unverändert.
 
+Seit v97 gehört `js/event-description.js` als gemeinsame Textprojektion für
+Discovery, öffentliche Details und deren Admin-Veröffentlichungskontrolle zur
+expliziten Oberflächenliste. Bekannte Importnotizen erscheinen dadurch auch beim
+Nachladen alter Bestandsdaten nicht als Veranstaltungsbeschreibung. Die
+gespeicherten Katalogdateien und deren ursprüngliche Prüfzeiten bleiben erhalten;
+die Textprojektion ist keine Datenverifikation oder Bereinigung der Rohdaten.
+
 Bei geänderten Runtime-Dateien auch deren Versionsadressen in den freigegebenen
 HTML-Einstiegsseiten erneuern. Der Builder kopiert diese Referenzen aus dem
 Quellstand; er aktualisiert sie nicht automatisch. Für `events.js`, `map.js` und

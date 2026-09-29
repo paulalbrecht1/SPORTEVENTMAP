@@ -34,7 +34,7 @@
     await new Promise(resolve => {
       window.sportEventMapPublicDetailReady = resolve;
       const script = document.createElement("script");
-      script.src = "/js/event-detail-live.js?v=20260929-detail-layout-v131";
+      script.src = "/js/event-detail-live.js?v=20260929-public-description-v132";
       script.onerror = () => {
         document.documentElement.dataset.semPublicDetailState = "unavailable";
         const notice = document.createElement("p");

@@ -40,6 +40,7 @@ try {
   assert.ok(CRITICAL_PATHS.includes("js/mobile-discovery.js"));
   assert.ok(CRITICAL_PATHS.includes("js/freshness-batch-review.js"));
   assert.ok(CRITICAL_PATHS.includes("js/manual-event-maintenance.js"));
+  assert.ok(CRITICAL_PATHS.includes("js/event-description.js"));
   restoreFiles();
   fs.writeFileSync(path.join(directory, "release.json"), JSON.stringify(release));
   assert.doesNotThrow(() => verifyReleaseArtifacts(directory, release), "Verified archive count must replace the historic hard-coded 994 pages");

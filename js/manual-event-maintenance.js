@@ -1,9 +1,14 @@
 (function (root, factory) {
-  const api = factory();
+  const api = factory(typeof module === "object" && module.exports ? require("./event-description.js") : root.SportEventMapDescriptions);
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.SemManualEventMaintenance = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (descriptions) {
   "use strict";
+
+  function publicDescription(value) {
+    if (typeof descriptions?.cleanPublicEventDescription !== "function") throw new Error("Die öffentliche Beschreibungsprüfung konnte nicht geladen werden. Bitte die Seite erneut laden.");
+    return descriptions.cleanPublicEventDescription(value);
+  }
 
   const EVENT_FIELDS = Object.freeze(["canonical_name", "sport", "city", "country", "address", "latitude", "longitude", "description", "official_url", "organizer_name", "organizer_url"]);
   const EDITION_FIELDS = Object.freeze(["edition_year", "edition_key", "start_date", "end_date", "start_time", "registration_url", "registration_status", "edition_status", "price_min", "price_max", "currency", "participant_limit", "race_formats", "source_url"]);
@@ -211,7 +216,7 @@
 
   function publicProjection(event, edition) {
     const date = edition.start_date ? edition.start_date.slice(0, 10).split("-").reverse().join(".") : null;
-    return { event_id: event.id, edition_id: edition.id, event_name: event.canonical_name, sport: event.sport, city: event.city, country: event.country, address: event.address, latitude: event.latitude, longitude: event.longitude, description: event.description, official_url: event.official_url, organizer_name: event.organizer_name, organizer_url: event.organizer_url, date, edition_year: edition.edition_year, registration_status: edition.registration_status, registration_url: edition.registration_url, source_url: edition.source_url, event_url: edition.registration_url ?? event.official_url ?? edition.source_url ?? null, distance: edition.legacy_distance ?? edition.race_formats?.[0]?.label ?? null, event_status: edition.edition_status, race_formats: edition.race_formats,
+    return { event_id: event.id, edition_id: edition.id, event_name: event.canonical_name, sport: event.sport, city: event.city, country: event.country, address: event.address, latitude: event.latitude, longitude: event.longitude, description: publicDescription(event.description), official_url: event.official_url, organizer_name: event.organizer_name, organizer_url: event.organizer_url, date, edition_year: edition.edition_year, registration_status: edition.registration_status, registration_url: edition.registration_url, source_url: edition.source_url, event_url: edition.registration_url ?? event.official_url ?? edition.source_url ?? null, distance: edition.legacy_distance ?? edition.race_formats?.[0]?.label ?? null, event_status: edition.edition_status, race_formats: edition.race_formats,
       ...Object.fromEntries(["end_date", "start_time", "price_min", "price_max", "currency", "participant_limit"].map(key => [key, edition[key] ?? null])) };
   }
 
@@ -277,7 +282,10 @@
       if (!response.ok) throw new Error("Der öffentliche Katalog ist aktuell nicht erreichbar. Die Datenbankspeicherung bleibt erhalten.");
       const rows = await response.json();
       if (!Array.isArray(rows) || rows.length > 1) throw new Error("Der öffentliche Katalog liefert kein eindeutiges Ergebnis.");
-      return rows[0] || null;
+      const row = rows[0] || null;
+      // The transport retains canonical raw text; the rendered page must expose
+      // the clean projection exactly. Never clean an iframe's claimed readback.
+      return row && Object.hasOwn(row, "description") ? { ...row, description: publicDescription(row.description) } : row;
     };
     const [archive, discovery] = await Promise.all([read("public_event_archive"), read("public_event_discovery")]);
     const archiveVerified = comparePublicRow(archive, expected);

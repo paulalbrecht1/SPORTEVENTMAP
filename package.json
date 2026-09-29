@@ -64,7 +64,7 @@
     "test:data-quality-release": "node tests/data-quality-release-gate.test.mjs",
     "test:quality-review": "node tests/event-quality-review-queue.test.mjs",
     "test:germany-expansion": "node tests/germany-expansion-review.test.mjs",
-    "test:data-workflow": "node tests/event-data-workflow.test.mjs && npm run test:p0-fact-batch",
+    "test:data-workflow": "node tests/event-data-workflow.test.mjs && node --test tests/public-import-descriptions.test.mjs tests/event-description.test.mjs && npm run test:p0-fact-batch",
     "test:event-automation": "node tests/event-automation-workflow.test.mjs",
     "test:source-monitor": "node tests/source-monitor-core.test.mjs && node tests/source-monitor-pinned-http.test.mjs && node tests/source-monitor-workflow.test.mjs && node tests/source-monitor-extraction.test.mjs && node --test tests/source-monitor-cors.test.mjs",
     "test:stage-four": "node tests/stage-four-preparation.test.mjs && node tests/stage-four-observation.test.mjs",

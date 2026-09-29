@@ -100,6 +100,40 @@ Der zusätzliche Cache-Regressionstest war vor der Korrektur rot; danach sind
 alle 15 Tests der manuellen Pflege sowie der Release-Einstiegspunktlauf
 einschließlich seiner 72 Paket- und Routingtests bestanden.
 
+## Produktiver Abschluss mit v94
+
+Das finale Paket `20260929-ui-only-v94` wurde am 29.09.2026 um 18:50 UTC aus
+Quellstand `7ad5524a40d3fd7ed9214edde03e6907fbf1281a` gebaut. Vorschau
+`https://e6215766.sporteventmap.pages.dev` und Produktion
+`https://2696d1bc.sporteventmap.pages.dev` verwenden dasselbe geprüfte Paket.
+SHA-256 der `release.json`:
+`f46fd96fb9f743c484507227afbc78b992ae1c9c7aa9bfbf3c866ddb3209ed5f`.
+
+Nach dem Rollout stimmen jeweils 56 ausgelieferte Dateien an der unveränderlichen
+Produktionsadresse und unter `sporteventmap.com` mit dem Paket überein: alle 45
+Nicht-HTML-Dateien, acht kritische HTML-Einstiege und drei historische Detailseiten.
+Die bekannte Cloudflare-HTML-Ergänzung wird auf der Hauptdomain eng abgegrenzt
+normalisiert. Nicht sämtliche 994 statischen Seiten wurden einzeln im Netz
+abgerufen; der lokale Paketvergleich prüft deren erlaubte Änderung vollständig.
+Es gab keine weitere Migration und keinen Datenexport. Der historische
+Fallbackexport behält seinen ursprünglichen Stand vom 27.08.2026.
+
+**Entscheidender echter Browsernachweis:** Der bereits zuvor betroffene
+Produktions-Tab wurde normal neu geladen, ohne Cache-Löschung oder neue Sitzung.
+Alle drei Skriptadressen zeigen v94. Liste und echter Leaflet-Popup zeigen
+`Registration open`, nach Sprachwechsel `Anmeldung offen` und nach Rückwechsel
+wieder `Registration open`. Datum 27.03.2027 und sechs Wettbewerbe bleiben erhalten.
+Die normale öffentliche Detailseite wurde ebenfalls erneut geladen: richtige
+Edition, Zustand `verified`, Startzeit 09:30, Gebühren 0–55 EUR, Anmeldung geöffnet
+und Prüfdatum 29.09.2026 sind vorhanden. Der vorhandene Admin-Login blieb erhalten.
+Die Vorschau wurde zusätzlich ohne Website-Login geprüft.
+
+Belege: `production-v94-map-list-de.txt`, `production-v94-map-list-en.txt`,
+`production-v94-map-list.png`, `production-v94-public-detail.txt` und
+`production-v94-public-detail.png` im privaten Auditverzeichnis.
+Damit ist der nachgewiesene Pflegeablauf einschließlich öffentlicher Anzeige
+für dieses echte Beispiel abgeschlossen; die P0-Mengenziele bleiben separat offen.
+
 ## Grenzen der aktuellen Liveprüfung
 
 Die lesende Nachkontrolle um 18:07 UTC bestätigt genau eine Edition 2027, einen

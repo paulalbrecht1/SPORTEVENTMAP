@@ -1,7 +1,9 @@
 # Events manuell pflegen
 
-Stand: Workflowkorrektur v92 vom 29. September 2026. Rollout- und Prüfnachweise
-stehen im [Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md). Die frühere
+Stand: Workflowkorrektur v92 und Anzeige-/Cachekorrekturen v94 vom 29. September
+2026. Der [echte Browserdurchlauf](MANUAL_BROWSER_AUDIT_20260929.md) dokumentiert
+den vollständigen Pflegeweg am Paderborner Osterlauf 2027. Weitere Rollout- und
+Prüfnachweise stehen im [Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md). Die frühere
 [Abnahme von v91](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md) bleibt als Fehlernachweis erhalten.
 
 Für die tägliche Pflege genügt dein **SportEventMap-Administratorkonto**.

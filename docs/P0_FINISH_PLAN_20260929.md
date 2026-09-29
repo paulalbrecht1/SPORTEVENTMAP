@@ -9,6 +9,8 @@ gültige vollständige Frischenachweise (3,77 %)**. Die alte Edition 2026 und ih
 Ergebnis blieben unverändert. Der Browserlauf entdeckte zusätzlich eine falsche
 Statusanzeige in Karte/Liste, deren eng begrenzte Korrektur dokumentiert ist:
 [Browserbericht](MANUAL_BROWSER_AUDIT_20260929.md).
+Die Status-, Sprachwechsel- und Cachekorrekturen sind mit v94 produktiv und in
+derselben zuvor betroffenen Browsersitzung nach normalem Neuladen bestanden.
 
 P0 bleibt offen. Bei unverändertem Ziel von 400 Discovery-Einträgen fehlen
 mindestens 188 Nettozugänge und 212 zusätzliche Vollnachweise. Wenn alle 188

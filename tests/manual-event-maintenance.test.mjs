@@ -93,11 +93,12 @@ test('timeout resolves by idempotent repeat and a real reload rather than optimi
   assert.equal(result.context.version, 'version-2');
 });
 
-test('authorization and parallel-version errors are not retried and never return success', async () => {
-  for (const code of ['42501', '40001', '23514']) {
+test('authorization and parallel-version errors including HTTP conflict PT409 are not retried and never return success', async () => {
+  for (const code of ['42501', '40001', 'PT409', '23514']) {
     let calls = 0;
-    const client = { rpc: async () => { calls++; return { error: { code, message: 'Rejected' } }; } };
-    await assert.rejects(api.saveWithRecovery(client, request), error => error.code === code);
+    const message = code === 'PT409' ? 'Die Daten wurden inzwischen geändert. Neu laden und die Änderungen erneut prüfen; Ihre Eingaben bleiben erhalten.' : 'Rejected';
+    const client = { rpc: async () => { calls++; return { error: { code, message } }; } };
+    await assert.rejects(api.saveWithRecovery(client, request), error => error.code === code && error.message === message && !error.uncertain);
     assert.equal(calls, 1);
   }
 });

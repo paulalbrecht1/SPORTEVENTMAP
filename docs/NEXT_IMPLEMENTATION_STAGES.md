@@ -2,29 +2,52 @@
 
 Stand: 29. September 2026
 
-**P0 bleibt aktiv.** Die lesende Produktionsmessung vom 29.09., 11:33 UTC,
+**P0 bleibt aktiv.** Die lesende Produktionsmessung nach dem Pilot vom 29.09., 13:26 UTC,
 ergibt 210 Discovery-Einträge (160 Deutschland), 990 Archiv-Editionen,
-vier gültige Vollnachweise (1,90 %) und 110 vollständige Einträge (52,38 %).
+sechs gültige Vollnachweise (2,86 %), 110 vollständige Einträge (52,38 %) und
+204 Einträge mit Reviewbedarf. Der Pilot lieferte zwei zusätzliche Vollnachweise;
+Discovery- und Archivbestand bleiben unverändert.
 Der [aktuelle P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) führt die verbleibende
-Arbeit zusammen: den verbleibenden Admin-Cachefehler beheben, einen kurzen Pilot
-mit gemessener Pflegezeit abschließen, länger nutzbare Nettozugänge und vorhandene
-Reviewpakete bearbeiten, danach den regulären Export mit allen Gates bestehen.
+Arbeit zusammen: den Pilot auswerten, länger nutzbare Nettozugänge und vorhandene
+Reviewpakete bearbeiten, danach den
+regulären Export mit allen Gates bestehen.
 
 Der [manuelle Admin-Pflegeweg](MANUAL_EVENT_MAINTENANCE.md) ist implementiert und
 benötigt im täglichen Betrieb keine LLM-Aufrufe. Beide Migrationen und die
-Oberfläche v90 sind seit 29.09. produktiv ausgerollt und geprüft. Die
-Migration-History enthält 46 Einträge; 15 bestehende Tabellen/Ansichten,
-Nutzerverknüpfungen und bisherige Frischeentscheidungen blieben unverändert.
-Die echten anonymen und Nicht-Admin-Zugriffe werden abgewiesen. v90 ist auf
-`https://86811745.sporteventmap.pages.dev` und der Produktionsdomain geprüft.
-Bestehende Adminsitzungen können noch ältere Dateien aus dem Browsercache laden;
-die begrenzte Korrektur v91 ist zum Stand 12:39 UTC in Arbeit. Bis dahin sind
-keine fachlichen Pilotänderungen gespeichert. Die Produktionskopie hatte zuvor
-64 anwendbare SQL-Prüfungen bestanden, der vollständige lokale Aufbau 66.
+Oberfläche **v91 sind produktiv**; der nachgewiesene Browsercachefehler ist
+behoben. Das Paket unter `https://01a6b663.sporteventmap.pages.dev` und die
+Produktionsdomain sind anhand der Dateihashes geprüft. Die echte angemeldete
+Adminoberfläche wurde erfolgreich verwendet: Ring Running Series und Christmas
+Run To Tree sind vollständig manuell bestätigt und im Live-Katalog nachgeprüft.
+Die Datenbankmigrationen erhielten bestehende Daten und Nutzerverknüpfungen;
+anonyme und Nicht-Admin-Schreibzugriffe werden abgewiesen.
+
+Allgäu 2027 wurde genau einmal als privater Entwurf an den vorhandenen Kandidaten
+gebunden. Nach vier Faktenkorrekturen wurden 15 Felder ausdrücklich geprüft
+(14 Kernfelder und Enddatum). Die historische Edition 2026, ihre Quelle und
+Ergebnis-/Saisonplaner-Verknüpfungen blieben unverändert. Zwei unvollständige
+Crawler-Vorschläge sind begründet abgelehnt, ihre Werte wurden nicht angewandt.
+Der echte Quellenkonflikt zwischen Sonntag 08.08. und
+bestätigtem Wochenende 07.–08.08.2027 sperrt die Veröffentlichung. Ein expliziter,
+auditierter Auflösungsweg fehlt noch und ist die nächste kleine Verbesserung
+nach diesem Rollout. Auch vollständig geprüfte Entwurfsfelder zählen bis zur
+regulären Freigabe nicht als publizierter Frischenachweis oder P0-Zugang.
+
+Der HTTP-409-Hotfix für zwischenzeitliche Datenänderungen ist produktiv und um
+13:20:21 UTC unabhängig bestätigt; die History enthält jetzt 47 Einträge. Nach
+66 SQL-Prüfungen und echtem HTTP-Test mit PostgREST 14.14 funktioniert auch die
+reale UI mit produktivem PostgREST 14.5: verständlicher Konflikt, Eingaben nach
+Neuladen erhalten, erneutes Prüfen und Speichern erfolgreich. Rechte, alte
+History und 15 Relationshashes sind unverändert. Die veröffentlichte UI bleibt
+v91. Statische Eventseiten und Ausfalldaten stammen
+weiter aus dem eingefrorenen Datenpaket; die erfolgreiche Live-Pflege ist keine
+neue statische Datenfreigabe.
 Die Grenzen bleiben unverändert: mindestens 400
 Discovery-Einträge, 55 % Frische, 45 % Vollständigkeit, effektiver Archivbestand
 mindestens 974 und ein höchstens 24 Stunden alter Export mit gebundenen Audits.
-Momentan fehlen mindestens 190 Nettozugänge und 216 zusätzliche Vollnachweise;
+Es fehlen mindestens 190 Nettozugänge und 214 zusätzliche Vollnachweise;
+bei 190 vollständig frischen Zugängen und sechs weiterhin gültigen Nachweisen
+wären noch 24 Bestandsreviews erforderlich. Dies ist eine Rechenuntergrenze;
 zeitbedingte Abgänge und auslaufende Prüfungen sind vor dem Release neu zu messen.
 P1 verlangt 1.000+ verifizierte deutsche Event-Editionen im operativen Katalog;
 die 990 historischen und aktuellen Archiv-Editionen erfüllen

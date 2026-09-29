@@ -26,6 +26,7 @@ async function fixture(page, mode = "success", viewport) {
         const request = args.p_request; window.calls.push(structuredClone(request));
         if (window.mode === "permission") return { error: { code: "42501", message: "Nur Administratoren dürfen Events pflegen." } };
         if (window.mode === "conflict") return { error: { code: "40001", message: "Die Daten wurden inzwischen geändert." } };
+        if (window.mode === "http_conflict") return { error: { code: "PT409", message: "Die Daten wurden inzwischen geändert. Neu laden und die Änderungen erneut prüfen; Ihre Eingaben bleiben erhalten." } };
         if (window.mode === "zero") return { data: { saved: false, request_id: request.request_id } };
         if (window.receipts[request.request_id]) return { data: { ...window.receipts[request.request_id], replayed: true } };
         let edition = window.db.editions.find(row => row.id === request.edition_id);
@@ -190,10 +191,14 @@ test("manual: authorization and zero-row outcomes preserve inputs and never repo
   }
 });
 
-test("manual: parallel conflict reload preserves edited field and requires renewed review", async ({ page }) => {
-  await fixture(page, "conflict"); await field(page, "edition.start_date").fill("2026-10-12");
+for (const mode of ["conflict", "http_conflict"]) test(`manual: ${mode} reload preserves edited field and requires renewed review`, async ({ page }) => {
+  await fixture(page, mode); await field(page, "edition.start_date").fill("2026-10-12");
   await check(page, "edition.start_date").check(); await preview(page); await page.locator("[data-maintenance-save]").click();
-  await expect(page.locator("[data-maintenance-status]")).toContainText("Zwischenzeitlich");
+  await expect(page.locator("[data-maintenance-status]")).toContainText(mode === "http_conflict" ? "Die Daten wurden inzwischen geändert. Neu laden und die Änderungen erneut prüfen; Ihre Eingaben bleiben erhalten." : "Zwischenzeitlich");
+  expect(await page.evaluate(() => ({ calls: window.calls.length, commits: window.commits }))).toEqual({ calls: 1, commits: 0 });
+  await expect(field(page, "edition.start_date")).toHaveValue("2026-10-12");
+  await expect(page.locator("[data-maintenance-notes]")).toHaveValue("Offizielle Ausschreibung persönlich geprüft.");
+  await expect(page.locator("[data-maintenance-status]")).not.toContainText("Speicherstand ist noch unklar");
   await page.evaluate(() => { window.db.event.city = "Potsdam"; window.db.version = "two"; window.mode = "success"; });
   await page.locator("[data-maintenance-reload]").click();
   await expect(field(page, "event.city")).toHaveValue("Potsdam");
@@ -203,6 +208,8 @@ test("manual: parallel conflict reload preserves edited field and requires renew
   await check(page, "edition.start_date").check(); await preview(page); await page.locator("[data-maintenance-save]").click();
   await expect(page.locator("[data-maintenance-status]")).toContainText("In der Datenbank gespeichert");
   expect(await page.evaluate(() => window.calls[1].expected_version)).toBe("two");
+  expect(await page.evaluate(() => window.calls[1].request_id !== window.calls[0].request_id)).toBe(true);
+  expect(await page.evaluate(() => ({ calls: window.calls.length, commits: window.commits }))).toEqual({ calls: 2, commits: 1 });
 });
 
 test("manual: unreachable source is not confirmation; publication fetch failure remains retryable", async ({ page }) => {

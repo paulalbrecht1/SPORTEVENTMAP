@@ -13,7 +13,7 @@ create function pg_temp.mm_assert(ok boolean,label text) returns void language p
   if ok is distinct from true then raise exception 'MANUAL MAINTENANCE REGRESSION: %',label; end if;
   insert into pg_temp.mm_checks values(label);
 end $$;
-create function pg_temp.mm_reject(statement text,label text,states text[] default array['22023','23514','40001','P0001'])
+create function pg_temp.mm_reject(statement text,label text,states text[] default array['22023','23514','40001','PT409','P0001'])
 returns void language plpgsql as $$ declare rejected boolean:=false; begin
   begin execute statement;
   exception when others then
@@ -117,7 +117,7 @@ begin
   perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',
     jsonb_set(payload,'{edition_patch,start_date}',to_jsonb(future_date+2))),'same operation ID cannot change payload');
   perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',
-    jsonb_set(payload,'{request_id}',to_jsonb(gen_random_uuid()))),'stale parallel version is rejected');
+    jsonb_set(payload,'{request_id}',to_jsonb(gen_random_uuid()))),'stale parallel version is rejected',array['PT409']);
 
   context:=public.admin_manual_event_context(event_id);
   payload:=jsonb_build_object('request_id',gen_random_uuid(),'action','confirm','event_id',event_id,'edition_id',edition_id,

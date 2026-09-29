@@ -1,10 +1,13 @@
 # P0-Abschlussplan – 29. September 2026
 
-Stand der lesenden Produktionsmessung: **29.09.2026, 11:33 UTC**.
-P0 bleibt offen. Beide Migrationen und das Frontend **v90 sind produktiv
-ausgerollt und geprüft**. Betriebsstand: 29.09.2026, 12:39 UTC. Ein Cacheproblem
-bei bereits geöffneten Adminsitzungen wird mit v91 korrigiert; diese Korrektur
-ist noch in Arbeit. Fachliche Pilotänderungen wurden bislang nicht gespeichert.
+Stand der folgenden Bestandsmessung: **29.09.2026, 13:26 UTC, nach dem Pilot**.
+P0 bleibt offen. Pflege-Migrationen, Konflikt-Hotfix und Frontend **v91 sind produktiv
+ausgerollt und geprüft**. Die echte angemeldete Adminoberfläche funktioniert;
+Ring Running Series und Christmas Run To Tree sind vollständig manuell bestätigt
+und im öffentlichen Live-Katalog nachgeprüft. Allgäu 2027 besteht als privater,
+an den vorhandenen Kandidaten gebundener Entwurf; der Datums-Konflikt sperrt die
+Veröffentlichung. Der Pilot erhöht gültige Vollnachweise von vier auf sechs;
+der öffentliche Bestand bleibt unverändert.
 Die folgende Reihenfolge konzentriert den Aufwand auf echte Katalogzugänge und
 gezielte Quellenprüfungen. Der tägliche Pflegeweg benötigt keine LLM-Aufrufe.
 
@@ -14,24 +17,27 @@ gezielte Quellenprüfungen. Der tägliche Pflegeweg benötigt keine LLM-Aufrufe.
 | --- | ---: | ---: |
 | Aktive Discovery-Einträge | 210, davon 160 in Deutschland | mindestens 400 |
 | Veröffentlichte Archiv-Editionen | 990 | effektiv mindestens 974 |
-| Gültige vollständige Frischenachweise | 4 von 210 = 1,90 % | mindestens 55 % |
+| Gültige vollständige Frischenachweise | 6 von 210 = 2,86 % | mindestens 55 % |
 | Vollständige Discovery-Einträge | 110 von 210 = 52,38 % | mindestens 45 % |
+| Einträge mit Reviewbedarf | 204 | gezielt abarbeiten |
 | Export und daran gebundene Audits | noch kein neuer freigegebener Datenrelease | Export höchstens 24 Stunden alt; gültige gebundene Audits |
 
 Für genau 400 sichtbare Einträge wären 220 gültige Vollnachweise erforderlich.
 Gegenüber dieser Momentaufnahme fehlen damit **mindestens 190 Nettozugänge und
-216 zusätzliche Vollnachweise**. Falls alle 190 Zugänge vollständig frisch
-veröffentlicht werden und die vier bisherigen Nachweise gültig bleiben, fehlen
-noch 26 Bestandsreviews. Das ist eine Rechenuntergrenze, keine Arbeitszusage:
+214 zusätzliche Vollnachweise**. Falls alle 190 Zugänge vollständig frisch
+veröffentlicht werden und die sechs bisherigen Nachweise gültig bleiben, fehlen
+noch 24 Bestandsreviews. Das ist eine Rechenuntergrenze, keine Arbeitszusage:
 Abgänge, auslaufende Nachweise und neue Quellenkonflikte erhöhen den Bedarf.
 
-Die vier momentan frischen Fälle sind Ratzeburger Adventslauf 446 und FSV-Lauf
+Die vier vor dem Pilot frischen Fälle waren Ratzeburger Adventslauf 446 und FSV-Lauf
 383 mit nächster Prüfung am 05.10. sowie MidSummerRun 695 und GVG-Winterstaffel
 Pulheim 153 am 08.10. Eine frühere Quellenänderung kann zusätzliche Prüfung
-auslösen. Vollständigkeit ersetzt keinen Frischenachweis.
+auslösen. Dazu kommen die jetzt vollständig bestätigten Bestandsfälle Ring
+Running Series 159 und Christmas Run To Tree 355. Vollständigkeit ersetzt keinen
+Frischenachweis.
 
-Eine Projektion nach den tatsächlichen Discovery-Viewregeln ergibt **ohne neue
-Änderungen**:
+Die Projektion von 11:33 UTC nach den tatsächlichen Discovery-Viewregeln ergab
+**ohne neue Änderungen**:
 
 | Abstand zur Messung | Weiter sichtbare Einträge | Lücke bis 400 |
 | --- | ---: | ---: |
@@ -42,7 +48,7 @@ Eine Projektion nach den tatsächlichen Discovery-Viewregeln ergibt **ohne neue
 Das sind datumsbasierte Szenarien, keine sicheren Zukunftsbestände. Vor jedem
 Paket und vor dem Release werden tatsächlicher Bestand und Frische neu gemessen.
 
-## 1. Manuellen Pflegeweg abnehmen und ausrollen
+## 1. Manueller Pflegeweg produktiv; begrenzte Restarbeiten
 
 Die vorhandene [Admin-Pflege](MANUAL_EVENT_MAINTENANCE.md) bietet Einzelprüfungen,
 Korrekturen, neue Editionsentwürfe und ausdrückliche vollständige Freigaben.
@@ -115,32 +121,51 @@ Zugriffe auf die neuen RPCs werden abgewiesen. Die bestehenden anonymen und
 Freshness-Live-Audits bestanden erneut; beide neuen RPCs lieferten ohne Sitzung
 HTTP 401 / SQLSTATE 42501. Private Nachweise: `exports/p0-rollout-20260929`.
 
-**Noch offen:** Die bestätigte Adminsitzung lädt wegen vorhandener Browsercaches
-teilweise ältere JavaScript-Dateien. Die begrenzte Korrektur v91 ist in Arbeit;
-sie ist noch nicht als produktiv bestätigt. Erst danach werden die echten
-Pilotfälle gespeichert und unabhängig nachgeprüft. Bis 12:39 UTC gab es keine
-fachlichen Writes durch diesen Pflegeweg.
+**Nachfolgender Live-Stand:** Der Cachefehler ist mit v91 behoben. Das Paket unter
+`https://01a6b663.sporteventmap.pages.dev` und die Produktionsdomain sind anhand
+der Dateihashes geprüft; der angemeldete Admin wurde anschließend erfolgreich
+bedient. Die Bestandsfälle wurden gespeichert und öffentlich nachgeprüft. Die
+privaten Releasebelege liegen unter `exports/ui-release-20260929-v91`.
+
+Ein echter Source-Monitor-Schreibvorgang während der Allgäu-Bearbeitung löste
+anschließend den vorgesehenen Versionskonflikt aus. PostgREST wiederholte dessen
+bisherigen SQL-Fehlercode bis zum HTTP-Timeout. Der eng begrenzte Hotfix
+`20260929130903_manual_maintenance_conflict_http_status.sql` meldet diesen
+fachlichen Konflikt als HTTP 409 und erhält die vollständige Versionsprüfung.
+Er besteht 66 lokale SQL-Prüfungen und eine echte HTTP-Prüfung mit PostgREST
+14.14. Die produktive Anwendung mit PostgREST 14.5 ist unabhängig um 13:20:21 UTC
+bestätigt: History 47, ausschließlich der vorgesehene SQLSTATE geändert;
+Rechte, alte History und Hashes von 15 bestehenden Tabellen/Ansichten unverändert.
+Der zuvor hängende echte UI-Auftrag meldet nun sofort den verständlichen
+Versionskonflikt. Neuladen erhält alle vier bearbeiteten Werte; neue Übersicht
+und Speichern waren erfolgreich. Die veröffentlichte UI bleibt v91.
+Die bestehenden Eingabe-, Reload- und erneuten Prüfschritte sind durch 13
+Unit-Tests und zwei gezielte Browser-Konfliktfälle abgesichert.
 
 ## 2. Kurzen manuellen Pilot messen
 
-Mit zwei bis drei vorhandenen Bestandsfällen beginnen. Je Fall werden aktive
-Pflegezeit, tatsächlich geprüfte Quellen, vollständiger Abschluss oder konkreter
-Blocker und der anschließend gemessene Frischegewinn festgehalten. Der Pilot
-belegt Bedienbarkeit und Durchsatz; er ersetzt keine Einzelprüfung der Quellen.
+Ring Running Series 159 und Christmas Run To Tree 355 sind über die echte
+angemeldete Oberfläche vollständig manuell bestätigt und öffentlich sichtbar
+nachgeprüft, jeweils mit 14 vollständigen Quellen-, Admin- und Versionsnachweisen.
+Der Pilot belegt den durchgängigen Pflegeweg und zwei zusätzliche gültige
+Vollnachweise ohne zusätzlichen Discovery-Eintrag. Eine belastbare
+aktive Pflegezeit oder ein daraus abgeleiteter Durchsatz wird noch nicht
+behauptet. Bei weiteren Fällen Pflegezeit, Quellen und konkrete Blocker knapp
+festhalten; Bestand und Frische vor jedem Paket erneut messen.
 
 Die erste vorbereitete Queue verwendet vorhandene vollständige Belegpakete:
 
 | Reihenfolge | Fall | Offene Feldvorschläge zum Messstand | Nächster Aufwand |
 | --- | --- | ---: | --- |
-| 1 | Ring Running Series 159 | 0 | Aktuelles Programm und Anmeldung erneut prüfen |
-| 2 | Christmas Run To Tree 355 | 0 | Aktuelle Ausgabe und Anmeldung erneut prüfen |
+| erledigt | Ring Running Series 159 | 0 | Vollständig bestätigt; Live-Sichtbarkeit geprüft |
+| erledigt | Christmas Run To Tree 355 | 0 | Vollständig bestätigt; Live-Sichtbarkeit geprüft |
 | 3 | Halloween-Run Bremen 482 | 0 | Vollständiges Lauf-, Walking-, Staffel- und Kinderprogramm prüfen |
 | 4 | Speed5 342 | 5 | Neue Vorschläge gegen Programm und editionsgenaue Anmeldung entscheiden |
 | 5 | Stromberglauf 367 | 1 | Vorschlag und aktuelle Ausgabezuordnung des Anmeldelinks prüfen |
 | 6 | Bietigheimer Silvesterlauf 235 | 4 | Anmeldung, Termin, Beschreibung und Wettbewerbe aktuell abgleichen |
 
 Null Vorschläge bedeutet keine Freigabe: Aufgaben, Quellenzustand und sonstige
-Blocker müssen ebenfalls geprüft werden. Die bisherigen Quellenpakete sind
+Blocker müssen ebenfalls geprüft werden. Die älteren vorbereiteten Quellenpakete sind
 älter als 24 Stunden. Sie dienen als Recherchevorlage, ihre Zeitstempel werden
 nicht umdatiert. Bietigheims angekündigte Anmeldeöffnung Anfang Oktober verlangt
 besonders einen aktuellen editionsgenauen Abgleich.
@@ -152,17 +177,37 @@ Frische beitragen. Bevorzugt werden zukünftig nutzbare Ausgaben mit vollständi
 offiziellem Programm und eindeutigem Anmeldeweg. Eine weitere Ausgabe einer
 bereits sichtbaren Serie ist kein zusätzlicher Discovery-Eintrag.
 
-**Allgäu Panorama Marathon 207** ist der am weitesten vorbereitete offene
-Nettozugang: Das private Paket vom 21.09. umfasst alle 14 Kernfelder und acht
-Wettbewerbe. Vor der Übernahme sind neue Quellenbelege und ein aktueller Abgleich
-erforderlich. Der bisher erkannte Sonntag 08.08.2027 muss mit dem belegten
-Wochenende 07.–08.08.2027, dem bestehenden Kandidaten und seiner Identität
-konsistent behandelt werden. Eine eigene 2027-Quellenbindung ist nötig; die
-historische Quelle bleibt erhalten. „Ultra rund 69 km“ bleibt eine Nennstrecke,
-widersprüchliche Kinderstartzeiten bleiben leer. Kein ungeprüftes neues SQL-Paket
-oder zusätzlicher Crawlerausbau ist dafür das Standardvorgehen.
+**Allgäu Panorama Marathon 207** ist weiterhin ein offener möglicher Nettozugang.
+Neue Originalbelege vom 29.09. liegen unter `exports/p0-allgaeu-20260929`; sie
+stützen die 14 Kernfelder, das Enddatum und acht Wettbewerbe. Genau ein
+2027-Entwurf wurde an den vorhandenen Kandidaten gebunden angelegt: zunächst
+ohne Feldbestätigungen, danach vier Faktenkorrekturen ohne Bestätigungen,
+anschließend 15 ausdrückliche Prüfungen (14 Kernfelder und Enddatum).
+Die historische Edition 2026 samt Quelle, einem bestehenden Ergebnis und null
+Saisonplaner-Verknüpfungen blieb laut Hashvergleich unverändert.
+„Ultra rund 69 km“ bleibt eine Nennstrecke,
+widersprüchliche Kinderstartzeiten bleiben leer.
 
-Die Live-Auswahl enthält 122 zukünftige, noch nicht sichtbare Eventidentitäten
+Der Source Monitor erkennt den Sonntag **08.08.2027**, die offiziellen Quellen
+belegen das Veranstaltungswochenende **07.–08.08.2027**. Der daraus entstandene
+Kandidatenkonflikt blockiert die Veröffentlichung. Auch vollständig manuell
+geprüfte Einzelfelder in diesem Entwurf ergeben deshalb noch keinen gültigen
+veröffentlichten Frischenachweis und keinen P0-Zugang. Die zwei unvollständigen
+Crawler-Vorschläge zum Anmeldelink und Wettbewerbsprogramm wurden um 13:25:03
+und 13:25:53 UTC mit Adminnachweis und fachlicher Begründung abgelehnt; ihre
+Werte wurden nicht angewandt. Der Kandidatenkonflikt bleibt bestehen.
+
+**Nächste kleine Verbesserung:** einen ausdrücklich auditierbaren Adminschritt
+für die Auflösung einer solchen Datumsabweichung am bereits gebundenen Entwurf
+ergänzen. Derzeit existiert dafür kein passender Review-RPC; Kandidatenablehnung
+oder das Schließen einer Aufgabe beseitigt die Validierungssperre nicht.
+Originalbeobachtung und Kandidaten-Fingerprint müssen erhalten bleiben. Danach
+bleiben die vollständige Quellenprüfung und die bestehenden Freigabegates
+unverändert erforderlich. Diese Ergänzung gehört nicht mehr zum aktuellen
+Rollout; bis dahin bleibt Allgäu privat. Kein Crawlerausbau und keine
+Umgehung der Sperre.
+
+Die Live-Auswahl zum Messstand 11:33 UTC enthielt 122 zukünftige, noch nicht sichtbare Eventidentitäten
 mit offenen Kandidaten, davon 115 deutsche. **Kandidaten sind keine verifizierten
 Zugänge.** Selbst wenn alle 115 deutschen Fälle freigabefähig wären, ergäben
 210 + 115 erst 325 Einträge: mindestens 75 weitere Zugänge wären bereits vor

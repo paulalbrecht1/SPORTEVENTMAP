@@ -1,9 +1,11 @@
 # Events manuell pflegen
 
-Stand: 29. September 2026, 12:39 UTC. Beide Backend-Migrationen und die
-Pflegeoberfläche v90 sind produktiv ausgerollt und geprüft. Ein Cacheproblem
-bei bereits geöffneten Adminsitzungen wird mit v91 korrigiert; diese Korrektur
-und die fachlichen Pilot-Schreibnachweise stehen noch aus.
+Stand: 29. September 2026, 13:26 UTC. Die beiden Pflege-Migrationen, der
+Konflikt-Hotfix und die Pflegeoberfläche sind produktiv. Der Cachefehler ist mit v91 behoben;
+die echte angemeldete Adminoberfläche wurde erfolgreich verwendet. Ring Running
+Series und Christmas Run To Tree sind vollständig manuell bestätigt und im
+öffentlichen Live-Katalog nachgeprüft. Der tägliche Pflegeweg ist damit auch
+an echten Bestandsfällen belegt. P0 und der reguläre Datenrelease bleiben offen.
 Der tägliche Ablauf benötigt keine KI und keinen LLM-Aufruf.
 
 ## Vor dem Bearbeiten
@@ -51,6 +53,8 @@ die Übersicht Änderungen, Löschungen und ausgewählte Prüfungen.
 
 Bei einem Fehler bleiben die Eingaben erhalten. Bei einer zwischenzeitlichen
 Änderung zuerst den aktuellen Stand laden und die Änderungen abgleichen.
+Bearbeitete Werte und die Notiz bleiben dabei erhalten; die Prüfhäkchen müssen
+bewusst neu gesetzt und die Änderungsübersicht erneut geprüft werden.
 Nach einer unklaren Netzwerkantwort denselben Speicherversuch wiederholen;
 die Wiederholung verwendet dieselbe Vorgangskennung.
 
@@ -61,7 +65,10 @@ geändert hat. Dann ist eine erneute Quellenprüfung notwendig.
 ## Wie lege ich die nächste Edition an?
 
 Zuerst prüfen, ob die Ausgabe bereits als Edition oder Kandidat vorhanden ist.
-Andernfalls **Neue Ausgabe als Entwurf anlegen** wählen und das Jahr angeben.
+Eine vorhandene Edition direkt weiterbearbeiten. Für eine neue Edition
+**Neue Ausgabe als Entwurf anlegen** wählen und das Jahr angeben; einen bereits
+vorhandenen passenden Kandidaten dabei auswählen, statt eine zweite Ausgabe
+anzulegen.
 Das **Ausgabekürzel bei mehreren Ausgaben pro Jahr** bleibt für die reguläre
 Ausgabe bei „main“. Für eine weitere Ausgabe im selben Jahr ein anderes
 Kürzel wie „herbst“ verwenden. Ein Datum wird nicht aus dem Vorjahr berechnet.
@@ -76,6 +83,8 @@ genannten Kernangaben anhand offizieller Quellen prüfen und einzeln markieren.
 Adresse, Koordinaten und Beschreibung stehen unter **Optionale Details und
 Veranstalterangaben**; für einen vollständigen Frischenachweis werden sie
 ebenfalls benötigt.
+Die Prüfnotiz muss mindestens zwölf Zeichen enthalten und den Beleg verständlich
+beschreiben.
 **Nach vollständiger Prüfung zur Veröffentlichung freigeben** wählen und die
 Änderungsübersicht bestätigen. Offene Konflikte oder fehlende Belege werden
 angezeigt; der Entwurf bleibt bei gescheiterter Freigabe gespeichert. Eine
@@ -86,6 +95,20 @@ deshalb nicht automatisch verändert oder archiviert.
 Für eine bereits veröffentlichte Ausgabe können dieselben 14 Prüfungen einen
 vollständigen Frischenachweis erneuern. Nur vollständige, konfliktfreie
 Nachweise zählen für die unveränderte P0-Frischegrenze.
+
+Der reale Pilot **Allgäu Panorama Marathon 2027** zeigt eine verbleibende
+Grenze: Der Entwurf ist an den vorhandenen Kandidaten gebunden, die historische
+Ausgabe 2026 blieb unverändert. Der Source Monitor meldet jedoch den Sonntag
+08.08.2027, während die offiziellen Belege das Wochenende 07.–08.08.2027
+bestätigen. Dieser Konflikt sperrt die Veröffentlichung. Es gibt noch keinen
+auditierbaren Adminschritt, um genau diese Abweichung ausdrücklich aufzulösen.
+Den Kandidaten nur abzulehnen oder eine Aufgabe zu schließen hebt die Sperre
+nicht auf. Der belegte Termin und die Kandidatenidentität werden nicht geändert,
+um die Freigabe zu erzwingen.
+Auch vollständig fachlich geprüfte Entwurfsfelder zählen bei dieser Sperre
+weder als veröffentlichter vollständiger Frischenachweis noch als P0-Zugang.
+Die ausdrückliche Konfliktauflösung wird nach diesem Rollout als kleine
+Ergänzung vorgesehen; der aktuelle Rollout enthält keine Sonderfreigabe.
 
 ## Woran erkenne ich, dass die Änderung öffentlich angekommen ist?
 
@@ -138,6 +161,12 @@ Monitor und die Importwege bleiben angebunden.
    `20260929104600_manual_event_maintenance.sql`,
    `20260929104628_manual_edition_import_compatibility.sql`.
    Sie ändern keine fachlichen Produktionswerte und geben keine Kandidaten frei.
+   Beide sind bereits produktiv. Auch der zusätzliche Hotfix
+   `20260929130903_manual_maintenance_conflict_http_status.sql` ist produktiv
+   angewendet und unabhängig nachgeprüft. Er meldet
+   zwischenzeitliche Änderungen als HTTP 409, damit PostgREST den fachlichen
+   Versionskonflikt nicht bis zum Timeout wiederholt. Die Versionsprüfung bleibt
+   unverändert; dafür ist kein weiterer UI-Release nötig.
 3. Datenbankprüfungen und Admin-/Nicht-Admin-Zugriffe prüfen, danach die Website
    mit dem zusätzlichen Modul `js/manual-event-maintenance.js` veröffentlichen.
 4. Statische Daten weiterhin mit `npm run data:refresh-public` aktualisieren.
@@ -154,7 +183,9 @@ Betriebsschritte; lokale Tests weisen keinen produktiven Rollout nach.
 
 ## Ausgeführte Prüfungen und Grenzen
 
-Die folgenden Ergebnisse stammen aus der Entwicklung am 29. September 2026:
+Die folgenden Entwicklungsergebnisse vom 29. September dokumentieren zunächst
+den v90-Ausgangsstand; zusätzliche Nachweise für v91 und den Konflikt-Hotfix
+stehen darunter:
 
 Für den lokalen Datenbanktest werden die installierten Projektabhängigkeiten
 und eine laufende lokale Docker-/Podman-Engine benötigt. Der Test erstellt
@@ -208,13 +239,33 @@ Anonyme und Nicht-Admin-Aufrufe wurden in der echten Datenbank abgewiesen.
 Beide neuen RPCs lieferten auch über HTTP ohne Sitzung 401 / 42501; die
 bestehenden anonymen Live- und Freshness-Audits bestanden erneut.
 
-Die Oberfläche v90 ist unter `https://86811745.sporteventmap.pages.dev` und
-der Produktionsdomain geprüft. Dieser UI-Release aktualisiert keine statischen
-Eventdaten. Bestehende Browsercaches können in bereits geöffneten Adminsitzungen
-noch ältere JavaScript-Dateien liefern. Die dafür vorbereitete Korrektur v91
-ist noch in Arbeit. Es wurden bislang keine fachlichen Pilotänderungen über
-den neuen Pflegeweg gespeichert; eine positive produktive Speicherprüfung
-wird deshalb noch nicht behauptet. Private Rolloutbelege liegen unter
-`exports/p0-rollout-20260929`. Den aktuellen Stand führt der
-[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
-Testdatensätze, lokale Testcontainer und deren Volumes wurden entfernt.
+Die nachfolgende Oberfläche **v91** ist unter
+`https://01a6b663.sporteventmap.pages.dev` und der Produktionsdomain anhand der
+Dateihashes geprüft. Neue Asset-Kennungen beheben den nachgewiesenen Browsercache-
+Fehler; bestehende Adminsitzungen laden nach einem Neuladen den aktuellen Code.
+Die echte angemeldete Oberfläche wurde danach erfolgreich für die beiden
+Bestandsreviews und den Allgäu-Entwurf genutzt. Datenbankstand und öffentliche
+Live-Ansichten der beiden Bestandsfälle wurden unabhängig nachgeprüft.
+Statische Eventseiten und Ausfalldaten bleiben aus dem eingefrorenen bisherigen
+Datenpaket; v91 stellt dafür keine neue Datenfreigabe dar.
+
+Der anschließende Konflikt-Hotfix besteht 66 lokale SQL-Prüfungen und eine echte
+HTTP-Regressionsprüfung mit PostgREST 14.14. Seine produktive Anwendung mit
+PostgREST 14.5 ist unabhängig um 13:20:21 UTC bestätigt: Migration
+`20260929130903`, History 47, ausschließlich der vorgesehene SQLSTATE geändert.
+Rechte, alte History und Inhalts-Hashes von 15 bestehenden Tabellen/Ansichten
+blieben unverändert. Der zuvor hängende echte UI-Auftrag meldet sofort den
+verständlichen Versionskonflikt; Neuladen erhielt die vier bearbeiteten Werte,
+erneute Übersicht und Speichern waren erfolgreich. Zusätzlich bestehen 13
+Unit-Tests und zwei gezielte Browser-Konfliktfälle: Der deutsche HTTP-409-Fehler
+erzeugt genau einen Speicheraufruf; Eingaben bleiben erhalten und können nach
+Neuladen und erneuter Prüfung gespeichert werden. Das produktive Allgäu-Problem
+enthielt einen echten Source-Monitor-Schreibvorgang, keine verlorenen
+Formulareingaben. Seine fachliche Datumssperre bleibt vom Timeout-Hotfix getrennt.
+
+Private Nachweise liegen unter `exports/p0-rollout-20260929`,
+`exports/ui-release-20260929-v91`, `exports/p0-manual-pilot-20260929` und
+`exports/p0-manual-http-20260929`. Den aktuellen Stand und die nächste kleine
+Ergänzung zur ausdrücklichen Konfliktauflösung führt der
+[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md). Die Entwicklungsprüfungen erzeugen
+keine produktiven Testeinträge.

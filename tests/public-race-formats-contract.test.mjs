@@ -72,3 +72,55 @@ assert.deepEqual(plain(context.normalizeRaceFormats('[null,5,"5 km",[],{"label":
   [{ label: "5 km", distance_km: 5 }], "only competition objects survive malformed list entries");
 assert.deepEqual(plain(context.normalizeRaceFormats("[]")), []);
 console.log("Public race-format export, CSV normalization and planner contract assertions passed.");
+
+// The same public rows feed list bars and map popups. Verification is not a
+// registration state, and canonical unknowns must not revive stale CSV values.
+vm.runInContext(source.slice(
+  source.indexOf("const EVENT_STATUS_CONFIG ="),
+  source.indexOf("function createEventStatusBadge(")
+), context);
+const statusCases = [
+  [{ verification_status: "verified", event_status: "scheduled", registration_status: "registration_open" }, "registration_open"],
+  [{ verification_status: "verified", event_status: "scheduled", registration_status: "registration_not_open" }, "registration_not_open"],
+  [{ verification_status: "verified", event_status: "scheduled", registration_status: "sold_out" }, "sold_out"],
+  [{ verification_status: "registration_open", event_status: "scheduled", registration_status: "cancelled" }, "registration_cancelled"],
+  ...["cancelled", "postponed", "completed", "inactive", "date_unconfirmed"].map(eventStatus => [
+    { verification_status: "verified", event_status: eventStatus, registration_status: "registration_open" }, eventStatus
+  ]),
+  ...["unknown", "unclear", "", null, undefined, "invalid"].flatMap(registrationStatus => [
+    [{ verification_status: "registration_open", registration_status: registrationStatus }, "unclear"],
+    [{ verification_status: "sold_out", event_status: "scheduled", registration_status: registrationStatus }, "scheduled"]
+  ]),
+  [{ verification_status: "verified" }, "unclear"],
+  [{ verification_status: "registration_open", event_status: "unknown" }, "unclear"],
+  [{ verification_status: "registration_open", event_status: "scheduled" }, "scheduled"],
+  [{ verification_status: "registration_open", event_status: "active" }, "registration_open"],
+  ...["confirmed", "date_expected", "registration_open", "registration_not_open", "sold_out", "cancelled", "unclear"].map(status => [
+    { verification_status: status }, status
+  ])
+];
+for (const [statuses, expected] of statusCases) {
+  const input = { ...row, ...statuses };
+  const before = JSON.stringify(input);
+  const normalized = context.normalizeEvent(input);
+  assert.equal(context.getEventStatusConfig(normalized).status, expected, JSON.stringify(statuses));
+  assert.equal(normalized.verification_status, statuses.verification_status,
+    "normalization preserves verification independently");
+  assert.equal(Object.hasOwn(normalized, "registration_status"), Object.hasOwn(statuses, "registration_status"),
+    "a missing legacy column remains distinct from an explicitly unknown canonical state");
+  assert.equal(JSON.stringify(input), before, "status normalization does not mutate the source row");
+}
+const separateStatuses = context.normalizeEvent({ ...row,
+  verification_status: " verified ", event_status: " scheduled ", registration_status: " registration_open "
+});
+assert.equal(separateStatuses.verification_status, "verified");
+assert.equal(separateStatuses.event_status, "scheduled");
+assert.equal(separateStatuses.registration_status, "registration_open");
+assert.equal(context.normalizeEvent({ ...row, registration_status: "registration_open" }).verification_status, "",
+  "an open registration never invents verification");
+const legacyCsvEvent = context.normalizeEvent(context.parseEventsCsv(
+  "event_key;event_name;verification_status\nlegacy;Legacy CSV;registration_open\n"
+)[0]);
+assert.equal(context.getEventStatusConfig(legacyCsvEvent).status, "registration_open");
+assert.equal(Object.hasOwn(legacyCsvEvent, "registration_status"), false);
+console.log(`Public status contract: ${statusCases.length} canonical/legacy combinations plus CSV and independent normalization passed.`);

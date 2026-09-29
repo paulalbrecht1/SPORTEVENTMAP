@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260929-ui-only-v92
+Version: 20260929-ui-only-v93
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: Canonical public details on existing event URLs, all editable edition fields, versioned audited review decisions inside Events pflegen, strict public render verification and open map/list refresh. Existing static HTML changes only the shared detail runtime script URL; all facts, export timestamps and sitemap remain unchanged. Database migration is deployed separately. This package performs no data export or automatic candidate approval.
+Includes: Correct canonical event and registration status on discovery cards, map popups and drawers after manual maintenance. Preserves the verified v92 admin workflow and public details. Existing static HTML changes only the shared detail runtime script URL; all facts, export timestamps and sitemap remain unchanged. No database migration, data export or automatic candidate approval.

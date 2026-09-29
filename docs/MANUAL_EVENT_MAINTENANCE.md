@@ -17,9 +17,12 @@ Normale Webseitenbesucher dürfen diese Schreibfunktion nicht verwenden.
    **An Quelle geprüft** markieren. Quellen-URL und **Prüfnotiz** ergänzen.
 4. **Änderungen prüfen**, Übersicht lesen und **Verbindlich speichern**.
 
+Die Prüfnotiz sollte knapp erklären, was die Quelle belegt (12 bis 1.000 Zeichen).
+Bei einer zu langen Notiz bleiben deine Eingaben erhalten; kürzen und erneut prüfen.
+
 Ein unverändertes Datum lässt sich erneut bestätigen. Nur angehakte Angaben
 bekommen einen Nachweis. Für die vollständige Aktualität einer veröffentlichten
-nächsten Ausgabe müssen alle 14 genannten Kernangaben geprüft und die offenen
+nächsten Ausgabe müssen alle 14 genannten Kernangaben geprüft und blockierende
 Hinweise geklärt sein. Vollständigkeit und Aktualität bleiben getrennt.
 
 ## Wie korrigiere ich eine Ausgabe?
@@ -54,6 +57,8 @@ Falls der Vorschlag selbst korrigiert werden muss, zuerst die richtigen Werte
 im Formular speichern und danach den falschen Vorschlag ablehnen.
 Quellenaufgaben, Datenhinweise und gemeldete Fehler erst nach tatsächlicher
 Klärung schließen. Eine Entscheidung ersetzt weder Quellenbeleg noch Freigabe.
+Nicht behobene optionale Hinweise, etwa ein fehlendes Bild, dürfen offen bleiben;
+sie dürfen nicht allein für einen grünen Status als erledigt markiert werden.
 
 Bei einem abweichenden Kandidatentermin zuerst Datum und gegebenenfalls
 Enddatum anhand der offiziellen editionsbezogenen Quelle bestätigen und
@@ -78,7 +83,7 @@ Die historische Ausgabe bleibt erhalten.
 Zum Veröffentlichen den gespeicherten Entwurf auswählen, alle 14 im Formular
 genannten Kernangaben an offiziellen Quellen prüfen und markieren. Adresse,
 Koordinaten und Beschreibung stehen bei den optionalen Details, gehören aber
-zum vollständigen Freigabenachweis. Offene Hinweise klären. Dann
+zum vollständigen Freigabenachweis. Blockierende Hinweise klären. Dann
 **Nach vollständiger Prüfung zur Veröffentlichung freigeben** auswählen,
 Änderungsübersicht kontrollieren und speichern.
 

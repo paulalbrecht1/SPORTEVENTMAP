@@ -7,12 +7,37 @@ import {
   test,
   waitForEventList
 } from "./helpers/browser.mjs";
-import { fixtureByName } from "./helpers/fixtures.mjs";
+import { fixtureByName, fixtureEvents, fixtureEventsCsv } from "./helpers/fixtures.mjs";
 
 // Discovery mirrors public_event_discovery and excludes completed/past rows,
 // including when the versioned CSV fallback is active.
 const DISCOVERY_EVENT_COUNT = 3;
 const RUNNING_DISCOVERY_EVENT_COUNT = 2;
+
+test("Public list displays canonical registration after a fresh catalog load in both languages", async ({ page }) => {
+  const run = fixtureByName["SEM E2E Future Run"];
+  await prepareApp(page);
+  const canonicalCsv = fixtureEventsCsv(fixtureEvents.map(event => ({
+    ...event, verification_status: "verified"
+  }))).split("\n").map((line, index) => !line ? "" : index === 0
+    ? `${line};event_status;registration_status`
+    : `${line};scheduled;registration_open`).join("\n");
+  await page.route("**/data/events.csv*", route => route.fulfill({
+    status: 200, contentType: "text/csv; charset=utf-8", body: canonicalCsv
+  }));
+
+  for (const sample of [
+    { language: "de", label: "Anmeldung offen" },
+    { language: "en", label: "Registration open" }
+  ]) {
+    await page.evaluate(language => setAppLanguage(language), sample.language);
+    await page.reload();
+    await waitForEventList(page);
+    await searchForEvent(page, run.event_name);
+    await expect(page.getByTestId("event-card").filter({ hasText: run.event_name })
+      .locator(".event-status-text")).toHaveText(sample.label);
+  }
+});
 
 test("Discovery search, drawer and filters remain usable", async ({ page }) => {
   const run = fixtureByName["SEM E2E Future Run"];

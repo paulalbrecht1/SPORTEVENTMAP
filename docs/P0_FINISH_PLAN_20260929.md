@@ -1,5 +1,21 @@
 # P0-Abschlussplan – 29. September 2026
 
+## Weiterer echter Browserpilot – 18:07 UTC
+
+Paderborner Osterlauf 2027 wurde über den vorhandenen Kandidaten im Admin als
+Entwurf angelegt, korrigiert, gezielt geprüft und veröffentlicht. Ergebnis:
+**212 Discovery-Einträge (162 Deutschland), 992 Archiv-Editionen und acht
+gültige vollständige Frischenachweise (3,77 %)**. Die alte Edition 2026 und ihr
+Ergebnis blieben unverändert. Der Browserlauf entdeckte zusätzlich eine falsche
+Statusanzeige in Karte/Liste, deren eng begrenzte Korrektur dokumentiert ist:
+[Browserbericht](MANUAL_BROWSER_AUDIT_20260929.md).
+
+P0 bleibt offen. Bei unverändertem Ziel von 400 Discovery-Einträgen fehlen
+mindestens 188 Nettozugänge und 212 zusätzliche Vollnachweise. Wenn alle 188
+Zugänge frisch veröffentlicht werden und die acht Nachweise gültig bleiben,
+sind zusätzlich mindestens 24 Bestandsreviews nötig. Die folgenden Messungen
+sind frühere Momentaufnahmen; Paderborn darf nicht erneut als Zugang zählen.
+
 ## Aktueller Stand nach der Workflowkorrektur – 16:02 UTC
 
 Der eigenständige Pflegeweg ist mit **v92 und zwei Backendergänzungen produktiv

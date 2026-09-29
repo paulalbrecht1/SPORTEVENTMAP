@@ -193,11 +193,13 @@ function normalizeEvent(rawEvent) {
     source_url:
       cleanValue(rawEvent.source_url || rawEvent.event_url || rawEvent.url),
     verification_status:
-      cleanValue(
-        rawEvent.verification_status ||
-        rawEvent.registration_status ||
-        rawEvent.event_status
-      ),
+      cleanValue(rawEvent.verification_status),
+    ...(Object.prototype.hasOwnProperty.call(rawEvent, "registration_status")
+      ? { registration_status: cleanValue(rawEvent.registration_status) }
+      : {}),
+    ...(Object.prototype.hasOwnProperty.call(rawEvent, "event_status")
+      ? { event_status: cleanValue(rawEvent.event_status) }
+      : {}),
     priority:
       cleanValue(rawEvent.priority),
     check_frequency:
@@ -1417,6 +1419,26 @@ function getEventFormatLabel(event) {
 }
 
 const EVENT_STATUS_CONFIG = {
+  scheduled: {
+    label: "Scheduled",
+    className: "confirmed"
+  },
+  date_unconfirmed: {
+    label: "Date not confirmed",
+    className: "date-expected"
+  },
+  postponed: {
+    label: "Postponed",
+    className: "date-expected"
+  },
+  completed: {
+    label: "Completed",
+    className: "unclear"
+  },
+  inactive: {
+    label: "Inactive",
+    className: "unclear"
+  },
   confirmed: {
     label: "Confirmed",
     className: "confirmed"
@@ -1441,6 +1463,10 @@ const EVENT_STATUS_CONFIG = {
     label: "Cancelled",
     className: "cancelled"
   },
+  registration_cancelled: {
+    label: "Registration cancelled",
+    className: "cancelled"
+  },
   unclear: {
     label: "Unclear",
     className: "unclear"
@@ -1459,10 +1485,29 @@ function normalizeEventStatus(value) {
 }
 
 function getEventStatusConfig(event) {
-  const status =
-    normalizeEventStatus(
-      event.verification_status
-    );
+  const eventStatus = normalizeEventStatus(event.event_status);
+  let status;
+
+  // Lifecycle exceptions remain visible even when an older registration is open.
+  if (["cancelled", "postponed", "completed", "inactive", "date_unconfirmed"].includes(eventStatus)) {
+    status = eventStatus;
+  } else if (Object.prototype.hasOwnProperty.call(event, "registration_status")) {
+    const registrationStatus = normalizeEventStatus(event.registration_status);
+    status = registrationStatus === "cancelled"
+      ? "registration_cancelled"
+      : ["registration_open", "registration_not_open", "sold_out"].includes(registrationStatus)
+        ? registrationStatus
+        : eventStatus === "scheduled" ? "scheduled" : "unclear";
+  } else if (eventStatus === "scheduled") {
+    status = "scheduled";
+  } else {
+    // Old CSVs stored registration in verification_status. An explicit unknown
+    // canonical status must never revive that potentially stale legacy value.
+    const legacyEventStatus = cleanValue(event.event_status).toLowerCase();
+    status = !legacyEventStatus || legacyEventStatus === "active"
+      ? normalizeEventStatus(event.verification_status)
+      : "unclear";
+  }
 
   return {
     status,

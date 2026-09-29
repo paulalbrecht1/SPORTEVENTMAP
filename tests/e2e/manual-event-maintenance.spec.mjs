@@ -235,33 +235,56 @@ test("manual: explicit full publication failure saves draft and explains retry w
   await expect(page.locator("[data-maintenance-publish]")).not.toBeChecked();
 });
 
-test("manual: actual admin markup opens the lazy module on mobile and keeps it mounted", async ({ page }, testInfo) => {
+test("manual: real lazy loader avoids the cached pre-maintenance router and keeps the mobile form mounted", async ({ page }, testInfo) => {
   await fixture(page, "success", { width: 390, height: 844 });
   await page.evaluate(html => {
     const original = new DOMParser().parseFromString(html, "text/html");
+    document.querySelectorAll('style').forEach(style => style.remove());
+    document.head.appendChild(document.importNode(original.querySelector('link[href*="css/style.css"]'), true));
     document.body.replaceChildren(document.importNode(original.querySelector("#adminModal"), true));
     document.body.dataset.theme = "light";
     document.querySelector("#adminModal").classList.add("open");
   }, indexSource);
   const switchTab = adminSource.slice(adminSource.indexOf("function setAdminTab("), adminSource.indexOf("function setDataOpsStatus("));
-  await page.route("**/js/maintenance-admin-fixture.js", route => route.fulfill({ contentType: "text/javascript", body: `
+  const tabMap = adminSource.slice(adminSource.indexOf("const ADMIN_TAB_PANEL_IDS ="), adminSource.indexOf("adminBtn.onclick ="));
+  const loadedRuntimeUrls = [];
+  await page.route("https://cdn.jsdelivr.net/npm/@supabase/supabase-js", route => route.fulfill({ contentType: "text/javascript", body: "/* SDK transport is supplied by the isolated fixture. */" }));
+  await page.route("**/js/supabase.js?*", route => {
+    loadedRuntimeUrls.push(new URL(route.request().url()).pathname + new URL(route.request().url()).search);
+    // The old URL still has the v89 router in an existing browser's four-hour
+    // HTTP cache. Reusing it reproduces the production fallback to Analytics.
+    const servedMap = route.request().url().includes("20260908-freshness-batch-v127")
+      ? tabMap.replace(/\s*eventMaintenance: "adminEventMaintenancePanel",/, "")
+      : tabMap;
+    return route.fulfill({ contentType: "text/javascript", body: `
     const supabaseClient = window.testClient;
     const SUPABASE_URL = 'https://example.test'; const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_test';
     const adminTabs = document.querySelectorAll('.admin-tab'); const adminTabPanels = document.querySelectorAll('.admin-tab-panel');
-    const ADMIN_TAB_PANEL_IDS = {analytics:'adminAnalyticsPanel',eventMaintenance:'adminEventMaintenancePanel',dataOperations:'adminDataOperationsPanel',feedback:'adminFeedbackPanel'};
+    ${servedMap}
     let currentAdminTab = 'analytics';
     const isCurrentUserAdmin = async () => true;
     const getFriendlyErrorMessage = error => error.message;
     ${switchTab}
     document.querySelector('[data-admin-tab="eventMaintenance"]').addEventListener('click', async () => {setAdminTab('eventMaintenance');await loadAdminTab('eventMaintenance');});
-  ` }));
-  await page.addScriptTag({ url: "/js/maintenance-admin-fixture.js" });
+  ` });
+  });
+  await page.evaluate(html => {
+    const original = new DOMParser().parseFromString(html, "text/html");
+    const publishedLoader = original.querySelector("script[data-supabase-src]");
+    const loader = document.createElement("script");
+    for (const attribute of publishedLoader.attributes) loader.setAttribute(attribute.name, attribute.value);
+    document.head.appendChild(loader);
+  }, indexSource);
+  await expect(page.locator("html")).toHaveAttribute("data-supabase-loaded", "true");
   await page.locator('[data-admin-tab="eventMaintenance"]').click();
+  await expect(page.locator('[data-admin-tab="eventMaintenance"]')).toHaveAttribute("aria-selected", "true");
   await expect(page.locator("#adminEventMaintenancePanel")).toBeVisible();
+  expect(loadedRuntimeUrls).toEqual(["/" + indexSource.match(/data-supabase-src="([^"]+)"/)[1]]);
   await page.locator("[data-maintenance-search]").fill("Berliner");
   await page.locator("[data-maintenance-search-form]").getByRole("button", { name: "Suchen" }).click();
   await page.locator("[data-maintenance-event]").click();
   await expect(field(page, "edition.start_date")).toHaveValue("2026-10-10");
+  await expect(page.locator(".maintenance-grid").first()).toHaveCSS("display", "grid");
   await page.locator('[data-admin-tab="eventMaintenance"]').click();
   await expect(field(page, "edition.start_date")).toHaveValue("2026-10-10");
   const overflow = await page.locator("#adminModal .admin-card").evaluate(element => ({ scroll: element.scrollWidth, client: element.clientWidth }));

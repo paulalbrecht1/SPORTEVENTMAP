@@ -1,8 +1,10 @@
 # P0-Abschlussplan – 29. September 2026
 
 Stand der lesenden Produktionsmessung: **29.09.2026, 11:33 UTC**.
-P0 bleibt offen. Der manuelle Pflegeweg ist implementiert; Frontend und beide
-zugehörigen Migrationen sind zu diesem Dokumentstand **noch nicht produktiv**.
+P0 bleibt offen. Beide Migrationen und das Frontend **v90 sind produktiv
+ausgerollt und geprüft**. Betriebsstand: 29.09.2026, 12:39 UTC. Ein Cacheproblem
+bei bereits geöffneten Adminsitzungen wird mit v91 korrigiert; diese Korrektur
+ist noch in Arbeit. Fachliche Pilotänderungen wurden bislang nicht gespeichert.
 Die folgende Reihenfolge konzentriert den Aufwand auf echte Katalogzugänge und
 gezielte Quellenprüfungen. Der tägliche Pflegeweg benötigt keine LLM-Aufrufe.
 
@@ -87,21 +89,37 @@ Bereits erfolgt:
   Die produktiven anonymen Zugriffs- und Freshness-Sicherheitsaudits bestehen
   ebenfalls; diese lesenden/abgewiesenen Aufrufe verändern keine Eventdaten.
 
-Das separate v90-Paket wird unter
-`exports/ui-release-20260929-v90/package` aus dem sauberen
-Quellcommit gebaut. Als nachgewiesene v89-Basis dienen
+Das separate v90-Paket wurde unter
+`exports/ui-release-20260929-v90/package` aus Quellcommit
+`75fef423a146266e65bb73914d3cf0c18a6b6ed5` gebaut. Als nachgewiesene v89-Basis dienten
 `exports/ui-release-20260920-v89/package` und
 `https://9cd74f1c.sporteventmap.pages.dev`; die SHA-256 der Basis-`release.json`
 ist `209adb7b35fd51ece8379e5707a72ae1c6cabc337b4575cae5e0c59f85eea389`.
 Quellcommit, Dateiinventar und tatsächliche Paketprüfung stehen in den erzeugten
 Release-Metadaten und Prüfprotokollen. Der konkrete Release umfasst genau die
 beiden in der Pflegeanleitung genannten Migrationen und dieses UI-Paket.
-Vor einem produktiven Upload sind nach dem bestehenden UI-Releaseweg ein
-Preview und ein erneuter Abgleich der weiterhin aktuellen Basis erforderlich.
+Preview, erneuter Basisabgleich und produktiver Upload sind erfolgt. v90 ist
+unter `https://86811745.sporteventmap.pages.dev` und der Produktionsdomain
+geprüft: sechs Browserprüfungen und 14 Dateivergleiche der Produktionsdomain
+bestanden. Statische Eventseiten und Ausfalldaten bleiben aus dem belegten
+bisherigen Datenpaket; die UI-Veröffentlichung ist keine neue Datenfreigabe.
 
-**Migrationseinspielung und Frontend-Rollout sind noch offen.** Die vorbereitete
-Versionskennung v90 ist keine Behauptung einer bereits veröffentlichten Version.
-Produktiv bleibt die verifizierte v89, bis der gesonderte Release ausgeführt ist.
+Die Datenbankmigrationen `20260929104600` und `20260929104628` wurden gemeinsam
+atomar angewendet. Die History enthält jetzt 46 Einträge; sämtliche 44 alten
+Einträge bleiben unverändert. Vor dem Commit und durch unabhängige Nachabfrage
+wurden unveränderte Inhalte von 15 bestehenden Tabellen/Ansichten,
+Nutzerverknüpfungen und allen bisherigen Frischeentscheidungen nachgewiesen.
+Zeitpläne wurden exakt wiederhergestellt; sechs für den Folgetag vorgesehene
+Wiederholungsaufträge blieben unverändert. Anonyme und bestehende Nicht-Admin-
+Zugriffe auf die neuen RPCs werden abgewiesen. Die bestehenden anonymen und
+Freshness-Live-Audits bestanden erneut; beide neuen RPCs lieferten ohne Sitzung
+HTTP 401 / SQLSTATE 42501. Private Nachweise: `exports/p0-rollout-20260929`.
+
+**Noch offen:** Die bestätigte Adminsitzung lädt wegen vorhandener Browsercaches
+teilweise ältere JavaScript-Dateien. Die begrenzte Korrektur v91 ist in Arbeit;
+sie ist noch nicht als produktiv bestätigt. Erst danach werden die echten
+Pilotfälle gespeichert und unabhängig nachgeprüft. Bis 12:39 UTC gab es keine
+fachlichen Writes durch diesen Pflegeweg.
 
 ## 2. Kurzen manuellen Pilot messen
 

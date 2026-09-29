@@ -200,7 +200,7 @@
     window.sportEventMapDetailConfig = { event: { ...event, event_slug: slug, event_key: [event.event_name, event.date, event.city].map(text).filter(Boolean).join('|').toLowerCase() } };
     render();
     const script = document.createElement('script');
-    script.src = '/js/event-detail.js?v=20260725-publish-runtime-v96';
+    script.src = '/js/event-detail.js?v=20260929-ui-runtime-v128';
     script.onerror = () => { byId('detailActionStatus').textContent = t('detail.saveUnavailable'); };
     document.head.append(script);
     void loadRichDetails();

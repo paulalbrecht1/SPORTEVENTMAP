@@ -1,11 +1,35 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const api = require('../js/manual-event-maintenance.js');
 const request = Object.freeze({ request_id: 'request-1', action: 'correct', event_id: 21, edition_id: 'edition-1', expected_version: 'version-1' });
 const context = { event: { id: 21 }, editions: [{ id: 'edition-1' }], version: 'version-2' };
 const receipt = { saved: true, ...request, context, publication: { status: 'database_public' } };
+
+test('manual admin release uses a new runtime URL instead of the four-hour cached pre-maintenance script', () => {
+  const page = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+  const runtime = page.match(/data-supabase-src="([^"]+)"/)?.[1];
+  assert.ok(runtime, 'Lazy admin runtime URL is required');
+  assert.notEqual(runtime, 'js/supabase.js?v=20260908-freshness-batch-v127', 'v89 and v90 reused this URL and existing sessions kept the old admin tab router');
+  assert.ok(Number(runtime.match(/-v(\d+)$/)?.[1]) >= 128, 'Manual maintenance needs the advanced runtime cache key');
+});
+
+test('all changed v90 UI assets use advanced URLs in overlay pages, dynamic imports and the next regular page generator', () => {
+  const references = [
+    ['index.html', 'css/style.css'], ['index.html', 'js/app.js'],
+    ['event-detail.html', 'css/style.css'], ['event-detail.html', 'js/event-detail-live.js'],
+    ['js/event-detail-live.js', 'js/event-detail.js'],
+    ['tools/generate-event-pages.js', 'css/style.css'], ['tools/generate-event-pages.js', 'js/event-detail.js'],
+    ...['about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html'].map(file => [file, 'css/style.css'])
+  ];
+  for (const [file, asset] of references) {
+    const source = fs.readFileSync(new URL('../' + file, import.meta.url), 'utf8');
+    const version = source.match(new RegExp(asset.replaceAll('.', '\\.') + '\\?v=([A-Za-z0-9-]+)'))?.[1];
+    assert.ok(Number(version?.match(/-v(\d+)$/)?.[1]) >= 128, `${file}: ${asset} still references the pre-v91 browser cache`);
+  }
+});
 
 test('patch contains only changed explicitly touched allowed values; blank and collapsed fields preserve data', () => {
   const before = { city: 'Berlin', description: 'Existing description', price_min: 25, participant_limit: 200 };

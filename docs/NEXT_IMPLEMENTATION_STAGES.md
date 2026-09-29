@@ -6,16 +6,22 @@ Stand: 29. September 2026
 ergibt 210 Discovery-Einträge (160 Deutschland), 990 Archiv-Editionen,
 vier gültige Vollnachweise (1,90 %) und 110 vollständige Einträge (52,38 %).
 Der [aktuelle P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) führt die verbleibende
-Arbeit zusammen: manuellen Pflegeweg abnehmen und ausrollen, einen kurzen Pilot
+Arbeit zusammen: den verbleibenden Admin-Cachefehler beheben, einen kurzen Pilot
 mit gemessener Pflegezeit abschließen, länger nutzbare Nettozugänge und vorhandene
 Reviewpakete bearbeiten, danach den regulären Export mit allen Gates bestehen.
 
 Der [manuelle Admin-Pflegeweg](MANUAL_EVENT_MAINTENANCE.md) ist implementiert und
-benötigt im täglichen Betrieb keine LLM-Aufrufe. Frontend und beide Migrationen
-sind zu diesem Dokumentstand noch nicht produktiv. Die aktuelle Produktionskopie
-hat die beiden Migrationen und 64 anwendbare SQL-Prüfungen erfolgreich bestanden;
-bestehende Fakten und Nutzerverknüpfungen bleiben unverändert. Der Rollout bleibt
-offen. Die Grenzen bleiben unverändert: mindestens 400
+benötigt im täglichen Betrieb keine LLM-Aufrufe. Beide Migrationen und die
+Oberfläche v90 sind seit 29.09. produktiv ausgerollt und geprüft. Die
+Migration-History enthält 46 Einträge; 15 bestehende Tabellen/Ansichten,
+Nutzerverknüpfungen und bisherige Frischeentscheidungen blieben unverändert.
+Die echten anonymen und Nicht-Admin-Zugriffe werden abgewiesen. v90 ist auf
+`https://86811745.sporteventmap.pages.dev` und der Produktionsdomain geprüft.
+Bestehende Adminsitzungen können noch ältere Dateien aus dem Browsercache laden;
+die begrenzte Korrektur v91 ist zum Stand 12:39 UTC in Arbeit. Bis dahin sind
+keine fachlichen Pilotänderungen gespeichert. Die Produktionskopie hatte zuvor
+64 anwendbare SQL-Prüfungen bestanden, der vollständige lokale Aufbau 66.
+Die Grenzen bleiben unverändert: mindestens 400
 Discovery-Einträge, 55 % Frische, 45 % Vollständigkeit, effektiver Archivbestand
 mindestens 974 und ein höchstens 24 Stunden alter Export mit gebundenen Audits.
 Momentan fehlen mindestens 190 Nettozugänge und 216 zusätzliche Vollnachweise;

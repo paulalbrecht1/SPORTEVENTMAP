@@ -1,7 +1,9 @@
 # Events manuell pflegen
 
-Stand: 29. September 2026. Diese Anleitung beschreibt die neue Pflegeansicht;
-sie ist erst nach dem unten beschriebenen Backend- und Website-Deployment online.
+Stand: 29. September 2026, 12:39 UTC. Beide Backend-Migrationen und die
+Pflegeoberfläche v90 sind produktiv ausgerollt und geprüft. Ein Cacheproblem
+bei bereits geöffneten Adminsitzungen wird mit v91 korrigiert; diese Korrektur
+und die fachlichen Pilot-Schreibnachweise stehen noch aus.
 Der tägliche Ablauf benötigt keine KI und keinen LLM-Aufruf.
 
 ## Vor dem Bearbeiten
@@ -196,8 +198,23 @@ sind dort ausdrücklich nicht anwendbar. Die Hashes von 14 bestehenden
 Tabellen/Ansichten und bisherige Frischeentscheidungen bleiben unverändert.
 Der vollständige lokale Stand besteht zusätzlich alle 66 SQL-Prüfungen.
 
-Keine Produktionsmigration, Produktionsschreibtests oder Veröffentlichung
-wurden ausgeführt. Der produktive Rollout und die Bereitstellung der neuen
-Pflegeoberfläche sind damit noch nicht nachgewiesen. Den aktuellen Stand führt
-der [P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
+Produktionsnachtrag vom 29. September, 12:39 UTC: Beide Migrationen sind unter
+den vorgesehenen Versionsnummern `20260929104600` und `20260929104628` atomar
+angewendet; die History enthält 46 statt 44 Einträge. Alle alten History-Zeilen,
+die Inhalte von 15 bestehenden Tabellen/Ansichten, Nutzerverknüpfungen und
+bisherige Frischeentscheidungen blieben unverändert. Zeitpläne und wartende
+Quellenaufträge wurden unverändert wiederhergestellt beziehungsweise erhalten.
+Anonyme und Nicht-Admin-Aufrufe wurden in der echten Datenbank abgewiesen.
+Beide neuen RPCs lieferten auch über HTTP ohne Sitzung 401 / 42501; die
+bestehenden anonymen Live- und Freshness-Audits bestanden erneut.
+
+Die Oberfläche v90 ist unter `https://86811745.sporteventmap.pages.dev` und
+der Produktionsdomain geprüft. Dieser UI-Release aktualisiert keine statischen
+Eventdaten. Bestehende Browsercaches können in bereits geöffneten Adminsitzungen
+noch ältere JavaScript-Dateien liefern. Die dafür vorbereitete Korrektur v91
+ist noch in Arbeit. Es wurden bislang keine fachlichen Pilotänderungen über
+den neuen Pflegeweg gespeichert; eine positive produktive Speicherprüfung
+wird deshalb noch nicht behauptet. Private Rolloutbelege liegen unter
+`exports/p0-rollout-20260929`. Den aktuellen Stand führt der
+[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
 Testdatensätze, lokale Testcontainer und deren Volumes wurden entfernt.

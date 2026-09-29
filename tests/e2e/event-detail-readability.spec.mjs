@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import fs from 'node:fs';
+const archive = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions;
 
 const detailPages = [
   {
@@ -67,7 +69,7 @@ async function preparePage(page, detailPath) {
     route.fulfill({
       status: 200,
       contentType: "text/javascript",
-      body: "window.SPORT_EVENT_MAP_CONFIG = {};"
+      body: 'window.SPORT_EVENT_MAP_CONFIG = {supabaseUrl:"https://detail-readability.test",supabasePublishableKey:"public-test"};'
     })
   );
 
@@ -82,7 +84,13 @@ async function preparePage(page, detailPath) {
     })
   );
 
+  const slug = detailPath.split('/').filter(Boolean).at(-1);
+  const row = { ...archive.find(item => item.edition_slug === slug), registration_status: 'unknown', price_min: 210, price_max: 230, currency: 'EUR' };
+  await page.addInitScript(() => localStorage.setItem('sportEventMapLanguage', 'en'));
+  await page.route('https://detail-readability.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([row]) }));
+  await page.route('https://detail-readability.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [row.edition_id]: false } }) }));
   await page.goto(detailPath);
+  await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
 }
 
 for (const detail of detailPages) {
@@ -171,59 +179,24 @@ for (const detail of detailPages) {
   });
 }
 
-test("registration warning uses a calm readable status card", async ({ page }) => {
+test("unconfirmed canonical registration status stays readable without a stale global badge", async ({ page }) => {
   await preparePage(page, "/event/bmw-berlin-marathon-2026/");
-
-  for (const viewport of [
-    { width: 390, height: 844 },
-    { width: 1280, height: 800 }
-  ]) {
+  const card = page.locator('[data-public-detail-field="registration"]');
+  await expect(card).toHaveText('RegistrationCheck with the organizer');
+  await expect(page.locator('.race-guide-status-panel > .event-detail-badge.pending')).toHaveCount(0);
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
     await page.setViewportSize(viewport);
-
-    for (const theme of ["light", "dark"]) {
-      await page.evaluate(activeTheme => {
-        document.documentElement.setAttribute("data-theme", activeTheme);
-      }, theme);
-
-      const result = await page.locator(
-        ".race-guide-status-panel > .event-detail-badge.pending"
-      ).evaluate(card => {
-        const style = getComputedStyle(card);
-        const iconStyle = getComputedStyle(card, "::before");
-
-        return {
-          display: style.display,
-          background: style.backgroundColor,
-          color: style.color,
-          borderLeft: style.borderLeftColor,
-          icon: iconStyle.content,
-          iconBackground: iconStyle.backgroundColor,
-          iconColor: iconStyle.color,
-          overflows:
-            card.scrollWidth > card.clientWidth + 1 ||
-            card.scrollHeight > card.clientHeight + 1
-        };
-      });
-
-      expect(result.display).toBe("grid");
-      expect(result.icon).toBe('"!"');
+    for (const theme of ['light', 'dark']) {
+      await page.evaluate(value => document.documentElement.dataset.theme = value, theme);
+      const result = await card.evaluate(node => ({
+        background: getComputedStyle(node).backgroundColor,
+        color: getComputedStyle(node.querySelector('strong')).color,
+        label: getComputedStyle(node.querySelector('span')).color,
+        overflows: node.scrollWidth > node.clientWidth + 1 || node.scrollHeight > node.clientHeight + 1
+      }));
       expect(result.overflows).toBe(false);
-      expect(
-        contrastRatio(result.color, result.background),
-        theme + " warning text lacks contrast at " + viewport.width + "px"
-      ).toBeGreaterThanOrEqual(4.5);
-
-      if (theme === "light") {
-        expect(result.background).toBe("rgb(242, 247, 244)");
-        expect(result.color).toBe("rgb(18, 32, 25)");
-        expect(result.borderLeft).toBe("rgb(183, 121, 31)");
-        expect(result.iconBackground).toBe("rgb(255, 243, 214)");
-        expect(result.iconColor).toBe("rgb(121, 80, 18)");
-      } else {
-        expect(result.background).toBe("rgb(23, 44, 37)");
-        expect(result.color).toBe("rgb(248, 250, 252)");
-        expect(result.borderLeft).toBe("rgb(245, 158, 11)");
-      }
+      expect(contrastRatio(result.color, result.background), theme + ' status value').toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(result.label, result.background), theme + ' status label').toBeGreaterThanOrEqual(4.5);
     }
   }
 });
@@ -259,47 +232,24 @@ test("Berlin registration dates and fee context are clear", async ({ page }) => 
     contrastRatio(typography.color, typography.background)
   ).toBeGreaterThanOrEqual(4.5);
 
-  const feeRows = page.locator(
-    "#registration .race-guide-table tbody tr"
-  );
-  await expect(feeRows).toHaveCount(1);
-  await expect(feeRows.locator("td")).toHaveText([
-    "Marathon",
-    "EUR 205",
-    "06.11.2025"
-  ]);
-  await expect(page.locator("#registration .race-guide-table"))
-    .not.toContainText("Tier 1");
-  await expect(page.locator("#registration .race-guide-table"))
-    .not.toContainText("Tier 2");
-  await expect(page.locator("#registration .race-guide-table"))
-    .not.toContainText("Clothing bag");
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.evaluate(() => {
-    document.documentElement.setAttribute("data-theme", "light");
-  });
-  const mobileFeeTable = await page.locator(
-    "#registration .race-guide-table-wrap.is-compact"
-  ).evaluate(table => {
-    const cell = table.querySelector("td");
-    const labelStyle = getComputedStyle(cell, "::before");
-
-    return {
-      scrollWidth: table.scrollWidth,
-      clientWidth: table.clientWidth,
-      labelColor: labelStyle.color,
-      background: getComputedStyle(table).backgroundColor
-    };
-  });
-  expect(mobileFeeTable.scrollWidth)
-    .toBeLessThanOrEqual(mobileFeeTable.clientWidth + 1);
-  expect(
-    contrastRatio(
-      mobileFeeTable.labelColor,
-      mobileFeeTable.background
-    )
-  ).toBeGreaterThanOrEqual(4.5);
+  // Dates remain distinct editorial knowledge; the editable canonical fee wins.
+  const price = page.locator('[data-public-detail-field="price"]');
+  await expect(price.locator('strong')).toHaveText('210 – 230 EUR');
+  await expect(page.locator('#registration .race-guide-table')).toHaveCount(0);
+  await expect(page.locator('#registration')).not.toContainText('EUR 205');
+  for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
+    await page.setViewportSize(viewport);
+    for (const theme of ['light', 'dark']) {
+      await page.evaluate(value => document.documentElement.dataset.theme = value, theme);
+      const styles = await price.evaluate(card => ({
+        background: getComputedStyle(card).backgroundColor,
+        color: getComputedStyle(card.querySelector('strong')).color,
+        overflows: card.scrollWidth > card.clientWidth + 1
+      }));
+      expect(styles.overflows).toBe(false);
+      expect(contrastRatio(styles.color, styles.background)).toBeGreaterThanOrEqual(4.5);
+    }
+  }
 });
 
 test("detail accordions and green chips stay readable in both themes", async ({ page }) => {

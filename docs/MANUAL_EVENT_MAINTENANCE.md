@@ -1,145 +1,113 @@
 # Events manuell pflegen
 
-**Erneute Abnahme vom 29.09.: noch nicht für sämtliche Fälle freigegeben.**
-Der Website-Admin benötigt keine Codex-Anmeldung. Reguläre statische Detaillinks
-können jedoch alte Werte zeigen; sechs optionale Eingaben fehlen im öffentlichen
-Prüfvertrag, und Konfliktfälle sind noch nicht vollständig im neuen Formular
-lösbar. Die [erneute Workflow-Abnahme](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md)
-dokumentiert die bestätigten Lücken. Die folgenden Speicher- und Pilotnachweise
-sind keine Zusicherung, dass jede Änderung bereits auf jeder Websiteansicht erscheint.
+Stand: Workflowkorrektur v92 vom 29. September 2026. Rollout- und Prüfnachweise
+stehen im [Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md). Die frühere
+[Abnahme von v91](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md) bleibt als Fehlernachweis erhalten.
 
-Stand: 29. September 2026, 13:26 UTC. Die beiden Pflege-Migrationen, der
-Konflikt-Hotfix und die Pflegeoberfläche sind produktiv. Der Cachefehler ist mit v91 behoben;
-die echte angemeldete Adminoberfläche wurde erfolgreich verwendet. Ring Running
-Series und Christmas Run To Tree sind vollständig manuell bestätigt und im
-öffentlichen Live-Katalog nachgeprüft. Der tägliche Pflegeweg ist damit auch
-an echten Bestandsfällen belegt. P0 und der reguläre Datenrelease bleiben offen.
-Der tägliche Ablauf benötigt keine KI und keinen LLM-Aufruf.
-
-## Vor dem Bearbeiten
-
-Als Administrator anmelden und im Adminbereich **Events pflegen** öffnen.
-Das Event suchen und die gewünschte Ausgabe auswählen. Jahr und Datum prüfen:
-Eine Änderung gilt für die gewählte Ausgabe, eine neue Ausgabe bekommt eine
-eigene Identität. Bereits vorhandene Entwürfe zuerst weiterbearbeiten.
-
-Die offizielle Quelle öffnen und die Angaben selbst nachlesen. Nur tatsächlich
-geprüfte Angaben markieren. Ein Häkchen bedeutet eine bewusste Quellenprüfung;
-Speichern allein bestätigt keine Angaben. Unbekanntes bleibt unbekannt.
+Für die tägliche Pflege genügt dein **SportEventMap-Administratorkonto**.
+Du brauchst weder Codex, KI-Tokens noch ein Supabase- oder Cloudflare-Konto.
+Offizielle Seiten selbst lesen, dann im Website-Admin **Events pflegen** öffnen.
+Normale Webseitenbesucher dürfen diese Schreibfunktion nicht verwenden.
 
 ## Wie bestätige ich ein Datum?
 
-1. Event und Ausgabe auswählen und die offizielle Quelle öffnen.
-2. Das eingetragene Datum mit der Quelle vergleichen.
-3. Bei **Was möchtest du tun?** „Angaben als weiterhin korrekt bestätigen“
-   wählen. Beim Datum **An Quelle geprüft** markieren, die **Persönlich
-   geprüfte Quellen-URL** und eine verständliche **Prüfnotiz** eintragen.
-4. **Änderungen prüfen** wählen, die Übersicht lesen und anschließend
-   **Verbindlich speichern** drücken.
+1. Event suchen und die richtige **Ausgabe auswählen**.
+2. **Offizielle Quelle öffnen** und das Datum selbst vergleichen.
+3. Unter **Was möchtest du tun?** die Bestätigung wählen. Beim Datum
+   **An Quelle geprüft** markieren. Quellen-URL und **Prüfnotiz** ergänzen.
+4. **Änderungen prüfen**, Übersicht lesen und **Verbindlich speichern**.
 
-Das Datum kann unverändert bestätigt werden. Andere Felder bekommen dadurch
-keinen neuen Prüfnachweis. Ein einzelnes bestätigtes Datum macht auch nicht
-automatisch die ganze Ausgabe frisch.
+Ein unverändertes Datum lässt sich erneut bestätigen. Nur angehakte Angaben
+bekommen einen Nachweis. Für die vollständige Aktualität einer veröffentlichten
+nächsten Ausgabe müssen alle 14 genannten Kernangaben geprüft und die offenen
+Hinweise geklärt sein. Vollständigkeit und Aktualität bleiben getrennt.
 
 ## Wie korrigiere ich eine Ausgabe?
 
-Die betreffende Ausgabe auswählen, **Bestehende Ausgabe korrigieren** wählen,
-die falschen Angaben berichtigen und die Quelle der Korrektur angeben.
-Veranstaltungsstatus (zum Beispiel verschoben)
-und Anmeldestatus (zum Beispiel ausgebucht) unabhängig einstellen.
-Wettbewerbe einzeln pflegen; Kilometer- und Meterangaben beachten. Bei einem
-Triathlon lassen sich Schwimmen, Radfahren und Laufen getrennt eintragen.
-Weitere Angaben stehen im einklappbaren Bereich.
+**Bestehende Ausgabe korrigieren** wählen, falsche Werte ändern und die Quelle
+angeben. Veranstaltungsstatus und Anmeldestatus sind getrennt. Wettbewerbe
+stehen in eigenen Zeilen; Kilometer und Höhenmeter beachten.
+**Optionale Details und Veranstalterangaben** enthalten unter anderem Enddatum,
+Startzeit, Gebühren, Währung und Teilnehmerlimit.
 
-Name, Ort, Adresse, Geodaten, Sport und Beschreibung gehören zum gemeinsamen
-Event. Änderungen daran gelten für alle Ausgaben; die Oberfläche weist darauf
-hin. Termin, Wettbewerbe und Anmeldung gehören zur ausgewählten Edition.
+Leere oder eingeklappte Felder löschen nichts. Bestehende Werte nur mit
+**Bewusst entfernen** löschen. Name, Ort, Adresse, Geodaten, Sport und
+Beschreibung gelten gemeinsam für alle Ausgaben; die übrigen Angaben gehören
+zur ausgewählten Ausgabe. Ihre Identität und Ergebnis-/Planerverknüpfungen bleiben erhalten.
 
-Ein leeres Eingabefeld löscht keinen bisherigen Wert. Für eine beabsichtigte
-Löschung die dafür vorgesehene Löschoption verwenden. Vor dem Speichern zeigt
-die Übersicht Änderungen, Löschungen und ausgewählte Prüfungen.
+Bei Fehlern bleiben Eingaben erhalten. Bei **zwischenzeitlich geänderten Daten**
+auf **Aktuellen Stand laden** klicken, vergleichen und erneut prüfen.
+Bearbeitete Werte und Notizen bleiben erhalten; Prüfhäkchen müssen neu gesetzt
+werden. Ist die Antwort unklar, denselben **Verbindlich speichern**-Vorgang
+wiederholen. Er erzeugt keine zweite Ausgabe.
 
-Bei einem Fehler bleiben die Eingaben erhalten. Bei einer zwischenzeitlichen
-Änderung zuerst den aktuellen Stand laden und die Änderungen abgleichen.
-Bearbeitete Werte und die Notiz bleiben dabei erhalten; die Prüfhäkchen müssen
-bewusst neu gesetzt und die Änderungsübersicht erneut geprüft werden.
-Nach einer unklaren Netzwerkantwort denselben Speicherversuch wiederholen;
-die Wiederholung verwendet dieselbe Vorgangskennung.
+## Wie kläre ich einen offenen Hinweis?
 
-Im einklappbaren **Prüfverlauf** stehen Quelle, Zeitpunkt und Notiz der letzten
-manuellen Prüfung. Er zeigt außerdem, wenn sich der geprüfte Wert danach
-geändert hat. Dann ist eine erneute Quellenprüfung notwendig.
+Unter **Offene Hinweise hier bearbeiten** stehen die Hinweise zur gewählten
+Ausgabe. Zuerst etwaige Formularänderungen speichern. Dann je Hinweis eine
+Entscheidung wählen, nachvollziehbar begründen, **Entscheidung prüfen** und
+**Verbindlich speichern**. Jede Entscheidung wird mit Admin, Serverzeit und
+vorherigem Stand protokolliert; sie bestätigt keine ungeprüften Felder.
+
+Falsche Crawler-Vorschläge begründet ablehnen oder richtige übernehmen.
+Falls der Vorschlag selbst korrigiert werden muss, zuerst die richtigen Werte
+im Formular speichern und danach den falschen Vorschlag ablehnen.
+Quellenaufgaben, Datenhinweise und gemeldete Fehler erst nach tatsächlicher
+Klärung schließen. Eine Entscheidung ersetzt weder Quellenbeleg noch Freigabe.
+
+Bei einem abweichenden Kandidatentermin zuerst Datum und gegebenenfalls
+Enddatum anhand der offiziellen editionsbezogenen Quelle bestätigen und
+speichern. Dann die **Abweichung der erkannten Ausgabe** ausdrücklich klären.
+Der Originalbefund bleibt erhalten. Die Entscheidung gilt nur für genau diese
+Ausgabe, Termine und Quelle. Neue widersprüchliche Befunde müssen erneut
+geprüft werden. Jahres-, Identitäts- und Dublettenkonflikte werden nicht damit
+übersprungen.
 
 ## Wie lege ich die nächste Edition an?
 
-Zuerst prüfen, ob die Ausgabe bereits als Edition oder Kandidat vorhanden ist.
-Eine vorhandene Edition direkt weiterbearbeiten. Für eine neue Edition
-**Neue Ausgabe als Entwurf anlegen** wählen und das Jahr angeben; einen bereits
-vorhandenen passenden Kandidaten dabei auswählen, statt eine zweite Ausgabe
-anzulegen.
-Das **Ausgabekürzel bei mehreren Ausgaben pro Jahr** bleibt für die reguläre
-Ausgabe bei „main“. Für eine weitere Ausgabe im selben Jahr ein anderes
-Kürzel wie „herbst“ verwenden. Ein Datum wird nicht aus dem Vorjahr berechnet.
+Vorhandene Entwürfe zuerst auswählen und weiterbearbeiten. Andernfalls
+**Neue Ausgabe als Entwurf anlegen** wählen, Ausgabejahr eintragen und einen
+bereits erkannten passenden Kandidaten auswählen, sofern vorhanden.
+Bei mehreren Ausgaben im selben Jahr ein anderes **Ausgabekürzel** verwenden,
+zum Beispiel „herbst“. Es wird kein Vorjahresdatum automatisch fortgeschrieben.
 
-Nur belegte Angaben eintragen. Ein Entwurf darf unvollständig bleiben und ist
-nicht öffentlich. Wettbewerbe, Anmeldung, Preise, Termine und Prüfnachweise
-werden nicht ungeprüft aus dem Vorjahr übernommen. Vorhandene Saisonpläne und
-Ergebnisse behalten ihre bisherige Editionszuordnung.
+Unbekannte Angaben dürfen im privaten Entwurf fehlen. Termine, Wettbewerbe,
+Anmeldung und Verifikationen werden nicht aus dem Vorjahr übernommen.
+Die historische Ausgabe bleibt erhalten.
 
-Zum Veröffentlichen den gespeicherten Entwurf auswählen, die 14 im Formular
-genannten Kernangaben anhand offizieller Quellen prüfen und einzeln markieren.
-Adresse, Koordinaten und Beschreibung stehen unter **Optionale Details und
-Veranstalterangaben**; für einen vollständigen Frischenachweis werden sie
-ebenfalls benötigt.
-Die Prüfnotiz muss mindestens zwölf Zeichen enthalten und den Beleg verständlich
-beschreiben.
-**Nach vollständiger Prüfung zur Veröffentlichung freigeben** wählen und die
-Änderungsübersicht bestätigen. Offene Konflikte oder fehlende Belege werden
-angezeigt; der Entwurf bleibt bei gescheiterter Freigabe gespeichert. Eine
-Folgeedition kann an der bestehenden Regel scheitern, dass die Frischeprüfung
-die aktuell nächste Discovery-Ausgabe verlangt. Die frühere Edition wird
-deshalb nicht automatisch verändert oder archiviert.
+Zum Veröffentlichen den gespeicherten Entwurf auswählen, alle 14 im Formular
+genannten Kernangaben an offiziellen Quellen prüfen und markieren. Adresse,
+Koordinaten und Beschreibung stehen bei den optionalen Details, gehören aber
+zum vollständigen Freigabenachweis. Offene Hinweise klären. Dann
+**Nach vollständiger Prüfung zur Veröffentlichung freigeben** auswählen,
+Änderungsübersicht kontrollieren und speichern.
 
-Für eine bereits veröffentlichte Ausgabe können dieselben 14 Prüfungen einen
-vollständigen Frischenachweis erneuern. Nur vollständige, konfliktfreie
-Nachweise zählen für die unveränderte P0-Frischegrenze.
-
-Der reale Pilot **Allgäu Panorama Marathon 2027** zeigt eine verbleibende
-Grenze: Der Entwurf ist an den vorhandenen Kandidaten gebunden, die historische
-Ausgabe 2026 blieb unverändert. Der Source Monitor meldet jedoch den Sonntag
-08.08.2027, während die offiziellen Belege das Wochenende 07.–08.08.2027
-bestätigen. Dieser Konflikt sperrt die Veröffentlichung. Es gibt noch keinen
-auditierbaren Adminschritt, um genau diese Abweichung ausdrücklich aufzulösen.
-Den Kandidaten nur abzulehnen oder eine Aufgabe zu schließen hebt die Sperre
-nicht auf. Der belegte Termin und die Kandidatenidentität werden nicht geändert,
-um die Freigabe zu erzwingen.
-Auch vollständig fachlich geprüfte Entwurfsfelder zählen bei dieser Sperre
-weder als veröffentlichter vollständiger Frischenachweis noch als P0-Zugang.
-Die ausdrückliche Konfliktauflösung wird nach diesem Rollout als kleine
-Ergänzung vorgesehen; der aktuelle Rollout enthält keine Sonderfreigabe.
+Fehlende Belege, Dubletten, Veröffentlichungssperren oder eine frühere noch
+aktuelle Ausgabe können die Freigabe weiter verhindern. Dann bleibt der Entwurf
+privat. Eine neue Ausgabe wird nicht durch Veränderung der alten erzwungen.
 
 ## Woran erkenne ich, dass die Änderung öffentlich angekommen ist?
 
-**Gespeichert** bestätigt den erneut gelesenen Datenbankstand.
-Die zusätzliche Prüfung des **Live-Katalogs** liest die öffentlichen Ansichten
-ohne Administratoranmeldung und vergleicht die Werte. Ein veröffentlichter
-Archiveintrag muss nicht auf der Karte erscheinen: Die Karte zeigt weiterhin
-nur die nächste geeignete veröffentlichte Edition eines Events.
+**In der Datenbank gespeichert und neu geladen** bestätigt nur das Speichern.
+Erst **Öffentlich aktualisiert: Normale Detailseite geprüft** bestätigt zusätzlich
+den Vergleich mit dem anonymen Live-Katalog und die tatsächlich geladene
+normale Detailseite. Bei einer nächsten Ausgabe werden auch Karte und Liste
+mit den gespeicherten Werten neu geladen. **Öffentliche Detailseite öffnen**
+führt zur überprüften Seite.
 
-**Statische Seiten und Ausfalldaten: hier nicht geprüft** bedeutet, dass die
-gespeicherten Ausfalldaten und vorab erzeugten Eventseiten separat geprüft
-werden müssen und noch einen älteren Stand haben können. Ein Datenbankerfolg
-ist kein Website-Release. Bei einem fehlgeschlagenen
-öffentlichen Abruf die öffentliche Prüfung erneut ausführen. Sie speichert
-keine zweite Ausgabe.
+Bei **noch nicht vollständig verifiziert** oder einem Abruffehler:
+**Öffentlichen Stand erneut prüfen**. Das prüft erneut, ohne einen weiteren
+Datensatz zu speichern. Historische Ausgaben erscheinen im Archiv; Karte und
+Liste zeigen jeweils die nächste geeignete Ausgabe.
 
-Solange das bestehende Datenqualitäts-Gate den Export sperrt, bleibt die
-statische Veröffentlichung offen. Die Pflegeansicht hebt diese Sperre nicht auf.
+Im normalen Onlinebetrieb ist pro Änderung kein Export oder Deployment nötig.
+Bei einem Datenbankausfall kann ein klar gekennzeichneter älterer Export
+erscheinen. Diese Ausfalldaten werden durch manuelles Speichern nicht erneuert;
+dafür bleibt das bestehende vollständige Datenrelease mit seinen Qualitätsgates nötig.
 
-Unter **Prüfergebnis** lassen sich auch „Noch keine neue Ausgabe angekündigt“
-und „Quelle nicht erreichbar“ dokumentieren. In beiden Fällen keine
-Feldbestätigungen markieren. Eine nicht erreichbare Quelle erzeugt keinen
-Frischenachweis.
+Unter **Prüfergebnis** lassen sich auch **Noch keine neue Ausgabe angekündigt**
+und **Quelle nicht erreichbar** dokumentieren. Dabei keine Feldbestätigungen
+markieren. Beide Ergebnisse sind keine Bestätigung alter Werte.
 
 ## Bestehende Datenwege
 
@@ -151,7 +119,7 @@ Frischenachweis.
 | Änderungsverlauf und Feldschutz | `event_audit_log`, `event_field_controls` |
 | Konflikte und Nachfolgekandidaten | `event_change_proposals`, `edition_succession_candidates`, Review-Inbox |
 | Karte und Liste | `public_event_discovery` über `js/event-catalog-loader.js` |
-| Öffentliche Ausgabe | `public_event_archive`, vorhandene dynamische Detailseite |
+| Öffentliche Ausgabe | `public_event_archive`, gemeinsamer Live-Renderer für reguläre und dynamische Detailseiten |
 | Saisonplaner und Ergebnisse | `season_planner_events.edition_id`, `edition_results` |
 | Ausfalldaten und statische Seiten | `data/events.csv`, `data/event-editions-public.json`, `event/` |
 
@@ -159,7 +127,7 @@ Die Umsetzung ergänzt den vorhandenen Vanilla-JavaScript-Admin und die
 Supabase-RPCs. Es gibt keine zweite Eventdatenhaltung. Der vorhandene Source
 Monitor und die Importwege bleiben angebunden.
 
-## Deployment und Betrieb
+## Historische Migrationen und Pilotnachweise (v90/v91)
 
 1. Datenbanksicherung und Schemaabgleich nach
    [Production-Recovery-Runbook](PRODUCTION_RECOVERY_RUNBOOK.md) durchführen.

@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260929-ui-only-v91
+Version: 20260929-ui-only-v92
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: New versioned Admin, application, stylesheet and dynamic-detail runtime URLs so freshly loaded pages request the matching UI instead of older cached assets. Future generated detail pages use the same cache keys; existing static event pages are not regenerated. Preserves the verified v90 data, static event pages, sitemap and runtime configuration. This UI package applies no migration or data export. Stage 4 and automatic publication remain disabled.
+Includes: Canonical public details on existing event URLs, all editable edition fields, versioned audited review decisions inside Events pflegen, strict public render verification and open map/list refresh. Existing static HTML changes only the shared detail runtime script URL; all facts, export timestamps and sitemap remain unchanged. Database migration is deployed separately. This package performs no data export or automatic candidate approval.

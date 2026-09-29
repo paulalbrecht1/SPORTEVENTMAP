@@ -62,6 +62,13 @@ declare
   candidate_edition_id uuid;
   conflict_candidate_id uuid;
   conflict_edition_id uuid;
+  review_task_id uuid;
+  review_issue_id uuid;
+  review_alert_id bigint;
+  review_feedback_id uuid;
+  separate_candidate_id uuid;
+  separate_edition_id uuid;
+  candidate_observation jsonb;
   candidate_date date:=make_date(extract(year from current_date)::integer+3,5,1);
 begin
   official_url:='https://example.invalid/'||marker;
@@ -79,7 +86,7 @@ begin
   select e.id into edition_id from public.event_editions e where e.event_id=event_id;
   update public.event_editions set publication_status='published',discovery_status='active',edition_status='scheduled',
     race_formats='[{"label":"10 km","distance_km":10,"elevation_gain_m":250}]',
-    registration_status='registration_open',price_min=15,price_max=25,currency='EUR',participant_limit=400
+    registration_status='registration_open',start_time='09:15',price_min=15,price_max=25,currency='EUR',participant_limit=400
     where id=edition_id;
   select last_verified_at into initial_verified_at from public.event_editions where id=edition_id;
   insert into public.event_sources(event_id,edition_id,source_type,source_url,parser_type,is_active,crawl_status)
@@ -102,6 +109,13 @@ begin
   perform pg_temp.mm_assert(receipt->>'saved'='true' and receipt->>'edition_id'=edition_id::text,'correction returns exact saved identity');
   perform pg_temp.mm_assert((select start_date=future_date+1 and end_date=future_date+1 from public.event_editions where id=edition_id),
     'correction persists in canonical database reload');
+  perform pg_temp.mm_assert((select end_date=future_date+1 and start_time='09:15'::time and price_min=15 and price_max=25
+    and currency='EUR' and participant_limit=400 from public.public_event_discovery where public_event_discovery.edition_id=edition_id)
+    and (select end_date=future_date+1 and start_time='09:15'::time and price_min=15 and price_max=25
+    and currency='EUR' and participant_limit=400 from public.public_event_archive where public_event_archive.edition_id=edition_id),
+    'six optional canonical fields are present and current in both public views');
+  perform pg_temp.mm_assert(context ?& array['proposals','review_tasks','validation_issues','data_alerts','feedback','candidate_resolutions'],
+    'manual context includes every existing review blocker collection');
   perform pg_temp.mm_assert((public.admin_manual_event_context(event_id)->>'version') is distinct from context->>'version',
     'stored version changes after correction');
   perform pg_temp.mm_assert((select price_min=15 and price_max=25 and participant_limit=400 and currency='EUR'
@@ -423,6 +437,139 @@ begin
     and (select candidate_status='conflict' from public.edition_succession_candidates where id=conflict_candidate_id),
     'unresolved candidate conflict prevents full manual publication without false success');
 
+
+  -- Complete website review workflow, isolated synthetic successor.
+  execute 'reset role';
+  select id into fresh_source_id from public.event_sources where event_sources.edition_id=conflict_edition_id and source_url=official_url||'/conflict';
+  update public.event_editions set start_date=candidate_date,end_date=candidate_date+1 where id=conflict_edition_id;
+  update public.edition_succession_candidates set source_id=fresh_source_id,source_url=official_url||'/conflict',
+    candidate_start_date=candidate_date+1,validation_reasons=array['edition_year_date_conflict'] where id=conflict_candidate_id;
+  insert into public.event_editions(event_id,edition_year,edition_key,edition_slug,legacy_event_key,start_date,publication_status)
+    values(event_id,extract(year from candidate_date),'autumn',marker||'-separate-autumn',marker||'-separate-autumn',make_date(extract(year from candidate_date)::integer,11,1),'draft')
+    returning id into separate_edition_id;
+  insert into public.edition_succession_candidates(event_id,source_id,predecessor_edition_id,draft_edition_id,candidate_year,candidate_start_date,
+    source_url,confidence,fingerprint,candidate_status,validation_status)
+    values(event_id,fresh_source_id,edition_id,separate_edition_id,extract(year from candidate_date),make_date(extract(year from candidate_date)::integer,11,1),
+      official_url||'/conflict',0.99,marker||'-separate-autumn-candidate','draft_created','validated') returning id into separate_candidate_id;
+  select to_jsonb(c)-array['updated_at','candidate_status','validation_status','validation_reasons','validated_at','reviewed_at','reviewed_by','review_notes']
+    into candidate_observation from public.edition_succession_candidates c where id=conflict_candidate_id;
+  execute 'set local role authenticated';
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_build_object('request_id',gen_random_uuid(),'action','review','event_id',event_id,'edition_id',conflict_edition_id,
+    'expected_version',context->>'version','source_url',official_url||'/conflict','source_result','confirmed',
+    'notes','Offizielles Wochenende geprüft; die einzelne Beobachtung liegt darin.',
+    'review',jsonb_build_object('kind','candidate_range','id',conflict_candidate_id,
+      'confirmed_start_date',candidate_date,'confirmed_end_date',candidate_date+1));
+  perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',payload),
+    'candidate resolution requires prior explicit current date verifications',array['23514']);
+  receipt:=public.save_manual_event_maintenance(jsonb_build_object('request_id',gen_random_uuid(),'action','confirm',
+    'event_id',event_id,'edition_id',conflict_edition_id,'expected_version',context->>'version',
+    'source_url',official_url||'/conflict','source_result','confirmed','notes','Beide Datumspunkte ausdrücklich auf offizieller Quelle geprüft.',
+    'confirmations',jsonb_build_array('edition.start_date','edition.end_date')));
+  execute 'reset role';
+  update public.edition_succession_candidates set candidate_start_date=candidate_date+1 where id=separate_candidate_id;
+  execute 'set local role authenticated';
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_set(payload,'{expected_version}',context->'version');
+  perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',payload),
+    'candidate resolution blocks an overlapping competing observation',array['23514']);
+  execute 'reset role';
+  update public.edition_succession_candidates set candidate_start_date=make_date(extract(year from candidate_date)::integer,11,1) where id=separate_candidate_id;
+  execute 'set local role authenticated';
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_set(payload,'{expected_version}',context->'version');
+  receipt:=public.save_manual_event_maintenance(payload);
+  perform pg_temp.mm_assert(receipt->>'saved'='true' and receipt->'freshness'->>'verified'='false'
+    and receipt->'publication'->>'status'='draft'
+    and (select candidate_status='draft_created' and validation_status='validated' from public.edition_succession_candidates where id=conflict_candidate_id),
+    'explicit candidate range resolution preserves draft and does not grant freshness');
+  perform pg_temp.mm_assert((select candidate_status='draft_created' and candidate_start_date=make_date(extract(year from candidate_date)::integer,11,1)
+    and draft_edition_id=separate_edition_id from public.edition_succession_candidates where id=separate_candidate_id)
+    and (select edition_key='autumn' and publication_status='draft' from public.event_editions where id=separate_edition_id),
+    'separate same-year occurrence neither blocks review nor changes identity');
+  perform pg_temp.mm_assert((select to_jsonb(c)-array['updated_at','candidate_status','validation_status','validation_reasons','validated_at','reviewed_at','reviewed_by','review_notes']
+    from public.edition_succession_candidates c where id=conflict_candidate_id)=candidate_observation,
+    'candidate resolution preserves all original observations evidence and identity');
+  replay:=public.save_manual_event_maintenance(payload);
+  perform pg_temp.mm_assert(replay->>'replayed'='true' and
+    (select count(*)=1 from public.event_audit_log where entity_id=conflict_edition_id::text and field_name='__manual_candidate_resolution__'),
+    'review replay returns one receipt and one original resolution audit');
+  perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',jsonb_set(payload,'{request_id}',to_jsonb(gen_random_uuid()))),
+    'review stale version is a final HTTP409 conflict',array['PT409']);
+  execute 'reset role';
+  update public.edition_succession_candidates set candidate_status='conflict',validation_status='conflict',
+    validation_reasons=array['edition_year_date_conflict'],last_detected_at=now() where id=conflict_candidate_id;
+  perform pg_temp.mm_assert((select candidate_status='draft_created' and validation_status='validated' from public.edition_succession_candidates where id=conflict_candidate_id),
+    'same crawler observation respects exact audited date range resolution');
+  update public.edition_succession_candidates set candidate_start_date=candidate_date+5 where id=conflict_candidate_id;
+  perform pg_temp.mm_assert((select candidate_status='conflict' and validation_status='conflict' from public.edition_succession_candidates where id=conflict_candidate_id),
+    'changed crawler observation reopens manual date conflict');
+  execute 'set local role authenticated';
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_set(jsonb_set(payload,'{request_id}',to_jsonb(gen_random_uuid())),'{expected_version}',context->'version');
+  perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',payload),
+    'range resolution rejects observation outside confirmed dates',array['23514']);
+  payload:=jsonb_set(payload,'{review,kind}','"candidate_dates"');
+  receipt:=public.save_manual_event_maintenance(payload);
+  perform pg_temp.mm_assert(receipt->>'saved'='true' and (select candidate_start_date=candidate_date+5 from public.edition_succession_candidates where id=conflict_candidate_id),
+    'explicit wrong-observation decision preserves outlying original date');
+  execute 'reset role';
+  update public.event_editions set end_date=candidate_date+2 where id=conflict_edition_id;
+  perform pg_temp.mm_assert((select candidate_status='conflict' from public.edition_succession_candidates where id=conflict_candidate_id),
+    'editing the confirmed date range invalidates previous candidate resolution');
+  insert into public.source_review_tasks(event_id,edition_id,source_id,task_type,title,fingerprint)
+    values(event_id,conflict_edition_id,fresh_source_id,'content_changed','Synthetic source review',marker||'-review-task') returning id into review_task_id;
+  insert into public.validation_issues(event_id,edition_id,severity,rule_code,description)
+    values(event_id,conflict_edition_id,'error',marker||'-manual-false-positive','Synthetic documented false positive') returning id into review_issue_id;
+  insert into public.data_workflow_alerts(event_id,edition_id,source_id,alert_scope,alert_code,severity,title)
+    values(event_id,conflict_edition_id,fresh_source_id,marker,marker||'-manual-alert','error','Synthetic resolved incident') returning id into review_alert_id;
+  execute 'set local role authenticated';
+  foreach operation in array array['source_task','validation_issue','data_alert'] loop
+    context:=public.admin_manual_event_context(event_id);
+    payload:=jsonb_build_object('request_id',gen_random_uuid(),'action','review','event_id',event_id,'edition_id',conflict_edition_id,
+      'expected_version',context->>'version','notes','Diesen einzelnen Hinweis ausdrücklich geprüft und nachvollziehbar geklärt.',
+      'review',jsonb_build_object('kind',operation,'id',case operation when 'source_task' then review_task_id::text when 'validation_issue' then review_issue_id::text else review_alert_id::text end,'decision','resolved'));
+    perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',jsonb_set(payload,'{edition_id}',to_jsonb(edition_id))),
+      operation||' cannot close another edition review item',array['22023']);
+    receipt:=public.save_manual_event_maintenance(payload);
+    perform pg_temp.mm_assert(receipt->>'saved'='true' and receipt->'freshness'->>'verified'='false',
+      operation||' stores explicit existing-policy decision without freshness');
+  end loop;
+  perform pg_temp.mm_assert((select reviewed_by=admin_id and reviewed_at=now() from public.source_review_tasks where id=review_task_id)
+    and (select resolved_by=admin_id and resolved_at=now() from public.validation_issues where id=review_issue_id)
+    and (select resolved_by=admin_id and resolved_at=now() from public.data_workflow_alerts where id=review_alert_id),
+    'review decisions use trusted server actor and transaction time');
+  execute 'reset role';
+  insert into public.event_change_proposals(event_id,edition_id,source_id,entity_type,proposal_status,rule_code,
+    field_name,old_value,proposed_value,normalized_value,proposed_changes,baseline_values,proposal_fingerprint,change_type,confidence)
+  select event_id,edition_id,source_id,'edition','pending','manual_review_formats','race_formats',d.race_formats,
+    '[{"label":"5 km","distance_km":5},{"label":"10 km","distance_km":10}]'::jsonb,
+    '[{"label":"5 km","distance_km":5},{"label":"10 km","distance_km":10}]'::jsonb,
+    '{"race_formats":[{"label":"5 km","distance_km":5},{"label":"10 km","distance_km":10}]}'::jsonb,
+    jsonb_build_object('race_formats',d.race_formats),marker||'-formats-review','updated_value',0.99
+    from public.event_editions d where d.id=edition_id returning id into proposal_id;
+  insert into public.user_feedback(event_id,category,status,summary,message,internal_notes)
+    values(event_id::text,'incorrect_event_data','reviewed','Synthetic feedback','Synthetic incorrect-data feedback','Earlier preserved note') returning id into review_feedback_id;
+  execute 'set local role authenticated';
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_build_object('request_id',gen_random_uuid(),'action','review','event_id',event_id,'edition_id',edition_id,
+    'expected_version',context->>'version','notes','Beide Wettbewerbe anhand des offiziellen Programms ausdrücklich bestätigt.',
+    'review',jsonb_build_object('kind','proposal','id',proposal_id,'decision','accepted'));
+  perform pg_temp.mm_reject(format('select public.save_manual_event_maintenance(%L::jsonb)',jsonb_set(payload,'{edition_id}',to_jsonb(conflict_edition_id))),
+    'proposal review cannot target another edition',array['22023']);
+  receipt:=public.save_manual_event_maintenance(payload);
+  perform pg_temp.mm_assert(receipt->>'saved'='true' and (select proposal_status='accepted' and reviewed_by=admin_id from public.event_change_proposals where id=proposal_id)
+    and (select distance='5 km / 10 km' and jsonb_array_length(race_formats)=2 from public.public_event_archive where public_event_archive.edition_id=edition_id),
+    'accepted competition proposal updates canonical competitions and public legacy distance together');
+  context:=public.admin_manual_event_context(event_id);
+  payload:=jsonb_build_object('request_id',gen_random_uuid(),'action','review','event_id',event_id,'edition_id',edition_id,
+    'expected_version',context->>'version','notes','Diese einzelne Datenrückmeldung wurde nachvollziehbar geprüft und geklärt.',
+    'review',jsonb_build_object('kind','feedback','id',review_feedback_id,'decision','resolved'));
+  receipt:=public.save_manual_event_maintenance(payload);
+  perform pg_temp.mm_assert(receipt->>'saved'='true' and (select status='resolved' and internal_notes like 'Earlier preserved note%' from public.user_feedback where id=review_feedback_id)
+    and exists(select 1 from public.event_audit_log where entity_id=edition_id::text and field_name='__manual_review_decision__'
+      and new_value->>'kind'='feedback' and changed_by=admin_id and reason=payload->>'notes'),
+    'feedback review preserves prior notes and audits trusted actor and explicit decision');
   execute 'reset role';
   insert into public.events(event_name,date,city,country,sport,event_url,status)
     values(marker||'-past',to_char(current_date-500,'DD.MM.YYYY'),'Berlin','Germany','Running',official_url||'/past','approved') returning id into past_event_id;

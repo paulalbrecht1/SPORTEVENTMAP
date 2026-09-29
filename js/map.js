@@ -1004,9 +1004,9 @@ function refreshEvents(options = {}) {
 
   clearMarkers();
 
-  loadEvents((events, discoveryEvents) => {
+  return loadEvents((events, discoveryEvents) => {
   if (refreshToken !== eventsRefreshToken) {
-    return;
+    return false;
   }
 
   console.log("Loaded events:", events);
@@ -1072,6 +1072,7 @@ function refreshEvents(options = {}) {
 
   discoveryMapDataReady = true;
   completeDiscoveryMapReady();
+  return true;
 
   });
 

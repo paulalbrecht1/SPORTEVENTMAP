@@ -1,4 +1,7 @@
 import { expect, test } from "@playwright/test";
+import fs from 'node:fs';
+const archive = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions;
+const liveRow = { ...archive.find(row => row.edition_slug === '10-charity-lauf-koldingen-2026'), official_url: 'https://official.example/koldingen' };
 
 const detailPath =
   "/event/10-charity-lauf-koldingen-2026/";
@@ -29,7 +32,7 @@ async function prepareDetailPage(page, options = {}) {
     route.fulfill({
       status: 200,
       contentType: "text/javascript",
-      body: "window.SPORT_EVENT_MAP_CONFIG = {};"
+      body: 'window.SPORT_EVENT_MAP_CONFIG = {supabaseUrl:"https://detail-behavior.test",supabasePublishableKey:"public-test"};'
     })
   );
 
@@ -47,7 +50,11 @@ async function prepareDetailPage(page, options = {}) {
     })
   );
 
+  await page.route('https://detail-behavior.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([liveRow]) }));
+  await page.route('https://detail-behavior.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [liveRow.edition_id]: false } }) }));
+
   await page.addInitScript(({ favorites, cloud }) => {
+    localStorage.setItem('sportEventMapLanguage', 'en');
     if (
       localStorage.getItem("sportEventMap.detailE2ESeeded") !== "true"
     ) {
@@ -140,6 +147,7 @@ async function prepareDetailPage(page, options = {}) {
   });
 
   await page.goto(detailPath);
+  await expect(page.locator("html")).toHaveAttribute("data-sem-public-detail-state", "verified");
 }
 
 test("Season button adds, survives reload, prevents duplicates and removes", async ({ page }) => {
@@ -148,7 +156,7 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
   const button =
     page.locator("#addDetailEventToSeason");
 
-  await expect(button).toHaveText("+ Add to Season");
+  await expect(button).toHaveText("Add to Season");
 
   await page.evaluate(() => {
     const target =
@@ -159,7 +167,7 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
     target.click();
   });
 
-  await expect(button).toHaveText("✓ Added to Season");
+  await expect(button).toHaveText("In your season");
   await expect(button).toHaveAttribute("aria-pressed", "true");
 
   let favorites =
@@ -170,12 +178,12 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
   expect(favorites).toHaveLength(1);
 
   await page.reload();
-  await expect(button).toHaveText("✓ Added to Season");
+  await expect(button).toHaveText("In your season");
 
   await button.click();
-  await expect(button).toHaveText("+ Add to Season");
+  await expect(button).toHaveText("Add to Season");
   await expect(page.locator("#detailActionStatus"))
-    .toContainText("Removed from your Season Planner");
+    .toContainText("Removed from your season.");
 
   favorites =
     await page.evaluate(() =>
@@ -195,7 +203,7 @@ test("signed-in state loads from the existing Season Planner table", async ({ pa
   const button =
     page.locator("#addDetailEventToSeason");
 
-  await expect(button).toHaveText("✓ Added to Season");
+  await expect(button).toHaveText("In your season");
   await expect(button).toHaveAttribute("aria-pressed", "true");
 
   const favorites =
@@ -219,10 +227,10 @@ test("failed cloud save restores the previous state and reports the error", asyn
 
   await button.click();
 
-  await expect(button).toHaveText("+ Add to Season");
+  await expect(button).toHaveText("Add to Season");
   await expect(button).toHaveAttribute("aria-pressed", "false");
   await expect(page.locator("#detailActionStatus"))
-    .toContainText("Could not save this event");
+    .toContainText("Could not save. Please try again.");
 
   const favorites =
     await page.evaluate(() =>
@@ -263,9 +271,9 @@ test("detail hero and action card remain within common viewport widths", async (
         const card =
           document.querySelector(".event-detail-cta-card");
         const official =
-          document.querySelector(".event-detail-primary");
+          document.querySelector("#liveDetailOfficial");
         const season =
-          document.querySelector(".event-detail-secondary");
+          document.querySelector("#addDetailEventToSeason");
 
         return {
           bodyWidth:
@@ -301,8 +309,9 @@ test("detail hero and action card remain within common viewport widths", async (
   }
 
   const official =
-    page.locator(".event-detail-primary");
+    page.locator("#liveDetailOfficial");
 
   await expect(official).toHaveAttribute("target", "_blank");
-  await expect(official.locator("svg")).toBeVisible();
+  await expect(official).toHaveAccessibleName("Official website / registration");
+  await expect(official).toHaveAttribute("href", liveRow.official_url);
 });

@@ -5049,14 +5049,22 @@ async function loadAdminTab(tabName, options = {}) {
     if (!panel || panel.dataset.maintenanceMounted === "true") return;
     try {
       if (!await isCurrentUserAdmin()) throw new Error("Für die Eventpflege ist eine Adminanmeldung erforderlich.");
-      await import("./manual-event-maintenance.js?v=20260929-v1");
+      await import("./manual-event-maintenance.js?v=20260929-v2");
       window.SemManualEventMaintenance.mount({
         root: panel,
         client: supabaseClient,
         verifyPublication: ({ event, edition }) => window.SemManualEventMaintenance.verifyPublicEdition({
           supabaseUrl: SUPABASE_URL, publishableKey: SUPABASE_PUBLISHABLE_KEY, event, edition
         }),
-        onOpenReview: async () => { setAdminTab("dataOperations"); await loadDataOperations({ force: true }); }
+        refreshCatalog: async ({ event, edition, discoveryPresent }) => {
+          const result = await window.refreshEvents?.({ preserveView: true });
+          const row = result?.rows?.find(item => item.edition_id === edition.id);
+          const refreshed = result?.source === "supabase" && result.rendered && (discoveryPresent
+            ? window.SemManualEventMaintenance.comparePublicRow(row, window.SemManualEventMaintenance.publicProjection(event, edition))
+            : !row);
+          if (typeof window.renderSeasonPlanner === "function") window.renderSeasonPlanner();
+          return { refreshed: Boolean(refreshed) };
+        }
       });
       panel.dataset.maintenanceMounted = "true";
     } catch (error) {

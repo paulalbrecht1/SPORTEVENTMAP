@@ -44,7 +44,7 @@ async function fixture(page, mode = "success", viewport) {
     window.app = window.SemManualEventMaintenance.mount({ root: document.querySelector("#root"), client, verifyPublication: async ({ edition }) => {
       if (window.failPublic) throw new Error("Öffentlicher Katalog nicht erreichbar.");
       return edition.publication_status === "draft" ? { status: "draft" } : { status: "live_verified", archiveVerified: true, discoveryVerified: true };
-    } });
+    }, verifyDetail: async () => ({ detailVerified: !window.failDetail, detailUrl: '/event/test-edition/' }), refreshCatalog: async () => ({ refreshed: !window.failRefresh }) });
     await window.app.loadEvent(7, editionId);
   }, { mode, editionId, nextId });
 }
@@ -73,7 +73,7 @@ for (const width of [390, 1280]) test(`manual: ${width}px date correction, targe
   expect(result.calls[0].edition_patch).toEqual({ start_date: "2026-10-11", end_date: "2026-10-11" });
   expect(result.db.event.description).toContain("Offizieller Lauf");
   expect(result.reads).toBe(2);
-  await expect(page.locator("[data-maintenance-publication]")).toContainText("Statische Seiten und Ausfalldaten: hier nicht geprüft");
+  await expect(page.locator("[data-maintenance-publication]")).toContainText("Öffentlich aktualisiert: Normale Detailseite geprüft");
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
@@ -194,7 +194,7 @@ test("manual: authorization and zero-row outcomes preserve inputs and never repo
 for (const mode of ["conflict", "http_conflict"]) test(`manual: ${mode} reload preserves edited field and requires renewed review`, async ({ page }) => {
   await fixture(page, mode); await field(page, "edition.start_date").fill("2026-10-12");
   await check(page, "edition.start_date").check(); await preview(page); await page.locator("[data-maintenance-save]").click();
-  await expect(page.locator("[data-maintenance-status]")).toContainText(mode === "http_conflict" ? "Die Daten wurden inzwischen geändert. Neu laden und die Änderungen erneut prüfen; Ihre Eingaben bleiben erhalten." : "Zwischenzeitlich");
+  await expect(page.locator("[data-maintenance-status]")).toContainText("Zwischenzeitlich wurden diese Daten geändert. Deine Eingaben bleiben erhalten.");
   expect(await page.evaluate(() => ({ calls: window.calls.length, commits: window.commits }))).toEqual({ calls: 1, commits: 0 });
   await expect(field(page, "edition.start_date")).toHaveValue("2026-10-12");
   await expect(page.locator("[data-maintenance-notes]")).toHaveValue("Offizielle Ausschreibung persönlich geprüft.");
@@ -225,7 +225,7 @@ test("manual: unreachable source is not confirmation; publication fetch failure 
   await expect(page.locator("[data-maintenance-publication]")).toContainText("Veröffentlichung konnte nicht geprüft werden");
   await page.evaluate(() => { window.failPublic = false; });
   await page.locator("[data-maintenance-check-publication]").click();
-  await expect(page.locator("[data-maintenance-publication]")).toContainText("Im öffentlichen Live-Archiv geprüft");
+  await expect(page.locator("[data-maintenance-publication]")).toContainText("Öffentlich aktualisiert: Normale Detailseite geprüft");
   expect(await page.evaluate(() => window.commits)).toBe(1);
 });
 
@@ -300,4 +300,16 @@ test("manual: real lazy loader avoids the cached pre-maintenance router and keep
   await page.screenshot({ path: testInfo.outputPath("manual-admin-mobile-light.png"), fullPage: true });
   await page.evaluate(() => { document.body.dataset.theme = "dark"; document.documentElement.dataset.theme = "dark"; });
   await page.screenshot({ path: testInfo.outputPath("manual-admin-mobile-dark.png"), fullPage: true });
+});
+
+for (const failure of ['failDetail', 'failRefresh']) test('manual: public API success cannot hide ' + failure + ' and retry verifies the website', async ({ page }) => {
+  await fixture(page);
+  await page.evaluate(key => { window[key] = true; }, failure);
+  await check(page, 'edition.start_date').check(); await preview(page); await page.locator('[data-maintenance-save]').click();
+  await expect(page.locator('[data-maintenance-publication]')).toContainText('noch nicht vollständig verifiziert');
+  await expect(page.locator('[data-maintenance-publication]')).not.toContainText('Öffentlich aktualisiert');
+  await page.evaluate(key => { window[key] = false; }, failure);
+  await page.locator('[data-maintenance-check-publication]').click();
+  await expect(page.locator('[data-maintenance-publication]')).toContainText('Öffentlich aktualisiert');
+  expect(await page.evaluate(() => window.commits)).toBe(1);
 });

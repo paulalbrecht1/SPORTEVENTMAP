@@ -54,6 +54,7 @@
     "test:edition-publication": "node --test tests/edition-publication-ui.test.mjs tests/safe-edition-publish.test.mjs",
     "test:manual-maintenance": "node --test tests/manual-event-maintenance.test.mjs",
     "test:manual-maintenance:local": "node tests/run-manual-event-maintenance-local.mjs",
+    "test:manual-workflow:local": "node tests/run-manual-workflow-acceptance-local.mjs",
     "test:alert-dispatch": "node tests/data-alert-dispatch-core.test.mjs && node tests/data-alert-dispatch-security.test.mjs",
     "test:event-detail": "node tests/event-detail-toggle.test.mjs",
     "test:event-detail-foundation": "node tests/event-detail-foundation.test.mjs && node tests/event-detail-integrity.test.mjs && node --test tests/knowledge-data-integrity.test.mjs && node tests/knowledge-review-safety.test.mjs",

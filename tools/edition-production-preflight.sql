@@ -70,7 +70,9 @@ deployment_sequence(ordinal, version, name) as (
     (17, '20260920174425', 'event_detail_foundation_schema_alignment'),
     (18, '20260920174737', 'preserve_edition_facts_from_legacy_sync'),
     (19, '20260929104600', 'manual_event_maintenance'),
-    (20, '20260929104628', 'manual_edition_import_compatibility')
+    (20, '20260929104628', 'manual_edition_import_compatibility'),
+    (21, '20260929130903', 'manual_maintenance_conflict_http_status'),
+    (22, '20260929150626', 'manual_workflow_publication_and_review')
 ),
 expected_pending(version, name) as (
   select sequence.version, sequence.name

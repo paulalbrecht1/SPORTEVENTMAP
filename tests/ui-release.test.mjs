@@ -33,7 +33,7 @@ function fixture() {
   const exportedAt = '2026-08-27T07:41:01.290Z';
   put(baseDir, 'data/catalog-export-manifest.json', JSON.stringify({ exported_at: exportedAt, metrics: { archive_rows: 2 } }));
   put(baseDir, 'data/event-editions-public.json', JSON.stringify({ exported_at: exportedAt, editions: [{ edition_slug: 'first' }, { edition_slug: 'second' }] }));
-  for (const [relative, text] of Object.entries({ 'data/events.csv': 'Original exported catalog', 'data/event-knowledge.json': '{"original":true}', 'event/first/index.html': '<html>Original static event A</html>', 'event/second/index.html': '<html>Original static event B</html>', 'sitemap.xml': '<urlset>Original sitemap</urlset>', 'js/config.js': 'window.PUBLIC_CONFIG={siteUrl:"https://sporteventmap.com"};', 'robots.txt': 'Original robots', 'docs/NO_CODE_DATA_IMPORT.md': 'Original docs', 'RELEASE_VERSION.txt': 'Version: 20260901-mobile-stability-v84\n' })) put(baseDir, relative, text);
+  for (const [relative, text] of Object.entries({ 'data/events.csv': 'Original exported catalog', 'data/event-knowledge.json': '{"original":true}', 'event/first/index.html': '<html>Original static event A<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'event/second/index.html': '<html>Original static event B<script src="../../js/event-detail.js?v=old-v96"></script></html>', 'sitemap.xml': '<urlset>Original sitemap</urlset>', 'js/config.js': 'window.PUBLIC_CONFIG={siteUrl:"https://sporteventmap.com"};', 'robots.txt': 'Original robots', 'docs/NO_CODE_DATA_IMPORT.md': 'Original docs', 'RELEASE_VERSION.txt': 'Version: 20260901-mobile-stability-v84\n' })) put(baseDir, relative, text);
   const entries = ui.artifactInventory(baseDir), byPath = new Map(entries.map(e => [e.path, e.sha256]));
   const release = { schema_version: 1, version: '20260901-mobile-stability-v84', git_commit: '8'.repeat(40), built_at: '2026-09-01T11:25:56.965Z', source_dirty: false, critical_files: Object.fromEntries(ui.BASE_CRITICAL_PATHS.map(p => [p, byPath.get(p)])), event_pages: { count: 2, aggregate_sha256: ui.inventoryDigest(entries.filter(e => /^event\//.test(e.path))) }, artifacts: { count: entries.length, aggregate_sha256: ui.inventoryDigest(entries) } };
   put(baseDir, 'release.json', `${JSON.stringify(release, null, 2)}\n`);
@@ -69,9 +69,15 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.release_scope, 'ui_only'); assert.equal(built.data_updated, false); assert.equal(built.full_data_quality_release, false);
     assert.equal(built.built_at, BUILD_TIME.toISOString()); assert.equal(built.base_release.built_at, '2026-09-01T11:25:56.965Z');
     assert.equal(built.base_release.original_data_timestamps.catalog_exported_at, '2026-08-27T07:41:01.290Z');
-    assert.equal(Object.keys(built.overlay_files).length, 20);
+    assert.equal(Object.keys(built.overlay_files).length, 21);
     assert.deepEqual(ui.artifactInventory(f.baseDir), f.entries, 'Build never changes dist');
-    for (const entry of f.entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path))) assert.equal(ui.sha256(fs.readFileSync(path.join(f.output, entry.path))), entry.sha256, entry.path);
+    for (const name of ['first', 'second']) {
+      const before = fs.readFileSync(path.join(f.baseDir, 'event/'+name+'/index.html'), 'utf8');
+      const after = fs.readFileSync(path.join(f.output, 'event/'+name+'/index.html'), 'utf8');
+      assert.equal(after, before.replace('?v=old-v96', '?v=' + f.options.version), 'Only the shared runtime query is changed');
+    }
+    assert.equal(built.detail_runtime_references.count, 2);
+    for (const entry of f.entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path) && !e.path.startsWith('event/'))) assert.equal(ui.sha256(fs.readFileSync(path.join(f.output, entry.path))), entry.sha256, entry.path);
     assert.equal(built.overlay_files['js/app.js'].source_sha256, ui.sha256(fs.readFileSync(path.join(f.root, 'js/app.js'))));
     assert.equal(built.overlay_files['js/app.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/app.js'));
     assert.equal(built.overlay_files['js/event-detail.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/event-detail.js'));
@@ -83,7 +89,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
       const before = fs.readFileSync(path.join(f.output, 'release.json'));
       await assert.rejects(ui.buildUiRelease(f.options, f.dependencies), /Refusing existing/); assert.ok(fs.readFileSync(path.join(f.output, 'release.json')).equals(before));
     });
-    for (const relative of ['data/events.csv', 'data/event-editions-public.json', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'docs/NO_CODE_DATA_IMPORT.md', 'js/map.js']) {
+    for (const relative of ['data/events.csv', 'data/event-editions-public.json', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'docs/NO_CODE_DATA_IMPORT.md', 'js/search.js']) {
       await t.test(`protected tampering is rejected even if the output manifest is recomputed: ${relative}`, async () => {
         const target = path.join(f.output, relative), before = fs.readFileSync(target), releaseBytes = fs.readFileSync(path.join(f.output, 'release.json'));
         try {
@@ -93,7 +99,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
           tampered.protected_artifacts.aggregate_sha256 = ui.inventoryDigest(entries.filter(e => !ui.OVERLAY_PATHS.includes(e.path)));
           tampered.critical_files[relative] = ui.sha256(fs.readFileSync(target));
           put(f.output, 'release.json', JSON.stringify(tampered));
-          await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /Protected deployed artifact inventory changed/);
+          await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /Protected deployed artifact inventory changed|Overlay bytes differ/);
         } finally { fs.writeFileSync(target, before); put(f.output, 'release.json', releaseBytes); }
       });
     }
@@ -124,16 +130,17 @@ test('base validation covers unlisted files and all catalog/static hashes', asyn
 test('new dependencies and committed credentials fail before output creation', async t => {
   const f = fixture();
   try {
-    await t.test('non-overlay changed runtime cannot slip in', async () => { fs.appendFileSync(path.join(f.root, 'js/map.js'), 'changed runtime'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /runtime dependency differs/); assert.equal(fs.existsSync(f.output), false); fs.writeFileSync(path.join(f.root, 'js/map.js'), fs.readFileSync(path.join(f.baseDir, 'js/map.js'))); f.options.sourceCommit = commit(f.root); });
+    await t.test('non-overlay changed runtime cannot slip in', async () => { fs.appendFileSync(path.join(f.root, 'js/search.js'), 'changed runtime'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /runtime dependency differs/); assert.equal(fs.existsSync(f.output), false); fs.writeFileSync(path.join(f.root, 'js/search.js'), fs.readFileSync(path.join(f.baseDir, 'js/search.js'))); f.options.sourceCommit = commit(f.root); });
     await t.test('missing dynamically required module is rejected', async () => { const source = ui.sourceSnapshot(f.root, f.options.sourceCommit), base = ui.validateBaseRelease(f.baseDir, f.options.baseReleaseSha256), overlay = ui.makeOverlay(source, { version: f.options.version, git_commit: f.options.sourceCommit, built_at: BUILD_TIME.toISOString() }); overlay.set('index.html', Buffer.from('<html><head><script src="js/unreviewed-module.js"></script></head></html>')); assert.throws(() => ui.assertRuntime(base, source, overlay), /Missing UI dependency/); });
     await t.test('committed secret rejected by real build, not merely dirty-tree check', async () => { fs.appendFileSync(path.join(f.root, 'js/app.js'), '\nconst client_secret="this-is-a-realistic-secret-value";'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /Potential private credential/); assert.equal(fs.existsSync(f.output), false); });
   } finally { dispose(f.root); }
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {
-  assert.equal(ui.OVERLAY_PATHS.length, 20);
+  assert.equal(ui.OVERLAY_PATHS.length, 21);
   assert.equal(ui.OVERLAY_PATHS.includes('js/event-detail.js'), true);
-  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/event-catalog-loader.js', 'js/map.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
+  assert.equal(ui.OVERLAY_PATHS.includes('js/map.js'), true);
+  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/event-catalog-loader.js', 'js/search.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
   assert.equal(ui.validateBaseUrl(`${BASE_URL}/`), BASE_URL);
   for (const url of ['http://1547ae47.sporteventmap.pages.dev', 'https://sporteventmap.com', 'https://sporteventmap.pages.dev', 'https://123456789.sporteventmap.pages.dev', `${BASE_URL}:443`, `${BASE_URL}/path`, `${BASE_URL}?x=1`, `${BASE_URL}#x`, 'https://user@1547ae47.sporteventmap.pages.dev', 'https://1547ae47.sporteventmap.pages.dev.evil.invalid']) assert.throws(() => ui.validateBaseUrl(url));
   const jwt = role => `${Buffer.from('{"alg":"HS256"}').toString('base64url')}.${Buffer.from(JSON.stringify({ role })).toString('base64url')}.signature`;

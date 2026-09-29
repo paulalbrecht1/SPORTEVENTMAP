@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, '..');
 const OVERLAY_PATHS = Object.freeze([
   'index.html', '404.html', 'event-detail.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html',
   'css/style.css', 'css/mobile-discovery.css',
-  'js/app.js', 'js/events.js', 'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/i18n.js',
+  'js/app.js', 'js/events.js', 'js/map.js', 'js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/i18n.js',
   'js/mobile-discovery.js', 'js/supabase.js', 'js/event-detail-live.js', 'js/event-detail.js', 'RELEASE_VERSION.txt'
 ]);
 const RUNTIME_PATHS = Object.freeze([
@@ -201,6 +201,20 @@ function makeOverlay(source, identity) {
     assertOverlaySafe(bytes, relative); return [relative, bytes];
   }));
 }
+// Only the shared detail runtime URL changes in existing event HTML. All data,
+// markup and export timestamps are copied from the verified production base.
+// Verification derives these bytes again; static pages are never free overlays.
+function addDetailRuntimeReferences(overlay, base, baseDir, version) {
+  for (const entry of base.eventPages) {
+    const bytes = fs.readFileSync(path.join(baseDir, entry.path));
+    assert.equal(sha256(bytes), entry.sha256, `Base static page changed: ${entry.path}`);
+    const text = bytes.toString('utf8');
+    assert.ok(Buffer.from(text).equals(bytes), `Static page is not lossless UTF-8: ${entry.path}`);
+    const reference = /(<script\b[^>]*\bsrc=["'](?:\.\.\/\.\.\/|\/)js\/event-detail\.js)\?v=[a-zA-Z0-9-]+(["'][^>]*>)/g;
+    assert.equal([...text.matchAll(reference)].length, 1, `Exactly one existing detail runtime reference required: ${entry.path}`);
+    overlay.set(entry.path, Buffer.from(text.replace(reference, `$1?v=${version}$2`)));
+  }
+}
 function assertRuntime(base, source, overlay) {
   for (const relative of RUNTIME_PATHS) {
     if (!overlay.has(relative)) assert.equal(base.byPath.get(relative), source.get(relative).sha256, `Unchanged runtime dependency differs from deployed base; explicit scope review required: ${relative}`);
@@ -221,8 +235,8 @@ function assertRuntime(base, source, overlay) {
 }
 function makeRelease(base, baseUrl, identity, source, overlay, entries) {
   const byPath = new Map(entries.map(e => [e.path, e.sha256]));
-  const protectedEntries = entries.filter(e => !OVERLAY_PATHS.includes(e.path));
-  const originalProtected = base.entries.filter(e => !OVERLAY_PATHS.includes(e.path));
+  const protectedEntries = entries.filter(e => !overlay.has(e.path));
+  const originalProtected = base.entries.filter(e => !overlay.has(e.path));
   assert.deepEqual(protectedEntries, originalProtected, 'Protected deployed artifact inventory changed');
   const expectedPaths = [...new Set([...base.entries.map(e => e.path), ...OVERLAY_PATHS])].sort();
   assert.deepEqual(entries.map(e => e.path).sort(), expectedPaths, 'Unexpected or missing package artifact');
@@ -233,9 +247,10 @@ function makeRelease(base, baseUrl, identity, source, overlay, entries) {
     data_updated: false, full_data_quality_release: false,
     base_release: { url: validateBaseUrl(baseUrl), release_json_sha256: sha256(base.bytes), version: base.release.version, git_commit: base.release.git_commit, built_at: base.release.built_at, artifacts: base.release.artifacts, event_pages: base.release.event_pages, original_data_timestamps: base.dataTimestamps },
     overlay_files: Object.fromEntries(OVERLAY_PATHS.map(relative => [relative, { source_sha256: source.get(relative).sha256, source_git_blob: source.get(relative).git_blob, artifact_sha256: byPath.get(relative) }])),
+    detail_runtime_references: { transformation: 'event-detail-script-version-only', count: base.eventPages.length, base_pages_sha256: inventoryDigest(base.eventPages), artifact_pages_sha256: inventoryDigest(entries.filter(e => /^event\/[^/]+\/index\.html$/.test(e.path))) },
     protected_artifacts: { count: protectedEntries.length, aggregate_sha256: inventoryDigest(protectedEntries) },
     critical_files: Object.fromEntries(criticalPaths.map(relative => [relative, byPath.get(relative)])),
-    event_pages: base.release.event_pages,
+    event_pages: { count: base.eventPages.length, aggregate_sha256: inventoryDigest(entries.filter(e => /^event\/[^/]+\/index\.html$/.test(e.path))) },
     artifacts: { count: entries.length, aggregate_sha256: inventoryDigest(entries) }
   };
 }
@@ -258,7 +273,7 @@ async function buildUiRelease(options, dependencies = {}) {
   assertSourceUnchanged(opts.root, opts.sourceCommit, source);
   const identity = { version: opts.version, git_commit: opts.sourceCommit, built_at: (dependencies.now || (() => new Date()))().toISOString() };
   assert.ok(Date.parse(identity.built_at) >= Date.parse(base.release.built_at), 'UI build cannot precede its deployed base');
-  const overlay = makeOverlay(source, identity); assertRuntime(base, source, overlay);
+  const overlay = makeOverlay(source, identity); addDetailRuntimeReferences(overlay, base, opts.baseDir, identity.version); assertRuntime(base, source, overlay);
   assert.deepEqual(validateBaseRelease(opts.baseDir, opts.baseReleaseSha256).entries, base.entries, 'Base changed during preparation');
   fs.mkdirSync(path.dirname(opts.directory), { recursive: true }); assertUnder(opts.root, opts.directory);
   fs.mkdirSync(opts.directory); // exclusive: a racing output creation also fails
@@ -288,6 +303,7 @@ async function verifyUiRelease(options, dependencies = {}) {
   isoDate(release.built_at, 'UI built_at');
   assert.ok(Date.parse(release.built_at) >= Date.parse(base.release.built_at) && Date.parse(release.built_at) <= (dependencies.now || (() => new Date()))().getTime() + 5 * 60000, 'Invalid UI build time');
   const identity = { version: opts.version, git_commit: opts.sourceCommit, built_at: release.built_at }, overlay = makeOverlay(source, identity);
+  addDetailRuntimeReferences(overlay, base, opts.baseDir, identity.version);
   assertRuntime(base, source, overlay);
   const entries = artifactInventory(opts.directory), expected = makeRelease(base, opts.baseUrl, identity, source, overlay, entries);
   assert.deepEqual(release, expected, 'UI manifest differs from its committed source, protected base or truthful scope');
@@ -306,4 +322,4 @@ async function main(argv = process.argv.slice(2)) {
   console.log(JSON.stringify({ mode, release_scope: release.release_scope, version: release.version, git_commit: release.git_commit, built_at: release.built_at, base_version: release.base_release.version, original_data_timestamps: release.base_release.original_data_timestamps, overlay_files: Object.keys(release.overlay_files).length, protected_artifacts: release.protected_artifacts, artifacts: release.artifacts, data_updated: false }));
 }
 if (require.main === module) main().catch(error => { console.error(error.message); process.exitCode = 1; });
-module.exports = { OVERLAY_PATHS, RUNTIME_PATHS, BASE_CRITICAL_PATHS, sha256, inventoryDigest, artifactInventory, validateBaseUrl, validateBaseRelease, verifyRemoteBase, sourceSnapshot, injectIdentity, assertOverlaySafe, makeOverlay, assertRuntime, makeRelease, buildUiRelease, verifyUiRelease, main };
+module.exports = { OVERLAY_PATHS, RUNTIME_PATHS, BASE_CRITICAL_PATHS, sha256, inventoryDigest, artifactInventory, validateBaseUrl, validateBaseRelease, verifyRemoteBase, sourceSnapshot, injectIdentity, assertOverlaySafe, makeOverlay, addDetailRuntimeReferences, assertRuntime, makeRelease, buildUiRelease, verifyUiRelease, main };

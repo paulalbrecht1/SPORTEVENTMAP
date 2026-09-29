@@ -26,7 +26,26 @@
   document.head.appendChild(themeScript);
 })();
 
-(function () {
+(async function () {
+  // Existing /event/<slug>/ documents share this runtime. Refresh their facts
+  // before binding the Season Planner to the canonical edition identity.
+  if (/^\/event\/[a-z0-9]+(?:-[a-z0-9]+)*\/(?:index\.html)?$/.test(window.location.pathname || "") &&
+      !document.getElementById("liveDetailContent")) {
+    await new Promise(resolve => {
+      window.sportEventMapPublicDetailReady = resolve;
+      const script = document.createElement("script");
+      script.src = "/js/event-detail-live.js?v=20260929-public-detail-v129";
+      script.onerror = () => {
+        document.documentElement.dataset.semPublicDetailState = "unavailable";
+        const notice = document.createElement("p");
+        notice.className = "live-detail-notice";
+        notice.textContent = "Gespeicherter Datenstand: Aktuelle Angaben konnten nicht geladen werden. Bitte beim Veranstalter prüfen.";
+        document.querySelector(".event-detail-header")?.after(notice);
+        resolve();
+      };
+      document.head.append(script);
+    });
+  }
   const detailConfig =
     window.sportEventMapDetailConfig || {};
   const detailEvent =

@@ -150,3 +150,19 @@ test('missing stale inaccessible and unpublished public rows never claim public 
   assert.equal(called, false);
   assert.equal(draft.status, 'draft');
 });
+
+test('every optional saved field including explicit deletion is part of the public contract', async () => {
+  const edition = { ...publicEdition, end_date: '2027-05-02', start_time: '09:30:00', price_min: 0, price_max: 42, currency: 'EUR', participant_limit: 350 };
+  const expected = api.publicProjection(publicEvent, edition);
+  for (const key of ['end_date', 'start_time', 'price_min', 'price_max', 'currency', 'participant_limit']) {
+    assert.equal(expected[key], edition[key]);
+    const missing = { ...expected }; delete missing[key];
+    assert.equal(api.comparePublicRow(missing, expected), false, `Missing public column ${key} cannot report success`);
+    const changed = { ...expected, [key]: null };
+    assert.equal(api.comparePublicRow(changed, expected), false, `Stale public column ${key} cannot report success`);
+    const cleared = api.publicProjection(publicEvent, { ...edition, [key]: null });
+    assert.equal(api.comparePublicRow(missing, cleared), false, `Missing ${key} is not a verified deletion`);
+    assert.equal(api.comparePublicRow(changed, cleared), true);
+  }
+  assert.equal(api.comparePublicRow({ ...expected, price_min: '0', price_max: '42.00', participant_limit: '350', start_time: '09:30' }, expected), true);
+});

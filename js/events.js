@@ -1785,6 +1785,7 @@ async function loadEvents(callback) {
   let discoveryEvents = [];
   let dbEvents = [];
   let dbReady = false;
+  let catalogPrepared = false;
   let catalogLoadError = null;
 
   try {
@@ -1860,7 +1861,8 @@ async function loadEvents(callback) {
     if (typeof window.updateLandingEventCount === "function") {
       window.updateLandingEventCount(discoveryEvents);
     }
-    processPendingSeasonAdd();
+    await processPendingSeasonAdd();
+    catalogPrepared = true;
   } catch (error) {
     console.error("Event catalog loading failed:", error);
     events = [];
@@ -1875,9 +1877,11 @@ async function loadEvents(callback) {
   }
 
   try {
-    callback(loadedEvents, discoveryEvents);
+    const rendered = callback(loadedEvents, discoveryEvents);
+    return { source: dbReady ? "supabase" : "csv-fallback", rows: dbEvents, rendered: catalogPrepared && rendered === true };
   } catch (error) {
     console.error("Event render callback failed:", error);
+    return { source: dbReady ? "supabase" : "csv-fallback", rows: dbEvents, rendered: false };
   }
 }
 

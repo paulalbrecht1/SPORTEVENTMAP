@@ -11,8 +11,13 @@ Der normale vollständige Release über `check`, `prepare-package` und
 `verify-package` behält alle bisherigen Daten-, Alters- und Auditprüfungen.
 Ein UI-Release verwendet ausschließlich ein nachgewiesenes bestehendes
 Cloudflare-Produktionspaket als Basis. Seine Datendateien einschließlich
-Exportzeit, sämtliche statischen Eventseiten, Sitemap, Runtimekonfiguration
-und alle nicht ausdrücklich freigegebenen Dateien bleiben bytegleich.
+Exportzeit, Sitemap, Runtimekonfiguration und alle nicht ausdrücklich
+freigegebenen Dateien bleiben bytegleich. Seit der Workflowkorrektur v92 gilt
+für bestehende statische Eventseiten genau eine kontrollierte Ausnahme:
+Der Versionsparameter des bereits vorhandenen `js/event-detail.js`-Skripts
+wird auf die neue Releasekennung gesetzt. Alle übrigen HTML-Bytes, insbesondere
+Eventfakten und Quellenstände, bleiben unverändert. Das verhindert, dass ein
+vier Stunden gecachtes altes Skript die aktuelle Datenanzeige verhindert.
 
 Es gibt keinen Datenexport, keine Seitengenerierung, keine Migration, keinen
 Admin-Datenwrite und kein Zurücksetzen von Prüfzeiten. Bereits produktive
@@ -34,6 +39,15 @@ gegen die dort veröffentlichte `release.json` geprüft. Der Builder bindet das
 neue Paket an deren SHA-256 und prüft die erlaubten Änderungen einzeln.
 Die neue `release.json` bezeichnet den Umfang ausdrücklich als `ui_only` und
 trennt die neue Buildzeit vom ursprünglichen Datenstand.
+
+Die Runtimeverknüpfung in Eventseiten ist keine frei beschreibbare Overlaydatei.
+Build und Verify leiten die zulässigen Bytes unabhängig aus der hashgeprüften
+Produktionsbasis ab; genau eine passende Skriptreferenz je Seite ist erforderlich.
+Jede zusätzliche Änderung an diesen Seiten lässt die Prüfung fehlschlagen.
+`detail_runtime_references` dokumentiert Anzahl sowie alte und neue Seitenhashes.
+Die feste Oberflächenliste umfasst außerdem `js/map.js`, dessen bestehender
+Refresh jetzt ein überprüfbares Ergebnis zurückgibt. Unveränderte übrige
+Runtimeabhängigkeiten bleiben geschützt. Die Kataloggates bleiben unverändert.
 
 ```powershell
 node tools/ui-release.js build --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --out exports/<release>/package

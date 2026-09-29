@@ -1,5 +1,9 @@
 # Erneute Abnahme: ausschließlich über den Website-Admin
 
+Dieser Bericht dokumentiert die frühere v91-Prüfung. Die anschließenden
+Korrekturen und ihren aktuellen Freigabestand beschreibt der
+[v92-Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md).
+
 Stand: 29.09.2026, Prüfung der produktiven v91 und des Quellstands `582906c`.
 **Gesamtergebnis: Anforderung noch nicht erfüllt.** Diese Prüfung ändert keine
 Produktionsdaten und erhöht keine Prüfzeitstempel. Ein funktionierender

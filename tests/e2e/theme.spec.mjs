@@ -4,15 +4,22 @@ import {
   prepareApp,
   test
 } from "./helpers/browser.mjs";
+import fs from 'node:fs';
+
+const detailRow = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions.find(row => row.edition_slug === '10-charity-lauf-koldingen-2026');
 
 const detailPath =
   "/event/10-charity-lauf-koldingen-2026/";
 
 test("theme selection is consistent across every main view and persists", async ({ page }) => {
+  // A regular detail URL now reads the anonymous canonical view before rendering.
+  // Keep this visual test local instead of contacting the production API.
   await prepareApp(page, {
     allowPlanner: true,
     openDiscoveryPanel: false
   });
+  await page.route('**/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([detailRow]) }));
+  await page.route('**/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [detailRow.edition_id]: false } }) }));
 
   await page.evaluate(() => {
     window.SportEventMapTheme.apply("light", {
@@ -39,6 +46,7 @@ test("theme selection is consistent across every main view and persists", async 
     .toHaveAttribute("data-theme", "light");
 
   await page.goto(detailPath);
+  await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
   await expect(page.locator("html"))
     .toHaveAttribute("data-theme", "light");
   const detailToggle =

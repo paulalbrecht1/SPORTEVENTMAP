@@ -367,6 +367,15 @@
     const prefix = fees.length === 1 ? t(numeric(event.price_min) ? 'from' : 'upTo') + ' ' : '';
     return prefix + [...new Set(fees)].join(' – ') + (text(event.currency) ? ' ' + text(event.currency) : '');
   }
+  function distanceLabel(value, distanceKm) {
+    let includesDistance = false;
+    const label = text(value).replace(/\b(\d+(?:[.,]\d+)?)(\s*[-‐‑‒–—]\s*|\s*)km\b/gi, (_match, amount, separator) => {
+      const kilometers = Number(amount.replace(',', '.'));
+      if (numeric(distanceKm) && kilometers === Number(distanceKm)) includesDistance = true;
+      return /[-‐‑‒–—]/.test(separator) ? number(kilometers) + separator + 'km' : unit(kilometers, 'kilometer');
+    });
+    return { label, includesDistance };
+  }
   function renderCompetitions() {
     let target = byId('competitions');
     if (!target) { target = section('competitions'); byId('key-facts').after(target); }
@@ -379,11 +388,7 @@
       if (!format || typeof format !== 'object' || Array.isArray(format)) continue;
       const key = JSON.stringify(stable(format)); if (seen.has(key)) continue; seen.add(key);
       const item = node('li', 'race-guide-info-box'); item.dataset.publicRaceFormat = '';
-      let label = text(format.label), distanceInLabel = false;
-      label = label.replace(/\b(\d+(?:[.,]\d+)?)\s*km\b/gi, (match, amount) => {
-        if (!numeric(format.distance_km) || Number(amount.replace(',', '.')) !== Number(format.distance_km)) return match;
-        distanceInLabel = true; return unit(format.distance_km, 'kilometer');
-      });
+      const { label, includesDistance: distanceInLabel } = distanceLabel(format.label, format.distance_km);
       const hasLegs = ['swim_km', 'bike_km', 'run_km'].filter(field => numeric(format[field])).length > 1;
       const details = [['distance_km', '', 'kilometer'], ['swim_km', 'swim', 'kilometer'], ['bike_km', 'bike', 'kilometer'], ['run_km', 'run', 'kilometer'], ['elevation_gain_m', 'elevation', 'meter']].flatMap(([field, key, measurement]) => numeric(format[field]) && !(field === 'distance_km' && (distanceInLabel || hasLegs)) ? [(key ? t(key) + ': ' : '') + unit(format[field], measurement)] : []);
       if (!label && !details.length) continue;
@@ -454,7 +459,7 @@
       ['date', event.date ? displayDate(isoDate(event.date)) : ''],
       ['end_date', event.end_date && isoDate(event.end_date) !== isoDate(event.date) ? displayDate(isoDate(event.end_date)) : ''],
       ['location', locationLabel], ['sport', text(event.sport)],
-      ['distance', hasFormats ? '' : text(event.distance)],
+      ['distance', hasFormats ? '' : distanceLabel(event.distance).label],
       ['start_time', clockTime(event.start_time)],
       ['registration', ['open','closed','sold_out','not_open','cancelled'].includes(registrationStatus) ? t(registrationStatus) : ''],
       ['price', priceLabel()], ['participant_limit', number(event.participant_limit)]
@@ -565,7 +570,7 @@
     render();
     if (!staticPage) {
       const script = document.createElement('script');
-      script.src = '/js/event-detail.js?v=20260929-detail-layout-v130';
+      script.src = '/js/event-detail.js?v=20260929-detail-layout-v131';
       script.onerror = () => { byId('detailActionStatus').textContent = t('detail.saveUnavailable'); };
       document.head.append(script);
     }

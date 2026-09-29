@@ -83,6 +83,36 @@ async function responsive(page) {
 }
 
 for (const mode of ['static', 'dynamic']) {
+  test(`${mode} hyphenated competition distance appears once and unrelated name numbers stay intact`, async ({ page }) => {
+    const state = { event: { ...canonical(), race_formats: [
+      { label: '10-km-Lauf', distance_km: 10 },
+      { label: 'Jubiläum 2027 / 10-km-Lauf', distance_km: 12 }
+    ] }, details: [] };
+    const { url } = await setup(page, state, mode);
+    await page.goto(url); await settled(page);
+    const formats = page.locator('#competitions [data-public-race-format]');
+    await expect(formats).toHaveCount(2);
+    for (const language of ['de', 'en', 'de']) {
+      await page.locator('#eventDetailLanguageSelect').selectOption(language);
+      await expect(formats.nth(0)).toHaveText('10-km-Lauf');
+      await expect(formats.nth(1)).toContainText('Jubiläum 2027 / 10-km-Lauf');
+      await expect(formats.nth(1)).toContainText('12 km');
+    }
+  });
+
+  test(`${mode} legacy Marathon distance localizes km without changing unrelated event-name numbers`, async ({ page }) => {
+    const state = { event: { ...canonical(), race_formats: [], distance: 'Marathon /42.195 km', event_name: 'Marathon Jubiläum 2027' }, details: [] };
+    const { url } = await setup(page, state, mode);
+    await page.goto(url); await settled(page);
+    const distance = page.locator('[data-public-detail-field="distance"] strong');
+    for (const language of ['de', 'en', 'de']) {
+      await page.locator('#eventDetailLanguageSelect').selectOption(language);
+      await expect(distance).toHaveText(language === 'en' ? 'Marathon /42.195 km' : 'Marathon /42,195 km');
+      await expect(page.locator('#liveDetailName')).toHaveText('Marathon Jubiläum 2027');
+    }
+    await expect(page.locator('#competitions [data-public-race-format]')).toHaveCount(0);
+  });
+
   test(`${mode} detail uses shared canonical layout, ordered competitions and a location pin after changed public data`, async ({ page }, testInfo) => {
     const state = { event: canonical(), details: details() };
     const { url, errors } = await setup(page, state, mode);

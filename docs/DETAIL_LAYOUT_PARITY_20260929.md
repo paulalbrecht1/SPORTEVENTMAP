@@ -41,6 +41,11 @@ Kindtabellenfelder erlauben hingegen den bestätigten Brand-Fallback.
   28 Paketbauprüfungen sichern die kontrollierten Änderungen an bestehenden
   statischen Seiten ab. Der Paketbau verändert nur die zwei vorhandenen
   Versionsparameter für Detail-Skript und Stylesheet.
+- 37 Detail-Browsertests auf dem abschließenden gemeinsamen Stand bestanden,
+  einschließlich beider Seitentypen, Deutsch/Englisch, Mobil/Desktop, Kontrast,
+  Quellenpflicht, Gebühren, FAQ und gezieltem Brand-/Editionsfallback. Der
+  Kartenmarker ist im automatisierten Test instrumentiert; der echte Kartenabruf
+  wird zusätzlich im Produktionsbrowser geprüft.
 
 Die Tests deckten echte Fehler bei Audit-Reihenfolge, Nullwert-Fallback und
 CSS-Spezifität auf. Diese wurden im produktiven Code korrigiert und gezielt erneut
@@ -59,7 +64,23 @@ Der UI-Paketbau verwendet v94 als unveränderliche Basis. Exportdaten, statische
 Eventfakten und Sitemap behalten ihren bisherigen Stand. Das Paket selbst
 führt keine Datenpflege oder automatische Kandidatenfreigabe aus.
 
-Der abschließende Produktionsnachweis und die über das echte Adminformular
+Die Migration ist produktiv angewendet. Eine unabhängige Abfrage nach dem Commit
+bestätigt 50 Migrationen, exakt dieselben alten 49 Einträge, das exakte neue
+Originalstatement, unveränderte 37 Tabellen-/View-Fingerprints, vorgesehene
+Funktionsrechte und unveränderte Freshness. Nachweis:
+`exports/detail-layout-audit-20260929/rollout/postcommit-summary.json`.
+
+Die erste v95-Vorschau zeigte die neue Darstellung mit echtem Kartenmarker.
+Dabei wurde zusätzlich die doppelte Distanz bei Bindestrichnamen wie
+„10-km-Lauf“ korrigiert. Die finale Oberfläche erhält deshalb v96.
+
+Der Berliner Knowledge-Datensatz war beim Live-Abgleich ausdrücklich privat,
+`needs_review`, und ohne bestätigte Quellen. Seine Zusatzangaben werden deshalb
+nicht als geprüfte Fakten veröffentlicht. Eine Rückkehr zum alten Export würde
+diese Freigaberegel umgehen. Die neue Oberfläche stellt vorhandene geprüfte
+Zusatzinformationen dar; ungeprüfte Inhalte benötigen weiterhin Quellenprüfung.
+
+Der abschließende Website-Nachweis und die über das echte Adminformular
 gepflegten Paderborn-Angaben werden nach erfolgreichem Rollout hier ergänzt.
 Lokale Testergebnisse allein sind kein Nachweis einer veröffentlichten Änderung.
 

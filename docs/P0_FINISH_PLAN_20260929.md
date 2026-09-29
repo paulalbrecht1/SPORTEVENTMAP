@@ -88,7 +88,7 @@ Bereits erfolgt:
   ebenfalls; diese lesenden/abgewiesenen Aufrufe verändern keine Eventdaten.
 
 Das separate v90-Paket wird unter
-`exports/ui-release-20260929-manual-maintenance/package` aus dem sauberen
+`exports/ui-release-20260929-v90/package` aus dem sauberen
 Quellcommit gebaut. Als nachgewiesene v89-Basis dienen
 `exports/ui-release-20260920-v89/package` und
 `https://9cd74f1c.sporteventmap.pages.dev`; die SHA-256 der Basis-`release.json`

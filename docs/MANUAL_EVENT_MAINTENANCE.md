@@ -1,5 +1,13 @@
 # Events manuell pflegen
 
+**Erneute Abnahme vom 29.09.: noch nicht für sämtliche Fälle freigegeben.**
+Der Website-Admin benötigt keine Codex-Anmeldung. Reguläre statische Detaillinks
+können jedoch alte Werte zeigen; sechs optionale Eingaben fehlen im öffentlichen
+Prüfvertrag, und Konfliktfälle sind noch nicht vollständig im neuen Formular
+lösbar. Die [erneute Workflow-Abnahme](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md)
+dokumentiert die bestätigten Lücken. Die folgenden Speicher- und Pilotnachweise
+sind keine Zusicherung, dass jede Änderung bereits auf jeder Websiteansicht erscheint.
+
 Stand: 29. September 2026, 13:26 UTC. Die beiden Pflege-Migrationen, der
 Konflikt-Hotfix und die Pflegeoberfläche sind produktiv. Der Cachefehler ist mit v91 behoben;
 die echte angemeldete Adminoberfläche wurde erfolgreich verwendet. Ring Running

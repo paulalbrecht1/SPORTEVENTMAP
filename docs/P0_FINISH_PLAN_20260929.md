@@ -1,5 +1,12 @@
 # P0-Abschlussplan – 29. September 2026
 
+**Nachtrag aus der erneuten Workflow-Abnahme:** Vor der vollständigen Freigabe
+des eigenständigen Pflegewegs müssen die verlinkten Detailseiten aktuelle Werte
+zeigen, sämtliche öffentlichen Formularfelder nachgeprüft werden und Konflikte
+im neuen Adminbereich lösbar sein. Auch die dynamische Frischeanzeige liest
+derzeit das RPC-Antwortformat falsch. Diese Fehler sind unabhängig von den
+Bestandsgrenzen; [Befunde und Abnahmereihenfolge](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md).
+
 Stand der folgenden Bestandsmessung: **29.09.2026, 13:26 UTC, nach dem Pilot**.
 P0 bleibt offen. Pflege-Migrationen, Konflikt-Hotfix und Frontend **v91 sind produktiv
 ausgerollt und geprüft**. Die echte angemeldete Adminoberfläche funktioniert;

@@ -179,6 +179,10 @@
     return clockTime(value);
   }
   function hasFieldSource(record, section, field) {
+    // The public RPC exposes only approvals whose audited value still matches.
+    // An admin value approval makes this field visible without claiming a fresh
+    // external source inspection or changing the edition freshness definition.
+    if (record.manual_approved_fields?.includes(`${section}.${field}`)) return true;
     return /^(verified|verified_official_source|confirmed|partially_verified)$/.test(record.verification_status || '') && (record.sources || []).some(source => /^(official|trusted)(?:_|$)/i.test(text(source.source_type)) && (!source.verification_status || /^(verified|verified_official_source|confirmed|partially_verified)$/.test(source.verification_status)) && safeUrl(source.source_url) && verifiedDate(source.last_verified) && text(source.field_path).split(/\s*,\s*/).some(path => path === `${section}.${field}` || path === section));
   }
   function richOwner(section, field) {

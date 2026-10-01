@@ -83,6 +83,33 @@ async function responsive(page) {
 }
 
 for (const mode of ['static', 'dynamic']) {
+  test(`${mode} a manual approval exposes exactly approved knowledge without renewing source checks`, async ({ page }) => {
+    const row = { ...details()[0], verification_status: 'needs_review', sources: [],
+      last_checked: '2026-09-01',
+      registration: { price_tiers: [{ tier: 'Manuelle Preisphase', price: '39 EUR' }], refund_policy: 'Nicht freigegebene Erstattung' },
+      course: {}, travel: {}, editorial: {},
+      race_day: { wave_start: [{ label: 'Manuelle Startwelle', time: '10:25' }], total_cutoff: 'Nicht freigegebenes Zeitlimit' },
+      faq: [{ id: 'faq-manual', question: 'Manuell freigegebene Frage?', answer: 'Manuell freigegebene Antwort.' }],
+      manual_approved_fields: ['registration.price_tiers', 'race_day.wave_start', 'faq.faq-manual'] };
+    const state = { event: canonical(), details: [row] };
+    const { url, errors } = await setup(page, state, mode);
+    await page.goto(url); await settled(page); await openDetails(page);
+    const content = page.locator('main');
+    for (const value of ['Manuelle Preisphase', '39', 'Manuelle Startwelle', '10:25', 'Manuell freigegebene Frage?', 'Manuell freigegebene Antwort.']) await expect(content).toContainText(value);
+    for (const value of ['Nicht freigegebene Erstattung', 'Nicht freigegebenes Zeitlimit']) await expect(content).not.toContainText(value);
+    const rendered = JSON.parse(await page.locator('#sem-public-detail-knowledge-data').textContent());
+    expect(rendered[0].rendered_fields).toEqual(expect.arrayContaining(['registration.price_tiers', 'race_day.wave_start', 'faq.faq-manual']));
+    expect(rendered[0].sources).toEqual([]);
+    expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).last_checked).toBe('2026-09-29T10:00:00Z');
+    // A later unapproved value has no current approval marker; do not fall back
+    // to the static document's former value or claim a fresh source check.
+    row.manual_approved_fields = [];
+    await page.reload(); await settled(page);
+    for (const value of ['Manuelle Preisphase', 'Manuelle Startwelle', 'Manuell freigegebene Frage?']) await expect(content).not.toContainText(value);
+    expect(errors).toEqual([]);
+    await responsive(page);
+  });
+
   test(`${mode} hyphenated competition distance appears once and unrelated name numbers stay intact`, async ({ page }) => {
     const state = { event: { ...canonical(), race_formats: [
       { label: '10-km-Lauf', distance_km: 10 },

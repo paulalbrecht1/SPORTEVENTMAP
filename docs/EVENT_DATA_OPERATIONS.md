@@ -2,6 +2,18 @@
 
 Stand: 28. Juli 2026
 
+**Historisches Fundament, keine aktuelle Pflegeanweisung.** Für tägliche
+Änderungen und neue Ausgaben gilt heute
+[Events manuell pflegen](MANUAL_EVENT_MAINTENANCE.md). Seit dem Nutzerauftrag
+vom 01.10.2026 genügt für normale Adminänderungen eine gemeinsame bewusste
+Bestätigung; separate Quellenprüfformulare sind dafür keine Pflicht.
+Manuelle Freigabe und editions-/feldwertgebundene Quellenprüfung bleiben
+verschiedene Nachweise. Die unten dokumentierte Initialmigration und ihre
+SQL-Beispiele ersetzen weder die Freigabe noch eine tatsächliche Quellenprüfung.
+Aktueller lokaler Stand und Grenzen vom 01.10.2026 stehen im
+[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) und
+[Releaseablauf](LOCAL_PUBLISH.md).
+
 ## 1. Bestandsaufnahme vor der Änderung
 
 Die öffentliche Discovery-Anwendung ist eine Vanilla-JavaScript-Anwendung. Ihr primärer Eventbestand liegt nach dem kontrollierten Vollimport in Supabase. `js/events.js` lädt `public_event_discovery`; `data/events.csv` (994 Zeilen) bleibt ausschließlich ein explizit erzeugter Export- und Ausfall-Fallback.

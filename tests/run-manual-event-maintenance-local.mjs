@@ -159,6 +159,26 @@ try {
   assert.match(output, /MANUAL_MAINTENANCE_ASSERTIONS=\d+/);
   assert.equal(sql("select count(*) from public.events where event_name like 'manual-maintenance-%';").trim(), '0', 'Test fixtures must be rolled back.');
   console.log('Database integration passed; synthetic fixtures rolled back.');
+  const catalogSnapshot = sql("set sporteventmap.test_catalog_snapshot = 'isolated';\n" + fs.readFileSync(path.join(root, 'tests/catalog-consistent-snapshot.sql'), 'utf8'));
+  process.stdout.write(catalogSnapshot);
+  assert.match(catalogSnapshot, /CATALOG_SNAPSHOT_ASSERTIONS=\d+/);
+  assert.equal(sql("select count(*) from public.events where event_name like 'catalog-snapshot-%';").trim(), '0', 'Catalog snapshot fixtures must be rolled back.');
+  console.log('Catalog snapshot public visibility, edition parity and nested whitelist integration passed; fixtures rolled back.');
+  const housekeeping = sql("set sporteventmap.test_housekeeping = 'isolated';\n" + fs.readFileSync(path.join(root, 'tests/housekeeping-validation-route.sql'), 'utf8'));
+  process.stdout.write(housekeeping);
+  assert.match(housekeeping, /HOUSEKEEPING_ASSERTIONS=\d+/);
+  assert.equal(sql("select count(*) from public.events where event_name like 'housekeeping-regression-%';").trim(), '0', 'Housekeeping fixtures must be rolled back.');
+  console.log('Housekeeping authorization and cron routing integration passed; synthetic changes rolled back.');
+  const approval = sql("set sporteventmap.test_manual_approval = 'isolated';\n" + fs.readFileSync(path.join(root, 'tests/manual-approved-save.sql'), 'utf8'));
+  process.stdout.write(approval);
+  assert.match(approval, /MANUAL_APPROVAL_ASSERTIONS=\d+/);
+  assert.equal(sql("select count(*) from public.events where event_name like 'manual-approval-%';").trim(), '0', 'Manual approval fixtures must be rolled back.');
+  console.log('Manual approval readback, publication and source-proof separation integration passed; fixtures rolled back.');
+  const ownArchive = sql("set sporteventmap.test_own_planner_archive = 'isolated';\n" + fs.readFileSync(path.join(root, 'tests/own-planner-archived-editions.sql'), 'utf8'));
+  process.stdout.write(ownArchive);
+  assert.match(ownArchive, /OWN_ARCHIVE_ASSERTIONS=\d+/);
+  assert.equal(sql("select count(*) from public.events where event_name like 'own-planner-archive-%';").trim(), '0', 'Own archive fixtures must be rolled back.');
+  console.log('Own Planner archive authorization and exact-identity integration passed; fixtures rolled back.');
   await testCommittedReadback();
 } catch (error) {
   primaryError = error;

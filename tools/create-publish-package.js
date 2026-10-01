@@ -23,6 +23,7 @@ const CRITICAL_PATHS = Object.freeze([
   "js/supabase.js",
   "js/freshness-batch-review.js",
   "js/manual-event-maintenance.js",
+  "js/catalog-quality-report.js",
   "data/events.csv",
   "data/event-editions-public.json",
   "data/catalog-export-manifest.json",
@@ -65,6 +66,7 @@ const COPY_ENTRIES = [
   "js/freshness-batch-review.js",
   "js/manual-event-maintenance.js",
   "js/data-freshness-health.js",
+  "js/catalog-quality-report.js",
   "js/event-catalog-loader.js",
   "js/events.js",
   "js/event-marker-types.js",
@@ -75,6 +77,7 @@ const COPY_ENTRIES = [
   "js/supabase.js",
   "data/events.csv",
   "data/catalog-export-manifest.json",
+  "data/catalog-release-policy.json",
   "data/event-editions-public.json",
   "data/event-category-details.json",
   "data/event-knowledge.json",
@@ -438,7 +441,8 @@ function main() {
     built_at: new Date().toISOString()
   };
 
-  require("./generate-event-pages.js");
+  const pageGenerator = require("./generate-event-pages.js");
+  const generated = pageGenerator.main();
   require("./generate-sitemap.js");
   assertCleanSource();
 
@@ -446,6 +450,7 @@ function main() {
 
   COPY_ENTRIES.forEach(copyFile);
   COPY_DIRECTORIES.forEach(copyDirectory);
+  pageGenerator.assertGeneratedCatalogPages({ ...generated, directory: path.join(DIST, "event") });
   writeRuntimeConfig();
   writeReleaseMetadata(identity);
 

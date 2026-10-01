@@ -4243,27 +4243,12 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     window.sportEventMapDetailConfig = {
-      event: ${escapeJson({
-        event_id: event.event_id || null,
-        edition_id: event.edition_id || null,
-        edition_year: event.edition_year || getEventYear(event) || null,
-        event_key: eventKey,
-        event_slug: slug,
-        event_name: clean(event.event_name),
-        date: clean(event.date),
-        city: clean(event.city),
-        country: clean(event.country),
-        sport: clean(event.sport_type || event.sport || event.category),
-        distance: clean(event.distance),
-        event_url: clean(event.event_url),
-        latitude: clean(event.latitude),
-        longitude: clean(event.longitude)
-      })}
+      event: ${escapeJson(publicPageEvent(event, slug, eventKey))}
     };
   </script>
   <script src="../../js/config.js"></script>
   <script defer src="../../js/supabase-loader.js" data-supabase-src="../../js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
-  <script defer src="../../js/event-detail.js?v=20260929-detail-layout-v130"></script>
+  <script defer src="../../js/event-detail.js?v=20261001-approved-detail-v137"></script>
   ${mapScript(event)}
 </body>
 </html>
@@ -4277,6 +4262,67 @@ function removeGeneratedPages() {
   });
 }
 
+function publicPageEvent(event, slug, eventKey = [event.event_name, event.date, event.city].map(clean).join("|").toLowerCase()) {
+  return {
+    event_id: event.event_id || null,
+    edition_id: event.edition_id || null,
+    edition_year: event.edition_year || getEventYear(event) || null,
+    event_key: eventKey,
+    event_slug: slug,
+    event_name: clean(event.event_name),
+    date: clean(event.date),
+    city: clean(event.city),
+    country: clean(event.country),
+    sport: clean(event.sport_type || event.sport || event.category),
+    distance: clean(event.distance),
+    event_url: clean(event.event_url),
+    latitude: clean(event.latitude),
+    longitude: clean(event.longitude)
+  };
+}
+
+function selectPublicEditions(rows, archiveRows) {
+  const editions = new Map();
+  for (const event of [...rows, ...archiveRows]) {
+    if (event.publication_status && event.publication_status !== "published") {
+      throw new Error("Unpublished edition cannot become a static public page.");
+    }
+    const editionId = clean(event.edition_id).toLowerCase();
+    const naturalKey = [event.event_name, event.date, event.city, event.country].map(clean).join("|").toLowerCase();
+    // Names/dates can coincide across separate editions. Only concrete edition
+    // IDs join the two public exports; legacy rows retain their previous key.
+    const key = editionId ? `edition:${editionId}` : `legacy:${naturalKey.replace(/\|/g, "") ? naturalKey : clean(event.edition_slug)}`;
+    const previous = editions.get(key);
+    if (previous && editionId) {
+      for (const field of ["event_id", "edition_slug", "edition_year", "event_name", "date", "city", "country", "sport", "distance", "address", "latitude", "longitude"]) {
+        if (clean(previous[field]) && clean(event[field]) && clean(previous[field]) !== clean(event[field])) {
+          throw new Error(`Discovery and archive disagree for edition ${editionId}: ${field}.`);
+        }
+      }
+    }
+    editions.set(key, { ...(previous || {}), ...event });
+  }
+  return [...editions.values()].filter(event => clean(event.event_name) && clean(event.city) && clean(event.country));
+}
+
+function assertGeneratedCatalogPages({ events, pages, directory = EVENT_DIR }) {
+  if (events.length !== pages.length) throw new Error("Generated page count differs from selected editions.");
+  events.forEach((event, index) => {
+    const slug = pages[index].slug;
+    const html = fs.readFileSync(path.join(directory, slug, "index.html"), "utf8");
+    // The generated public config is one JSON line. Parse data, never execute
+    // scripts from a saved page while checking its concrete edition facts.
+    const match = /window\.sportEventMapDetailConfig\s*=\s*\{\s*event:\s*(\{[^\r\n]*\})\s*\};/.exec(html);
+    let actual;
+    try { actual = match && JSON.parse(match[1]); } catch (_error) { actual = null; }
+    const expected = publicPageEvent(event, slug);
+    if (!actual || Object.keys(actual).length !== Object.keys(expected).length ||
+        Object.entries(expected).some(([key, value]) => actual[key] !== value)) {
+      throw new Error(`Stored detail page does not match its catalog edition: ${slug}.`);
+    }
+  });
+}
+
 function main() {
   const rows = parseCsvFile(EVENTS_PATH);
   const archiveRows = loadPublicArchive();
@@ -4286,22 +4332,7 @@ function main() {
     loadEventKnowledge();
   const richEventDetails =
     loadEventDetailDatabase();
-  const mergedRows = [...rows, ...archiveRows];
-  const uniqueRows = new Map();
-  mergedRows.forEach(event => {
-    const naturalKey = [event.event_name, event.date, event.city, event.country]
-      .map(clean)
-      .join("|")
-      .toLowerCase();
-    const key = naturalKey.replace(/\|/g, "") ? naturalKey : clean(event.edition_slug) || clean(event.edition_id);
-    uniqueRows.set(key, { ...(uniqueRows.get(key) || {}), ...event });
-  });
-  const selected =
-    [...uniqueRows.values()].filter(event =>
-      clean(event.event_name) &&
-      clean(event.city) &&
-      clean(event.country)
-    );
+  const selected = selectPublicEditions(rows, archiveRows);
 
   if (!selected.length) {
     throw new Error("No events found for event page generation.");
@@ -4355,7 +4386,10 @@ function main() {
     "utf8"
   );
 
+  assertGeneratedCatalogPages({ events: selected, pages: manifest });
+
   console.log(`Generated ${manifest.length} event detail page(s).`);
+  return { events: selected, pages: manifest };
 }
 
 if (require.main === module) {
@@ -4364,6 +4398,7 @@ if (require.main === module) {
 
 module.exports = {
   buildEventPage,
+  assertGeneratedCatalogPages,
   buildRaceGuideKeyFacts,
   buildRaceGuideRegistration,
   buildRaceGuideSources,
@@ -4382,7 +4417,8 @@ module.exports = {
   parseEventDate,
   prepareRichDetails,
   isRaceCutoffValue,
-  resolveOrganizer
+  resolveOrganizer,
+  selectPublicEditions
 };
 
 

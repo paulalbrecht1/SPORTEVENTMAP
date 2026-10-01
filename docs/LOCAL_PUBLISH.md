@@ -8,6 +8,51 @@ artifact, use the separate [UI release workflow](UI_ONLY_RELEASE.md). Its fixed
 allowlist and base-package integrity checks do not change the full-release
 requirements below and do not approve a new catalog export.
 
+## Local preparation on 1 October 2026
+
+The exporter now requires the reviewed read-only
+`20261001095043_public_catalog_consistent_snapshot.sql` migration. It is prepared
+locally, not installed in production. Without the RPC the export stops and keeps
+the previous files. The separate housekeeping route migration also remains
+unapplied in production. Both passed isolated SQL/RLS acceptance with the full
+64-migration schema; explicit rollout approval is still required. The housekeeper
+resumes existing automatic validation/aging behavior, unlike the read-only snapshot.
+Do not apply the historical pending migration list blindly.
+
+`npm run data:refresh-public` reads one consistent database statement, validates
+IDs/edition relationships and public fields, then runs the existing bound date,
+geo and duplicate audits in staging **before** replacing the fallback. The CSV,
+archive, three audit reports and manifest are one recoverable group; the
+manifest is written last. A normal write failure restores every previous file.
+An interrupted write retains `<manifest>.transaction/recovery.json` and backups;
+all release entry points refuse that state. Compare its target list against the
+intended workspace paths, restore every original artifact together, and verify
+the manifest hashes before retrying. Never remove the marker just to pass a gate.
+
+The package builder explicitly runs the guarded detail-page generator and checks
+the saved and copied HTML against its concrete catalog edition values. CSV and
+archive rows merge by edition UUID; two distinct editions with the same name,
+date and place remain separate. A conflicting UUID or explicitly unpublished row
+stops generation before existing pages are removed. The existing clean-source
+check still runs after generation and before replacing `dist/`: reviewed generated
+pages must be included in the approved source state before packaging. The isolated
+`tests/catalog-page-release.test.mjs` exercises the actual candidate, generator
+and package path; it does not authorize publishing production data.
+
+Diagnostic output is marked `diagnostic_only` and must keep all outputs outside
+`data/` and `dist/`. It cannot pass a release check. An export timestamp is a
+technical creation time; `measured_at` identifies the database snapshot;
+`last_checked` remains the actual stored edition verification time. Neither
+export nor HTTP success renews verification.
+
+Local evidence for this run is in `exports/p0-20261001`: a real read-only
+snapshot, `quality-report.json`, a blocked diagnostic candidate and its bound
+audits. No data publication or package deployment follows from those files.
+`npm run audit:catalog-snapshot -- --snapshot <local-file> --out
+exports/<report>.json` uses the same evaluator as the Admin. For a deliberate
+historical replay add `--at-snapshot-time`; that preserves the original
+measurement and explicitly labels the report as a replay.
+
 ## Install, Test and Build
 
 Run all commands from the project directory:

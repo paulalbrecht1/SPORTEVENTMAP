@@ -96,6 +96,7 @@
     const confirmed = new Set((request.confirmations || []).map(row => row.field));
     const removed = new Set([...(request.clear_fields || []), ...(request.faq_remove || []).map(id => `faq.${id}`)]);
     const changed = Object.entries(request.patch || {}).flatMap(([section, fields]) => Object.keys(fields).map(key => `${section}.${key}`));
+    if (request.manual_approval) for (const path of [...changed, ...(request.faq_upserts || []).map(row => `faq.${row.id}`)]) confirmed.add(path);
     const paths = [...new Set([...changed, ...removed, ...confirmed, ...(request.faq_upserts || []).map(row => `faq.${row.id}`)])];
     return { scope: request.scope || "edition", event_id: context.event.id, edition_id: editionId, fields: paths.map(path => ({ path, visible: confirmed.has(path) && !removed.has(path), value: knowledgeValue(record, path) })) };
   }
@@ -124,7 +125,7 @@
     if (/active|discovery|current.*edition|latest.*edition/i.test(message)) return "Die Ausgabe ist noch nicht die nächste sichtbare Ausgabe. Bitte vorhandene aktuelle Ausgaben und deren Termine hier unter den offenen Hinweisen prüfen.";
     if (/source|crawl|health|fetch/i.test(message)) return "Die vorhandenen Quellenbedingungen sind noch nicht erfüllt. Bitte die offizielle editionsgenaue Quelle und offene Quellenprobleme hier unter den offenen Hinweisen prüfen.";
     if (/conflict|pending|review task|proposal|issue/i.test(message)) return "Es gibt noch offene Prüfungen oder widersprüchliche Angaben. Bitte die Hinweise hier unter den offenen Hinweisen klären.";
-    if (/required|missing|evidence|field|complete/i.test(message)) return "Der vollständige Freigabenachweis ist noch unvollständig. Bitte alle 14 Kernangaben mit belegbaren Werten ausdrücklich prüfen.";
+    if (/required|missing|evidence|field|complete/i.test(message)) return "Für die öffentliche Anzeige fehlen erforderliche Angaben. Bitte die konkreten Pflichtangaben und offenen Hinweise ergänzen.";
     if (/[äöüÄÖÜß]|\b(Bitte|Die|Der|Für|Vor|Ein|Eine)\b/.test(message)) return message.replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, "[Ausgabe]");
     return "Die bestehenden Freigaberegeln sind noch nicht erfüllt. Bitte die offenen Hinweise hier unter den offenen Hinweisen prüfen.";
   }
@@ -184,6 +185,60 @@
     return context;
   }
 
+  function assertPersistedChanges(context, request, editionId) {
+    const edition = context.editions.find(row => row.id === editionId);
+    const matches = (field, actual, expected) => {
+      if (expected === null) return actual === null;
+      if (["latitude", "longitude", "edition_year", "price_min", "price_max", "participant_limit"].includes(field)) {
+        return actual !== null && actual !== undefined && Number(actual) === Number(expected);
+      }
+      if (field === "start_time" && actual && expected) {
+        const clock = value => String(value).split(":").concat("00").slice(0, 3).join(":");
+        return clock(actual) === clock(expected);
+      }
+      return equal(actual, expected);
+    };
+    for (const scope of ["event", "edition"]) {
+      const record = scope === "event" ? context.event : edition;
+      for (const [field, expected] of Object.entries(request[`${scope}_patch`] || {})) {
+        if (!record || !Object.hasOwn(record, field) || !matches(field, record[field], expected)) {
+          throw new Error(`Die Änderung „${LABELS[`${scope}.${field}`] || field}“ wurde nicht gespeichert. Bitte denselben Speichervorgang erneut prüfen.`);
+        }
+      }
+    }
+    for (const path of request.clear_fields || []) {
+      const [scope, field] = path.split(".");
+      const record = scope === "event" ? context.event : edition;
+      if (!record || !Object.hasOwn(record, field) || record[field] !== null) {
+        throw new Error(`Das Entfernen von „${LABELS[path] || field}“ wurde nicht gespeichert.`);
+      }
+    }
+    if (request.knowledge) {
+      const record = knowledgeRecord(context, request.knowledge.scope || "edition", editionId);
+      for (const [section, fields] of Object.entries(request.knowledge.patch || {})) {
+        for (const [field, expected] of Object.entries(fields)) if (!equal(record[section]?.[field], expected)) {
+          throw new Error(`Die Zusatzangabe „${knowledgeLabel(`${section}.${field}`)}“ wurde nicht gespeichert.`);
+        }
+      }
+      for (const path of request.knowledge.clear_fields || []) {
+        const value = knowledgeValue(record, path);
+        if (value != null && !(Array.isArray(value) && value.length === 0)) throw new Error("Die Zusatzangabe wurde nicht entfernt.");
+      }
+      for (const row of request.knowledge.faq_upserts || []) {
+        const actual = knowledgeValue(record, `faq.${row.id}`);
+        // The database adds audit/source metadata to FAQs. Check the submitted
+        // values and their parent binding, not equality with the entire row.
+        if (!actual || ["id", "question", "answer", "sort_order"].some(field =>
+          Object.hasOwn(row, field) && !equal(actual[field], row[field])) ||
+          (actual.event_detail_id != null && actual.event_detail_id !== record.id)) {
+          throw new Error("Die Frage und Antwort wurden nicht gespeichert.");
+        }
+      }
+      for (const id of request.knowledge.faq_remove || []) if (knowledgeValue(record, `faq.${id}`) != null) throw new Error("Die Frage wurde nicht entfernt.");
+    }
+    return context;
+  }
+
   async function rpc(client, name, args, timeoutMs = 20000) {
     let timer;
     try {
@@ -211,6 +266,8 @@
     try { context = assertContext(await rpc(client, "admin_manual_event_context", { p_event_id: request.event_id }, options.timeoutMs), request.event_id); }
     catch (error) { error.uncertain = true; throw error; }
     if (!context.editions.some(edition => edition.id === receipt.edition_id)) throw new Error("Gespeicherte Ausgabe konnte nicht aus der Datenbank zurückgelesen werden. Bitte denselben Vorgang erneut prüfen.");
+    try { assertPersistedChanges(context, request, receipt.edition_id); }
+    catch (error) { error.uncertain = true; throw error; }
     return { ...receipt, context };
   }
 
@@ -309,11 +366,11 @@
   function mount({ root, client, verifyPublication, refreshCatalog, verifyDetail = verifyRenderedDetail }) {
     let context = null, selectedId = null, action = "correct", busy = false, pending = null, lastReceipt = null, unresolved = false;
     let touched = new Set(), formatsDirty = false, formatConflict = false, searchSequence = 0, selectionSequence = 0, initialSourceUrl = "";
-    let knowledgeScope = "edition", knowledgeTouched = new Set(), knowledgeConflict = false, lastKnowledgeRequest = null;
+    let knowledgeScope = "edition", knowledgeTouched = new Set(), knowledgeConflict = false, lastKnowledgeRequest = null, editorBaseline = "";
     root.innerHTML = `<section class="admin-table-section event-maintenance" aria-labelledby="maintenanceTitle">
       <span class="admin-eyebrow">Manuelle Datenpflege</span><h3 id="maintenanceTitle">Events pflegen</h3>
-      <p>Offizielle Seiten selbst prüfen, einzelne Angaben bestätigen oder korrigieren und neue Ausgaben als Entwurf anlegen.</p>
-      <form data-maintenance-search-form class="maintenance-search"><label>Event suchen<input data-maintenance-search type="search" placeholder="Name der Veranstaltung" autocomplete="off" maxlength="120"></label><button type="submit">Suchen</button></form>
+      <p>Angaben bearbeiten, Änderungen speichern und einmal bestätigen. Bestehende Ausgaben und persönliche Verknüpfungen bleiben erhalten.</p>
+      <form data-maintenance-search-form class="maintenance-search"><label>Event suchen<input data-maintenance-search type="search" placeholder="Name der Veranstaltung" autocomplete="off" maxlength="120"></label><button type="submit">Suchen</button><button type="button" data-maintenance-close hidden>Schließen und anderes Event suchen</button></form>
       <div data-maintenance-results class="maintenance-results" aria-live="polite"></div>
       <p data-maintenance-status class="admin-section-status" role="status" aria-live="polite"></p>
       <div data-maintenance-editor></div><div data-maintenance-publication aria-live="polite"></div>
@@ -324,7 +381,28 @@
     const selected = () => context?.editions.find(edition => edition.id === selectedId);
     const values = () => ({ event: context?.event || {}, edition: action === "create" ? seedNextEdition() : selected() || {} });
     const setBusy = value => { busy = value; root.setAttribute("aria-busy", String(value)); root.querySelectorAll("input,select,textarea,button").forEach(input => { input.disabled = value || input.dataset.maintenanceReadonly === "true" || (unresolved && !input.matches("[data-maintenance-save]")); }); };
-    const invalidate = () => { pending = null; $("[data-maintenance-preview-box]")?.remove(); };
+    const invalidate = () => { pending = null; const dialog = $("[data-maintenance-preview-box]"); if (dialog?.open) dialog.close(); dialog?.remove(); };
+
+    const editorFingerprint = () => JSON.stringify([...editor.querySelectorAll("input,select,textarea")].map(input => [input.value, input.type === "checkbox" ? input.checked : null]));
+    const canLeaveSelection = () => !context || editorFingerprint() === editorBaseline || globalThis.confirm("Ungespeicherte Änderungen verwerfen und ein anderes Event suchen?");
+    function resetEditor() {
+      ++selectionSequence;
+      invalidate(); context = null; selectedId = null; action = "correct";
+      lastReceipt = null; lastKnowledgeRequest = null; initialSourceUrl = "";
+      touched = new Set(); formatsDirty = false; formatConflict = false;
+      knowledgeScope = "edition"; knowledgeTouched = new Set(); knowledgeConflict = false;
+      editor.innerHTML = ""; editorBaseline = "";
+      $("[data-maintenance-publication]").innerHTML = "";
+    }
+    function closeSearch() {
+      if (busy || unresolved || !canLeaveSelection()) return;
+      ++searchSequence; resetEditor();
+      $("[data-maintenance-results]").innerHTML = "";
+      $("[data-maintenance-search]").value = "";
+      $("[data-maintenance-close]").hidden = true;
+      status("Suche geschlossen. Du kannst jetzt ein anderes Event suchen.");
+      $("[data-maintenance-search]").focus();
+    }
 
     const currentKnowledge = () => action === "create" ? {} : knowledgeRecord(context, knowledgeScope, selectedId);
     const knowledgeDirty = () => knowledgeTouched.size || $("[data-knowledge-confirm]:checked,[data-knowledge-clear]:checked,[data-knowledge-remove]:checked");
@@ -339,7 +417,7 @@
       else if (type === "date" && value && !/^\d{4}-\d{2}-\d{2}$/.test(value)) control = `<input ${common} type="text" value="${escape(value)}" placeholder="JJJJ-MM-TT; vorhandene Quellenangabe erhalten">`;
       else if (type === "date" || type === "url") control = `<input ${common} type="${type}" value="${escape(value)}">`;
       else control = `<textarea ${common} rows="2" maxlength="4000">${escape(value)}</textarea>`;
-      return `<div class="maintenance-field"><label for="${id}">${escape(label)}</label>${control}<div class="maintenance-field-actions"><label><input type="checkbox" data-knowledge-confirm="${path}"> Zusatzangabe an Quelle geprüft</label>${value !== "" ? `<label><input type="checkbox" data-knowledge-clear="${path}"> Zusatzangabe bewusst entfernen</label>` : ""}</div></div>`;
+      return `<div class="maintenance-field"><label for="${id}">${escape(label)}</label>${control}<div class="maintenance-field-actions">${value !== "" ? `<label><input type="checkbox" data-knowledge-clear="${path}"> Zusatzangabe bewusst entfernen</label>` : ""}</div></div>`;
     }
     function knowledgeArrayRow(path, row, index) {
       const specs = path.endsWith("price_tiers") ? [["tier", "Wettbewerb / Gebührenstufe"], ["price", "Betrag"], ["currency", "Währung (z. B. EUR)"], ["until", "Gültig bis / Kontingent"], ["note", "Bedingung / Hinweis"]] : [["point", "Streckenpunkt / Abschnitt"], ["time", "Zeitlimit (z. B. 2:30 h)"]];
@@ -347,14 +425,14 @@
     }
     function faqRow(row) {
       const id = row.id || globalThis.crypto.randomUUID();
-      return `<div class="maintenance-format" data-knowledge-faq="${escape(id)}"><label>Frage<input data-knowledge-question value="${escape(row.question || "")}" maxlength="500"></label><label>Antwort<textarea data-knowledge-answer rows="3" maxlength="4000">${escape(row.answer || "")}</textarea></label><label><input type="checkbox" data-knowledge-confirm="faq.${escape(id)}"> Frage und Antwort an Quelle geprüft</label><label><input type="checkbox" data-knowledge-remove> Frage bewusst entfernen</label></div>`;
+      return `<div class="maintenance-format" data-knowledge-faq="${escape(id)}"><label>Frage<input data-knowledge-question value="${escape(row.question || "")}" maxlength="500"></label><label>Antwort<textarea data-knowledge-answer rows="3" maxlength="4000">${escape(row.answer || "")}</textarea></label><label><input type="checkbox" data-knowledge-remove> Frage bewusst entfernen</label></div>`;
     }
     function renderKnowledge() {
       const holder = $("[data-maintenance-knowledge]");
       if (!holder) return;
       if (action === "create") { holder.innerHTML = '<p class="maintenance-help">Zusatzdetails nach dem Anlegen an der neuen Ausgabe ergänzen. Jahresangaben und Prüfungen werden nicht aus der vorherigen Ausgabe übernommen.</p>'; return; }
       const record = currentKnowledge();
-      holder.innerHTML = `<details class="admin-secondary-details"><summary>Zusatzdetails für Detailseite und Event-Wiki</summary><p>Nur vorhandene und ausdrücklich geprüfte Zusatzangaben erscheinen öffentlich. Leere Felder ändern nichts. Ungeprüfte Entwürfe bleiben gespeichert. Datum, Startzeit, Distanzen und Gebührenrahmen stehen weiterhin im Kernformular.</p><label>Geltungsbereich der Zusatzdetails<select data-knowledge-scope><option value="edition" ${knowledgeScope === "edition" ? "selected" : ""}>Nur diese Ausgabe (${escape(selected()?.edition_year)})</option><option value="brand" ${knowledgeScope === "brand" ? "selected" : ""}>Allgemeines Event-Wiki – alle Ausgaben</option></select></label><p class="maintenance-help">Gebührenstaffeln, Startwellen und konkrete Streckenangaben gelten ausschließlich für die gewählte Ausgabe. Allgemeine Wiki-Angaben enthalten keine jahresabhängigen Termine oder Preise. Alle markierten Zusatzangaben werden mit der Quellen-URL und Prüfnotiz unten bestätigt; unterschiedliche Quellen bitte getrennt speichern.</p>${Object.entries(KNOWLEDGE_GROUPS).filter(([section]) => knowledgeScope !== "brand" || BRAND_KNOWLEDGE_GROUPS.includes(section)).map(([section, [label, fields]]) => `<details class="admin-secondary-details" data-knowledge-section="${section}"><summary>${escape(label)}</summary><div class="maintenance-grid">${fields.map(spec => knowledgeControl(section, spec)).join("")}</div></details>`).join("")}<details class="admin-secondary-details" data-knowledge-section="faq"><summary>Häufige Fragen</summary><div data-knowledge-faq-rows>${(record.faq || []).map(faqRow).join("")}</div><button type="button" data-knowledge-add-faq>Frage hinzufügen</button></details></details>`;
+      holder.innerHTML = `<details class="admin-secondary-details"><summary>Zusatzdetails für Detailseite und Event-Wiki</summary><p>Deine geänderten Zusatzangaben werden gemeinsam manuell freigegeben. Unbearbeitete Felder bleiben erhalten. Eine leere bearbeitete Angabe wird entfernt. Datum, Startzeit, Distanzen und Gebührenrahmen stehen weiterhin im Kernformular.</p><label>Geltungsbereich der Zusatzdetails<select data-knowledge-scope><option value="edition" ${knowledgeScope === "edition" ? "selected" : ""}>Nur diese Ausgabe (${escape(selected()?.edition_year)})</option><option value="brand" ${knowledgeScope === "brand" ? "selected" : ""}>Allgemeines Event-Wiki – alle Ausgaben</option></select></label><p class="maintenance-help">Gebührenstaffeln, Startwellen und konkrete Streckenangaben gelten ausschließlich für die gewählte Ausgabe. Allgemeine Wiki-Angaben enthalten keine jahresabhängigen Termine oder Preise. Die Freigabe und alte/neue Werte werden protokolliert. Vorhandene Quellen bleiben erhalten; eine manuelle Freigabe ist keine neue externe Quellenprüfung.</p>${Object.entries(KNOWLEDGE_GROUPS).filter(([section]) => knowledgeScope !== "brand" || BRAND_KNOWLEDGE_GROUPS.includes(section)).map(([section, [label, fields]]) => `<details class="admin-secondary-details" data-knowledge-section="${section}"><summary>${escape(label)}</summary><div class="maintenance-grid">${fields.map(spec => knowledgeControl(section, spec)).join("")}</div></details>`).join("")}<details class="admin-secondary-details" data-knowledge-section="faq"><summary>Häufige Fragen</summary><div data-knowledge-faq-rows>${(record.faq || []).map(faqRow).join("")}</div><button type="button" data-knowledge-add-faq>Frage hinzufügen</button></details></details>`;
     }
     function collectKnowledge(sourceUrl) {
       if (!knowledgeDirty()) return null;
@@ -371,7 +449,11 @@
         values[path] = [...holder.querySelectorAll("[data-knowledge-row]")].filter(row => !row.querySelector("[data-knowledge-remove]").checked).flatMap(row => {
           const before = Array.isArray(original) ? original[Number(row.dataset.knowledgeRow)] : null;
           const next = before && typeof before === "object" ? clone(before) : {};
-          row.querySelectorAll("[data-knowledge-cell]").forEach(input => { if (input.value.trim()) next[input.dataset.knowledgeCell] = input.value.trim(); });
+          row.querySelectorAll("[data-knowledge-cell]").forEach(input => {
+            const key = input.dataset.knowledgeCell;
+            if (input.value.trim()) next[key] = input.value.trim();
+            else delete next[key];
+          });
           if (!Object.keys(next).length) return [];
           if (path.endsWith("price_tiers") && (!next.tier || next.price === undefined || next.price === "")) throw new Error("Jede Gebührenstufe braucht eine Bezeichnung und einen Betrag. Unbekannte Gebühren bitte noch nicht als Stufe hinzufügen.");
           if (path.endsWith("intermediate_cutoffs") && (!next.point || !next.time)) throw new Error("Jedes Zwischenzeitlimit braucht einen Streckenpunkt und ein Zeitlimit.");
@@ -379,6 +461,7 @@
         });
       });
       let clear = [...root.querySelectorAll("[data-knowledge-clear]:checked")].map(input => input.dataset.knowledgeClear);
+      for (const path of knowledgeTouched) if (values[path] === "" && knowledgeValue(record, path) != null && knowledgeValue(record, path) !== "") clear.push(path);
       for (const [path, value] of Object.entries(values)) if (Array.isArray(value) && !value.length && Array.isArray(knowledgeValue(record, path)) && knowledgeValue(record, path).length) clear.push(path);
       clear = [...new Set(clear)];
       const patch = buildKnowledgePatch(record, values, knowledgeTouched, clear, knowledgeScope);
@@ -386,7 +469,7 @@
       root.querySelectorAll("[data-knowledge-faq]").forEach((row, index) => {
         const id = row.dataset.knowledgeFaq, prior = (record.faq || []).find(item => item.id === id);
         if (row.querySelector("[data-knowledge-remove]").checked) { if (prior) faqRemove.push(id); return; }
-        const next = { id, question: row.querySelector("[data-knowledge-question]").value.trim() || prior?.question || "", answer: row.querySelector("[data-knowledge-answer]").value.trim() || prior?.answer || "", sort_order: prior?.sort_order ?? (index + 1) * 10 };
+        const next = { id, question: row.querySelector("[data-knowledge-question]").value.trim(), answer: row.querySelector("[data-knowledge-answer]").value.trim(), sort_order: prior?.sort_order ?? (index + 1) * 10 };
         if (!next.question && !next.answer) return;
         if (!next.question || !next.answer) throw new Error("Bitte Frage und Antwort ergänzen oder die unvollständige Frage bewusst entfernen.");
         if (!prior || next.question !== prior.question || next.answer !== prior.answer) faqUpserts.push(next);
@@ -410,7 +493,7 @@
       } else if (type === "textarea") control = `<textarea ${common} rows="3">${escape(value)}</textarea>`;
       else control = `<input ${common} type="${type}" value="${escape(value)}" ${type === "number" ? `step="${name === "participant_limit" ? "1" : "any"}"` : ""}>`;
       const clearAllowed = !["canonical_name", "sport", "city", "country", "registration_status", "edition_status"].includes(name) && !(action === "create" && scope === "event");
-      return `<div class="maintenance-field"><label for="maintenance-${scope}-${name}">${escape(label)}${scope === "event" ? ' <small>(alle Ausgaben)</small>' : ""}</label>${control}<div class="maintenance-field-actions"><label><input type="checkbox" data-maintenance-confirm="${path}"> An Quelle geprüft</label>${value !== "" && clearAllowed ? `<label><input type="checkbox" data-maintenance-clear="${path}"> Bewusst entfernen</label>` : ""}</div></div>`;
+      return `<div class="maintenance-field"><label for="maintenance-${scope}-${name}">${escape(label)}${scope === "event" ? ' <small>(alle Ausgaben)</small>' : ""}</label>${control}<div class="maintenance-field-actions">${value !== "" && clearAllowed ? `<label><input type="checkbox" data-maintenance-clear="${path}"> Bewusst entfernen</label>` : ""}</div></div>`;
     }
 
     function renderFormats() {
@@ -460,7 +543,7 @@
 
     function previewReview(row) {
       try {
-        if (touched.size || formatsDirty || knowledgeDirty() || root.querySelector("[data-maintenance-confirm]:checked,[data-maintenance-clear]:checked") || $("[data-maintenance-notes]").value.trim() || $("[data-maintenance-source]").value.trim() !== initialSourceUrl || $("[data-maintenance-source-result]").value !== "confirmed" || $("[data-maintenance-publish]")?.checked) throw new Error("Bitte deine Formularänderungen und Feldprüfungen zuerst speichern. Danach die offene Entscheidung bearbeiten.");
+        if (touched.size || formatsDirty || knowledgeDirty() || root.querySelector("[data-maintenance-confirm]:checked,[data-maintenance-clear]:checked") || $("[data-maintenance-notes]")?.value.trim() || $("[data-maintenance-publish]")?.checked) throw new Error("Bitte deine Formularänderungen und Feldprüfungen zuerst speichern. Danach die offene Entscheidung bearbeiten.");
         const notes = row.querySelector("[data-maintenance-review-notes]").value.trim();
         if (notes.length < 20) throw new Error("Bitte die Entscheidung mit mindestens 20 Zeichen nachvollziehbar begründen.");
         const kind = row.dataset.maintenanceReviewKind;
@@ -490,34 +573,38 @@
       const sourceUrl = action === "create" ? "" : edition.source_url || source?.source_url || context.event.official_url || "";
       initialSourceUrl = sourceUrl;
       const warnings = [];
-      if (edition.publication_status === "draft") warnings.push("Diese Ausgabe ist ein privater Entwurf. Speichern veröffentlicht sie nicht.");
+      if (edition.publication_status === "draft") warnings.push("Diese Ausgabe ist ein privater Entwurf. Nach deiner Bestätigung wird die zulässige Veröffentlichung automatisch geprüft.");
       if (edition.needs_review) warnings.push("Für diese Ausgabe ist eine Prüfung offen.");
       if (edition.next_check_at && Date.parse(edition.next_check_at) <= Date.now()) warnings.push("Die nächste Quellenprüfung ist fällig.");
       if (!edition.start_date) warnings.push("Der Termin ist unbekannt. Ein Entwurf darf ohne Datum gespeichert werden.");
       if (action === "create") warnings.push("Neue Ausgabe: Stammdaten der Veranstaltung bleiben als ungeprüfte Vorlage sichtbar. Termin, Anmeldung, Wettbewerbe und Prüfungen werden nicht aus der alten Ausgabe übernommen.");
       const candidates = (context.candidates || []).filter(candidate => !["rejected", "superseded", "approved"].includes(candidate.candidate_status));
-      editor.innerHTML = `<div class="maintenance-selection"><label>Ausgabe auswählen<select data-maintenance-edition>${context.editions.map(row => `<option value="${escape(row.id)}" ${row.id === selectedId ? "selected" : ""}>${escape(`${row.edition_year} · ${row.start_date || "Termin offen"}${row.edition_key && row.edition_key !== "main" ? ` · ${row.edition_key}` : ""} · ${row.publication_status === "draft" ? "Entwurf" : "Veröffentlicht"}`)}</option>`).join("")}</select></label><label>Was möchtest du tun?<select data-maintenance-action><option value="confirm" ${action === "confirm" ? "selected" : ""}>Angaben als weiterhin korrekt bestätigen</option><option value="correct" ${action === "correct" ? "selected" : ""}>Bestehende Ausgabe korrigieren</option><option value="create" ${action === "create" ? "selected" : ""}>Neue Ausgabe als Entwurf anlegen</option></select></label></div>
+      editor.innerHTML = `<div class="maintenance-selection"><label>Ausgabe auswählen<select data-maintenance-edition>${context.editions.map(row => `<option value="${escape(row.id)}" ${row.id === selectedId ? "selected" : ""}>${escape(`${row.edition_year} · ${row.start_date || "Termin offen"}${row.edition_key && row.edition_key !== "main" ? ` · ${row.edition_key}` : ""} · ${row.publication_status === "draft" ? "Entwurf" : "Veröffentlicht"}`)}</option>`).join("")}</select></label><label>Was möchtest du tun?<select data-maintenance-action><option value="correct" ${action === "correct" ? "selected" : ""}>Bestehende Ausgabe korrigieren</option><option value="create" ${action === "create" ? "selected" : ""}>Neue Edition anlegen</option></select></label></div>
         <h4>${escape(context.event.canonical_name || context.event.event_name)}</h4>
         ${verificationHistory()}
         ${warnings.length ? `<ul class="maintenance-notice">${warnings.map(item => `<li>${escape(item)}</li>`).join("")}</ul>` : ""}
-        ${candidates.length ? `<div class="maintenance-notice">${candidates.length} bereits erkannte Ausgabe(n). Vorhandene Entwürfe oben auswählen; weitere erkannte Ausgaben lassen sich über „Neue Ausgabe als Entwurf anlegen“ weiterbearbeiten. So bleibt die vorhandene Editionsidentität erhalten.</div>` : ""}
+        ${candidates.length ? `<div class="maintenance-notice">${candidates.length} bereits erkannte Ausgabe(n). Vorhandene Entwürfe oben auswählen; weitere erkannte Ausgaben lassen sich über „Neue Edition anlegen“ weiterbearbeiten. So bleibt die vorhandene Editionsidentität erhalten.</div>` : ""}
         <form data-maintenance-form novalidate>
-          ${action === "create" ? `<div class="maintenance-grid"><div class="maintenance-field"><label for="maintenance-edition-edition_year">Ausgabejahr (erforderlich)</label><input id="maintenance-edition-edition_year" data-maintenance-field="edition.edition_year" type="number" min="2000" max="2200" step="1"><label><input type="checkbox" data-maintenance-confirm="edition.edition_year"> An Quelle geprüft</label></div><div class="maintenance-field"><label for="maintenance-edition-edition_key">Ausgabekürzel bei mehreren Ausgaben pro Jahr</label><input id="maintenance-edition-edition_key" data-maintenance-field="edition.edition_key" value="main" maxlength="48"><small>Für eine weitere Ausgabe z. B. „herbst“ statt „main“. Jahr und Kürzel identifizieren diese Ausgabe.</small></div></div>${candidates.some(row => !row.draft_edition_id) ? `<label>Bereits erkannte Ausgabe weiterbearbeiten<select data-maintenance-candidate><option value="">Neue, noch nicht erkannte Ausgabe</option>${candidates.filter(row => !row.draft_edition_id).map(row => `<option value="${escape(row.id)}">${escape(`${row.candidate_year} · ${row.candidate_start_date || "Termin offen"}`)}</option>`).join("")}</select></label><p class="maintenance-help">Bei Auswahl werden nur die bereits beobachteten Kandidatenangaben als ungeprüfte Vorlage eingesetzt.</p>` : ""}` : `<p class="maintenance-help">Ausgabejahr: ${escape(edition.edition_year)}. Eine Korrektur erhält die bestehende Ausgabe und ihre Saisonplaner- und Ergebnisverknüpfungen.</p><label class="maintenance-check"><input type="checkbox" data-maintenance-confirm="edition.edition_year"> Ausgabejahr ${escape(edition.edition_year)} an Quelle geprüft</label>`}
-          <p class="maintenance-help">Name, Ort, Sport und die optionalen Veranstalterangaben gehören zur gemeinsamen Veranstaltung und gelten für alle Ausgaben. Ein Häkchen bestätigt nur das jeweilige Feld anhand deiner Quelle.</p>
+          ${action === "create" ? `<div class="maintenance-grid"><div class="maintenance-field"><label for="maintenance-edition-edition_year">Ausgabejahr (erforderlich)</label><input id="maintenance-edition-edition_year" data-maintenance-field="edition.edition_year" type="number" min="2000" max="2200" step="1"></div><div class="maintenance-field"><label for="maintenance-edition-edition_key">Ausgabekürzel bei mehreren Ausgaben pro Jahr</label><input id="maintenance-edition-edition_key" data-maintenance-field="edition.edition_key" value="main" maxlength="48"><small>Für eine weitere Ausgabe z. B. „herbst“ statt „main“. Jahr und Kürzel identifizieren diese Ausgabe.</small></div></div>${candidates.some(row => !row.draft_edition_id) ? `<label>Bereits erkannte Ausgabe weiterbearbeiten<select data-maintenance-candidate><option value="">Neue, noch nicht erkannte Ausgabe</option>${candidates.filter(row => !row.draft_edition_id).map(row => `<option value="${escape(row.id)}">${escape(`${row.candidate_year} · ${row.candidate_start_date || "Termin offen"}`)}</option>`).join("")}</select></label><p class="maintenance-help">Bei Auswahl werden nur die bereits beobachteten Kandidatenangaben als ungeprüfte Vorlage eingesetzt.</p>` : ""}` : `<p class="maintenance-help">Ausgabejahr: ${escape(edition.edition_year)}. Eine Korrektur erhält die bestehende Ausgabe und ihre Saisonplaner- und Ergebnisverknüpfungen.</p>`}
+          <p class="maintenance-help">Name, Ort, Sport und die optionalen Veranstalterangaben gehören zur gemeinsamen Veranstaltung und gelten für alle Ausgaben. Die gemeinsame Bestätigung gibt nur deine tatsächlichen Änderungen frei; sie bestätigt keine neue externe Quellenprüfung.</p>
           <div class="maintenance-grid">${FIELDS.filter(row => !row[3]).map(field).join("")}</div>
-          <fieldset class="maintenance-formats"><legend>Wettbewerbe / Distanzen</legend><p class="maintenance-help">Je Wettbewerb eine Zeile: Bezeichnung und Kilometer getrennt eintragen. Die öffentliche Seite sortiert nach Distanz; verschiedene Wettbewerbe mit derselben Distanz bleiben getrennt. Weitere vorhandene Wettbewerbsdetails bleiben erhalten. Unbekannte Distanzen dürfen leer bleiben.</p><div data-maintenance-formats></div><button type="button" data-maintenance-add-format>Wettbewerb hinzufügen</button><label class="maintenance-check"><input type="checkbox" data-maintenance-confirm="edition.race_formats"> Alle aufgeführten Wettbewerbe an Quelle geprüft</label></fieldset>
+          <fieldset class="maintenance-formats"><legend>Wettbewerbe / Distanzen</legend><p class="maintenance-help">Je Wettbewerb eine Zeile: Bezeichnung und Kilometer getrennt eintragen. Die öffentliche Seite sortiert nach Distanz; verschiedene Wettbewerbe mit derselben Distanz bleiben getrennt. Weitere vorhandene Wettbewerbsdetails bleiben erhalten. Unbekannte Distanzen dürfen leer bleiben.</p><div data-maintenance-formats></div><button type="button" data-maintenance-add-format>Wettbewerb hinzufügen</button></fieldset>
           <details class="admin-secondary-details"><summary>Optionale Details und Veranstalterangaben</summary><div class="maintenance-grid">${FIELDS.filter(row => row[3]).map(field).join("")}</div></details>
           <div data-maintenance-knowledge></div>
-          <fieldset class="maintenance-evidence"><legend>Quelle und Prüfnotiz</legend><label>Persönlich geprüfte Quellen-URL<input data-maintenance-source type="url" value="${escape(sourceUrl)}" placeholder="https://…"></label><a data-maintenance-open-source class="maintenance-source" target="_blank" rel="noopener noreferrer" ${safeUrl(sourceUrl) ? `href="${escape(safeUrl(sourceUrl))}"` : "hidden"}>Offizielle Quelle öffnen ↗</a><label>Prüfergebnis<select data-maintenance-source-result><option value="confirmed">Angaben auf der Quelle geprüft</option><option value="no_new_edition">Noch keine neue Ausgabe angekündigt</option><option value="unreachable">Quelle nicht erreichbar</option></select></label><label>Prüfnotiz<textarea data-maintenance-notes rows="3" placeholder="Was steht auf der offiziellen Seite? Bei Bestätigung den relevanten Beleg notieren." minlength="12" maxlength="1000"></textarea></label><p class="maintenance-help">Nur markierte Felder werden verifiziert und vor automatischem Überschreiben geschützt. Eine nicht erreichbare Quelle bestätigt keine Angaben. Normales Speichern erneuert nicht die Frische des gesamten Datensatzes.</p></fieldset>
-          ${action !== "create" && edition.publication_status === "draft" ? `<div class="maintenance-notice"><label class="maintenance-check"><input type="checkbox" data-maintenance-publish> Nach vollständiger Prüfung zur Veröffentlichung freigeben</label><p>Erfordert die bewusste Quellenprüfung aller 14 Kernangaben: Name, Ausgabejahr, Datum, Ort, Land, Adresse, beide Koordinaten, Sport, Wettbewerbe, Beschreibung, Anmeldestatus, offizielle Ausgabeseite und Anmeldelink. Fehlende Belege blockieren die Freigabe; der Entwurf bleibt gespeichert.</p></div>` : ""}
-          <div class="maintenance-actions"><button type="submit" data-maintenance-preview>Änderungen prüfen</button><button type="button" data-maintenance-reload>Aktuellen Stand laden</button></div>
+          <fieldset class="maintenance-evidence"><legend>Änderungsnotiz (optional)</legend><a data-maintenance-open-source class="maintenance-source" target="_blank" rel="noopener noreferrer" ${safeUrl(sourceUrl) ? `href="${escape(safeUrl(sourceUrl))}"` : "hidden"}>Vorhandene offizielle Quelle öffnen ↗</a><label>Notiz<textarea data-maintenance-notes rows="2" maxlength="1000" placeholder="Optional: Warum wird die Angabe korrigiert?"></textarea></label><p class="maintenance-help">Die Änderung wird mit deinem Admin-Konto, Zeitpunkt sowie alten und neuen Werten protokolliert. Quellenprüfzeitpunkte werden dadurch nicht erneuert.</p></fieldset>
+          <div class="maintenance-actions"><button type="submit" data-maintenance-preview>Änderungen speichern</button><button type="button" data-maintenance-reload>Aktuellen Stand laden</button></div>
         </form><div data-maintenance-reviews>${reviewItems()}</div>`;
       renderFormats();
       renderKnowledge();
+      editorBaseline = editorFingerprint();
     }
 
     async function loadEvent(eventId, editionId) {
-      const sequence = ++selectionSequence;
+      if (busy || unresolved) return;
+      resetEditor(); const sequence = selectionSequence;
+      ++searchSequence;
+      $("[data-maintenance-results]").innerHTML = "";
+      $("[data-maintenance-close]").hidden = false;
       status("Event und Ausgaben werden geladen …");
       try {
         const loaded = assertContext(await rpc(client, "admin_manual_event_context", { p_event_id: eventId }), eventId);
@@ -525,54 +612,50 @@
         context = loaded;
         selectedId = loaded.editions.some(row => row.id === editionId) ? editionId : loaded.editions[0]?.id;
         action = loaded.editions.length ? "correct" : "create"; knowledgeScope = "edition"; lastReceipt = null; lastKnowledgeRequest = null; $("[data-maintenance-publication]").innerHTML = "";
-        renderEditor(); status("Datenbankstand geladen. Nur ausdrücklich geprüfte Angaben markieren.");
-      } catch (error) { status(error.message || "Event konnte nicht geladen werden.", true); }
+        renderEditor(); status("Datenbankstand geladen. Angaben bearbeiten und Änderungen speichern.");
+      } catch (error) { if (sequence === selectionSequence) status(error.message || "Event konnte nicht geladen werden.", true); }
     }
 
     function collectRequest() {
-      if (formatConflict) throw new Error("Die Wettbewerbe wurden zwischenzeitlich geändert. Bitte zuerst den aktuellen Formularstand übernehmen und die Wettbewerbe erneut bearbeiten.");
-      const before = values();
-      const edited = { event: {}, edition: {} };
+      if (formatConflict) throw new Error("Die Wettbewerbe wurden zwischenzeitlich geändert. Bitte zuerst den aktuellen Formularstand übernehmen und erneut bearbeiten.");
+      const before = values(), edited = { event: {}, edition: {} };
       root.querySelectorAll("[data-maintenance-field]").forEach(input => {
         const [scope, key] = input.dataset.maintenanceField.split(".");
         edited[scope][key] = input.value === "" ? "" : input.type === "number" ? Number(input.value) : input.value.trim();
+        if (input.type === "url" && input.value && !safeUrl(input.value)) throw new Error("Bitte eine gültige http://- oder https://-Adresse eingeben.");
       });
       const clear = [...root.querySelectorAll("[data-maintenance-clear]:checked")].map(input => input.dataset.maintenanceClear);
-      const cleared = scope => clear.filter(path => path.startsWith(`${scope}.`)).map(path => path.split(".")[1]);
-      const touchedFor = scope => [...touched].filter(path => path.startsWith(`${scope}.`)).map(path => path.split(".")[1]);
+      const required = new Set(["canonical_name", "sport", "city", "country", "registration_status", "edition_status"]);
+      for (const path of touched) {
+        const [scope, key] = path.split(".");
+        if (edited[scope]?.[key] !== "") continue;
+        if (required.has(key)) throw new Error((LABELS[path] || key) + " darf nicht leer sein.");
+        if (before[scope]?.[key] != null && before[scope][key] !== "" && !clear.includes(path)) clear.push(path);
+      }
+      const cleared = scope => clear.filter(path => path.startsWith(scope + ".")).map(path => path.split(".")[1]);
+      const touchedFor = scope => [...touched].filter(path => path.startsWith(scope + ".")).map(path => path.split(".")[1]);
       const eventPatch = buildPatch(before.event, edited.event, touchedFor("event"), cleared("event"), EVENT_FIELDS);
       const editionPatch = buildPatch(before.edition, edited.edition, touchedFor("edition"), cleared("edition"), EDITION_FIELDS);
-      if (editionPatch.start_date && before.edition.end_date && before.edition.end_date === before.edition.start_date && !touched.has("edition.end_date") && !clear.includes("edition.end_date")) editionPatch.end_date = editionPatch.start_date;
+      if (editionPatch.start_date && before.edition.end_date === before.edition.start_date && !touched.has("edition.end_date") && !clear.includes("edition.end_date")) editionPatch.end_date = editionPatch.start_date;
       const nextStart = editionPatch.start_date || before.edition.start_date;
       const nextEnd = clear.includes("edition.end_date") ? null : editionPatch.end_date || before.edition.end_date;
       if (nextStart && nextEnd && nextEnd < nextStart) {
         root.querySelector("[data-maintenance-field='edition.end_date']").closest("details").open = true;
-        throw new Error("Das Enddatum liegt vor dem neuen Termin. Bitte das Enddatum in den optionalen Details ebenfalls prüfen und korrigieren.");
+        throw new Error("Das Enddatum liegt vor dem neuen Termin. Bitte das Enddatum ebenfalls korrigieren.");
       }
       if (action === "create") {
-        const year = edited.edition.edition_year;
-        if (!Number.isInteger(year) || year < 2000 || year > 2200) throw new Error("Bitte das belegte Ausgabejahr eingeben. Das Datum darf für einen Entwurf unbekannt bleiben.");
+        const year = edited.edition.edition_year || Number(nextStart?.slice(0, 4));
+        if (!Number.isInteger(year) || year < 2000 || year > 2200) throw new Error("Bitte das Ausgabejahr oder ein gültiges Datum eingeben.");
         Object.assign(editionPatch, { edition_year: year, edition_key: edited.edition.edition_key || "main" });
-        if (Object.keys(eventPatch).length || clear.some(path => path.startsWith("event."))) throw new Error("Neue Ausgaben übernehmen nur die Stammdaten. Bitte gemeinsame Angaben separat an einer bestehenden Ausgabe korrigieren.");
+        if (Object.keys(eventPatch).length || clear.some(path => path.startsWith("event."))) throw new Error("Die neue Edition verwendet die gemeinsamen Stammdaten. Gemeinsame Angaben bitte an der bestehenden Edition korrigieren.");
       }
       if (formatsDirty) {
-        const rows = [...root.querySelectorAll("[data-maintenance-format]")].map(row => ({ index: Number(row.dataset.maintenanceFormat), label: row.querySelector("[data-format-label]").value, distance_km: row.querySelector("[data-format-distance]").value, clear_distance: row.querySelector("[data-format-clear-distance]")?.checked, removed: row.querySelector("[data-format-remove]").checked, ...Object.fromEntries(FORMAT_DETAILS.flatMap(([key]) => [[key, row.querySelector(`[data-format-detail="${key}"]`).value], [`clear_${key}`, Boolean(row.querySelector(`[data-format-clear="${key}"]`)?.checked)]])) }));
+        const rows = [...root.querySelectorAll("[data-maintenance-format]")].map(row => ({ index: Number(row.dataset.maintenanceFormat), label: row.querySelector("[data-format-label]").value, distance_km: row.querySelector("[data-format-distance]").value, clear_distance: row.querySelector("[data-format-clear-distance]")?.checked, removed: row.querySelector("[data-format-remove]").checked, ...Object.fromEntries(FORMAT_DETAILS.flatMap(([key]) => [[key, row.querySelector('[data-format-detail="' + key + '"]').value], ["clear_" + key, Boolean(row.querySelector('[data-format-clear="' + key + '"]')?.checked)]])) }));
         editionPatch.race_formats = mergeRaceFormats(before.edition.race_formats || [], rows, rows.filter(row => row.removed).map(row => row.index));
       }
-      if (action === "confirm" && (Object.keys(eventPatch).length || Object.keys(editionPatch).length || clear.length)) throw new Error("Für geänderte Angaben bitte „Bestehende Ausgabe korrigieren“ wählen. Deine Eingaben bleiben erhalten.");
-      const confirmations = [...root.querySelectorAll("[data-maintenance-confirm]:checked")].map(input => input.dataset.maintenanceConfirm);
-      const sourceUrl = $("[data-maintenance-source]").value.trim();
-      const knowledge = collectKnowledge(sourceUrl);
-      const sourceResult = $("[data-maintenance-source-result]").value;
-      if (sourceResult !== "confirmed" && (confirmations.length || knowledge?.confirmations.length)) throw new Error("Bei einer unerreichbaren Quelle oder noch nicht angekündigten Ausgabe dürfen keine Felder bestätigt werden. Bitte die Häkchen entfernen.");
-      if (action === "confirm" && knowledge && (Object.keys(knowledge.patch).length || knowledge.clear_fields.length || knowledge.faq_upserts.length || knowledge.faq_remove.length)) throw new Error("Für geänderte Zusatzangaben bitte „Bestehende Ausgabe korrigieren“ wählen. Deine Eingaben bleiben erhalten.");
-      if (sourceResult === "confirmed" && !confirmations.length && !knowledge && !Object.keys(eventPatch).length && !Object.keys(editionPatch).length && !clear.length) throw new Error("Bitte mindestens ein geprüftes Feld markieren oder eine Angabe ändern.");
-      if (!safeUrl(sourceUrl)) throw new Error("Bitte eine vollständige offizielle Quellen-URL mit https:// oder http:// eingeben.");
-      const notes = $("[data-maintenance-notes]").value.trim();
-      if (notes.length < 12) throw new Error("Bitte eine verständliche Prüfnotiz mit mindestens 12 Zeichen ergänzen.");
-      const publish = Boolean($("[data-maintenance-publish]")?.checked);
-      if (publish && REQUIRED_CHECKS.some(path => !confirmations.includes(path))) throw new Error("Vor der Veröffentlichung bitte alle 14 Kernangaben ausdrücklich an der Quelle prüfen. Ohne vollständige Prüfung kannst du den Entwurf speichern, indem du die Freigabe abwählst.");
-      const request = { request_id: globalThis.crypto.randomUUID(), action, event_id: context.event.id, edition_id: selectedId, expected_version: context.version, event_patch: eventPatch, edition_patch: editionPatch, clear_fields: clear, confirmations, source_url: sourceUrl, source_result: sourceResult, notes, publish };
+      const knowledge = collectKnowledge("");
+      if (!knowledge && !Object.keys(eventPatch).length && !Object.keys(editionPatch).length && !clear.length) throw new Error("Es gibt noch keine geänderten Angaben.");
+      const request = { request_id: globalThis.crypto.randomUUID(), action, manual_approval: true, event_id: context.event.id, edition_id: selectedId, expected_version: context.version, event_patch: eventPatch, edition_patch: editionPatch, clear_fields: clear, confirmations: [], notes: $("[data-maintenance-notes]")?.value.trim() || "", publish: true };
       if (knowledge) request.knowledge = knowledge;
       if ($("[data-maintenance-candidate]")?.value) request.candidate_id = $("[data-maintenance-candidate]").value;
       return request;
@@ -581,25 +664,54 @@
     function preview() {
       try {
         if (!$("[data-maintenance-form]").reportValidity()) return;
-        pending = collectRequest();
-        $("[data-maintenance-preview-box]")?.remove();
-        const before = values();
-        const changes = [];
-        for (const scope of ["event", "edition"]) for (const [key, value] of Object.entries(pending[`${scope}_patch`])) changes.push([`${scope}.${key}`, before[scope][key], value]);
-        for (const path of pending.clear_fields) { const [scope, key] = path.split("."); changes.push([path, before[scope][key], null]); }
-        const box = document.createElement("section"); box.dataset.maintenancePreviewBox = ""; box.className = "maintenance-preview"; box.tabIndex = -1;
-        box.innerHTML = `<h4>Vor dem Speichern prüfen</h4><p>${action === "create" ? "Es entsteht eine neue private Ausgabe. Die alte Ausgabe bleibt unverändert." : "Die ausgewählte bestehende Ausgabe wird bearbeitet."}</p>${changes.length ? `<ul>${changes.map(([path, oldValue, next]) => `<li><strong>${escape(LABELS[path] || path)}</strong><div>Bisher: ${escape(display(oldValue))}</div><div>${next === null ? "Bewusst entfernen" : `Neu: ${escape(display(next))}`}</div></li>`).join("")}</ul>` : "<p>Keine Faktenänderungen.</p>"}<p><strong>Gezielt bestätigen:</strong> ${escape(pending.confirmations.map(path => LABELS[path] || path).join(", ") || "Keine Felder")}</p><p><strong>Quelle:</strong> ${escape(pending.source_url)}</p><p><strong>Prüfergebnis:</strong> ${escape($("[data-maintenance-source-result]").selectedOptions[0].textContent)}</p><p>${escape(pending.notes)}</p><p>${pending.publish ? "Ausdrücklich gewünscht: nach erfolgreicher vollständiger Prüfung veröffentlichen." : "Keine neue Veröffentlichung angefordert."} Speichern und öffentliche Veröffentlichung werden getrennt geprüft.</p><button type="button" data-maintenance-save>Verbindlich speichern</button><button type="button" data-maintenance-back>Weiter bearbeiten</button>`;
-        $("[data-maintenance-form]").appendChild(box); box.focus(); status("Änderungsübersicht bereit. Noch nichts gespeichert.");
-        if (pending.knowledge) {
-          const knowledge = pending.knowledge, record = currentKnowledge(), entries = [];
-          for (const [section, fields] of Object.entries(knowledge.patch)) for (const [key, value] of Object.entries(fields)) entries.push([`${section}.${key}`, knowledgeValue(record, `${section}.${key}`), value]);
-          for (const path of knowledge.clear_fields) entries.push([path, knowledgeValue(record, path), null]);
-          for (const row of knowledge.faq_upserts) entries.push([`faq.${row.id}`, knowledgeValue(record, `faq.${row.id}`), row]);
-          for (const id of knowledge.faq_remove) entries.push([`faq.${id}`, knowledgeValue(record, `faq.${id}`), null]);
-          const detail = document.createElement("div"); detail.className = "maintenance-notice";
-          detail.innerHTML = `<h4>Zusatzdetails: ${knowledge.scope === "brand" ? "allgemeines Event-Wiki – alle Ausgaben" : "nur die gewählte Ausgabe"}</h4>${entries.length ? `<ul>${entries.map(([path, old, value]) => `<li><strong>${escape(knowledgeLabel(path))}</strong><div>Bisher: ${escape(displayKnowledge(old))}</div><div>${value === null ? "Bewusst entfernen" : `Neu: ${escape(displayKnowledge(value))}`}</div></li>`).join("")}</ul>` : "<p>Keine Änderung der Zusatzangaben.</p>"}<p><strong>Gezielt bestätigen:</strong> ${escape(knowledge.confirmations.map(row => knowledgeLabel(row.field)).join(", ") || "Keine Zusatzangaben")}</p><p>Unbestätigte Zusatzangaben werden gespeichert und öffentlich ausgeblendet. Sie erhöhen nicht die Frische der gesamten Ausgabe.</p>`;
-          box.querySelector("[data-maintenance-save]").before(detail);
-        }
+        const originalRequest = collectRequest(), before = values();
+        const newFaqIds = new Map((originalRequest.knowledge?.faq_upserts || []).map(row => [row.id, globalThis.crypto.randomUUID()]));
+        invalidate(); pending = originalRequest;
+        const dialog = document.createElement("dialog");
+        dialog.dataset.maintenancePreviewBox = "";
+        dialog.className = "content-verification-dialog maintenance-preview";
+        dialog.setAttribute("aria-labelledby", "maintenanceConfirmTitle");
+        const year = Number((originalRequest.edition_patch.start_date || "").slice(0, 4));
+        const yearChange = action !== "create" && year && year !== selected()?.edition_year;
+        dialog.innerHTML = '<h4 id="maintenanceConfirmTitle">Änderungen übernehmen?</h4><p><strong>' + escape(context.event.canonical_name || context.event.event_name) + '</strong> · <span data-maintenance-dialog-edition></span></p>' + (yearChange ? '<fieldset><legend>Der Termin liegt in einem anderen Kalenderjahr.</legend><label><input type="radio" name="maintenanceYearChoice" data-maintenance-year-choice value="current" checked> Bestehende Edition korrigieren</label><label><input type="radio" name="maintenanceYearChoice" data-maintenance-year-choice value="create"> Neue Edition anlegen</label><label data-maintenance-key-label hidden>Ausgabekürzel<input data-maintenance-new-key value="main" maxlength="48"></label><p>Eine Verschiebung kann dieselbe Edition betreffen. Die Auswahl bestimmt, welche Edition gespeichert wird.</p></fieldset>' : '') + '<div data-maintenance-dialog-changes></div><p>Die Bestätigung gibt nur diese Änderungen manuell frei. Sie bestätigt keine frische Prüfung externer Quellen. Die Anwendung übernimmt zulässige Änderungen automatisch in die öffentlichen Ansichten.</p><p data-maintenance-dialog-error role="alert"></p><div class="maintenance-actions"><button type="button" data-maintenance-save>Übernehmen und speichern</button><button type="button" data-maintenance-back>Abbrechen</button></div>';
+        const update = () => {
+          const create = action === "create" || dialog.querySelector('[data-maintenance-year-choice]:checked')?.value === "create";
+          pending = clone(originalRequest);
+          if (create && action !== "create") {
+            Object.assign(pending, { action: "create", clear_fields: originalRequest.clear_fields.filter(path => path.startsWith("event.")), edition_patch: { ...seedNextEdition(), ...originalRequest.edition_patch, edition_year: year, edition_key: dialog.querySelector("[data-maintenance-new-key]").value.trim() || "main" } });
+            if (pending.knowledge?.scope === "edition") {
+              // Only explicit edits enter the new edition. Old FAQ identities,
+              // deletions and unedited annual knowledge belong to the old one.
+              pending.knowledge.clear_fields = [];
+              pending.knowledge.faq_remove = [];
+              pending.knowledge.faq_upserts = pending.knowledge.faq_upserts.map(row => ({ ...row, id: newFaqIds.get(row.id) }));
+              if (!Object.keys(pending.knowledge.patch).length && !pending.knowledge.faq_upserts.length) delete pending.knowledge;
+            }
+          }
+          dialog.querySelector("[data-maintenance-key-label]")?.toggleAttribute("hidden", !create);
+          dialog.querySelector("[data-maintenance-dialog-edition]").textContent = create ? "Neue Edition " + pending.edition_patch.edition_year : "Bestehende Edition " + selected().edition_year + " bleibt erhalten";
+          const target = create && context.editions.find(row => row.edition_year === pending.edition_patch.edition_year && (row.edition_key || "main") === (pending.edition_patch.edition_key || "main"));
+          dialog.querySelector("[data-maintenance-save]").disabled = Boolean(target);
+          dialog.querySelector("[data-maintenance-dialog-error]").textContent = target ? "Diese Zielausgabe existiert bereits. Abbrechen und die vorhandene Ausgabe auswählen; für eine tatsächlich andere Austragung ein eigenes Kürzel verwenden." : "";
+          const changes = [];
+          for (const scope of ["event", "edition"]) for (const [key, value] of Object.entries(pending[scope + "_patch"])) changes.push([scope + "." + key, create && scope === "edition" ? null : before[scope][key], value]);
+          for (const field of pending.clear_fields) { const [scope, key] = field.split("."); changes.push([field, before[scope][key], null]); }
+          let html = '<p>' + (create ? "Eine neue Editionsidentität entsteht. Die alte Edition und persönliche Ergebnisse bleiben unverändert. Unbearbeitete Jahresangaben und alte Prüfnachweise werden nicht übernommen." : "Die Editionsidentität sowie persönliche Planner- und Ergebnisverknüpfungen bleiben unverändert.") + '</p><ul>' + changes.map(([field, old, value]) => '<li><strong>' + escape(LABELS[field] || field) + '</strong><div>Bisher: ' + escape(display(old)) + '</div><div>Neu: ' + escape(display(value)) + '</div></li>').join("") + '</ul>';
+          if (pending.knowledge) {
+            const record = currentKnowledge(), knowledge = pending.knowledge, entries = [];
+            for (const [section, fields] of Object.entries(knowledge.patch || {})) for (const [key, value] of Object.entries(fields)) entries.push([section + "." + key, value]);
+            for (const field of knowledge.clear_fields || []) entries.push([field, null]);
+            for (const row of knowledge.faq_upserts || []) entries.push(["faq." + row.id, row]);
+            for (const id of knowledge.faq_remove || []) entries.push(["faq." + id, null]);
+            html += '<h4>Zusatzdetails: ' + (knowledge.scope === "brand" ? "alle Ausgaben" : "diese Edition") + '</h4><ul>' + entries.map(([field, value]) => '<li><strong>' + escape(knowledgeLabel(field)) + '</strong><div>Bisher: ' + escape(displayKnowledge(create && knowledge.scope === "edition" ? null : knowledgeValue(record, field))) + '</div><div>Neu: ' + escape(displayKnowledge(value)) + '</div></li>').join("") + '</ul>';
+          }
+          dialog.querySelector("[data-maintenance-dialog-changes]").innerHTML = html;
+        };
+        dialog.addEventListener("change", () => { try { update(); } catch (error) { dialog.querySelector("[data-maintenance-dialog-error]").textContent = error.message; dialog.querySelector("[data-maintenance-save]").disabled = true; } });
+        dialog.querySelector("[data-maintenance-new-key]")?.addEventListener("input", update);
+        dialog.addEventListener("cancel", event => { if (busy) { event.preventDefault(); return; } invalidate(); });
+        root.appendChild(dialog); update(); dialog.showModal(); dialog.querySelector("[data-maintenance-back]").focus();
+        status("Änderungsübersicht bereit. Noch nichts gespeichert.");
       } catch (error) { status(error.message, true); }
     }
 
@@ -610,6 +722,11 @@
       const receipt = lastReceipt;
       const expectedId = selectedId, expectedVersion = context.version;
       const current = () => selectedId === expectedId && context?.version === expectedVersion && lastReceipt === receipt;
+      // Online readback and the separately gated fallback release are different
+      // outcomes. Only a server-confirmed requirement may label the latter.
+      const fallbackNotice = edition.publication_status === "published" && receipt.publication?.static_refresh_required === true
+        ? "<p><strong>Ausfallexport: Veröffentlichung erforderlich.</strong> Der gespeicherte Stand muss nach bestandenen Qualitätsprüfungen über den regulären Datenrelease in die Ausfalldaten übernommen werden. Eine erfolgreiche Onlineprüfung bestätigt diesen Schritt nicht.</p>"
+        : "";
       output.innerHTML = `<p>Veröffentlichungsstand wird geprüft …</p>`;
       try {
         const result = verifyPublication ? await verifyPublication({ event: context.event, edition }) : { status: edition.publication_status === "draft" ? "draft" : "pending" };
@@ -625,26 +742,30 @@
         }
         if (!current()) return;
         const websiteVerified = result.archiveVerified && detail.detailVerified && (!result.discoveryPresent && !result.discoveryVerified || result.discoveryVerified && catalog.refreshed);
-        const liveText = failed ? `Entwurf gespeichert; Veröffentlichung fehlgeschlagen: ${friendlyReviewReason(receipt.publication.error)} Bitte die fehlenden Belege ergänzen und erneut bewusst freigeben.` : result.status === "draft" ? "Privater Entwurf gespeichert. Für die Veröffentlichung alle 14 Kernangaben prüfen und die Freigabe im Formular ausdrücklich auswählen." : websiteVerified ? `Öffentlich aktualisiert: Normale Detailseite geprüft.${result.discoveryVerified ? " Karte und Liste sind mit den gespeicherten Angaben neu geladen." : " Diese Ausgabe ist im Archiv sichtbar; sie ist nicht die nächste Ausgabe in Karte und Liste."}` : "Datenbank gespeichert; die öffentliche Änderung ist noch nicht vollständig verifiziert.";
-        output.innerHTML = `<div class="maintenance-notice${failed ? " is-error" : ""}"><strong>${escape(liveText)}</strong>${result.archiveVerified && !websiteVerified ? `<p>Öffentlicher Katalog: geprüft. Detailseite: ${detail.detailVerified ? "geprüft" : "noch nicht bestätigt"}. Karte und Liste: ${catalog.refreshed ? "neu geladen" : "noch nicht bestätigt"}. Erneut prüfen; die Speicherung bleibt erhalten.</p>` : ""}<p>Die Online-Ansichten laden aktuelle Daten direkt. Bei einem Datenbankausfall kann ein älterer, entsprechend gekennzeichneter Export erscheinen; dessen Stand wird durch diese Prüfung nicht erneuert.</p>${detail.detailUrl ? `<a href="${escape(detail.detailUrl)}" target="_blank" rel="noopener noreferrer">Öffentliche Detailseite öffnen ↗</a>` : ""}<button type="button" data-maintenance-check-publication>Öffentlichen Stand erneut prüfen</button></div>`;
+        const liveText = failed ? `Entwurf gespeichert; öffentliche Übernahme fehlgeschlagen: ${friendlyReviewReason(receipt.publication.error)} Die Änderungen bleiben erhalten.` : result.status === "draft" ? `Privater Entwurf gespeichert; öffentliche Übernahme ausstehend. ${receipt.publication?.error ? friendlyReviewReason(receipt.publication.error) : "Für die öffentliche Anzeige fehlen noch zulässige Pflichtangaben oder eine Konfliktklärung."} Nach der Korrektur erneut „Änderungen speichern“ wählen; die Übernahme erfolgt automatisch.` : websiteVerified ? `Öffentlich aktualisiert: Normale Detailseite geprüft.${result.discoveryVerified ? " Karte und Liste sind mit den gespeicherten Angaben neu geladen." : " Diese Ausgabe ist im Archiv sichtbar; sie ist nicht die nächste Ausgabe in Karte und Liste."}` : "Datenbank gespeichert; die öffentliche Übernahme ist noch nicht bestätigt.";
+        output.innerHTML = `<div class="maintenance-notice${failed ? " is-error" : ""}"><strong>${escape(liveText)}</strong>${result.archiveVerified && !websiteVerified ? `<p>Öffentlicher Katalog: geprüft. Detailseite: ${detail.detailVerified ? "geprüft" : "noch nicht bestätigt"}. Karte und Liste: ${catalog.refreshed ? "neu geladen" : "noch nicht bestätigt"}. Erneut prüfen; die Speicherung bleibt erhalten.</p>` : ""}${fallbackNotice}<p>Die Online-Ansichten laden aktuelle Daten direkt. Bei einem Datenbankausfall kann ein älterer, entsprechend gekennzeichneter Export erscheinen; dessen Stand wird durch diese Prüfung nicht erneuert.</p>${detail.detailUrl ? `<a href="${escape(detail.detailUrl)}" target="_blank" rel="noopener noreferrer">Öffentliche Detailseite öffnen ↗</a>` : ""}<button type="button" data-maintenance-check-publication>Öffentlichen Stand erneut prüfen</button></div>`;
       } catch (error) {
         if (!current()) return;
-        output.innerHTML = `<div class="maintenance-notice is-error"><strong>${escape(error.message)}</strong><p>Die Speicherung ist erhalten; Veröffentlichung konnte nicht geprüft werden.</p><button type="button" data-maintenance-check-publication>Veröffentlichung erneut prüfen</button></div>`;
+        output.innerHTML = `<div class="maintenance-notice is-error"><strong>${escape(error.message)}</strong><p>Die Speicherung ist erhalten; Veröffentlichung konnte nicht geprüft werden.</p>${fallbackNotice}<button type="button" data-maintenance-check-publication>Veröffentlichung erneut prüfen</button></div>`;
       }
     }
 
     async function save() {
       if (busy || !pending) return;
       const request = pending; setBusy(true); status("Wird atomar gespeichert und erneut aus der Datenbank geladen …");
+      lastReceipt = null; lastKnowledgeRequest = null;
+      $("[data-maintenance-publication]").textContent = "";
       try {
         const result = await saveWithRecovery(client, request, { onRecovery: () => status("Antwort unklar. Derselbe Speichervorgang wird ohne Duplikat erneut abgefragt …") });
-        unresolved = false; context = result.context; selectedId = result.edition_id; action = "correct"; lastReceipt = result; lastKnowledgeRequest = request.knowledge || null;
-        renderEditor(); setBusy(true); status(`In der Datenbank gespeichert und neu geladen. ${request.action === "review" ? "Entscheidung protokolliert. Für einen vollständigen Frischenachweis die Kernangaben gezielt prüfen und speichern." : result.freshness?.verified ? "Vollständige Frischeprüfung bestätigt." : `Nur ausdrücklich ausgewählte Felder wurden geprüft; keine pauschale Frischebestätigung.${result.freshness?.reason ? ` ${friendlyReviewReason(result.freshness.reason)}` : ""}`}`);
+        unresolved = false; context = result.context; selectedId = result.edition_id; action = "correct"; lastReceipt = result; lastKnowledgeRequest = request.knowledge ? { ...request.knowledge, manual_approval: request.manual_approval === true } : null;
+        invalidate(); renderEditor(); setBusy(true); status(`In der Datenbank gespeichert und neu geladen. ${request.action === "review" ? "Entscheidung protokolliert." : "Die bestätigten Änderungen wurden manuell freigegeben; Quellenprüfzeitpunkte bleiben getrennt."}`);
         await checkPublication();
       } catch (error) {
         unresolved = Boolean(error.uncertain);
+        const dialogError = $("[data-maintenance-dialog-error]"); if (dialogError) dialogError.textContent = error.message || "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten.";
         const conflict = ["40001", "PT409"].includes(error.code) || /version|conflict|concurrent|zwischenzeit|verändert/i.test(error.message || "");
-        status(unresolved ? "Der Speicherstand ist noch unklar. Deine Eingaben bleiben erhalten. Bitte „Verbindlich speichern“ erneut wählen: Derselbe Auftrag wird sicher wiederholt, bevor du weiterbearbeitest." : conflict ? "Zwischenzeitlich wurden diese Daten geändert. Deine Eingaben bleiben erhalten. Lade den aktuellen Stand zum Vergleich und prüfe deine Änderungen erneut." : (error.message || "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten. Derselbe Speichervorgang kann erneut geprüft werden."), true);
+        if (!unresolved) invalidate();
+        status(unresolved ? "Der Speicherstand ist noch unklar. Deine Eingaben bleiben erhalten. Bitte „Übernehmen und speichern“ erneut wählen: Derselbe Auftrag wird sicher wiederholt, bevor du weiterbearbeitest." : conflict ? "Zwischenzeitlich wurden diese Daten geändert. Deine Eingaben bleiben erhalten. Lade den aktuellen Stand zum Vergleich und prüfe deine Änderungen erneut." : (error.message || "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten. Derselbe Speichervorgang kann erneut geprüft werden."), true);
       } finally { setBusy(false); }
     }
 
@@ -656,12 +777,13 @@
       const query = $("[data-maintenance-search]").value.trim();
       if (query.length < 2) { status("Bitte mindestens zwei Buchstaben des Eventnamens eingeben.", true); return; }
       const sequence = ++searchSequence; status("Events werden gesucht …");
+      $("[data-maintenance-close]").hidden = false;
       try {
         const { data, error } = await client.from("events").select("id,canonical_name,event_name,city").ilike("canonical_name", `%${query.replace(/[%_\\]/g, "\\$&")}%`).order("canonical_name").limit(30);
         if (error) throw error; if (sequence !== searchSequence) return;
         $("[data-maintenance-results]").innerHTML = (data || []).map(row => `<button type="button" data-maintenance-event="${escape(row.id)}">${escape(row.canonical_name || row.event_name)} <small>${escape(row.city || "Ort unbekannt")}</small></button>`).join("");
         status(data?.length ? `${data.length} Treffer${data.length === 30 ? " (Suche bei Bedarf eingrenzen)" : ""}. Event auswählen.` : "Keine passenden Events gefunden.");
-      } catch (error) { status(error.message || "Suche fehlgeschlagen.", true); }
+      } catch (error) { if (sequence === searchSequence) status(error.message || "Suche fehlgeschlagen.", true); }
     });
 
     root.addEventListener("input", event => {
@@ -709,7 +831,8 @@
     });
     root.addEventListener("click", async event => {
       const button = event.target.closest("button"); if (!button || busy) return;
-      if (button.dataset.maintenanceEvent) await loadEvent(button.dataset.maintenanceEvent);
+      if (button.matches("[data-maintenance-close]")) { closeSearch(); return; }
+      if (button.dataset.maintenanceEvent && !unresolved && canLeaveSelection()) await loadEvent(button.dataset.maintenanceEvent);
       if (button.matches("[data-maintenance-review-preview]")) previewReview(button.closest("[data-maintenance-review-row]"));
       if (button.matches("[data-maintenance-save]")) await save();
       if (button.matches("[data-maintenance-back]")) invalidate();
@@ -738,11 +861,11 @@
           if (!formatsDirty && action !== "create") renderFormats();
           if (!knowledgeDirty()) renderKnowledge();
           const notice = document.createElement("div"); notice.className = "maintenance-notice";
-          notice.innerHTML = `<strong>Aktueller Datenbankstand geladen; deine bearbeiteten Eingaben bleiben im Formular.</strong>${changed.length ? `<ul>${changed.map(([path, , value]) => `<li>${escape(LABELS[path] || path)} ist jetzt: ${escape(display(value))}</li>`).join("")}</ul>` : "<p>Keine zwischenzeitlichen Faktenänderungen.</p>"}<p>${formatConflict ? "Die Wettbewerbe haben sich überlagert. Bitte den aktuellen Formularstand übernehmen und erneut bearbeiten." : "Bitte insbesondere bestätigte Felder erneut mit der Quelle vergleichen und danach „Änderungen prüfen“ wählen."}</p><button type="button" data-maintenance-reset-form>Datenbankstand übernehmen und Formulareingaben verwerfen</button>`;
+          notice.innerHTML = `<strong>Aktueller Datenbankstand geladen; deine bearbeiteten Eingaben bleiben im Formular.</strong>${changed.length ? `<ul>${changed.map(([path, , value]) => `<li>${escape(LABELS[path] || path)} ist jetzt: ${escape(display(value))}</li>`).join("")}</ul>` : "<p>Keine zwischenzeitlichen Faktenänderungen.</p>"}<p>${formatConflict ? "Die Wettbewerbe haben sich überlagert. Bitte den aktuellen Formularstand übernehmen und erneut bearbeiten." : "Bitte deine Änderungen mit dem aktuellen Datenbankstand vergleichen und danach „Änderungen speichern“ wählen."}</p><button type="button" data-maintenance-reset-form>Datenbankstand übernehmen und Formulareingaben verwerfen</button>`;
           editor.prepend(notice); root.querySelectorAll("[data-maintenance-confirm]").forEach(input => { input.checked = false; });
           root.querySelectorAll("[data-knowledge-confirm]").forEach(input => { input.checked = false; });
           if (knowledgeConflict) notice.insertAdjacentHTML("beforeend", "<p>Auch die Zusatzdetails wurden zwischenzeitlich geändert. Deine Eingaben bleiben erhalten; bitte vor dem Speichern den aktuellen Formularstand übernehmen und erneut bearbeiten.</p>");
-          status("Aktueller Stand geladen. Bitte Änderungen und Bestätigungen erneut prüfen.");
+          status("Aktueller Stand geladen. Bitte Änderungen vergleichen und erneut gemeinsam bestätigen.");
         } catch (error) { status(error.message, true); }
         finally { setBusy(false); }
       }
@@ -750,5 +873,5 @@
     return { loadEvent, getContext: () => context };
   }
 
-  return { EVENT_FIELDS, EDITION_FIELDS, REQUIRED_CHECKS, KNOWLEDGE_GROUPS, BRAND_KNOWLEDGE_GROUPS, buildKnowledgePatch, knowledgeRecord, knowledgeExpectation, compareRenderedKnowledge, displayKnowledge, buildPatch, seedNextEdition, mergeRaceFormats, assertSaveOutcome, assertContext, saveWithRecovery, publicProjection, comparePublicRow, verifyPublicEdition, verifyRenderedDetail, friendlyReviewReason, mount };
+  return { EVENT_FIELDS, EDITION_FIELDS, REQUIRED_CHECKS, KNOWLEDGE_GROUPS, BRAND_KNOWLEDGE_GROUPS, buildKnowledgePatch, knowledgeRecord, knowledgeExpectation, compareRenderedKnowledge, displayKnowledge, buildPatch, seedNextEdition, mergeRaceFormats, assertSaveOutcome, assertContext, assertPersistedChanges, saveWithRecovery, publicProjection, comparePublicRow, verifyPublicEdition, verifyRenderedDetail, friendlyReviewReason, mount };
 });

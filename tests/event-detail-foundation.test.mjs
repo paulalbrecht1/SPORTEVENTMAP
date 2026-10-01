@@ -173,7 +173,7 @@ const mapped = mapDiscoveryRow({
 assert.equal(mapped.last_checked, "2026-08-18T10:00:00Z");
 assert.equal(mapped.edition_last_verified_at, "2026-08-18T10:00:00Z");
 assert.notEqual(mapped.last_checked, "2026-08-24T11:00:00Z");
-assert.equal(mapped.data_source, "Sport Event Map verified event catalog");
+assert.equal(mapped.data_source, "Sport Event Map event catalog");
 assert.doesNotMatch(mapped.data_source, /supabase|public_event_discovery/i);
 
 const publicCatalog = fs.readFileSync(path.join(root, "data/events.csv"), "utf8");

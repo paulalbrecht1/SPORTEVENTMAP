@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20261001-ui-only-v99
+Version: 20261001-ui-only-v141
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: The manual admin review preview displays legacy crawler race formats with their original labels or numeric distances and units. Public detail renderers, styles, embedded maps, pins and Google Maps location links are unchanged. Existing static HTML changes only shared detail script and stylesheet version URLs; static facts, data exports, verification timestamps and sitemap remain unchanged. No database migration or event data export. Separate source-backed manual data corrections are documented in the browser audit.
+Includes: One-confirmation manual administration with verified persistence, safe retries, automatic public readback, FAQ correction and closing search to maintain another event. Personal Planner history, archived results, counters and existing finish badges remain bound to exact saved editions. Shared catalog quality reporting distinguishes manual approval from source verification. Required backend migrations are deployed separately. Existing static HTML changes only shared detail script and stylesheet version URLs; static facts, data exports, verification timestamps and sitemap remain unchanged. No catalog data release.

@@ -44,6 +44,7 @@ test("Past event result values persist after reload", async ({ page }) => {
   await openPlanner(page);
   await selectPlannerTab(page, "events");
 
+
   await ensureResultFormOpen(page);
   await expect(page.getByTestId("planner-field-result-finish-status")).toHaveValue("Finished");
   await expect(page.getByTestId("planner-time-result-finish-time-hours")).toHaveValue("3");

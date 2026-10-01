@@ -11,10 +11,26 @@ const root = path.resolve(
 const requestedWorkdir = process.env.SPORT_EVENT_MAP_LOCAL_SUPABASE_WORKDIR;
 const localSupabaseWorkdir = path.resolve(requestedWorkdir || root);
 const temporaryWorkdirPrefix = `${path.join(root, ".tmp-")}`;
+const acceptanceRoot = path.join(root, "exports", "manual-workflow-acceptance");
+let acceptanceProjectId = null;
+if (path.dirname(localSupabaseWorkdir) === acceptanceRoot) {
+  const suffix = path.basename(localSupabaseWorkdir).match(/^run-([a-z0-9]+)$/i)?.[1];
+  assert.ok(suffix, "Only a runner-owned acceptance directory is allowed.");
+  assert.equal(fs.realpathSync(localSupabaseWorkdir), path.join(fs.realpathSync(root), "exports", "manual-workflow-acceptance", `run-${suffix}`),
+    "Acceptance workdir must not resolve through a link outside this repository.");
+  acceptanceProjectId = `sport-event-map-acceptance-${suffix.toLowerCase()}`;
+  const metadata = JSON.parse(fs.readFileSync(path.join(localSupabaseWorkdir, "owned-stack.json"), "utf8"));
+  assert.equal(metadata.projectId, acceptanceProjectId, "Acceptance ownership metadata must match the exact workdir.");
+  assert.equal(fs.existsSync(path.join(localSupabaseWorkdir, "supabase", ".temp", "project-ref")), false,
+    "A linked cloud project is never allowed in the acceptance stack.");
+  const configuredProject = fs.readFileSync(path.join(localSupabaseWorkdir, "supabase", "config.toml"), "utf8")
+    .match(/^project_id\s*=\s*"([^"]+)"/m)?.[1];
+  assert.equal(configuredProject, acceptanceProjectId, "Acceptance config must target its own disposable stack.");
+}
 
 assert.ok(
-  localSupabaseWorkdir === root || localSupabaseWorkdir.startsWith(temporaryWorkdirPrefix),
-  "Local RLS tests only accept the repository or an isolated .tmp-* workdir."
+  localSupabaseWorkdir === root || localSupabaseWorkdir.startsWith(temporaryWorkdirPrefix) || acceptanceProjectId,
+  "Local RLS tests only accept the repository, isolated .tmp-* or verified runner-owned acceptance workdirs."
 );
 const supabaseCli = path.join(
   root,
@@ -119,6 +135,9 @@ const local = parseStatusEnvironment(
 );
 
 assert.ok(local.API_URL, "Local Supabase API_URL is missing.");
+assert.ok(["127.0.0.1", "localhost", "[::1]"].includes(new URL(local.API_URL).hostname),
+  "Local RLS tests must never target a remote API.");
+if (acceptanceProjectId) assert.equal(local.API_URL, "http://127.0.0.1:56321");
 assert.ok(local.ANON_KEY, "Local Supabase ANON_KEY is missing.");
 assert.ok(
   local.SERVICE_ROLE_KEY,
@@ -224,7 +243,7 @@ console.log("Local Supabase hardening assertions passed.");
 // container: CLI db query uses a prepared statement and cannot run BEGIN/ROLLBACK.
 const detailProjectId = fs.readFileSync(path.join(localSupabaseWorkdir, "supabase", "config.toml"), "utf8")
   .match(/^project_id\s*=\s*"([^"]+)"/m)?.[1];
-assert.ok(["sport-event-map", "sport-event-map-edition-staging"].includes(detailProjectId),
+assert.ok(["sport-event-map", "sport-event-map-edition-staging", acceptanceProjectId].filter(Boolean).includes(detailProjectId),
   "Knowledge integration requires the existing local or disposable staging project.");
 const detailContainerCli = ["C:\\Program Files\\RedHat\\Podman\\podman.exe", "docker", "podman"]
   .find(candidate => spawnSync(candidate, ["--version"], { encoding: "utf8" }).status === 0);

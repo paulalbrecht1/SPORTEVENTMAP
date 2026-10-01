@@ -258,12 +258,32 @@ function splitDelimitedLine(line, delimiter) {
   return cells;
 }
 
+function splitCsvRecords(content) {
+  // Exported descriptions may contain quoted newlines. Keep complete CSV
+  // records together so quality checks do not invent extra event rows.
+  const lines = [];
+  let record = "";
+  let quoted = false;
+  const source = content.replace(/^\uFEFF/, "");
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '"') {
+      if (quoted && source[index + 1] === '"') { record += '""'; index += 1; continue; }
+      quoted = !quoted;
+    }
+    if ((char === "\n" || char === "\r") && !quoted) {
+      if (record.trim()) lines.push(record);
+      record = "";
+      if (char === "\r" && source[index + 1] === "\n") index += 1;
+    } else record += char;
+  }
+  if (quoted) throw new Error("CSV has an unterminated quoted field.");
+  if (record.trim()) lines.push(record);
+  return lines;
+}
+
 function parseCsv(content) {
-  const lines =
-    content
-      .replace(/^\uFEFF/, "")
-      .split(/\r?\n/)
-      .filter(line => line.trim());
+  const lines = splitCsvRecords(content);
 
   if (!lines.length) {
     return [];
@@ -1687,6 +1707,7 @@ module.exports = {
   parseCsv,
   parseCsvFile,
   splitDelimitedLine,
+  splitCsvRecords,
   toCsv,
   writeCsvFile,
   writeJsonFile

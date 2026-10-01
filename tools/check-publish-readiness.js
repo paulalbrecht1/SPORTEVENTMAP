@@ -5,6 +5,7 @@ const {
   dedupeEvents,
   getValidationErrors,
   parseCsvFile,
+  splitCsvRecords,
   splitDelimitedLine
 } = require("./event-table-utils");
 const {
@@ -380,18 +381,15 @@ function checkEventsCsv() {
     fs.readFileSync(csvPath, "utf8")
       .replace(/^\uFEFF/, "");
 
-  const physicalRows =
-    csvContent
-      .split(/\r?\n/)
-      .filter(line => line.trim());
+  const csvRecords = splitCsvRecords(csvContent);
 
   const headerColumns =
-    physicalRows.length
-      ? splitDelimitedLine(physicalRows[0], ";")
+    csvRecords.length
+      ? splitDelimitedLine(csvRecords[0], ";")
       : [];
 
   const malformedRows =
-    physicalRows
+    csvRecords
       .map((line, index) => ({
         line: index + 1,
         columns: splitDelimitedLine(line, ";").length
@@ -494,7 +492,7 @@ function checkEventsCsv() {
         .join(", ");
 
     failures.push(
-      fail(`data/events.csv has ${malformedRows.length} malformed physical rows: ${sample}`)
+      fail(`data/events.csv has ${malformedRows.length} malformed CSV records: ${sample}`)
     );
   } else {
     pass(`data/events.csv has exactly ${PUBLIC_CATALOG_COLUMNS.length} columns per row`);

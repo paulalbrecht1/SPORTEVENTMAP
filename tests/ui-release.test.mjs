@@ -69,7 +69,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.release_scope, 'ui_only'); assert.equal(built.data_updated, false); assert.equal(built.full_data_quality_release, false);
     assert.equal(built.built_at, BUILD_TIME.toISOString()); assert.equal(built.base_release.built_at, '2026-09-01T11:25:56.965Z');
     assert.equal(built.base_release.original_data_timestamps.catalog_exported_at, '2026-08-27T07:41:01.290Z');
-    assert.equal(Object.keys(built.overlay_files).length, 22);
+    assert.equal(Object.keys(built.overlay_files).length, 25);
     assert.deepEqual(ui.artifactInventory(f.baseDir), f.entries, 'Build never changes dist');
     for (const name of ['first', 'second']) {
       const before = fs.readFileSync(path.join(f.baseDir, 'event/'+name+'/index.html'), 'utf8');
@@ -155,11 +155,15 @@ test('static detail cache refresh requires exactly one existing script and style
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {
-  assert.equal(ui.OVERLAY_PATHS.length, 22);
+  assert.equal(ui.OVERLAY_PATHS.length, 25);
+  for (const file of ['css/data-operations.css', 'js/catalog-quality-report.js', 'js/event-catalog-loader.js']) {
+    assert.ok(ui.OVERLAY_PATHS.includes(file));
+    assert.ok(ui.RUNTIME_PATHS.includes(file));
+  }
   assert.equal(ui.OVERLAY_PATHS.includes('js/event-description.js'), true);
   assert.equal(ui.OVERLAY_PATHS.includes('js/event-detail.js'), true);
   assert.equal(ui.OVERLAY_PATHS.includes('js/map.js'), true);
-  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/event-catalog-loader.js', 'js/search.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
+  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/search.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
   assert.equal(ui.validateBaseUrl(`${BASE_URL}/`), BASE_URL);
   for (const url of ['http://1547ae47.sporteventmap.pages.dev', 'https://sporteventmap.com', 'https://sporteventmap.pages.dev', 'https://123456789.sporteventmap.pages.dev', `${BASE_URL}:443`, `${BASE_URL}/path`, `${BASE_URL}?x=1`, `${BASE_URL}#x`, 'https://user@1547ae47.sporteventmap.pages.dev', 'https://1547ae47.sporteventmap.pages.dev.evil.invalid']) assert.throws(() => ui.validateBaseUrl(url));
   const jwt = role => `${Buffer.from('{"alg":"HS256"}').toString('base64url')}.${Buffer.from(JSON.stringify({ role })).toString('base64url')}.signature`;

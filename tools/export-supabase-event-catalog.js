@@ -1,6 +1,13 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const {
+  assertFreshnessGuardCoverage, buildExportMetrics, isCompleteDiscoveryRow,
+  isFreshDiscoveryRow
+} = require("../js/catalog-quality-report.js");
+const {
+  publicRow, assertPublicCatalogSnapshot, assertDiagnosticPaths, prepareBoundQualityAudits, replaceCatalogArtifacts
+} = require("./catalog-snapshot-safety.js");
 
 const ROOT = path.resolve(__dirname, "..");
 const PUBLIC_CATALOG_COLUMNS = [
@@ -10,7 +17,8 @@ const PUBLIC_CATALOG_COLUMNS = [
   "event_id", "edition_id", "edition_year", "edition_slug", "brand_slug", "organizer_name",
   "organizer_url", "official_url", "registration_url", "registration_status", "event_status",
   "brand_verification_status", "brand_last_verified_at", "edition_verification_status",
-  "edition_last_verified_at", "race_formats"
+  "edition_last_verified_at", "race_formats", "end_date", "start_time",
+  "price_min", "price_max", "currency", "participant_limit"
 ];
 
 function clean(value) {
@@ -122,12 +130,15 @@ function assertExportPolicy(metrics, policy) {
 
 function writeCatalogSnapshot({
   args,
-  archiveOutput,
   exportedAt,
-  metrics,
-  output,
-  policy
+  policy,
+  snapshot,
+  io = fs
 }) {
+  assertDiagnosticPaths(args, ROOT);
+  assertPublicCatalogSnapshot(snapshot);
+  assertFreshnessGuardCoverage(snapshot.discovery, snapshot.freshness_guard);
+  const metrics = buildExportMetrics(snapshot.discovery, snapshot.archive, snapshot.measured_at, snapshot.freshness_guard);
   const policyResult = evaluateExportPolicy(metrics, policy);
 
   if (args.allowUnhealthy) {
@@ -138,13 +149,24 @@ function writeCatalogSnapshot({
     assertExportPolicy(metrics, policy);
   }
 
+  // Build only from the validated database envelope; callers cannot substitute
+  // unrelated healthy metrics, raw archive rows or private columns.
+  const { output, archiveOutput } = buildCatalogArtifacts(snapshot, exportedAt);
+  const audits = prepareBoundQualityAudits({ args, root: ROOT, output, exportedAt });
+
   const manifestOutput = `${JSON.stringify({
     schema_version: 1,
     exported_at: exportedAt,
+    measured_at: new Date(snapshot.measured_at).toISOString(),
+    snapshot_consistency: snapshot.consistency,
+    diagnostic_only: Boolean(args.allowUnhealthy),
+    data_quality_checked_at: audits.checkedAt,
+    data_quality_passed: audits.quality.passed,
     sources: {
       discovery: "public_event_discovery",
       archive: "public_event_archive",
-      freshness_guard: "get_public_event_freshness_guard"
+      freshness_guard: "get_public_event_freshness_guard",
+      snapshot: "get_public_event_catalog_snapshot"
     },
     sha256: {
       discovery: sha256(output),
@@ -153,11 +175,21 @@ function writeCatalogSnapshot({
     metrics
   }, null, 2)}\n`;
 
-  fs.writeFileSync(args.out, output, "utf8");
-  fs.writeFileSync(args.archiveOut, archiveOutput, "utf8");
-  fs.writeFileSync(args.manifestOut, manifestOutput, "utf8");
+  replaceCatalogArtifacts([
+    { target: args.out, content: output },
+    { target: args.archiveOut, content: archiveOutput },
+    ...audits.artifacts,
+    { target: args.manifestOut, content: manifestOutput }
+  ], io);
 
-  return { manifestOutput, policyResult };
+  return { manifestOutput, policyResult, metrics, qualityResult: audits.quality };
+}
+
+function buildCatalogArtifacts(snapshot, exportedAt) {
+  const mapped = snapshot.discovery.map(row => mapDiscoveryRow(row, exportedAt));
+  const output = [PUBLIC_CATALOG_COLUMNS.join(";"), ...mapped.map(row => PUBLIC_CATALOG_COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
+  const archiveOutput = `${JSON.stringify({ exported_at: exportedAt, measured_at: new Date(snapshot.measured_at).toISOString(), editions: snapshot.archive.map(row => publicRow(row, true)) }, null, 2)}\n`;
+  return { output, archiveOutput };
 }
 
 function readPublicRuntimeConfig() {
@@ -170,114 +202,6 @@ function readPublicRuntimeConfig() {
   return {
     url: read("supabaseUrl"),
     key: read("supabasePublishableKey")
-  };
-}
-
-function hasUsableCoordinates(row) {
-  const latitude = Number(row.latitude);
-  const longitude = Number(row.longitude);
-
-  return Number.isFinite(latitude) &&
-    Number.isFinite(longitude) &&
-    latitude >= -90 && latitude <= 90 &&
-    longitude >= -180 && longitude <= 180;
-}
-
-function isCompleteDiscoveryRow(row) {
-  return [
-    row.event_name,
-    row.sport,
-    row.city,
-    row.country,
-    row.date,
-    row.description,
-    row.event_url,
-    row.source_url
-  ].every(value => Boolean(clean(value).trim())) &&
-    hasUsableCoordinates(row) &&
-    Boolean(clean(row.distance).trim()) &&
-    clean(row.description).trim().length >= 80;
-}
-
-function isFreshDiscoveryRow(row, exportedAt, authoritativeDecision = false) {
-  const nextCheck = Date.parse(clean(row.next_check));
-
-  return clean(row.verification_status).toLowerCase() === "verified" &&
-    Boolean(clean(row.last_checked).trim()) &&
-    Number.isFinite(nextCheck) &&
-    nextCheck > Date.parse(exportedAt) &&
-    authoritativeDecision === true;
-}
-
-function percentage(numerator, denominator) {
-  return denominator > 0
-    ? Number(((numerator / denominator) * 100).toFixed(2))
-    : 0;
-}
-
-function assertFreshnessGuardCoverage(rows, payload, now = Date.now()) {
-  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
-    throw new Error("Freshness guard returned no valid JSON object.");
-  }
-  if (payload.schema_version !== 1) {
-    throw new Error(`Unsupported freshness guard schema version: ${clean(payload.schema_version) || "missing"}.`);
-  }
-
-  const evaluatedAt = Date.parse(clean(payload.evaluated_at));
-  if (!Number.isFinite(evaluatedAt) || evaluatedAt < now - 300000 || evaluatedAt > now + 300000) {
-    throw new Error("Freshness guard evaluation is missing or older than five minutes.");
-  }
-
-  const editionIds = rows.map(row => clean(row.edition_id).trim());
-  if (editionIds.some(id => !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))) {
-    throw new Error("Discovery export contains a missing or invalid edition id.");
-  }
-  const expectedIds = new Set(editionIds);
-  if (expectedIds.size !== editionIds.length) {
-    throw new Error("Discovery export contains duplicate edition ids.");
-  }
-  if (Number(payload.requested_count) !== expectedIds.size) {
-    throw new Error("Freshness guard requested_count does not match the Discovery snapshot.");
-  }
-
-  const decisions = payload.decisions;
-  if (!decisions || typeof decisions !== "object" || Array.isArray(decisions)) {
-    throw new Error("Freshness guard decisions are missing or malformed.");
-  }
-  const decisionIds = Object.keys(decisions);
-  if (decisionIds.length !== expectedIds.size ||
-      decisionIds.some(id => !expectedIds.has(id)) ||
-      editionIds.some(id => !Object.prototype.hasOwnProperty.call(decisions, id))) {
-    throw new Error("Freshness guard decisions do not exactly match the Discovery snapshot.");
-  }
-  if (decisionIds.some(id => typeof decisions[id] !== "boolean")) {
-    throw new Error("Freshness guard returned a non-boolean decision.");
-  }
-
-  return {
-    decisions: new Map(decisionIds.map(id => [id, decisions[id]])),
-    evaluatedAt: new Date(evaluatedAt).toISOString()
-  };
-}
-
-function buildExportMetrics(rows, archiveRows, exportedAt, freshnessGuardPayload) {
-  const guard = assertFreshnessGuardCoverage(rows, freshnessGuardPayload);
-  const freshRows = rows.filter(row => isFreshDiscoveryRow(
-    row,
-    exportedAt,
-    guard.decisions.get(clean(row.edition_id).trim())
-  ));
-  const completeRows = rows.filter(isCompleteDiscoveryRow);
-
-  return {
-    discovery_rows: rows.length,
-    archive_rows: archiveRows.length,
-    fresh_rows: freshRows.length,
-    freshness_rate: percentage(freshRows.length, rows.length),
-    complete_rows: completeRows.length,
-    completeness_rate: percentage(completeRows.length, rows.length),
-    review_required_rows: rows.length - freshRows.length,
-    freshness_guard_evaluated_at: guard.evaluatedAt
   };
 }
 
@@ -308,7 +232,7 @@ function mapDiscoveryRow(row, exportedAt) {
     event_url: row.event_url,
     // Keep implementation provenance out of the public fallback catalog. The
     // concrete database/view remains an internal operational detail.
-    data_source: "Sport Event Map verified event catalog",
+    data_source: "Sport Event Map event catalog",
     source_url: row.source_url,
     // Legacy CSV readers use this column for the public registration state.
     // The explicit columns below preserve verification and registration as
@@ -339,26 +263,14 @@ function mapDiscoveryRow(row, exportedAt) {
     brand_last_verified_at: row.brand_last_verified_at,
     edition_verification_status: row.edition_verification_status || row.verification_status,
     edition_last_verified_at: editionLastVerifiedAt,
-    race_formats: jsonCell(row.race_formats)
+    race_formats: jsonCell(publicRow(row).race_formats),
+    end_date: row.end_date,
+    start_time: row.start_time,
+    price_min: row.price_min,
+    price_max: row.price_max,
+    currency: row.currency,
+    participant_limit: row.participant_limit
   };
-}
-
-async function requestPage(url, key, view, offset, limit) {
-  const response = await fetch(`${url}/rest/v1/${view}?select=*&order=edition_slug.asc&offset=${offset}&limit=${limit}`, {
-    headers: { apikey: key }
-  });
-  if (!response.ok) throw new Error(`Supabase export failed (${response.status}): ${(await response.text()).slice(0, 500)}`);
-  return response.json();
-}
-
-async function requestAll(url, key, view) {
-  const rows = [];
-  const pageSize = 500;
-  for (let offset = 0; ; offset += pageSize) {
-    const page = await requestPage(url, key, view, offset, pageSize);
-    rows.push(...page);
-    if (page.length < pageSize) return rows;
-  }
 }
 
 async function requestFreshnessGuard(url, key, editionIds) {
@@ -380,6 +292,21 @@ async function requestFreshnessGuard(url, key, editionIds) {
   }
 }
 
+async function requestCatalogSnapshot(url, key) {
+  const response = await fetch(`${url}/rest/v1/rpc/get_public_event_catalog_snapshot`, {
+    method: "POST",
+    headers: { apikey: key, "Content-Type": "application/json" },
+    body: "{}"
+  });
+  if (!response.ok) {
+    throw new Error(`Consistent catalog snapshot unavailable (${response.status}); fallback files remain unchanged. Deploy the reviewed read-only snapshot migration before exporting.`);
+  }
+  let snapshot;
+  try { snapshot = await response.json(); }
+  catch { throw new Error("Catalog snapshot returned malformed JSON; fallback files remain unchanged."); }
+  return assertPublicCatalogSnapshot(snapshot);
+}
+
 async function main() {
   const args = parseArgs(process.argv);
   const runtime = readPublicRuntimeConfig();
@@ -389,40 +316,29 @@ async function main() {
     throw new Error("Set SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY or provide js/config.js.");
   }
   if (!args.write) throw new Error("Export is explicit: add --write and review the git diff before publishing.");
+  assertDiagnosticPaths(args, ROOT);
 
-  const [rows, archiveRows] = await Promise.all([
-    requestAll(url, key, "public_event_discovery"),
-    requestAll(url, key, "public_event_archive")
-  ]);
-  if (!rows.length) throw new Error("Refusing to replace the discovery fallback with an empty active catalog.");
-  if (archiveRows.length < 900) throw new Error(`Refusing to replace the archive with only ${archiveRows.length} public editions.`);
-
-  const freshnessGuard = await requestFreshnessGuard(
-    url,
-    key,
-    rows.map(row => clean(row.edition_id).trim())
-  );
+  const snapshot = await requestCatalogSnapshot(url, key);
+  const rows = snapshot.discovery;
+  const archiveRows = snapshot.archive.map(row => publicRow(row, true));
+  const freshnessGuard = snapshot.freshness_guard;
+  assertFreshnessGuardCoverage(rows, freshnessGuard);
   const exportedAt = new Date().toISOString();
-  const mapped = rows.map(row => mapDiscoveryRow(row, exportedAt));
-  const output = [PUBLIC_CATALOG_COLUMNS.join(";"), ...mapped.map(row => PUBLIC_CATALOG_COLUMNS.map(column => csvCell(row[column])).join(";"))].join("\n") + "\n";
-  const archiveOutput = `${JSON.stringify({ exported_at: exportedAt, editions: archiveRows }, null, 2)}\n`;
-  const metrics = buildExportMetrics(rows, archiveRows, exportedAt, freshnessGuard);
+  const metrics = buildExportMetrics(rows, archiveRows, snapshot.measured_at, freshnessGuard);
   const policy = JSON.parse(
     fs.readFileSync(path.join(ROOT, "data", "catalog-release-policy.json"), "utf8")
   );
 
-  console.log(`Fetched ${mapped.length} active discovery editions and ${archiveRows.length} public archive editions.`);
+  console.log(`Fetched ${rows.length} active discovery editions and ${archiveRows.length} public archive editions from ${snapshot.measured_at}.`);
   console.log(`Freshness ${metrics.freshness_rate}%; completeness ${metrics.completeness_rate}%.`);
 
   writeCatalogSnapshot({
     args,
-    archiveOutput,
     exportedAt,
-    metrics,
-    output,
-    policy
+    policy,
+    snapshot
   });
-  console.log(`Exported ${mapped.length} active discovery editions and ${archiveRows.length} public archive editions.`);
+  console.log(`Exported ${rows.length} active discovery editions and ${archiveRows.length} public archive editions locally; no publication was performed.`);
 }
 
 if (require.main === module) {
@@ -437,14 +353,15 @@ module.exports = {
   assertExportPolicy,
   assertFreshnessGuardCoverage,
   buildExportMetrics,
+  buildCatalogArtifacts,
   evaluateExportPolicy,
   isCompleteDiscoveryRow,
   isFreshDiscoveryRow,
   mapDiscoveryRow,
   main,
   maximumAllowedDrop,
-  percentage,
   readPublicRuntimeConfig,
+  requestCatalogSnapshot,
   requestFreshnessGuard,
   sha256,
   writeCatalogSnapshot

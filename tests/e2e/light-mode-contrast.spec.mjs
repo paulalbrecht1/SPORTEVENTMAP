@@ -277,85 +277,38 @@ test("Light mode keeps Profile account and race history readable", async ({ page
   await prepareApp(page, {
     openDiscoveryPanel: false
   });
-  await page.evaluate(() => {
+  await page.waitForFunction(() => typeof renderProfileCompletedEvents === "function");
+  await page.evaluate(async () => {
+    // Finish the initial personal-catalog lookup before installing the owned
+    // synthetic cohort. The real change listener must render the same state.
+    await window.refreshPersonalPlannedCatalog();
     window.SportEventMapTheme.apply("light", {
       persist: true
     });
 
     document.getElementById("profileEmail").textContent =
       "athlete@example.com";
-    document.getElementById("profileCompletedCount").textContent =
-      "3 completed";
     document.getElementById("profileEmailBtn").disabled = true;
     document.getElementById("profilePasswordBtn").disabled = true;
 
-    const achievements = [
-      ["🏁", "5 Events", "2 to go", true],
-      ["🥉", "10 Events", "7 to go", false],
-      ["🥈", "20 Events", "17 to go", false],
-      ["🥇", "50 Events", "47 to go", false],
-      ["🏆", "100 Events", "97 to go", false]
-    ];
-    const badgeContainer =
-      document.getElementById("profileAchievementBadges");
-    badgeContainer.replaceChildren(...achievements.map(item => {
-      const article = document.createElement("article");
-      article.className =
-        "profile-achievement-card " +
-        (item[3] ? "is-unlocked" : "is-locked");
-      const icon = document.createElement("span");
-      icon.className = "profile-achievement-icon";
-      icon.setAttribute("aria-hidden", "true");
-      icon.textContent = item[0];
-      const title = document.createElement("strong");
-      title.textContent = item[1];
-      const copy = document.createElement("small");
-      copy.textContent = item[2];
-      article.append(icon, title, copy);
-      return article;
+    const plannedEvents = Array.from({ length: 5 }, (_, index) => ({
+      _planner_key: `contrast-marathon|29.09.${2020 + index}|berlin|germany`,
+      event_key: `contrast-marathon|29.09.${2020 + index}|berlin|germany`,
+      edition_id: `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      event_name: `Contrast Marathon ${2020 + index}`, date: `29.09.${2020 + index}`,
+      end_date: `${2020 + index}-09-29`, city: "Berlin", country: "Germany", sport: "Running",
+      distance: "Marathon", race_formats: [{ label: "Marathon", distance_km: 42.195 }], event_status: "completed"
     }));
-
-    document.getElementById("profileCompletedEvents").innerHTML =
-      '<div class="profile-completed-empty is-success">' +
-      "<strong>3 completed races</strong>" +
-      "<span>Completed planned races count toward achievement badges.</span>" +
-      "</div>";
-
-    const archiveToggle =
-      document.getElementById("profileCompletedArchiveToggle");
-    archiveToggle.setAttribute("aria-expanded", "true");
-    archiveToggle.querySelector("span").textContent =
-      "Hide completed events";
-    const archivePanel =
-      document.getElementById("profileCompletedArchivePanel");
-    archivePanel.hidden = false;
-    document.querySelectorAll("[data-profile-completed-filter]")
-      .forEach((button, index) => {
-        const label = button.textContent;
-        button.innerHTML =
-          label + "<strong>" + (index ? "0" : "1") + "</strong>";
-      });
-    document.getElementById("profileCompletedArchiveList").innerHTML =
-      '<article class="profile-completed-archive-card">' +
-      '<div class="profile-completed-archive-head"><div>' +
-      "<span>Marathon</span><strong>Berlin Marathon</strong>" +
-      "<em>Berlin, Germany · 29.09.2024</em></div>" +
-      '<span class="profile-completed-status has-result">Result saved</span>' +
-      "</div>" +
-      '<div class="profile-completed-archive-meta">' +
-      "<span><em>Distance</em><strong>42.2 km</strong></span>" +
-      "<span><em>Priority</em><strong>A Race</strong></span></div>" +
-      '<div class="profile-completed-context-row">' +
-      "<span><em>Goal</em><strong>Personal best</strong></span></div>" +
-      '<div class="profile-completed-result-row">' +
-      '<span class="profile-completed-primary-metric">' +
-      "<em>Finish time</em><strong>03:45:12</strong></span></div>" +
-      '<div class="profile-completed-planning-row">' +
-      "<span><em>Race rating</em><strong>5 of 5</strong></span></div>" +
-      '<p class="profile-completed-race-report">' +
-      "Strong race with a controlled second half.</p>" +
-      '<a class="profile-completed-result-link" href="#result">' +
-      "Official result</a></article>";
+    const seasonMeta = Object.fromEntries(plannedEvents.map(event => [event._planner_key, {
+      edition_id: event.edition_id, distance: "Marathon", priority: "A", planner_details: {
+        personal_note: "Strong race with a controlled second half.",
+        goals: { target_time: "03:40:00" }, post_race: { archived: true },
+        result: { finish_status: "Finished", finish_time: "03:45:12", personal_rating: "5", official_result_url: "https://example.test/result" }
+      }
+    }]));
+    window.applyRemotePlanningState({ favorites: [], plannedEditions: plannedEvents.map(event => event._planner_key), plannedEvents, seasonMeta });
+    profileCompletedArchiveOpen = true;
+    renderProfileCompletedEvents();
 
     document.getElementById("profileModal").classList.add("open");
   });
@@ -364,6 +317,9 @@ test("Light mode keeps Profile account and race history readable", async ({ page
     .toHaveAttribute("data-theme", "light");
   await expect(page.locator("#profileModal"))
     .toHaveClass(/open/);
+  await expect(page.locator("#profileCompletedCount")).toHaveText("5 completed");
+  await expect(page.locator("#profileAchievementBadges .is-unlocked")).toHaveCount(1);
+  await expect(page.locator("#profileCompletedArchivePanel")).toBeVisible();
 
   const readableSelectors = [
     ".profile-header span",
@@ -387,8 +343,8 @@ test("Light mode keeps Profile account and race history readable", async ({ page
     ".profile-completed-archive-head strong",
     ".profile-completed-archive-head em",
     ".profile-completed-status",
-    ".profile-completed-archive-meta em",
-    ".profile-completed-archive-meta strong",
+    ".profile-completed-context-row em",
+    ".profile-completed-context-row strong",
     ".profile-completed-primary-metric em",
     ".profile-completed-primary-metric strong",
     ".profile-completed-planning-row em",

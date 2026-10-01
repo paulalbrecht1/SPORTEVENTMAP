@@ -1,6 +1,7 @@
 const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
+const { parseCsv } = require("./event-table-utils");
 
 const DEFAULT_ROOT = path.resolve(__dirname, "..");
 
@@ -30,7 +31,8 @@ function evaluateCatalogRelease(options = {}) {
   const pages = readJson(dataPath("event-pages.json"));
   const discoveryContent = fs.readFileSync(dataPath("events.csv"), "utf8");
   const archiveContent = fs.readFileSync(dataPath("event-editions-public.json"), "utf8");
-  const discoveryRows = discoveryContent.split(/\r?\n/).filter(line => line.trim()).length - 1;
+  const discovery = parseCsv(discoveryContent);
+  const discoveryRows = discovery.length;
   const archiveRows = Array.isArray(archive.editions) ? archive.editions.length : 0;
   const pageRows = Array.isArray(pages) ? pages.length : 0;
   const exportTime = Date.parse(manifest.exported_at || "");
@@ -39,6 +41,22 @@ function evaluateCatalogRelease(options = {}) {
     : Number.POSITIVE_INFINITY;
   const checks = [];
 
+  addCheck(checks, "catalog write completed", !fs.existsSync(`${dataPath("catalog-export-manifest.json")}.transaction`),
+    fs.existsSync(`${dataPath("catalog-export-manifest.json")}.transaction`) ? "unfinished transaction; original files retained for recovery" : "completed", "completed");
+  addCheck(checks, "release snapshot is not diagnostic", manifest.diagnostic_only === false,
+    manifest.diagnostic_only, false);
+  addCheck(checks, "consistent database snapshot", manifest.snapshot_consistency === "single_statement",
+    manifest.snapshot_consistency, "single_statement");
+  addCheck(checks, "snapshot measurement", Number.isFinite(Date.parse(manifest.measured_at || "")) &&
+    manifest.measured_at === manifest.metrics?.freshness_guard_evaluated_at && archive.measured_at === manifest.measured_at,
+    manifest.measured_at, "archive and authoritative freshness measured together");
+  const measuredTime = Date.parse(manifest.measured_at || "");
+  const snapshotAgeHours = (now.getTime() - measuredTime) / 3600000;
+  addCheck(checks, "snapshot data age", Number.isFinite(snapshotAgeHours) &&
+    snapshotAgeHours <= Number(policy.maximum_export_age_hours) &&
+    snapshotAgeHours >= -(Number(policy.maximum_future_clock_skew_minutes) || 0) / 60 &&
+    exportTime - measuredTime >= -300000 && exportTime - measuredTime <= 300000,
+    Number.isFinite(snapshotAgeHours) ? Number(snapshotAgeHours.toFixed(2)) : "not measured", "recent source measurement within five minutes of export");
   addCheck(checks, "manifest schema", manifest.schema_version === 1, manifest.schema_version, 1);
   addCheck(checks, "export timestamp", Number.isFinite(exportTime), manifest.exported_at, "valid ISO timestamp");
   addCheck(checks, "export is not from the future",
@@ -51,6 +69,16 @@ function evaluateCatalogRelease(options = {}) {
   addCheck(checks, "archive rowcount manifest", archiveRows === Number(manifest.metrics?.archive_rows),
     archiveRows, manifest.metrics?.archive_rows);
   addCheck(checks, "static page rowcount", pageRows === archiveRows, pageRows, archiveRows);
+  const archiveEditions = Array.isArray(archive.editions) ? archive.editions : [];
+  const archiveByEdition = new Map(archiveEditions.map(row => [row.edition_id, row]));
+  addCheck(checks, "discovery detail edition alignment", discovery.every(row => {
+    const detail = archiveByEdition.get(row.edition_id);
+    return detail && String(detail.event_id) === String(row.event_id) && detail.edition_slug === row.edition_slug &&
+      String(detail.edition_year) === String(row.edition_year) && String(detail.date || "") === String(row.date || "");
+  }), "matching edition ids, parent events, slugs, years and dates", "same edition snapshot");
+  const pageSlugs = new Set(Array.isArray(pages) ? pages.map(row => row.slug) : []);
+  addCheck(checks, "static page edition alignment", pageSlugs.size === archiveRows &&
+    archiveEditions.every(row => pageSlugs.has(row.edition_slug)), pageSlugs.size, `${archiveRows} exact archive slugs`);
   addCheck(checks, "archive export timestamp", archive.exported_at === manifest.exported_at,
     archive.exported_at, manifest.exported_at);
   addCheck(checks, "discovery checksum", sha256(discoveryContent) === manifest.sha256?.discovery,

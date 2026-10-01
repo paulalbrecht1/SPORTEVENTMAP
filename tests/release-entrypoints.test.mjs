@@ -9,6 +9,7 @@ import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
 const { PUBLIC_CATALOG_COLUMNS } = require("../tools/export-supabase-event-catalog.js");
+const { splitCsvRecords } = require("../tools/event-table-utils.js");
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const scripts = JSON.parse(fs.readFileSync(path.join(repositoryRoot, "package.json"), "utf8")).scripts;
 
@@ -19,7 +20,7 @@ assert.equal(scripts["prepare-package"], "node tools/create-publish-package.js")
 assert.equal(scripts["verify-package"], "node tools/verify-release-package.js");
 const technicalGroups = [
   "test:release-entrypoints", "test:catalog-release", "test:catalog-loader",
-  "test:data-freshness", "test:manual-maintenance", "test:alert-dispatch", "test:static", "test:quality",
+  "test:data-freshness", "test:manual-maintenance", "test:personal-history", "test:alert-dispatch", "test:static", "test:quality",
   "test:quality-review", "test:germany-expansion", "test:data-workflow",
   "test:event-automation", "test:source-monitor", "test:stage-four",
   "test:edition-lifecycle", "audit:layout", "test:e2e"
@@ -56,9 +57,12 @@ try {
     "check-release-readiness.js", "check-publish-readiness.js",
     "check-data-quality-release.js", "check-catalog-release.js",
     "create-publish-package.js", "verify-release-package.js",
-    "export-supabase-event-catalog.js", "event-table-utils.js", "find-duplicate-candidates.js"
+    "export-supabase-event-catalog.js", "catalog-snapshot-safety.js", "event-table-utils.js", "find-duplicate-candidates.js"
   ]) {
     write(`tools/${script}`, fs.readFileSync(path.join(repositoryRoot, "tools", script)));
+  }
+  for (const script of ["catalog-quality-report.js", "event-catalog-loader.js"]) {
+    write(`js/${script}`, fs.readFileSync(path.join(repositoryRoot, "js", script)));
   }
   for (const script of ["generate-event-pages.js", "generate-sitemap.js"]) {
     write(`tools/${script}`, 'require("fs").writeFileSync(require("path").join(__dirname, "..", "generator-ran.txt"), "unexpected mutation");');
@@ -90,23 +94,33 @@ try {
     event_name: `Fixture Event ${index}`, sport: "Running", date: "01.01.2099",
     city: `Fixture City ${index}`, country: "Germany", latitude: "52.52", longitude: "13.405",
     distance: "10 km", event_url: `https://example.test/events/${index}`,
-    verification_status: "confirmed", edition_id: `fixture-edition-${index}`
+    description: index === 0 ? 'First description line\nSecond "quoted" description line; still the same event' : "Fixture description",
+    verification_status: "confirmed", event_id: index + 1, edition_id: `fixture-edition-${index}`,
+    edition_slug: `fixture-${index}`, edition_year: 2099
   }));
   const csv = [PUBLIC_CATALOG_COLUMNS.join(";"), ...events.map(event =>
-    PUBLIC_CATALOG_COLUMNS.map(column => event[column] || "").join(";")), ""].join("\n");
+    PUBLIC_CATALOG_COLUMNS.map(column => {
+      const value = String(event[column] ?? "");
+      return /[;"\r\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value;
+    }).join(";")), ""].join("\n");
   write("data/events.csv", csv);
   const auditEvents = events.map(event => ({ event_id: event.edition_id, severity: "clean", issues: [] }));
   const now = new Date().toISOString();
 
   function writeHealthyData({ exportedAt = now, freshness = 100 } = {}) {
     write("index.html", indexHtml);
-    const archive = JSON.stringify({ exported_at: exportedAt, editions: Array.from({ length: archiveCount }, (_, index) => ({ edition_slug: `fixture-${index}` })) });
+    write("data/events.csv", csv);
+    const archive = JSON.stringify({ exported_at: exportedAt, measured_at: exportedAt, editions: Array.from({ length: archiveCount }, (_, index) => ({
+      event_id: events[index]?.event_id, edition_id: events[index]?.edition_id,
+      date: events[index]?.date, edition_year: events[index]?.edition_year, edition_slug: `fixture-${index}`
+    })) });
     write("data/event-editions-public.json", archive);
     writeJson("data/event-pages.json", Array.from({ length: archiveCount }, (_, index) => ({ slug: `fixture-${index}` })));
     writeJson("data/catalog-export-manifest.json", {
       schema_version: 1, exported_at: exportedAt,
+      measured_at: exportedAt, snapshot_consistency: "single_statement", diagnostic_only: false,
       sha256: { discovery: sha256(csv), archive: sha256(archive) },
-      metrics: { discovery_rows: discoveryCount, archive_rows: archiveCount, freshness_rate: freshness, completeness_rate: 100 }
+      metrics: { discovery_rows: discoveryCount, archive_rows: archiveCount, freshness_rate: freshness, completeness_rate: 100, freshness_guard_evaluated_at: exportedAt }
     });
     writeJson("data/review/duplicate-candidates.json", {
       schema_version: 2, generated_at: now, input_sha256: sha256(csv), events_checked: discoveryCount,
@@ -129,8 +143,15 @@ try {
   assert.match(healthy.stdout, /LAUNCH READY/);
   assert.match(healthy.stdout, /DATA QUALITY RELEASE READY/);
   assert.match(healthy.stdout, /CATALOG RELEASE READY/);
+  assert.match(healthy.stdout, new RegExp(`PASS data/events.csv has exactly ${PUBLIC_CATALOG_COLUMNS.length} columns per row`),
+    "The exact current schema accepts correctly quoted multiline descriptions as one CSV record.");
 
   const cases = [
+    { name: "malformed CSV record", expected: /FAIL data\/events.csv has 1 malformed CSV records/, change: () => {
+      const records = splitCsvRecords(csv);
+      records[1] = records[1].slice(0, -1);
+      write("data/events.csv", records.join("\n") + "\n");
+    } },
     { name: "stale export", expected: /FAIL export age/, change: () => writeHealthyData({ exportedAt: new Date(Date.now() - 48 * 3600000).toISOString() }) },
     { name: "unhealthy freshness", expected: /FAIL freshness floor/, change: () => writeHealthyData({ freshness: policy.minimum_freshness_rate - 1 }) },
     { name: "unresolved duplicate", expected: /FAIL unresolved release-blocking duplicate candidates/, change: () => updateJson("data/review/duplicate-candidates.json", report => {

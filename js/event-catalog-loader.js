@@ -275,6 +275,7 @@
     return Object.freeze({
       DEFAULT_PAGE_SIZE,
       MAX_PAGE_SIZE,
+      parseCatalogDate,
       filterCurrentCatalogRows,
       fetchCompleteCatalog
     });

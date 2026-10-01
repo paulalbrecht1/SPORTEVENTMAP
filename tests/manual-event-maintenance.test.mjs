@@ -8,12 +8,54 @@ const request = Object.freeze({ request_id: 'request-1', action: 'correct', even
 const context = { event: { id: 21 }, editions: [{ id: 'edition-1' }], version: 'version-2' };
 const receipt = { saved: true, ...request, context, publication: { status: 'database_public' } };
 
+test('an approved changed value must match the persisted reload; a formal saved receipt cannot hide zero affected rows', async () => {
+  const changed = { ...request, manual_approval: true, event_patch: { city: 'Hamburg' }, edition_patch: { start_time: '09:30' } };
+  const loaded = { ...context, event: { id: 21, city: 'Berlin' }, editions: [{ id: 'edition-1', start_time: '09:30:00' }] };
+  const client = { async rpc(name) { return { data: name === 'admin_manual_event_context' ? loaded : { ...receipt, affected_rows: 0 } }; } };
+  await assert.rejects(() => api.saveWithRecovery(client, changed), /nicht gespeichert/);
+  loaded.event.city = 'Hamburg';
+  assert.equal((await api.saveWithRecovery(client, changed)).saved, true);
+  loaded.editions[0].start_time = '09:30:45';
+  await assert.rejects(() => api.saveWithRecovery(client, changed), /nicht gespeichert/);
+});
+
+test('readback checks explicit clears and manually approved knowledge without inventing source verification', () => {
+  const loaded = { ...context, event: { id: 21, organizer_url: null }, editions: [{ id: 'edition-1' }],
+    knowledge: [{ knowledge_scope: 'edition', edition_id: 'edition-1', registration: { price_tiers: [] } }] };
+  assert.doesNotThrow(() => api.assertPersistedChanges(loaded, { clear_fields: ['event.organizer_url'], knowledge: {
+    scope: 'edition', clear_fields: ['registration.price_tiers'] } }, 'edition-1'));
+  const expectation = api.knowledgeExpectation({ ...loaded, knowledge: [{ knowledge_scope: 'edition', edition_id: 'edition-1',
+    race_day: { wave_start: '09:30' } }] }, { scope: 'edition', manual_approval: true, confirmations: [],
+    patch: { race_day: { wave_start: '09:30' } } }, 'edition-1');
+  assert.equal(expectation.fields[0].visible, true);
+  assert.equal(expectation.fields[0].value, '09:30');
+});
+
+test('FAQ readback checks submitted values and ownership while accepting database audit metadata', () => {
+  const faq = { id: 'faq-1', question: 'Wo?', answer: 'Am Start.', sort_order: 10 };
+  const detail = { id: 'detail-1', knowledge_scope: 'edition', edition_id: 'edition-1', faq: [{ ...faq,
+    event_detail_id: 'detail-1', created_at: '2026-10-01T12:00:00Z', updated_at: '2026-10-01T12:01:00Z', source_url: null, last_verified: null }] };
+  const loaded = { ...context, knowledge: [detail] };
+  const changed = { ...request, knowledge: { scope: 'edition', faq_upserts: [faq] } };
+  assert.doesNotThrow(() => api.assertPersistedChanges(loaded, changed, 'edition-1'));
+  for (const [field, value] of [['id', 'other-faq'], ['question', 'Wann?'], ['answer', 'Unveränderter alter Text'],
+    ['sort_order', 20], ['event_detail_id', 'other-detail']]) {
+    const wrong = structuredClone(loaded); wrong.knowledge[0].faq[0][field] = value;
+    assert.throws(() => api.assertPersistedChanges(wrong, changed, 'edition-1'), /nicht gespeichert/, field);
+  }
+  const absent = structuredClone(loaded); absent.knowledge[0].faq = [];
+  assert.throws(() => api.assertPersistedChanges(absent, changed, 'edition-1'), /nicht gespeichert/);
+});
+
 test('manual admin release uses a new runtime URL instead of the four-hour cached pre-maintenance script', () => {
   const page = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
   const runtime = page.match(/data-supabase-src="([^"]+)"/)?.[1];
   assert.ok(runtime, 'Lazy admin runtime URL is required');
   assert.notEqual(runtime, 'js/supabase.js?v=20260908-freshness-batch-v127', 'v89 and v90 reused this URL and existing sessions kept the old admin tab router');
-  assert.ok(Number(runtime.match(/-v(\d+)$/)?.[1]) >= 128, 'Manual maintenance needs the advanced runtime cache key');
+  assert.ok(Number(runtime.match(/-v(\d+)$/)?.[1]) >= 141, 'FAQ readback needs the advanced admin runtime cache key');
+  const admin = fs.readFileSync(new URL('../js/supabase.js', import.meta.url), 'utf8');
+  const maintenanceImport = admin.match(/import\("\.\/manual-event-maintenance\.js\?v=([^"]+)"\)/)?.[1];
+  assert.ok(Number(maintenanceImport?.match(/-v(\d+)$/)?.[1]) >= 141, 'The dynamically loaded maintenance module must bypass the previous cached version too');
 });
 
 test('all changed v90 UI assets use advanced URLs in overlay pages, dynamic imports and the next regular page generator', () => {
@@ -43,7 +85,7 @@ test('status and popup runtime references leave the cached pre-v94 assets behind
       const url = new URL(reference, 'https://sporteventmap.com/');
       const asset = url.pathname.slice(1);
       if (!assets.includes(asset)) continue;
-      const expectedVersion = asset === 'js/events.js' ? '20260929-public-description-v132' : '20260929-ui-only-v94';
+      const expectedVersion = ({ 'js/events.js': '20261001-planner-history-v138', 'js/i18n.js': '20261001-history-labels-v139', 'js/map.js': '20260929-ui-only-v94' })[asset];
       assert.equal(url.searchParams.get('v'), expectedVersion, `${file}: ${asset} must bypass the old cached runtime`);
       seen.add(asset);
     }

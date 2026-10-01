@@ -67,8 +67,10 @@ try {
   if(resumeIndex<0)run(process.execPath, [cli, '--workdir', stage, 'start', '-x', 'edge-runtime,imgproxy,logflare,mailpit,postgres-meta,realtime,storage-api,studio,supavisor,vector']);
   else {
     sql("select 'owned isolated stack available';");
-    if(metadata.eventIds?.length)sql(`delete from public.events where id in(${metadata.eventIds.map(id=>{assert.ok(Number.isSafeInteger(id));return id;}).join(',')});`);
+    // Remove only this runner's accounts first: their own Planner rows cascade
+    // with the accounts, preserving the edition FK's deliberate RESTRICT rule.
     if(metadata.actorIds?.length)sql(`delete from auth.users where id in(${metadata.actorIds.map(id=>{assert.match(id,/^[a-f0-9-]{36}$/);return literal(id);}).join(',')});`);
+    if(metadata.eventIds?.length)sql(`delete from public.events where id in(${metadata.eventIds.map(id=>{assert.ok(Number.isSafeInteger(id));return id;}).join(',')});`);
   }
   sql('select cron.unschedule(jobid) from cron.job;');
   const status = JSON.parse(run(process.execPath, [cli, '--workdir', stage, 'status', '-o', 'json']));
@@ -87,10 +89,28 @@ try {
   assert.match(knowledgeRegression,/MANUAL_KNOWLEDGE_ASSERTIONS=\d+/);
   report.knowledge_sql_assertions = Number(knowledgeRegression.match(/MANUAL_KNOWLEDGE_ASSERTIONS=(\d+)/)[1]);
   console.log('Knowledge SQL assertions passed: '+report.knowledge_sql_assertions);
+  for(const [file,setting,marker] of [
+    ['manual-approved-save.sql','test_manual_approval','MANUAL_APPROVAL_ASSERTIONS'],
+    ['own-planner-archived-editions.sql','test_own_planner_archive','OWN_ARCHIVE_ASSERTIONS'],
+    ['catalog-consistent-snapshot.sql','test_catalog_snapshot','CATALOG_SNAPSHOT_ASSERTIONS'],
+    ['housekeeping-validation-route.sql','test_housekeeping','HOUSEKEEPING_ASSERTIONS']
+  ]) {
+    const regression=sql(`set sporteventmap.${setting}='isolated';\n`+fs.readFileSync(path.join(root,'tests',file),'utf8'));
+    fs.writeFileSync(path.join(stage,file.replace('.sql','-regression.log')),regression);
+    const completed=regression.match(new RegExp(marker+'=(\\d+)'));assert.ok(completed,`Missing ${file} completion marker`);
+    report[file.replace('.sql','').replaceAll('-','_')+'_assertions']=Number(completed[1]);
+    console.log(marker+'='+completed[1]);
+  }
   if(args.includes('--prepare-only')) {
     report.prepared_only=true;
     report.browser_acceptance_pending=true;
   } else {
+  const rls=spawnSync(process.execPath,[path.join(root,'tests/local-rls-security.test.mjs')],{cwd:root,encoding:'utf8',env:{...env,SPORT_EVENT_MAP_LOCAL_SUPABASE_WORKDIR:stage},maxBuffer:16*1024*1024});
+  const rlsLog=[rls.stdout,rls.stderr].filter(Boolean).join('\n');fs.writeFileSync(path.join(stage,'local-rls-security.log'),rlsLog);
+  report.local_rls={passed:rls.status===0,workdir:path.relative(root,stage),log:'local-rls-security.log'};
+  assert.equal(rls.status,0,`Existing isolated Auth/RLS suite failed; see ${path.join(stage,'local-rls-security.log')}`);
+  assert.match(rlsLog,/Local Supabase Auth and RLS verification passed\./);
+  console.log('Existing local Auth/RLS suite passed against the exact owned workflow stack.');
   for (const field of ['end_date','start_time','price_min','price_max','currency','participant_limit']) {
     assert.equal(sql(`select count(*) from information_schema.columns where table_schema='public' and table_name='public_event_archive' and column_name=${literal(field)};`).trim(), '1', `Acceptance backend migration missing ${field}`);
   }
@@ -137,8 +157,25 @@ try {
     from public.events e join public.event_editions d on d.event_id=e.id join public.event_sources s on s.edition_id=d.id where e.event_name=${literal(historyName)};
   `));
   metadata.eventIds.push(historical.event_id);fs.writeFileSync(metadataPath,JSON.stringify(metadata,null,2));
+  const participation=parse(sql(`
+    with inserted as (
+      insert into public.event_editions(event_id,edition_year,edition_key,edition_slug,legacy_event_key,start_date,end_date,
+        publication_status,published_at,discovery_status,edition_status,race_formats,legacy_distance,source_url)
+      select ${historical.event_id},${pastYear}-n,'main',${literal(marker+'-personal-')}||n,${literal(marker+'-personal-key-')}||n,
+        make_date(${pastYear}-n,6,10),make_date(${pastYear}-n,6,10),'archived',make_date(${pastYear}-n,1,1),'suppressed','completed',
+        '[{"label":"10 km","distance_km":10}]'::jsonb,'10 km',${literal(historyOfficial)} from generate_series(1,8) n
+      returning id,edition_year,legacy_event_key
+    ), planned as (
+      insert into public.season_planner_events(user_id,event_id,edition_id,priority,planned_distance,planner_details)
+      select ${literal(user.id)},legacy_event_key,id,'A','10 km',jsonb_build_object('result',jsonb_build_object(
+        'finish_status',(array['Finished','DNF','DNS','DSQ','Finisher','Finished','Finished','Finished'])[${pastYear}-edition_year],
+        'finish_time',case when ${pastYear}-edition_year in(1,5,6,7,8) then '00:45:00' else '' end),
+        'post_race',jsonb_build_object('archived',${pastYear}-edition_year>=6)) from inserted
+      returning event_id,edition_id,planner_details
+    ) select jsonb_agg(jsonb_build_object('key',event_id,'edition_id',edition_id,'status',planner_details->'result'->>'finish_status') order by event_id) from planned;
+  `));
   Object.assign(historical,{name:historyName,official:historyOfficial,year});
-  Object.assign(fixture,{name,year,date,official,admin,user,historical});
+  Object.assign(fixture,{name,year,date,official,admin,user,historical,participation});
   const allowed = /^(?:(?:css|js|assets|event|data)\/|(?:index|404|event-detail|about|contact|privacy|legal|imprint)\.html$|(?:favicon[^/]*|apple-touch-icon\.png|site\.webmanifest)$)/;
   const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.csv':'text/csv','.svg':'image/svg+xml','.png':'image/png','.ico':'image/x-icon'};
   const configSource=`window.SPORT_EVENT_MAP_CONFIG=${JSON.stringify({supabaseUrl:apiUrl,supabasePublishableKey:publishableKey,siteUrl:'http://127.0.0.1:4189',authCallbackPath:'index.html',passwordResetPath:'index.html'})};document.documentElement.dataset.appConfig='loaded';`;

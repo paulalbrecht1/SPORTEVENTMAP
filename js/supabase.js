@@ -1316,6 +1316,20 @@ function getProfileFavoriteEvents() {
 
 }
 
+function getProfilePlannedEvents() {
+  // Personal history is edition-bound and may outlive the Discovery catalog.
+  // The Planner owns this collection, including unresolved saved editions.
+  return typeof window.getPersonalPlannedEvents === "function"
+    ? window.getPersonalPlannedEvents()
+    : [];
+}
+
+function getProfileParticipationState(event) {
+  return typeof window.getPersonalParticipationState === "function"
+    ? window.getPersonalParticipationState(event)
+    : { temporal: "unknown", personal: "planned", finished: false, hasOutcome: false, isUpcoming: false };
+}
+
 
 function getProfileFavoriteKey(event) {
 
@@ -1381,31 +1395,9 @@ function syncValidProfileFavorites(favoriteEvents) {
 
 
 function parseProfileDate(value) {
-
-  const match =
-    /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(
-      String(value || "").trim()
-    );
-
-  if (!match) {
-
-    return null;
-
-  }
-
-  const parsed =
-    new Date(
-      Number(match[3]),
-      Number(match[2]) - 1,
-      Number(match[1])
-    );
-
-  parsed.setHours(0, 0, 0, 0);
-
-  return Number.isNaN(parsed.getTime())
-    ? null
-    : parsed;
-
+  return typeof parseSeasonDate === "function"
+    ? parseSeasonDate(value)
+    : null;
 }
 
 
@@ -1487,19 +1479,9 @@ function getUpcomingProfileFavoriteEvents(favoriteEvents) {
 
 }
 
-function getCompletedProfileEvents(favoriteEvents) {
-  const today =
-    new Date();
-
-  today.setHours(0, 0, 0, 0);
-
-  return favoriteEvents
-    .filter(event => {
-      const date =
-        parseProfileDate(event.date);
-
-      return date && date < today;
-    })
+function getCompletedProfileEvents(plannedEvents = getProfilePlannedEvents()) {
+  return plannedEvents
+    .filter(event => getProfileParticipationState(event).finished)
     .sort((first, second) => {
       const firstDate =
         parseProfileDate(first.date);
@@ -1585,7 +1567,7 @@ function renderProfileAchievementBadges(completedCount) {
       .join("");
 }
 
-function renderProfileCompletedEvents(favoriteEvents) {
+function renderProfileCompletedEvents() {
   const list =
     document.getElementById("profileCompletedEvents");
 
@@ -1600,7 +1582,7 @@ function renderProfileCompletedEvents(favoriteEvents) {
   }
 
   const completedEvents =
-    getCompletedProfileEvents(favoriteEvents);
+    getCompletedProfileEvents();
 
   if (countElement) {
     countElement.textContent =
@@ -1616,15 +1598,13 @@ function renderProfileCompletedEvents(favoriteEvents) {
     completedEvents.length
   );
 
-  renderProfileCompletedArchive(
-    favoriteEvents
-  );
+  renderProfileCompletedArchive();
 
   if (!completedEvents.length) {
     list.innerHTML = `
       <div class="profile-completed-empty">
         <strong>No completed races yet</strong>
-        <span>Plan your first race in Season Planner. Past planned races unlock achievements here.</span>
+        <span>Record a finished race in Season Planner. Passing the event date does not unlock achievements.</span>
       </div>
     `;
     return;
@@ -1633,10 +1613,16 @@ function renderProfileCompletedEvents(favoriteEvents) {
   list.innerHTML = `
     <div class="profile-completed-empty is-success">
       <strong>${completedEvents.length} completed race${completedEvents.length === 1 ? "" : "s"}</strong>
-      <span>Your completed planned races are counted toward achievement badges.</span>
+      <span>Your explicitly finished planned editions count toward lifetime achievement badges, including archived editions.</span>
     </div>
   `;
 }
+
+window.addEventListener("personalplanningchange", () => {
+  if (document.getElementById("profileModal")?.classList.contains("open")) {
+    renderProfileCompletedEvents();
+  }
+});
 
 let profileCompletedArchiveFilter =
   "all";
@@ -1780,27 +1766,14 @@ function hasProfileResult(details) {
   ].some(value => String(value || "").trim());
 }
 
-function getProfileCompletedArchiveEvents(favoriteEvents) {
-  const today =
-    new Date();
-
-  today.setHours(0, 0, 0, 0);
-
-  return favoriteEvents
+function getProfileCompletedArchiveEvents(plannedEvents = getProfilePlannedEvents()) {
+  return plannedEvents
     .filter(event => {
       const entry =
         getProfilePlannerEntry(event);
-      const date =
-        parseProfileDate(event.date);
-      const resultStatus =
-        String(
-          entry.planner_details.result.finish_status || ""
-        ).trim();
-
-      return Boolean(
-        (date && date < today) ||
-        resultStatus
-      );
+      const state = getProfileParticipationState(event);
+      const archived = entry.planner_details.post_race?.archived;
+      return state.temporal === "past" || state.hasOutcome || archived === true || archived === "true";
     })
     .sort((first, second) => {
       const firstDate =
@@ -2157,19 +2130,16 @@ function getFilteredProfileArchiveEvents(eventsForArchive) {
   return eventsForArchive.filter(event => {
     const details =
       getProfilePlannerEntry(event).planner_details;
-    const result =
-      details.result || {};
-    const status =
-      String(result.finish_status || "").toLowerCase();
+    const state = getProfileParticipationState(event);
     const hasResult =
       hasProfileResult(details);
 
     if (profileCompletedArchiveFilter === "finisher") {
-      return status === "finisher";
+      return state.finished;
     }
 
     if (profileCompletedArchiveFilter === "dnf_dns") {
-      return ["dnf", "dns", "cancelled"].includes(status);
+      return ["dnf", "dns", "dsq"].includes(String(state.personal || "").toLowerCase());
     }
 
     if (profileCompletedArchiveFilter === "with_result") {
@@ -2190,27 +2160,11 @@ function getProfileArchiveFilterCounts(eventsForArchive) {
       eventsForArchive.length,
     finisher:
       eventsForArchive.filter(event => {
-        const status =
-          String(
-            getProfilePlannerEntry(event)
-              .planner_details
-              .result
-              .finish_status || ""
-          ).toLowerCase();
-
-        return status === "finisher";
+        return getProfileParticipationState(event).finished;
       }).length,
     dnf_dns:
       eventsForArchive.filter(event => {
-        const status =
-          String(
-            getProfilePlannerEntry(event)
-              .planner_details
-              .result
-              .finish_status || ""
-          ).toLowerCase();
-
-        return ["dnf", "dns", "cancelled"].includes(status);
+        return ["dnf", "dns", "dsq"].includes(String(getProfileParticipationState(event).personal || "").toLowerCase());
       }).length,
     with_result:
       eventsForArchive.filter(event =>
@@ -2241,7 +2195,7 @@ function renderProfileCompletedFilters(eventsForArchive) {
   [
     ["all", "profile.filterAll", "All"],
     ["finisher", "profile.filterFinisher", "Finisher"],
-    ["dnf_dns", "profile.filterDnfDns", "DNF/DNS"],
+    ["dnf_dns", "profile.filterDnfDns", "DNF/DNS/DSQ"],
     ["with_result", "profile.filterWithResult", "With result"],
     ["without_result", "profile.filterWithoutResult", "Without result"]
   ].forEach(([filter, key, fallback]) => {
@@ -2287,14 +2241,14 @@ function updateProfileCompletedArchiveToggle() {
         ? "profile.hideCompletedEvents"
         : "profile.viewCompletedEvents",
       profileCompletedArchiveOpen
-        ? "Hide completed events"
-        : "View completed events"
+        ? "Hide race history"
+        : "View race history"
     ))}</span>
     <span class="profile-completed-toggle-chevron" aria-hidden="true"></span>
   `;
 }
 
-function renderProfileCompletedArchive(favoriteEvents) {
+function renderProfileCompletedArchive() {
   const list =
     document.getElementById("profileCompletedArchiveList");
   const panel =
@@ -2305,7 +2259,7 @@ function renderProfileCompletedArchive(favoriteEvents) {
   }
 
   const allArchiveEvents =
-    getProfileCompletedArchiveEvents(favoriteEvents);
+    getProfileCompletedArchiveEvents();
 
   renderProfileCompletedFilters(allArchiveEvents);
   updateProfileCompletedArchiveToggle();
@@ -2324,8 +2278,8 @@ function renderProfileCompletedArchive(favoriteEvents) {
   if (!archiveEvents.length) {
     list.innerHTML = `
       <div class="profile-completed-empty">
-        <strong>${escapeProfileHTML(profileText("profile.noCompletedArchive", "No completed events yet"))}</strong>
-        <span>${escapeProfileHTML(profileText("profile.noCompletedArchiveHint", "Once events from your Season Planner are over, they appear here."))}</span>
+        <strong>${escapeProfileHTML(profileText("profile.noCompletedArchive", "No race history yet"))}</strong>
+        <span>${escapeProfileHTML(profileText("profile.noCompletedArchiveHint", "Past planned editions and recorded outcomes appear here. An elapsed date does not mean a finish."))}</span>
       </div>
     `;
     return;
@@ -2445,13 +2399,11 @@ function exportProfileData() {
       })),
     season_meta:
       (() => {
-        try {
-          return JSON.parse(
-            localStorage.getItem("seasonPlanMeta") || "{}"
-          );
-        } catch (_error) {
-          return {};
-        }
+        const meta = getProfileSeasonMeta();
+        return Object.fromEntries(getProfilePlannedEvents()
+          .map(event => getProfileFavoriteKey(event))
+          .filter(key => Object.hasOwn(meta, key))
+          .map(key => [key, meta[key]]));
       })()
   };
 
@@ -2569,9 +2521,7 @@ async function openProfileModal() {
 
   }
 
-  renderProfileCompletedEvents(
-    getProfileFavoriteEvents()
-  );
+  renderProfileCompletedEvents();
 
   profileModal.classList.add("open");
 
@@ -2862,10 +2812,84 @@ async function isCurrentUserAdmin() {
 
 }
 
+async function loadPersonalPlannedEditions(references = []) {
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  const ids = [...new Set(references.map(row => row.edition_id).filter(id => uuid.test(String(id || ""))))];
+  const keys = [...new Set(references.filter(row => !row.edition_id && /\|.*\d{4}/.test(String(row.event_id || ""))).map(row => row.event_id))];
+  const legacyPrefix = key => {
+    const parts = String(key || "").trim().split("|");
+    return parts.length === 3 && /^(?:\d{2}\.\d{2}\.\d{4}|\d{4}-\d{2}-\d{2})$/.test(parts[1]) &&
+      parts[0] && parts[2] && (typeof parseSeasonDate !== "function" || parseSeasonDate(parts[1])) ? parts.join("|") : "";
+  };
+  const matchesKey = (row, key) => String(row.event_key || "").toLowerCase() === String(key || "").toLowerCase() ||
+    (legacyPrefix(key) && String(row.event_key || "").toLowerCase().startsWith(`${legacyPrefix(key).toLowerCase()}|`));
+  const unresolved = (reference, resolution) => ({ _planner_key: reference.event_id, edition_id: reference.edition_id || null, _planner_resolution: resolution });
+  if (!ids.length && !keys.length) return references.map(reference => unresolved(reference, "unresolved_reference"));
+  let rows = [], snapshotAt = "", failedResolution = "", ownedResolution = "";
+  try {
+    for (const [column, values] of [["edition_id", ids], ["event_key", keys]]) {
+      for (let offset = 0; offset < values.length; offset += 40) {
+        const result = await supabaseClient.from("public_event_archive").select("*").in(column, values.slice(offset, offset + 40));
+        if (result.error || !Array.isArray(result.data)) throw result.error || new Error("Ungültige Archivantwort.");
+        rows.push(...result.data);
+      }
+    }
+    for (const key of keys.filter(key => legacyPrefix(key) && !rows.some(row => matchesKey(row, key)))) {
+      // Match only the same name, concrete date and city. Literal SQL wildcards
+      // are escaped; three returned rows are enough to reject an ambiguous key.
+      const pattern = `${legacyPrefix(key).replace(/[\\%_]/g, character => `\\${character}`)}|%`;
+      const result = await supabaseClient.from("public_event_archive").select("*").ilike("event_key", pattern).limit(3);
+      if (result.error || !Array.isArray(result.data)) throw result.error || new Error("Ungültige Legacy-Archivantwort.");
+      rows.push(...result.data);
+    }
+  } catch (error) {
+    failedResolution = ["42501", "401", "403"].includes(String(error?.code || error?.status || "")) ? "permission_denied" : "unavailable";
+    // Only an unavailable primary request uses the existing public snapshot.
+    // A successful empty answer never resurrects an unpublished edition.
+    try {
+      const response = await fetch("data/event-editions-public.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("Archivsnapshot nicht verfügbar.");
+      const archive = await response.json();
+      if (!Array.isArray(archive.editions) || !Number.isFinite(Date.parse(archive.exported_at))) throw new Error("Ungültiger Archivsnapshot.");
+      rows = archive.editions.filter(row => ids.includes(row.edition_id) || keys.some(key => matchesKey(row, key)));
+      snapshotAt = archive.measured_at || archive.exported_at;
+    } catch { /* Existing personal facts remain available in honest placeholders. */ }
+  }
+  const missingIds = ids.filter(id => !rows.some(row => row.edition_id === id));
+  if (missingIds.length) {
+    try {
+      const current = await supabaseClient.auth.getUser();
+      if (current.error || !current.data?.user) throw { code: "42501" };
+      if (typeof supabaseClient.rpc !== "function") throw new Error("Persönliches Archiv noch nicht verfügbar.");
+      for (let offset = 0; offset < missingIds.length; offset += 40) {
+        const requested = missingIds.slice(offset, offset + 40);
+        const result = await supabaseClient.rpc("get_own_planner_archived_editions", { p_edition_ids: requested });
+        if (result.error || !Array.isArray(result.data)) throw result.error || new Error("Ungültige persönliche Archivantwort.");
+        if (result.data.some(row => !requested.includes(row?.edition_id) || row?.catalog_visibility !== "owned_archived" || row?.publication_status !== "archived")) throw new Error("Persönliches Archiv enthält unerwartete Editionen.");
+        rows.push(...result.data.map(row => ({ ...row, _planner_owned_archive: true })));
+      }
+    } catch (error) {
+      ownedResolution = ["42501", "401", "403"].includes(String(error?.code || error?.status || "")) ? "permission_denied" : "owned_archive_unavailable";
+    }
+  }
+  const unique = [...new Map(rows.map(row => [row.edition_id, row])).values()];
+  return references.flatMap(reference => {
+    const matches = unique.filter(row => reference.edition_id ? row.edition_id === reference.edition_id : matchesKey(row, reference.event_id));
+    if (matches.length !== 1) return [unresolved(reference, matches.length > 1 ? "ambiguous" : failedResolution || (reference.edition_id ? ownedResolution : "") || "not_publicly_available")];
+    const event = typeof normalizeEvent === "function" ? normalizeEvent(matches[0]) : matches[0];
+    return [{ ...event, _planner_key: reference.event_id, ...(snapshotAt && !event._planner_owned_archive ? { _planner_snapshot_at: snapshotAt } : {}) }];
+  });
+}
+window.loadPersonalPlannedEditions = loadPersonalPlannedEditions;
+
+let personalPlanningCloudLoadVersion = 0;
+window.cancelPersonalPlanningLoad = () => { personalPlanningCloudLoadVersion += 1; };
+
 async function loadRemotePlanningState(user) {
   if (!user) {
     return;
   }
+  const loadVersion = ++personalPlanningCloudLoadVersion;
 
   try {
     const favoritesPromise =
@@ -2896,7 +2920,7 @@ async function loadRemotePlanningState(user) {
       seasonResult =
         await supabaseClient
           .from("season_planner_events")
-          .select("event_id, priority, planned_distance")
+          .select("event_id, edition_id, priority, planned_distance")
           .eq("user_id", user.id);
     }
 
@@ -2931,6 +2955,7 @@ async function loadRemotePlanningState(user) {
       (seasonResult.data || [])
         .reduce((result, row) => {
           result[row.event_id] = {
+            edition_id: row.edition_id || null,
             priority:
               row.priority || "Maybe",
             distance:
@@ -2947,10 +2972,14 @@ async function loadRemotePlanningState(user) {
         .filter(Boolean);
 
     const planningState = {
+      userId: user.id,
       favorites: remoteFavorites,
       plannedEditions: remotePlannedEditions,
-      seasonMeta: remoteSeasonMeta
+      seasonMeta: remoteSeasonMeta,
+      plannedEvents: await loadPersonalPlannedEditions(seasonResult.data || [])
     };
+    const current = await supabaseClient.auth.getUser();
+    if (loadVersion !== personalPlanningCloudLoadVersion || current.error || current.data?.user?.id !== user.id) return;
 
     if (
       typeof window.applyRemotePlanningState === "function"
@@ -3094,56 +3123,62 @@ async function syncSeasonEditionToSupabase(event, isPlannedNow) {
   }
 }
 
+const personalPlannerSyncQueues = new Map();
+
+function samePersonalPlannerValue(first, second) {
+  const stable = value => Array.isArray(value) ? value.map(stable) : value && typeof value === "object"
+    ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value;
+  return JSON.stringify(stable(first)) === JSON.stringify(stable(second));
+}
+
 async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
+  const entry = typeof getSeasonMetaEntry === "function" ? getSeasonMetaEntry(eventId) : {};
+  const revision = entry._sync_revision;
+  const owner = localStorage.getItem("personalPlanningUser");
+  const queuedPatch = JSON.parse(JSON.stringify(patch));
+  const previous = personalPlannerSyncQueues.get(eventId) || Promise.resolve();
+  const task = previous.catch(() => {}).then(async () => {
   try {
     const {
       data: { user }
     } = await supabaseClient.auth.getUser();
 
-    if (!user || !eventId) {
-      return;
-    }
+    if (!user || !eventId || (owner && owner !== user.id)) throw new Error("Cloudzugriff für diese persönliche Planung nicht verfügbar.");
 
     const payload = {
       user_id: user.id,
       event_id: eventId
     };
 
-    if (patch.priority) {
+    if (queuedPatch.priority) {
       payload.priority =
-        patch.priority;
+        queuedPatch.priority;
     }
 
     if (
       Object.prototype.hasOwnProperty.call(
-        patch,
+        queuedPatch,
         "distance"
       )
     ) {
       payload.planned_distance =
-        patch.distance || null;
+        queuedPatch.distance || null;
     }
 
     if (
       Object.prototype.hasOwnProperty.call(
-        patch,
+        queuedPatch,
         "planner_details"
       )
     ) {
       payload.planner_details =
-        patch.planner_details || {};
+        queuedPatch.planner_details || {};
     }
 
-    if (typeof events !== "undefined" && Array.isArray(events)) {
-      const edition = events.find(item =>
-        typeof getEventKey === "function" && getEventKey(item) === eventId
-      );
-      if (edition?.edition_id) {
-        payload.edition_id = edition.edition_id;
-      }
-    }
+    const edition = typeof findSeasonEventByKey === "function" ? findSeasonEventByKey(eventId) : null;
+    if (edition?.edition_id || entry.edition_id) payload.edition_id = edition?.edition_id || entry.edition_id;
 
-    let { error } =
+    const { error } =
       await supabaseClient
         .from("season_planner_events")
         .upsert(
@@ -3153,36 +3188,30 @@ async function syncSeasonPlanMetaToSupabase(eventId, patch = {}) {
           }
         );
 
-    if (
-      error &&
-      payload.planner_details &&
-      /planner_details/i.test(error.message || "")
-    ) {
-      const fallbackPayload =
-        { ...payload };
-
-      delete fallbackPayload.planner_details;
-
-      ({ error } =
-        await supabaseClient
-          .from("season_planner_events")
-          .upsert(
-            fallbackPayload,
-            {
-              onConflict: "user_id,event_id"
-            }
-          ));
-    }
-
     if (error) {
       throw error;
     }
+    const readback = await supabaseClient.from("season_planner_events")
+      .select("event_id,edition_id,priority,planned_distance,planner_details")
+      .eq("user_id", user.id).eq("event_id", eventId).limit(2);
+    if (readback.error || readback.data?.length !== 1 || Object.entries(payload).some(([field, value]) =>
+      field !== "user_id" && !samePersonalPlannerValue(readback.data[0][field], value))) {
+      throw readback.error || new Error("Cloudspeicherung konnte durch erneutes Lesen nicht bestätigt werden.");
+    }
+    window.setPersonalPlannerSyncState?.(eventId, revision, "synced", "In der Cloud gespeichert und erneut gelesen.", user.id);
+    return true;
   } catch (error) {
     console.warn(
       "Season Planner cloud sync failed:",
       error
     );
+    window.setPersonalPlannerSyncState?.(eventId, revision, "error", "Auf diesem Gerät gespeichert; Cloudspeicherung fehlgeschlagen. Ergebnis bleibt erhalten.", owner || undefined);
+    return false;
   }
+  });
+  personalPlannerSyncQueues.set(eventId, task);
+  task.finally(() => { if (personalPlannerSyncQueues.get(eventId) === task) personalPlannerSyncQueues.delete(eventId); });
+  return task;
 }
 
 window.syncFavoriteToSupabase =
@@ -3566,7 +3595,9 @@ supabaseClient.auth.onAuthStateChange((event) => {
         typeof window.applyRemotePlanningState === "function"
       ) {
         window.applyRemotePlanningState({
+          clear: true,
           favorites: [],
+          plannedEditions: [],
           seasonMeta: {}
         });
       }
@@ -4709,6 +4740,13 @@ function ensureDataOpsReviewWorkspace() {
         </article>
       </div>
       <div class="data-freshness-priorities">
+        <strong>Datenqualität und Freigabe</strong>
+        <p id="catalogQualityDefinition">Katalogmessung nicht ermittelt.</p>
+        <dl id="catalogQualityDetails" class="catalog-quality-details"></dl>
+        <p id="catalogQualityBlockers">Freigabeblocker nicht ermittelt.</p>
+        <button type="button" id="downloadCatalogQualityReport">Prüfbericht herunterladen</button>
+      </div>
+      <div class="data-freshness-priorities">
         <strong>Nächste Prioritäten</strong>
         <ul id="dataFreshnessPriorityList"><li>Daten werden geladen.</li></ul>
       </div>
@@ -4936,6 +4974,9 @@ let dataOpsProposals = [];
 let dataOpsAlerts = [];
 let dataOpsRuns = [];
 let dataOpsFreshnessBlockingFeedback = [];
+let catalogQualityReport = null;
+let catalogQualityExport = null;
+let dataOpsMeasuredAt = null;
 
 let sourceMonitorJobs = [];
 let sourceMonitorActiveJobs = [];
@@ -5049,7 +5090,7 @@ async function loadAdminTab(tabName, options = {}) {
     if (!panel || panel.dataset.maintenanceMounted === "true") return;
     try {
       if (!await isCurrentUserAdmin()) throw new Error("Für die Eventpflege ist eine Adminanmeldung erforderlich.");
-      await import("./manual-event-maintenance.js?v=20261001-review-preview-v134");
+      await import("./manual-event-maintenance.js?v=20261001-faq-readback-v141");
       window.SemManualEventMaintenance.mount({
         root: panel,
         client: supabaseClient,
@@ -5387,6 +5428,103 @@ function renderDataOpsAlerts() {
     </article>`).join("") || '<p class="admin-quality-empty">Keine offenen Workflow-Alarme.</p>';
 }
 
+function renderCatalogQualityReport() {
+  const definition = document.getElementById("catalogQualityDefinition");
+  const details = document.getElementById("catalogQualityDetails");
+  const blockers = document.getElementById("catalogQualityBlockers");
+  if (!definition || !details || !blockers) return;
+  const report = catalogQualityReport;
+  const number = value => value == null ? "nicht ermittelt" : String(value);
+  const ratio = (count, total, rate) => rate == null ? "nicht ermittelt" : `${count} von ${total} (${rate.toLocaleString("de-DE")} %)`;
+  definition.textContent = report?.available
+    ? `${report.definition}. Messzeitpunkt: ${formatDataOpsDate(report.measured_at, true)}. ${report.future.definition}.`
+    : "Katalogmessung nicht ermittelt. Vollnachweise benötigen den editions- und feldwertgebundenen Frische-Guard; Status oder HTTP-Erfolg genügen nicht.";
+  const future = report?.available ? report.future : null;
+  const ops = report?.operations;
+  const entries = [
+    ["Zukünftig öffentlich suchbar", future ? `${future.total} insgesamt · ${future.germany} Deutschland` : "nicht ermittelt"],
+    ["Eventidentitäten (gesamte Datenbank)", number(ops?.event_identities)],
+    ["Veröffentlichte Editionen mit zukünftigem Datum (auch außerhalb der Suche)", number(report?.available ? report.population.future_dated_published_editions : null)],
+    ["Vollständig aktuell verifiziert", future ? ratio(future.fresh, future.total, future.freshness_rate) : "nicht ermittelt"],
+    ["Deutschland: Vollnachweise", future ? ratio(future.germany_fresh, future.germany, future.germany_freshness_rate) : "nicht ermittelt"],
+    ["Datum nicht zugeordnet", number(future?.unknown_date)],
+    ["Fehlende oder ungültige Vollnachweise", number(future?.missing_or_invalid_attestation)],
+    ["Überfällige Prüfungen / ohne Prüftermin", future ? `${future.overdue} / ${future.unscheduled}` : "nicht ermittelt"],
+    ["Kritische Datenprobleme (gesamter Pflegebestand)", number(ops?.critical_issues)],
+    ["Offene Reviews / Kandidatenkonflikte (Quellenaufgaben, Vorschläge, Nachfolgekandidaten)", ops ? `${ops.open_reviews} / ${ops.candidate_conflicts}` : "nicht ermittelt"],
+    ["Entwürfe / veröffentlichtes Archiv", report?.available && ops ? `${ops.draft_editions} / ${report.metrics.archive_rows}` : "nicht ermittelt"],
+    ["Letzter erfolgreicher Qualitätscheck (Validierung/gebundener Exportcheck)", ops?.last_successful_quality_check ? formatDataOpsDate(ops.last_successful_quality_check, true) : catalogQualityExport?.data_quality_passed === true && catalogQualityExport.data_quality_checked_at ? `${formatDataOpsDate(catalogQualityExport.data_quality_checked_at, true)} (Exportprüfung)` : "nicht ermittelt"],
+    ["Letzter erfolgreicher Export / Quelldatenstand", catalogQualityExport?.exported_at ? `${formatDataOpsDate(catalogQualityExport.exported_at, true)} · ${catalogQualityExport.metrics?.discovery_rows ?? "?"} Sucheinstiege / ${catalogQualityExport.metrics?.archive_rows ?? "?"} Archiv; SHA-256 geprüft; Snapshot: ${catalogQualityExport.measured_at || "nicht dokumentiert"}; keine Aussage über neue Quellenprüfung oder Freigabe` : "nicht ermittelt"]
+  ];
+  details.innerHTML = entries.map(([label, value]) => `<div><dt>${escapeAdminHTML(label)}</dt><dd>${escapeAdminHTML(value)}</dd></div>`).join("");
+  const reasons = [...(report?.blockers || ["Katalog-Snapshot nicht ermittelt."])];
+  if (catalogQualityExport?.exported_at) reasons.push(`Ausfallexport separat prüfen (Datenstand ${catalogQualityExport.exported_at}); gebundene Audits und produktive Freigabe erforderlich.`);
+  else reasons.push("Exportstand nicht ermittelt.");
+  blockers.textContent = `Freigabeblocker: ${reasons.join(" ")}`;
+  const button = document.getElementById("downloadCatalogQualityReport");
+  if (button) button.disabled = !report;
+}
+
+async function loadCatalogQualityReport() {
+  const jsonFile = async file => {
+    const response = await fetch(file, { cache: "no-store" });
+    if (!response.ok) throw new Error("Qualitätsmetadaten nicht verfügbar.");
+    return response.json();
+  };
+  const checkedExport = async () => {
+    const manifest = await jsonFile("data/catalog-export-manifest.json");
+    if (manifest?.schema_version !== 1 || !Number.isFinite(Date.parse(manifest.exported_at))) throw new Error("Ungültiges Exportmanifest.");
+    const sha256 = async file => {
+      const response = await fetch(file, { cache: "no-store" });
+      if (!response.ok) throw new Error("Exportdatei fehlt.");
+      const bytes = await response.arrayBuffer();
+      const hash = await crypto.subtle.digest("SHA-256", bytes);
+      return [...new Uint8Array(hash)].map(byte => byte.toString(16).padStart(2, "0")).join("");
+    };
+    const hashes = await Promise.all([sha256("data/events.csv"), sha256("data/event-editions-public.json")]);
+    if (hashes[0] !== manifest.sha256?.discovery || hashes[1] !== manifest.sha256?.archive) throw new Error("Exportintegrität nicht bestätigt.");
+    return manifest;
+  };
+  const [snapshotResult, policyResult, exportResult] = await Promise.allSettled([
+    Promise.resolve().then(() => {
+      if (typeof supabaseClient === "undefined" || typeof supabaseClient?.rpc !== "function") throw new Error("Katalogzugriff nicht verfügbar.");
+      return supabaseClient.rpc("get_public_event_catalog_snapshot");
+    }),
+    jsonFile("data/catalog-release-policy.json"),
+    checkedExport()
+  ]);
+  catalogQualityExport = exportResult.status === "fulfilled" && exportResult.value?.schema_version === 1 ? exportResult.value : null;
+  const qualityCheck = dataOpsRuns.filter(run => run.job_type === "validation" && run.run_status === "succeeded" && run.finished_at)
+    .map(run => run.finished_at).sort().at(-1) || null;
+  const operations = dataOpsMeasuredAt ? {
+    measured_at: dataOpsMeasuredAt,
+    event_identities: dataOpsEvents.length,
+    critical_issues: dataOpsIssues.length,
+    open_reviews: sourceMonitorReviews.filter(item => item.status === "open").length +
+      dataOpsProposals.filter(item => item.proposal_status === "pending").length +
+      dataOpsSuccessionCandidates.filter(item => ["detected", "conflict", "draft_created"].includes(item.candidate_status)).length,
+    candidate_conflicts: dataOpsSuccessionCandidates.filter(item => item.validation_status === "conflict" && ["detected", "conflict", "draft_created"].includes(item.candidate_status)).length,
+    draft_editions: dataOpsEditions.filter(item => item.publication_status === "draft").length,
+    last_successful_quality_check: qualityCheck
+  } : null;
+  const payload = snapshotResult.status === "fulfilled" && !snapshotResult.value?.error ? snapshotResult.value.data : null;
+  catalogQualityReport = typeof CatalogQualityReport === "undefined" ? null : CatalogQualityReport.buildCatalogQualityReport({
+    snapshot: payload, policy: policyResult.status === "fulfilled" ? policyResult.value : null, operations
+  });
+  renderCatalogQualityReport();
+}
+
+document.getElementById("downloadCatalogQualityReport")?.addEventListener("click", () => {
+  if (!catalogQualityReport) return;
+  const blob = new Blob([JSON.stringify({ ...catalogQualityReport, last_export: catalogQualityExport }, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "sporteventmap-quality-report.json";
+  link.click();
+  URL.revokeObjectURL(url);
+});
+
 function renderDataFreshnessOverview() {
   if (!dataFreshnessElements.section) return;
   if (
@@ -5412,7 +5550,12 @@ function renderDataFreshnessOverview() {
     proposals: dataOpsProposals,
     alerts: dataOpsAlerts
   });
+  // Technical source-operation signals are separate from content verification.
+  const strictMetrics = catalogQualityReport?.available ? catalogQualityReport.metrics : null;
+  summary.editions.fresh = strictMetrics?.fresh_rows ?? null;
+  summary.editions.freshnessRate = strictMetrics?.freshness_rate ?? null;
   window.dataFreshnessDiagnostics = summary;
+  window.catalogQualityDiagnostics = catalogQualityReport;
 
   const stateLabels = {
     healthy: "Betrieb stabil",
@@ -5444,10 +5587,12 @@ function renderDataFreshnessOverview() {
       "Öffentlichen Ladepfad prüfen";
   }
 
-  dataFreshnessElements.rate.textContent =
-    `${summary.editions.freshnessRate.toLocaleString("de-DE")} %`;
-  dataFreshnessElements.rateDetail.textContent =
-    `${summary.editions.fresh} von ${summary.editions.current} aktuell verifiziert`;
+  const verified = catalogQualityReport?.available ? catalogQualityReport.future : null;
+  dataFreshnessElements.rate.textContent = verified?.freshness_rate == null
+    ? "nicht ermittelt" : `${verified.freshness_rate.toLocaleString("de-DE")} %`;
+  dataFreshnessElements.rateDetail.textContent = verified
+    ? `${verified.fresh} von ${verified.total} mit vollständigem aktuellem Prüfnachweis`
+    : "Vollständiger Prüfnachweis konnte nicht ermittelt werden";
   dataFreshnessElements.due.textContent = String(
     summary.editions.overdue + summary.editions.unscheduled
   );
@@ -5514,6 +5659,7 @@ function renderDataFreshnessOverview() {
     dataFreshnessElements.summary.textContent =
       "Der Katalog bleibt nutzbar, aber einzelne Prüf- oder Review-Aufgaben sind offen.";
   }
+  renderCatalogQualityReport();
 }
 
 function openDataFreshnessTarget(detailsId, targetSelector) {
@@ -7082,6 +7228,9 @@ async function loadDataOperations({ throwOnError = false } = {}) {
     return;
   }
   setDataOpsStatus(dataOpsText("admin.dataOps.loading", "Loading Data Operations..."));
+  dataOpsMeasuredAt = null;
+  catalogQualityReport = null;
+  renderCatalogQualityReport();
   const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult] = await Promise.all([
     loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
     loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at,updated_at,race_formats,legacy_distance,predecessor_edition_id,generated_from_candidate_id,generated_from_source_id"),
@@ -7101,6 +7250,8 @@ async function loadDataOperations({ throwOnError = false } = {}) {
   ]);
   const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult].find(result => result.error);
   if (failed) {
+    await loadCatalogQualityReport();
+    renderDataFreshnessOverview();
     setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
     console.error("Data Operations load failed:", failed.error);
     if (throwOnError) throw new Error("Aktueller Datenstand konnte nicht vollständig geladen werden. Keine Freigabe möglich.");
@@ -7134,6 +7285,8 @@ async function loadDataOperations({ throwOnError = false } = {}) {
     seenInboxItems.add(key);
     return true;
   });
+  dataOpsMeasuredAt = new Date().toISOString();
+  await loadCatalogQualityReport();
   populateDataOpsSelect(dataOpsElements.country, dataOpsEvents.map(row => row.country));
   populateDataOpsSelect(dataOpsElements.sport, dataOpsEvents.map(row => row.sport));
   populateDataOpsSelect(dataOpsElements.proposalType, dataOpsProposals.map(row => row.change_type));

@@ -66,6 +66,21 @@ Quellstand; er aktualisiert sie nicht automatisch. Für `events.js`, `map.js` un
 zusätzlich in einer bereits zuvor geöffneten Sitzung nach normalem Neuladen
 prüfen, damit ein alter Browsercache keine korrigierten Dateien verdeckt.
 
+Lokal vorbereitet am 01.10.2026: Die feste Oberflächenliste enthält auch
+`css/data-operations.css`, `js/catalog-quality-report.js` und den geänderten
+`js/event-catalog-loader.js`, weil der erhaltene Quellstand diese Abhängigkeiten
+bereits verwendet. Die übrigen Daten-/Konfigurationsdateien bleiben geschützt.
+Admin-Speichern benötigt zusätzlich die gesondert abzunehmende Migration
+`20261001104403_manual_approved_save.sql`; ein bloßer UI-Upload installiert sie
+nicht. Für tatsächlich archivierte Plannereditionen ist außerdem
+`20261001112438_own_planner_archived_editions.sql` nötig: ein Lese-RPC für eigene
+früher öffentliche Editionen, ohne Datenmigration oder globale RLS-Öffnung.
+Der Nutzer hat den Backend-/UI-Rollout am 01.10.2026 ausdrücklich freigegeben.
+Zielversion ist **20261001-ui-only-v141**. Der Ausführungsnachweis wird im
+[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) ergänzt; die Freigabe allein belegt
+noch keine angewendete Migration oder Veröffentlichung. Die Datenreleasegates
+bleiben unverändert.
+
 ```powershell
 node tools/ui-release.js build --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --out exports/<release>/package
 node tools/ui-release.js verify --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --package exports/<release>/package

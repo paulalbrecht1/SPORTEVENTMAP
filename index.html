@@ -33,7 +33,7 @@
   <!-- DEIN CSS -->
   <link rel="stylesheet" href="css/style.css?v=20260929-detail-layout-v130" />
   <link rel="stylesheet" href="css/mobile-discovery.css?v=20260907-v1" />
-  <link rel="stylesheet" href="css/data-operations.css?v=20260810-freshness-overview-v2" />
+  <link rel="stylesheet" href="css/data-operations.css?v=20261001-quality-report-v3" />
 </head>
 
 <body>
@@ -1579,7 +1579,7 @@
     <section class="profile-section profile-completed-archive-section">
       <div class="profile-section-heading">
         <h3>
-          Completed Events
+          Race history
         </h3>
         <span>Race history</span>
       </div>
@@ -1590,7 +1590,7 @@
         aria-expanded="false"
         aria-controls="profileCompletedArchivePanel"
       >
-        <span>View completed events</span>
+        <span>View race history</span>
         <span class="profile-completed-toggle-chevron" aria-hidden="true"></span>
       </button>
       <div
@@ -1601,7 +1601,7 @@
         <div class="profile-completed-filterbar" id="profileCompletedFilterbar">
           <button type="button" class="active" data-profile-completed-filter="all">All</button>
           <button type="button" data-profile-completed-filter="finisher">Finisher</button>
-          <button type="button" data-profile-completed-filter="dnf_dns">DNF/DNS</button>
+          <button type="button" data-profile-completed-filter="dnf_dns">DNF/DNS/DSQ</button>
           <button type="button" data-profile-completed-filter="with_result">With result</button>
           <button type="button" data-profile-completed-filter="without_result">Without result</button>
         </div>
@@ -3536,17 +3536,18 @@
   defer
   src="js/config.js?v=20260706-header-nav-v67"
 ></script>
-<script defer src="js/i18n.js?v=20260929-ui-only-v94"></script>
+<script defer src="js/i18n.js?v=20261001-history-labels-v139"></script>
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
-  data-supabase-src="js/supabase.js?v=20261001-review-preview-v134"
+  data-supabase-src="js/supabase.js?v=20261001-admin-faq-readback-v141"
 ></script>
 
 <script defer src="js/data-freshness-health.js?v=20260810-freshness-overview-v1"></script>
-<script defer src="js/event-catalog-loader.js?v=20260810-catalog-pagination-v1"></script>
+<script defer src="js/catalog-quality-report.js?v=20261001-v1"></script>
+<script defer src="js/event-catalog-loader.js?v=20261001-catalog-integrity-v2"></script>
 <script defer src="js/event-description.js?v=20260929-public-description-v132"></script>
-<script defer src="js/events.js?v=20260929-public-description-v132"></script>
+<script defer src="js/events.js?v=20261001-planner-history-v138"></script>
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
 <script defer src="js/map.js?v=20260929-ui-only-v94"></script>
 <script defer src="js/search.js?v=20260827-mobile-stability-v72"></script>

@@ -1,5 +1,208 @@
 # P0-Abschlussplan – 29. September 2026
 
+## Aktuelle lokale Abnahme – 1. Oktober 2026
+
+**Nachfolgende Freigabe am 01.10.2026:** Der Nutzer hat den vorgeschlagenen
+Backend-/UI-Rollout ausdrücklich erlaubt. Vorgesehen sind die vier unten
+genannten, lokal geprüften Migrationen und UI-Version **20261001-ui-only-v141**
+über den bestehenden getrennten UI-Releaseweg. Vor der Anwendung werden
+aktueller Produktionsstand, Wiederherstellungspunkt und Produktionsklon geprüft.
+Die nachstehenden lokalen Nachweise sind der Stand vor diesem Rollout; sein
+separater Ausführungsnachweis folgt erst nach tatsächlicher Anwendung. Keine
+Absenkung der Datenreleasegates, kein Bestandsimport und keine neue Quellenfreigabe.
+
+**P0 am 01.10.2026 wieder aufgenommen:** Die zwischenzeitlich priorisierten
+Admin-/Planner-Reparaturen und sämtliche bisherigen Änderungen bleiben erhalten.
+P1 und der weitere Bestandsausbau bleiben pausiert. Der normale manuelle Pflegeweg
+kommt mit einer gemeinsamen Änderungsbestätigung aus; diese ist kein externer
+Quellenprüfnachweis.
+Archivierung darf persönliche Teilnahmen und Ergebnisse niemals entfernen.
+
+**Akute Korrekturen lokal umgesetzt:** zentrale Änderungsbestätigung,
+versions-/requestgebundene Speicherung mit tatsächlichem Werte-Readback,
+automatische gezielte Onlineübernahme ohne erfundene Quellenprüfung;
+explizite neue Edition versus identitätserhaltende Verschiebung. Persönliche
+Historie, Ergebnisse, Zähler und bestehende Finish-Badges verwenden eigene
+konkrete Teilnahmen unabhängig von Discovery. Vor der P0-Wiederaufnahme bestand
+`npm run test:code` mit allen technischen Gruppen und **225/225 Browsertests**;
+Admin-/Historiengruppen jeweils **26/26**. Belege und Testanleitung stehen in
+[Events manuell pflegen](MANUAL_EVENT_MAINTENANCE.md) und
+`exports/acute-20261001/test-code-green.log`.
+Die akuten Migrationen `20261001104403_manual_approved_save.sql` und
+`20261001112438_own_planner_archived_editions.sql` sind vorbereitet und nicht
+produktiv installiert. Die vorhandene Podman-Maschine `sporteventmap` war nur
+gestoppt; sie wurde für isolierte SQL-/RLS-Tests gestartet. Die frühere Angabe
+„Docker fehlt“ war unzutreffend. Backend-/UI-Rollout bleibt separat freizugeben.
+Keine produktive Wirksamkeit dieser Änderungen behauptet.
+
+**P0 teilweise abgeschlossen:** belegte technische Lücken lokal korrigiert;
+die neuen Migrationen bestehen inzwischen die lokale SQL-/RLS-Laufzeitabnahme.
+Manuelle Datenprüfung und reguläre produktive Freigabe bleiben offen. Die folgenden Septemberabschnitte sind
+historische Messungen und Rolloutnachweise. Heute wurde nichts produktiv
+geschrieben, importiert, angewendet oder veröffentlicht; kein Commit/Push.
+
+Lesende Einzelstatement-Messung über Production-Supabase:
+**01.10.2026, 10:13:01 UTC / 12:13:01 MESZ**. Die neue Snapshot-SQL-Abfrage wurde
+als SELECT ausgeführt; das RPC selbst wurde nicht installiert.
+
+| Bezugsbestand | Tatsächliche Messung |
+| --- | ---: |
+| Eventidentitäten in der gesamten Datenbank | 999 |
+| Öffentlich suchbare nächste aktive Editionen, mit Zukunftsdatum | 211 |
+| Davon Deutschland | 161 |
+| Gültige vollständige aktuelle Nachweise, gleiche 211 Editionen | 7 / 211 = 3,32 % |
+| Deutschlandnachweise, gleiche 161 deutschen Editionen | 7 / 161 = 4,35 % |
+| Strukturell vollständige Sucheinstiege | 111 / 211 = 52,61 % |
+| Veröffentlichte Editionen insgesamt, einschließlich Historie | 992 |
+| Davon zukünftiges Datum / historisches Datum | 211 / 781 |
+| Private Editionsentwürfe | 33 |
+| Fehlende/ungültige Vollnachweise; überfällige Prüfungen im Discoverybestand | jeweils 204 |
+| Kritische offene Validierungsprobleme, gesamter Pflegebestand | 31 |
+| Offene Quellenaufgaben + Vorschläge + Nachfolgekandidaten, gesamter Pflegebestand | 4.004 |
+| Offene Kandidatenkonflikte | 4 |
+
+Eine erneute ausschließlich lesende Einzelstatement-Zählung am **01.10.2026,
+12:24:09 UTC / 14:24:09 MESZ** bestätigt 999 Eventidentitäten, 211/161
+Discovery-Editionen, sieben/sieben aktuelle Vollnachweise im jeweils gleichen
+Bestand, 992 veröffentlichte Editionen (781 vergangen) und 33 Entwürfe.
+`publication_status='archived'` betrifft dabei null Editionen; öffentlich
+erreichbare vergangene Editionen sind ein anderer Bezugsbestand. Beleg:
+`exports/p0-20261001/resumed-read-only-counts.json`. Review-/Problemzahlen der
+Tabelle wurden in dieser späteren Zählung nicht erneut erhoben.
+
+Das sind verschiedene Bestände: 999 Identitäten und 992 veröffentlichte Editionen
+belegen keine 999 aktuellen verifizierten deutschen Veranstaltungen. Die 4.004
+Revieweinträge sind einzelne Aufgaben/Vorschläge, keine 4.004 fehlerhaften Events.
+Kein erfolgreicher `validation`-Lauf ist in `data_workflow_runs` protokolliert;
+sein letzter Zeitpunkt bleibt **nicht ermittelt**. Der vorhandene Quellenmonitor
+ist davon getrennt.
+
+Der Rückgang von 212/162 am 29.09. auf 211/161 ist durch den AOK Firmenlauf
+Ludwigsburg (Event 303, Datum/Enddatum 30.09.2026) belegbar. Der achte Vollnachweis
+am Paderborner Osterlauf 2027 (1013) wurde laut Audit um 29.09., 19:45:06 UTC
+durch ein blockierendes Reviewsignal invalidiert: `needs_review`, sofortige
+Prüffälligkeit und entfernter Quellenbindungsnachweis. Das belegt Prüfbedarf,
+keinen falschen Termin. Die sieben übrigen früher bestätigten Fälle bestehen
+den Guard weiterhin. Paderborn zuerst editionsgenau nachprüfen, nicht pauschal
+frisch setzen.
+
+Belegte lokale Änderungen: gemeinsame Admin-/Exportauswertung statt reiner
+Statusfrische; klare Datenbank-/Online-/Fallbackmeldungen; single-statement
+Snapshot; öffentliche Feld-Whitelist; vorhandene Datums-/Geo-/Dublettenprüfungen
+vor Exportersetzung; rückrollbare Artefaktgruppe und Abbruchsperre; konsistente
+CSV-Records bei mehrzeiligen Beschreibungen. Reguläre Gates bleiben unverändert.
+
+Vorbereitete Migrationen:
+`20261001095043_public_catalog_consistent_snapshot.sql` (nur lesender Snapshot)
+und `20261001100704_housekeeping_validation_core_route.sql` (bestehender Validator
+als einmaliger privater Core; öffentlicher Admin-/Service-Guard unverändert).
+Der bestehende `postgres`-Cron ohne JWT scheitert derzeit an der öffentlichen
+RPC-Prüfung. Seine produktive Reparatur aktiviert wieder die bereits vorgesehenen
+Housekeeping-/Validierungsänderungen und braucht deshalb Integrationstest und
+ausdrückliche Freigabe. Keine Automatisierungsschalter wurden eingeschaltet.
+
+Realer lokaler Diagnosekandidat unter `exports/p0-20261001/candidate`:
+gebundene Datums-/Geo-/Dublettenchecks bestanden, null kritische Datums-/Geobefunde,
+null blockierende Dubletten; drei Geo-Warnungen und ein Dublettenhinweis bleiben
+fachlich zu prüfen. Der reguläre Export wurde absichtlich abgewiesen:
+**211 < 400**, **3,32 % < 55 %**. Kandidat `diagnostic_only`, keine Datenfreigabe.
+Die sechs bisherigen Daten-/Auditdateien blieben laut Hashvergleich unverändert.
+Fallbackdatenstand weiterhin **27.08.2026**; altes 36-Spaltenschema passt nicht
+zum aktuellen 42-Spaltenexport. Die fünf eingefrorenen Dubletten aus dem alten
+Bericht sind weiterhin kein Nachweis neuer Produktionsfälle.
+
+Lokale Prüfbelege und Grenzen vor der Prioritätsänderung stehen in
+`exports/p0-20261001`. `npm run test:code` bestand damals einschließlich
+**209 Browsertests**; der zusätzliche
+abschließende Katalogrelease-Regressionslauf bestand ebenfalls. Der erste
+Gesamtlauf deckte eine fehlende lokale Detail-RPC-Testantwort auf; die Theme-
+Fixture wurde korrigiert. Die neue CSV-Cacheversion wurde im exakten Cachetest
+nachgeführt. `git diff --check` bestand.
+`test:all`, `prepare-package` und `verify-package` blockierten vor Erzeugung
+eines Releasepakets am unveränderten alten 36-Spalten-Fallback.
+Der rein lesende produktive `audit:anon` bestand: öffentliche Discovery/Archiv-
+Formate lesbar, ausstehende Events und persönliche Tabellen weiterhin geschützt.
+Die ersten lokalen SQL-/RLS-Versuche konnten wegen der gestoppten Podman-Maschine
+nicht starten; diese Grenze wurde bei Wiederaufnahme von P0 behoben. Die isolierte
+Abnahme mit **64 Migrationen** bestand **247 SQL-Assertions** (97 Pflege, 34
+Knowledge, 28 gemeinsame Freigabe, 14 eigenes Archiv, 52 Snapshot, 22 Housekeeping)
+und die vorhandene **RLS-Suite 23/23** einschließlich ihrer bestehenden
+Knowledge-/Legacy-Prüfungen. Kein produktiver Admin-Schreibpilot und keine
+produktive Migration wurden ausgeführt.
+
+Zusätzlich wurden zwei reale Releasefehler behoben: Der Paketbuilder führte
+bisher den Detailseitengenerator nicht aus; CSV und Archiv wurden dabei über
+Namen/Datum statt Editions-ID zusammengeführt. Der Builder ruft den Generator
+jetzt auf und vergleicht gespeicherte sowie kopierte HTML-Editionswerte mit dem
+Katalog. Unterschiedliche UUIDs bleiben getrennt, auch bei gleichem Namen/Datum.
+Die echte Browser-/Datenbankabnahme deckte außerdem einen FAQ-Readbackfehler auf:
+Zusätzliche Servermetadaten wurden als Abweichung gewertet. Der Vergleich prüft
+nun nur beantragte FAQ-Werte und die Detailbindung; die Erfolgsmeldung eines
+älteren Auftrags wird beim nächsten Speichern entfernt (Admincache v141).
+Die gekoppelte Regression nutzt einen synthetischen Kandidaten und echte lokale
+Dateierzeugung/-paketierung; Git-/Freigabegates sind nur in dieser Testfixture
+isoliert. Bestehende echte Releasegates bleiben unverändert.
+
+Aktueller vollständiger technischer Lauf: `npm run test:code` **EXIT 0**, alle
+Scriptgruppen, Layoutprüfung und **239/239 Browsertests** einschließlich mobilem
+Adminwechsel und simuliertem Primärausfall. Beleg:
+`exports/p0-20261001/test-code-resumed.log`. Nach dem letzten FAQ-Fix bestanden
+erneut **27/27 Unitprüfungen und 50/50 Admin-/Knowledge-Browserfälle**
+(`manual-faq-unit.log`, `faq-browser.log`). `test:all`, `prepare-package` und
+`verify-package` wurden erneut ausgeführt und blockierten weiterhin vor einem
+Releasepaket am alten 36-Spalten-Fallback. Es wurde kein Datenrelease vorbereitet,
+das die unveränderten Bedingungen bereits erfüllt.
+
+Die anschließende echte lokale Browserabnahme bestand **19/19 Abläufe** mit
+Supabase Auth, PostgREST und tatsächlichen Datenbankantworten (keine simulierten
+erfolgreichen Speicherantworten). Geprüft sind unter anderem unabhängige anonyme
+Detailaufrufe, FAQ-Speicherung, Versionskonflikt, verlorene Commitantwort,
+Veröffentlichungsretry, neue Edition, unberechtigter Zugriff und acht eigene
+archivierte Editionen. Mobile Ergebnisänderungen Finished → DNF → Finished,
+persönliche Archivierung und Entfernen des Ergebnisstatus blieben nach erneutem
+Cloudlesen/Neuladen erhalten; Finish-Badges wurden ohne doppelte Einträge
+entsprechend neu berechnet. Der sichtbare Planner-Navigationseinstieg wird
+benutzt und seine Route/Ansicht geprüft. Beleg:
+`exports/manual-workflow-acceptance/run-k7ZfiZ/acceptance-report.json`
+(`production_touched: false`, `passed: true`). Testdaten sind synthetisch und
+der Stack war ausschließlich lokal; dies weist keinen produktiven Rollout nach.
+
+Auch `npm run test:manual-maintenance:local` bestand abschließend separat:
+**213 SQL-Assertions** und echte getrennte Commit-/Lesesitzungen einschließlich
+idempotenter Wiederholung. Zwei tatsächlich gleichzeitig schreibende Sitzungen
+ergaben genau einen Commit und einen Versionskonflikt. Beleg:
+`exports/p0-20261001/sql-resumed-green.log`. Beide lokalen Runner beendeten ihre
+eigenen Teststacks; eine anschließende Podman-Abfrage zeigte keine aktiven
+Container. Die für diese Tests gestartete Maschine wurde wieder gestoppt.
+
+Zusätzliche Änderungen bei Wiederaufnahme: `tools/create-publish-package.js`,
+`tools/generate-event-pages.js`, FAQ-Readback in `js/manual-event-maintenance.js`
+samt Cacheadressen in `index.html`/`js/supabase.js`; Regressionen in
+`tests/catalog-page-release.test.mjs`, `tests/catalog-consistent-snapshot.sql`,
+den bestehenden SQL-/Browser-/Release-Tests und lokalen Runnern. Die RLS-Suite
+akzeptiert zusätzlich ausschließlich den exakt geprüften, runner-eigenen
+lokalen Abnahmestack. Die vier vorbereiteten Migrationen wurden bei dieser
+Wiederaufnahme inhaltlich nicht verändert; Produktionsmigrationen bleiben
+ausstehend. Betriebsdokumente wurden an diesen tatsächlichen Stand angepasst.
+
+Nächster Betriebsschritt: den eng abgegrenzten Backend-/UI-Rollout gesondert
+freigeben, dabei den nur lesenden Snapshot und die bestehende Housekeepingroute
+von den akuten Admin-/Planneränderungen ausdrücklich unterscheiden. Housekeeping
+nimmt vorhandene automatische Prüf-/Alterungsänderungen wieder auf. Die größere
+P1-Arbeit und der 15er-Ausbaubatch bleiben pausiert. P0 benötigt weiterhin
+editionsgenaue manuelle Nachweise, darunter den blockierten Paderborn-Nachweis;
+erst bei erfüllten unveränderten Datenbedingungen den normalen Export und
+vollständigen Releaseweg ausführen. Anleitungen:
+[manuelle Pflege](MANUAL_EVENT_MAINTENANCE.md), [Release/Rückweg](LOCAL_PUBLISH.md).
+
+Anschließende Roadmap dieses Auftrags: zuerst kontrollierter Ausbau zu etwa
+300–500 nutzbaren zukünftigen deutschen Editionen, weiterführend 500 mit über
+90 % vollständigen aktuellen Nachweisen. Danach Umkreisfilter, belastbarer
+Anmeldestatus, teilbare Suchfilter und bei gemessenem Bedarf weniger gleichzeitig
+gerenderte Eventkarten. Anschließend datengetriebene regionale SEO-Seiten und
+gezielte Wartbarkeit. Diese Funktionen wurden hier nicht implementiert; die
+bestehenden Releasegrenzen werden durch die Ausbauziele nicht ersetzt.
+
 ## Weiterer echter Browserpilot – 18:07 UTC
 
 Paderborner Osterlauf 2027 wurde über den vorhandenen Kandidaten im Admin als
@@ -318,3 +521,62 @@ Nachweis der P1-Zielerreichung.
 [P0 vom 21.09.](P0_SOURCE_REVIEW_OPERATIONS_20260921.md) und dem
 [ursprünglichen Durchsatzplan](P0_THROUGHPUT_PLAN_20260908.md) erhalten. Für die
 aktuelle Arbeitsplanung gilt die datierte Messung dieses Dokuments.
+
+## Vorbereiteter Pflegebatch – 1. Oktober 2026
+
+Der lokale Batch `data/imports/review/germany-edition-care-20261001.json`
+(Quellenbefunde und offene Fragen) und die gleichnamige CSV (priorisierte
+Pflegeliste) verwenden ausschließlich vorhandene Eventidentitäten und offene
+Nachfolgekandidaten. Die Dateien bleiben gemäß Repository-Regel lokal und
+privat. Der lesende Supabase-Snapshot stammt vom **01.10.2026, 09:49:08 UTC**;
+die gezielte Quellenrecherche erfolgte am selben Tag. Bezugsbestand sind
+**15 vorgeschlagene deutsche 2027 Editionen**, mit Kandidatenterminen zwischen
+01.01. und 01.10.2027: fünf Laufen, sechs Triathlon, vier Ultra/Trail. Sie sind
+keine 15 öffentlichen Sucheinstiege und keine Nettozugänge. Fünf vorhandene
+2027 Entwürfe werden weiterverwendet, zehn Kandidaten brauchen zunächst einen
+privaten Editionsentwurf an der vorhandenen Event-ID.
+
+**Ergebnis dieses Batches:** 14 editionsbezogen recherchiert, ein Quellenzugriff
+gesperrt, alle 15 lokal zur Pflege vorgeschlagen; null menschlich vollständig
+geprüft, null freigegeben und null durch diesen Batch veröffentlicht. Keine
+Datenbankänderung, kein Import, kein Geocoding und kein Deployment. Die
+Kandidatenprüfung `validated` wird ausdrücklich nicht als vollständiger
+Frischenachweis gezählt. Recherchezeit und Beobachtungen stehen getrennt von
+den unveränderten produktiven Erkennungs- und Prüfzeiten.
+
+| Rang | Bestehende Event-ID / Ausgabe | Datumsbefund aus offizieller Quelle | Konkrete verbleibende Pflege |
+| --- | --- | --- | --- |
+| 1 | 892 The Last Light, 2027 | 06.03., Winter Edition | Vorhandenen Entwurf zu Winter/Original zuordnen; Anmeldung noch nicht veröffentlicht; Standort bestätigen. |
+| 2 | 894 GaPa Everesting, 2027 | 14.–15.05. | Entwurf weiterpflegen; Runden-/Höhenformate strukturieren, 2027 Anmeldung und Standort selbst prüfen. |
+| 3 | 180 Havelberg Triathlon, 2027 | 05.06. | Anmeldung ab 01.12.2026; 2027 Disziplindistanzen und Standort fehlen als Vollbeleg. |
+| 4 | 186 Triathlon Ingolstadt, 2027 | 06.06. | 2027 Registrierungsziel vorhanden; echte Formularverfügbarkeit, Disziplindistanzen und Wettkampfort prüfen. |
+| 5 | 269 Salzkotten Marathon, 2027 | 06.06. | Stammdatenort Paderborn gegen Salzkotten prüfen; Anmeldung ab 11.11.2026; Geodaten/gesamtes Programm bestätigen. |
+| 6 | 189 Stadttriathlon Erding, 2027 | 13.06. | Ausschreibung und Anmeldung folgen; keine 2026 Distanzen oder Prüfungen übernehmen. |
+| 7 | 826 Heuchelberg Trail, 2027 | 03.07. | Entwurf behalten; verlinktes Raceresult-Ziel 409838 gehört zu 2027, Programm und Anmeldeverfügbarkeit prüfen. |
+| 8 | 616 Leipziger Triathlon, 2027 | 25.07. | Anmeldung ab 01.12.2026; Hauptseite/Programmlinks teils noch 2026; Standort und 2027 Distanzen prüfen. |
+| 9 | 44 OstseeMan, 2027 | Haupttriathlons 01.08.; Wochenende 31.07.–01.08. | Kandidat 07.03. stammt aus Trainingslagerkontext; ausdrücklicher Review nötig; Startplatzbörse prüfen. |
+| 10 | 899 Hunsbuckeltrail, 2027 | 15.08. | Entwurf behalten; oberer Registrierungslink führt noch zu 2026; nominale/GPS-Distanzen, Standort klären. |
+| 11 | 913 Neustrelitz Triathlon, 2027 | 21.08. | Entwurf behalten; Anmeldung ab 01.05.2027, verlinktes Raceresult-Ziel noch 2026; Geodaten prüfen. |
+| 12 | 106 Fränkische Schweiz Marathon, 2027 | 05.09. | Datum angekündigt; 2027 Programm, Anmeldung und Standort noch konkret prüfen. |
+| 13 | 42 Münster Marathon, 2027 | Nicht ermittelt | Webtool durch robots.txt gesperrt; Kandidat 12.09. manuell im normalen Browser prüfen, weder bestätigen noch verwerfen. |
+| 14 | 122 Baden Marathon, 2027 | 19.09. | Explizite 2027 Ankündigung verwenden; 2026 Seitenkopf nicht übertragen; Programm/Anmeldung/Standort prüfen. |
+| 15 | 39 Berlin Marathon, 2027 | 26.09. | Offizielle Weiterleitung auf GENERALI 2027 belegt dieselbe Identität; Sponsor-/Quellenwechsel reviewen; Verlosung statt garantierter Teilnahme dokumentieren. |
+
+Die Quellenbefunde stehen jeweils mit konkreter URL und beobachtetem Wert im
+JSON. Beispiele für die zuerst fachlich zu klärenden Fälle:
+[OstseeMan-Zeitplan und 2027 Ausschreibung](https://www.ostseeman.de/wettkampf.html),
+[Neustrelitz 2027 mit noch altem Registrierungsziel](https://jedermann-triathlon.de/)
+und [offizielle Berlin-Weiterleitung](https://www.bmw-berlin-marathon.com/en/).
+Die früheren lokalen August-Befunde zu Fränkischer Schweiz und Baden-Marathon
+waren damalige Momentaufnahmen; die jetzt sichtbaren 2027 Ankündigungen sind
+neue Recherchebelege, keine nachträgliche Änderung alter Prüfnachweise.
+
+Nächster Schritt: zunächst die vorhandenen Entwürfe sowie die drei konkreten
+Kontext-/Registrierungskonflikte im bestehenden **Events pflegen**-Workflow
+bearbeiten. Vor jeder Speicherung aktuellen Datenstand laden, Quellen selbst
+lesen, nur tatsächlich geprüfte Angaben bestätigen und offene Konflikte
+ausdrücklich entscheiden. Alle 14 bestehenden Kernprüfungen und die regulären
+Freigabegates gelten weiter; dieser vorbereitete Batch enthält keine Freigabe.
+`npm run test:germany-expansion` und lokale JSON-/CSV-Prüfung auf 15 eindeutige
+Identitäten, fünf Entwurfsbezüge, Status/Zeitraum und fehlende Freigabeclaims
+bestanden am 01.10.2026. Kein produktiver Pflegeablauf wurde hierbei getestet.

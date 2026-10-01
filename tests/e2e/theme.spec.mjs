@@ -7,6 +7,8 @@ import {
 import fs from 'node:fs';
 
 const detailRow = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions.find(row => row.edition_slug === '10-charity-lauf-koldingen-2026');
+const detailKnowledge = JSON.parse(fs.readFileSync(new URL('../../data/event-detail-database.json', import.meta.url), 'utf8')).filter(row =>
+  row.edition_id === detailRow.edition_id || (row.knowledge_scope === 'brand' && String(row.event_brand_id) === String(detailRow.event_id)));
 
 const detailPath =
   "/event/10-charity-lauf-koldingen-2026/";
@@ -20,6 +22,11 @@ test("theme selection is consistent across every main view and persists", async 
   });
   await page.route('**/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([detailRow]) }));
   await page.route('**/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [detailRow.edition_id]: false } }) }));
+  await page.route('**/rest/v1/rpc/get_public_event_detail_bundle', route => {
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toEqual({ p_edition_id: detailRow.edition_id });
+    return route.fulfill({ contentType: 'application/json', body: JSON.stringify(detailKnowledge) });
+  });
 
   await page.evaluate(() => {
     window.SportEventMapTheme.apply("light", {
@@ -47,6 +54,7 @@ test("theme selection is consistent across every main view and persists", async 
 
   await page.goto(detailPath);
   await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-state', 'verified');
+  await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-knowledge-state', 'verified');
   await expect(page.locator("html"))
     .toHaveAttribute("data-theme", "light");
   const detailToggle =

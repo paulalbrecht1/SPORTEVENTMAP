@@ -4,6 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
+import "./catalog-page-release.test.mjs";
 
 const require = createRequire(import.meta.url);
 const { CRITICAL_PATHS } = require("../tools/create-publish-package.js");

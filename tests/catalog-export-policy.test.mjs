@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { createRequire } from "node:module";
+import "./catalog-snapshot-safety.test.mjs";
 
 const require = createRequire(import.meta.url);
 const exporterSource = fs.readFileSync(new URL("../tools/export-supabase-event-catalog.js", import.meta.url), "utf8");
@@ -20,7 +21,7 @@ const exporterMain = exporterSource.slice(
   exporterSource.indexOf("async function main()"),
   exporterSource.indexOf("if (require.main === module)")
 );
-assert.ok(exporterMain.indexOf("requestFreshnessGuard(") < exporterMain.indexOf("writeCatalogSnapshot({"),
+assert.ok(exporterMain.indexOf("requestCatalogSnapshot(") < exporterMain.indexOf("writeCatalogSnapshot({"),
   "The authoritative guard must be validated before any snapshot write, including diagnostic exports.");
 
 const policy = {
@@ -67,6 +68,9 @@ const secondEditionId = "22222222-2222-4222-8222-222222222222";
 const exportedAt = new Date().toISOString();
 const discoveryRow = {
   edition_id: editionId,
+  event_id: 7,
+  edition_slug: "guarded-event-2027",
+  edition_year: 2027,
   event_name: "Guarded Event",
   sport: "Running",
   city: "Berlin",
@@ -163,10 +167,12 @@ try {
   assert.throws(
     () => writeCatalogSnapshot({
       args: { out, archiveOut, manifestOut, allowUnhealthy: false },
-      archiveOutput: "replacement archive\n",
-      exportedAt: "2026-09-04T10:00:00.000Z",
-      metrics: unhealthyMetrics,
-      output: "replacement discovery\n",
+      exportedAt,
+      snapshot: {
+        schema_version: 1, consistency: "single_statement", measured_at: exportedAt,
+        discovery_count: 1, archive_count: 1, discovery: [discoveryRow], archive: [discoveryRow],
+        freshness_guard: { ...guardPayload({ [editionId]: false }), evaluated_at: exportedAt }
+      },
       policy
     }),
     /Refusing to replace the public fallback with an unhealthy catalog/

@@ -25,8 +25,8 @@ for (const artifact of [
 }
 
 const exportedAt = "2026-08-24T08:00:00.000Z";
-const discovery = "event_name;date\nTest Event;01.01.2027\n";
-const archive = `${JSON.stringify({ exported_at: exportedAt, editions: [{ edition_slug: "test-event-2027" }] }, null, 2)}\n`;
+const discovery = 'event_name;date;event_id;edition_id;edition_slug;edition_year;description\nTest Event;01.01.2027;7;edition-7;test-event-2027;2027;"First line\nSecond line"\n';
+const archive = `${JSON.stringify({ exported_at: exportedAt, measured_at: exportedAt, editions: [{ event_id: 7, edition_id: "edition-7", edition_slug: "test-event-2027", edition_year: 2027, date: "01.01.2027" }] }, null, 2)}\n`;
 fs.writeFileSync(path.join(data, "events.csv"), discovery);
 fs.writeFileSync(path.join(data, "event-editions-public.json"), archive);
 fs.writeFileSync(path.join(data, "event-pages.json"), JSON.stringify([{ slug: "test-event-2027" }]));
@@ -45,11 +45,22 @@ fs.writeFileSync(path.join(data, "catalog-release-policy.json"), JSON.stringify(
 fs.writeFileSync(path.join(data, "catalog-export-manifest.json"), JSON.stringify({
   schema_version: 1,
   exported_at: exportedAt,
+  measured_at: exportedAt,
+  snapshot_consistency: "single_statement",
+  diagnostic_only: false,
   sha256: { discovery: sha256(discovery), archive: sha256(archive) },
-  metrics: { discovery_rows: 1, archive_rows: 1, freshness_rate: 60, completeness_rate: 50 }
+  metrics: { discovery_rows: 1, archive_rows: 1, freshness_rate: 60, completeness_rate: 50, freshness_guard_evaluated_at: exportedAt }
 }));
 
 assert.equal(evaluateCatalogRelease({ root, now: "2026-08-24T09:00:00.000Z" }).passed, true);
+fs.mkdirSync(path.join(data, "catalog-export-manifest.json.transaction"));
+assert.equal(evaluateCatalogRelease({ root, now: "2026-08-24T09:00:00.000Z" }).passed, false, "Interrupted grouped writes cannot be published.");
+fs.rmdirSync(path.join(data, "catalog-export-manifest.json.transaction"));
+const manifestPath = path.join(data, "catalog-export-manifest.json");
+const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+fs.writeFileSync(manifestPath, JSON.stringify({ ...manifest, diagnostic_only: true }));
+assert.equal(evaluateCatalogRelease({ root, now: "2026-08-24T09:00:00.000Z" }).passed, false, "Diagnostics cannot obtain release approval.");
+fs.writeFileSync(manifestPath, JSON.stringify(manifest));
 assert.equal(evaluateCatalogRelease({ root, now: "2026-08-26T09:00:00.000Z" }).passed, false);
 fs.writeFileSync(path.join(data, "event-pages.json"), "[]\n");
 assert.equal(evaluateCatalogRelease({ root, now: "2026-08-24T09:00:00.000Z" }).passed, false);

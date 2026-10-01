@@ -1,149 +1,285 @@
 # Events manuell pflegen
 
-Stand: Workflowkorrektur v92, Anzeige-/Cachekorrekturen v94 und gemeinsame
-Detaildarstellung mit Zusatzfeldern v96 vom 29. September
-2026. Der [echte Browserdurchlauf](MANUAL_BROWSER_AUDIT_20260929.md) dokumentiert
-den vollständigen Pflegeweg am Paderborner Osterlauf 2027. Weitere Rollout- und
-Zusatzfeldnachweise enthält [Einheitliche Eventdetails](DETAIL_LAYOUT_PARITY_20260929.md).
-Prüfnachweise stehen im [Korrekturbericht](MANUAL_WORKFLOW_FIX_20260929.md). Die frühere
-[Abnahme von v91](MANUAL_WORKFLOW_ACCEPTANCE_20260929.md) bleibt als Fehlernachweis erhalten.
+Stand: **lokale Umsetzung vom 01.10.2026**, noch kein produktiver Rollout.
+Die neue Produktregel ersetzt die früheren Pflichtprüfhäkchen im normalen
+Pflegeweg. Historische Abnahmen vom September bleiben weiter unten dokumentiert;
+sie weisen die heute vorbereitete Änderung nicht nach.
 
-Für die tägliche Pflege genügt dein **SportEventMap-Administratorkonto**.
-Du brauchst weder Codex, KI-Tokens noch ein Supabase- oder Cloudflare-Konto.
-Offizielle Seiten selbst lesen, dann im Website-Admin **Events pflegen** öffnen.
-Normale Webseitenbesucher dürfen diese Schreibfunktion nicht verwenden.
+## Normaler Pflegeweg: eine Bestätigung
 
-## Wie bestätige ich ein Datum?
+1. Mit dem SportEventMap-Administratorkonto **Events pflegen** öffnen, Veranstaltung
+   suchen und die konkrete Edition auswählen.
+2. Gewünschte Angaben bearbeiten. Eingeklappte und unberührte Felder bleiben
+   erhalten. Ein absichtlich geleertes optionales Feld wird entfernt; ebenso
+   funktionieren die vorhandenen Schalter **Bewusst entfernen**.
+3. **Änderungen speichern** anklicken. Ein Dialog zeigt die betroffene Edition
+   und tatsächlich geänderte alte/neue Werte, einschließlich Zusatzdetails.
+4. **Übernehmen und speichern** bestätigt einmal. **Abbrechen** und Escape
+   schreiben nichts. Es gibt keine zusätzlichen Pflichtprüfhäkchen oder einen
+   weiteren normalen Veröffentlichungsbutton.
 
-1. Event suchen und die richtige **Ausgabe auswählen**.
-2. **Offizielle Quelle öffnen** und das Datum selbst vergleichen.
-3. Unter **Was möchtest du tun?** die Bestätigung wählen. Beim Datum
-   **An Quelle geprüft** markieren. Quellen-URL und **Prüfnotiz** ergänzen.
-4. **Änderungen prüfen**, Übersicht lesen und **Verbindlich speichern**.
+Nach einer Suche oder Eventauswahl führt **Schließen und anderes Event suchen**
+zur leeren Suche zurück. Treffer, Formular und Veröffentlichungsmeldung werden
+geschlossen; das Suchfeld bekommt den Fokus. Bei ungespeicherten Eingaben fragt
+die Anwendung vor dem Verwerfen nach. Abbrechen erhält das Formular. Beim
+Öffnen eines Events verschwinden die Suchtreffer automatisch. Verspätete Such-
+oder Ladeantworten können eine geschlossene Auswahl nicht wieder öffnen.
+Während des Speicherns oder bei noch unklarem Speicherstand bleibt dieser
+Wechsel gesperrt, bis die bestehende sichere Speicherprüfung beendet ist.
 
-Die Prüfnotiz sollte knapp erklären, was die Quelle belegt (12 bis 1.000 Zeichen).
-Bei einer zu langen Notiz bleiben deine Eingaben erhalten; kürzen und erneut prüfen.
+Die serverseitige Adminprüfung, Transaktion, Versionsprüfung und Requestkennung
+bleiben bestehen. Wiederholung desselben Auftrags erzeugt keine zweite Edition.
+Nach dem Speichern werden die konkreten Werte erneut gelesen und verglichen;
+eine formal erfolgreiche Antwort mit unveränderten Werten gilt nicht als Erfolg.
+Fehler erhalten die Eingaben. Bei Versionskonflikt **Aktuellen Stand laden**,
+vergleichen und erneut bestätigen. Bei unklarer Antwort denselben Auftrag im
+offenen Dialog erneut speichern. Ein späterer öffentlicher Prüfretry führt keine
+zweite Datenänderung aus.
 
-Ein unverändertes Datum lässt sich erneut bestätigen. Nur angehakte Angaben
-bekommen einen Nachweis. Für die vollständige Aktualität einer veröffentlichten
-nächsten Ausgabe müssen alle 14 genannten Kernangaben geprüft und blockierende
-Hinweise geklärt sein. Vollständigkeit und Aktualität bleiben getrennt.
+## Manuelle Freigabe und Quellenprüfung bleiben getrennt
 
-## Wie korrigiere ich eine Ausgabe?
+Die gemeinsame Bestätigung dokumentiert Admin, Serverzeit, vorherigen und neuen
+Wert sowie manuelle Freigabe nur der tatsächlich geänderten Angaben. Diese
+Angaben werden gegen automatisches Überschreiben geschützt. Bestehende Quellen
+bleiben erhalten; die offizielle Editionsquelle und Veranstalterlinks können
+im bestehenden Formular bearbeitet und geöffnet werden. Eine Notiz ist optional.
 
-**Bestehende Ausgabe korrigieren** wählen, falsche Werte ändern und die Quelle
-angeben. Veranstaltungsstatus und Anmeldestatus sind getrennt. Wettbewerbe
-stehen in eigenen Zeilen; Kilometer und Höhenmeter beachten.
-**Optionale Details und Veranstalterangaben** enthalten unter anderem Enddatum,
-Startzeit, Gebühren, Währung und Teilnehmerlimit.
+Eine URL-Übernahme oder Wertefreigabe beweist keine frische externe Prüfung.
+Sie erneuert keine Quellenprüfzeiten und setzt keine ganze Edition auf vollständig
+aktuell verifiziert. Die bestehende feldwert-/editionsgebundene Definition für
+diesen Qualitätsnachweis bleibt erhalten. Tatsächliche externe Prüfungen werden
+über die vorhandenen gesonderten Verifikationswerkzeuge dokumentiert; sie sind
+keine Voraussetzung für eine zulässige normale manuelle Korrektur.
+Der tägliche Pflegeweg benötigt keine KI-Credits oder LLM-Aufrufe.
 
-Leere oder eingeklappte Felder löschen nichts. Bestehende Werte nur mit
-**Bewusst entfernen** löschen. Name, Ort, Adresse, Geodaten, Sport und
-Beschreibung gelten gemeinsam für alle Ausgaben; die übrigen Angaben gehören
-zur ausgewählten Ausgabe. Ihre Identität und Ergebnis-/Planerverknüpfungen bleiben erhalten.
+Zusatzdetails behalten die Auswahl **Nur diese Ausgabe** beziehungsweise
+**Allgemeines Event-Wiki – alle Ausgaben**. Preise, Startwellen und jährliche
+Streckenangaben gehören zur Edition. Freigegebene Zusatzwerte sind öffentlich
+sichtbar, ohne sich als Quellenprüfung auszugeben. Unbearbeitete Werte und
+Quellen bleiben erhalten; eine spätere abweichende ungeprüfte Änderung kann
+die frühere Freigabe nicht für ihren neuen Wert verwenden.
 
-Bei Fehlern bleiben Eingaben erhalten. Bei **zwischenzeitlich geänderten Daten**
-auf **Aktuellen Stand laden** klicken, vergleichen und erneut prüfen.
-Bearbeitete Werte und Notizen bleiben erhalten; Prüfhäkchen müssen neu gesetzt
-werden. Ist die Antwort unklar, denselben **Verbindlich speichern**-Vorgang
-wiederholen. Er erzeugt keine zweite Ausgabe.
+## Bestehende Edition oder ausdrücklich neue Edition
 
-## Wie ergänze ich Gebührenstaffeln, Anreise und Event-Wiki?
+Eine Terminverschiebung korrigiert grundsätzlich die ausgewählte Edition,
+auch über einen Jahreswechsel. UUID, Ausgabejahr, Slug, historische Verweise
+und persönliche Ergebnisse bleiben erhalten. Bei einem anderen Kalenderjahr
+bietet derselbe Bestätigungsdialog die Wahl **Bestehende Edition korrigieren**
+(Vorgabe) oder **Neue Edition anlegen**. Das Datum allein erzeugt keine Edition.
+Der bestehende direkte Einstieg **Neue Edition anlegen** bleibt verfügbar.
 
-Unter **Zusatzdetails für Detailseite und Event-Wiki** die passende Ebene
-wählen: **Nur diese Ausgabe** für jährliche Angaben, oder **Allgemeines
-Event-Wiki – alle Ausgaben** für dauerhaft gültige Informationen. Gebühren,
-Startwellen und Renntag sind nur bei einer konkreten Ausgabe verfügbar.
+Für eine neue Edition entstehen eine neue UUID und ein eigenes Jahr/Kürzel.
+Eine bereits vorhandene Zielausgabe muss weiterbearbeitet werden; die Prüfung
+im Dialog und die Datenbank verhindern Duplikate. Gemeinsame Stammdaten werden
+wiederverwendet. Unbearbeitete Jahresangaben, Gebühren, Anmeldung und alte
+Quellenprüfnachweise werden nicht übernommen. Im Dialog ausdrücklich bearbeitete
+Zusatzwerte gehören bei dieser Wahl zur neuen Edition; FAQ bekommen eigene IDs.
+Alte Edition und persönliche Teilnahmen bleiben erhalten.
 
-Die benötigte Gruppe aufklappen. Gebührenstaffeln haben eigene Zeilen für
-Bezeichnung, Betrag, Währung, Gültigkeit/Kontingent und Hinweis. Unterschiedliche
-Wettbewerbe eindeutig in der Bezeichnung benennen. FAQ bestehen aus Frage und
-Antwort. Unbekannte Werte leer lassen; zum Löschen ausdrücklich die betreffende
-Angabe oder Zeile entfernen. Bei neuen Ausgaben werden jährliche Zusatzdetails
-nicht aus dem Vorjahr übernommen.
+Die manuelle Freigabe verknüpft zulässige Veröffentlichung automatisch mit dem
+Speichern. Fehlende strukturelle Pflichtangaben lassen eine neue Edition als
+privaten Entwurf gespeichert; der konkrete Grund wird angezeigt. Echte
+Editions-/Dublettenkonflikte und Veröffentlichungssperren bleiben wirksam.
+Importe, Crawler und Vorschläge behalten ihren gesonderten Reviewprozess.
 
-Nur selbst geprüfte Zusatzangaben anhaken, offizielle Quelle und Prüfnotiz
-eintragen, **Änderungen prüfen** und **Verbindlich speichern**. Für unterschiedliche
-Quellen getrennte Speichervorgänge verwenden. Gespeicherte ungeprüfte Änderungen
-erscheinen nicht als bestätigte öffentliche Angaben. Eine Zusatzbestätigung
-erneuert nicht automatisch die Aktualität sämtlicher Kernangaben.
+## Öffentlicher Stand
 
-Die Veröffentlichungskontrolle prüft auch, ob die gerade bearbeiteten Zusatzfelder
-auf der normalen Detailseite dargestellt sind. Die Darstellung folgt für alle
-Ausgaben demselben Aufbau: Uhrzeiten ohne Sekunden, geordnete Wettbewerbe,
-Gebührentabellen und Standortkarte mit Pin. Koordinaten stehen nur im Adminformular.
+**In der Datenbank gespeichert und neu geladen** bestätigt Persistenz.
+Anschließend prüft die Anwendung anonymen Archiv-/Discoverystand, lädt Karte
+und Liste neu und kontrolliert die normale Detailseite. Erst danach lautet
+die Meldung **Öffentlich aktualisiert: Normale Detailseite geprüft**.
+Historische und weitere spätere veröffentlichte Editionen können öffentlich
+im Archiv/Detail verfügbar sein, während Discovery nur die nächste geeignete
+Edition derselben Veranstaltung zeigt.
 
-## Wie kläre ich einen offenen Hinweis?
+Bei Abruffehlern **Öffentlichen Stand erneut prüfen** verwenden. Das wiederholt
+nur die Kontrolle. Veröffentlichte Einzelkorrekturen benötigen keinen weiteren
+normalen Admin-Klick und keine Freigabe des gesamten ungeprüften Katalogs.
+Supabase bleibt die maßgebliche Datenquelle. Cacheadressen der betroffenen
+Oberflächenmodule sind erneuert; bestehende statische Seiten laden denselben
+Live-Renderer über den vorhandenen kontrollierten UI-Releaseweg.
 
-Unter **Offene Hinweise hier bearbeiten** stehen die Hinweise zur gewählten
-Ausgabe. Zuerst etwaige Formularänderungen speichern. Dann je Hinweis eine
-Entscheidung wählen, nachvollziehbar begründen, **Entscheidung prüfen** und
-**Verbindlich speichern**. Jede Entscheidung wird mit Admin, Serverzeit und
-vorherigem Stand protokolliert; sie bestätigt keine ungeprüften Felder.
+Ein Datenbankausfall kann den klar gekennzeichneten älteren Export anzeigen.
+Manuelles Speichern erneuert diesen Fallback nicht. **Ausfallexport:
+Veröffentlichung erforderlich** bezeichnet diesen getrennten Zustand. Der
+bestehende geprüfte Datenrelease bleibt dafür erforderlich; fehlgeschlagene
+Exportchecks erhalten den letzten Export. Keine Exportzeit ersetzt Quellenzeit.
 
-Falsche Crawler-Vorschläge begründet ablehnen oder richtige übernehmen.
-Falls der Vorschlag selbst korrigiert werden muss, zuerst die richtigen Werte
-im Formular speichern und danach den falschen Vorschlag ablehnen.
-Quellenaufgaben, Datenhinweise und gemeldete Fehler erst nach tatsächlicher
-Klärung schließen. Eine Entscheidung ersetzt weder Quellenbeleg noch Freigabe.
-Nicht behobene optionale Hinweise, etwa ein fehlendes Bild, dürfen offen bleiben;
-sie dürfen nicht allein für einen grünen Status als erledigt markiert werden.
+## Persönliche Historie, Ergebnisse und Profil
 
-Bei einem abweichenden Kandidatentermin zuerst Datum und gegebenenfalls
-Enddatum anhand der offiziellen editionsbezogenen Quelle bestätigen und
-speichern. Dann die **Abweichung der erkannten Ausgabe** ausdrücklich klären.
-Der Originalbefund bleibt erhalten. Die Entscheidung gilt nur für genau diese
-Ausgabe, Termine und Quelle. Neue widersprüchliche Befunde müssen erneut
-geprüft werden. Jahres-, Identitäts- und Dublettenkonflikte werden nicht damit
-übersprungen.
+Persönliche Einträge werden zuerst aus den eigenen `season_planner_events`
+geladen. Anschließend werden ausschließlich deren konkrete erlaubte Editionen
+im öffentlichen Archiv aufgelöst. Tatsächlich `archived` gespeicherte Editionen
+liefert ergänzend `get_own_planner_archived_editions` nur bei eigenem UUID-Bezug,
+nachgewiesener früherer Veröffentlichung und weiterhin freigegebener Eventmarke.
+Entwürfe werden damit nicht geöffnet. Das gesamte Archiv kommt nicht zurück in
+die öffentliche Suche. UUID ist maßgeblich; ältere Textreferenzen werden nur bei
+eindeutigem vollständigem Editionsschlüssel aufgelöst, niemals auf die neueste
+Ausgabe geraten. Alte dreiteilige Name-/Datum-/Ort-Schlüssel werden gezielt
+gegen vierteilige öffentliche Archivschlüssel geprüft; mehrere Treffer bleiben
+mehrdeutig. Ein fehlender Bezug bleibt als persönlicher Eintrag sichtbar und
+beweist keine Löschung. Bei einem fehlgeschlagenen zusätzlichen Archivabruf
+bleibt eine bereits eindeutig geladene öffentliche Edition mit Abrufhinweis
+nutzbar. Ein erfolgreich festgestellter fehlender Bezug wird damit nicht
+überschrieben. Fremde persönliche Daten bleiben geschützt.
 
-## Wie lege ich die nächste Edition an?
+Vergangene geplante Teilnahmen bleiben zum Nachtragen erreichbar. Der vorhandene
+Ergebniseditor speichert in `season_planner_events.planner_details.result`;
+Archivierung oder eine neue Edition verändern diesen Bezug nicht. Cloudspeicherung
+wird durch erneutes Lesen bestätigt. Bei Fehlern bleibt das Ergebnis lokal mit
+sichtbarem Syncstatus und sicherem Retry erhalten; es wird nicht stillschweigend
+aus einem Request entfernt oder beim Laden durch leere Standardwerte ersetzt.
 
-Vorhandene Entwürfe zuerst auswählen und weiterbearbeiten. Andernfalls
-**Neue Ausgabe als Entwurf anlegen** wählen, Ausgabejahr eintragen und einen
-bereits erkannten passenden Kandidaten auswählen, sofern vorhanden.
-Bei mehreren Ausgaben im selben Jahr ein anderes **Ausgabekürzel** verwenden,
-zum Beispiel „herbst“. Es wird kein Vorjahresdatum automatisch fortgeschrieben.
+Gesamtzahl zählt eigene Einträge im gewählten Saisonumfang einschließlich
+Historie. Anstehend verlangt einen bekannten noch bevorstehenden Termin,
+geplante Teilnahme und passenden Veranstaltungsstatus. Vergangen ohne persönliche
+Abschlussangabe bleibt offen; Datum und Archivierung erzeugen keinen Finish.
+Ausdrücklich **Finished** bzw. das ältere **Finisher** zählt für Abschluss und
+die vorhandenen lebenszeitbezogenen Badges (5/10/20/50/100). DNF/DNS/DSQ bleiben
+in der Historie, zählen jedoch nicht als Finish. Abgesagte persönliche Teilnahmen,
+sonstige Abschlussangaben und unbekannte Termine zählen nicht als anstehend.
+Wiederholte Berechnung vergibt
+keine doppelten Leistungen. Profil und Planner verwenden denselben persönlichen
+Bestand und dieselbe Status-/Datumslogik; Ergebnisprivatsphäre bleibt erhalten.
 
-Unbekannte Angaben dürfen im privaten Entwurf fehlen. Termine, Wettbewerbe,
-Anmeldung und Verifikationen werden nicht aus dem Vorjahr übernommen.
-Die historische Ausgabe bleibt erhalten.
+## Abnahme und Rolloutgrenze
 
-Zum Veröffentlichen den gespeicherten Entwurf auswählen, alle 14 im Formular
-genannten Kernangaben an offiziellen Quellen prüfen und markieren. Adresse,
-Koordinaten und Beschreibung stehen bei den optionalen Details, gehören aber
-zum vollständigen Freigabenachweis. Blockierende Hinweise klären. Dann
-**Nach vollständiger Prüfung zur Veröffentlichung freigeben** auswählen,
-Änderungsübersicht kontrollieren und speichern.
+Nachtrag zum Schließen-/Eventwechsel vom 01.10.2026: **14 neue Browserfälle**
+prüfen A → schließen → B, die Speicherung ausschließlich an B, Verwerfen/
+Abbrechen, Zusatzdetails und Wettbewerbe, verspätete Antworten sowie die
+Speichersperren bei Busy/unklarem Ergebnis. Der anschließende gemeinsame Admin-,
+Knowledge-, Theme- und Kontrastlauf bestand **61/61**, einschließlich 390 px
+und 1280 px; der mobile Schließen-Button wurde visuell geprüft. Pflege-Unitgruppe
+**26/26**, Releaseentrypoints **73/73**, Static-Smoke und `git diff --check`
+bestanden. Cacheadressen von Adminloader und Pflege-Modul wurden auf v140
+erneuert. Belege: `exports/acute-20261001/event-switch-browser-green.log`,
+`event-switch-unit.log`, `event-switch-release.log`, `event-switch-static.log`.
+Auch diese Ergänzung ist lokal und noch nicht produktiv ausgerollt.
 
-Fehlende Belege, Dubletten, Veröffentlichungssperren oder eine frühere noch
-aktuelle Ausgabe können die Freigabe weiter verhindern. Dann bleibt der Entwurf
-privat. Eine neue Ausgabe wird nicht durch Veränderung der alten erzwungen.
+Bei der anschließenden echten Supabase-Abnahme wurde ein weiterer Speicherfehler
+gefunden: FAQ-Readback verglich auch vom Server ergänzte Metadaten mit dem
+Formularauftrag und meldete dadurch korrekt gespeicherte Fragen fälschlich als
+unklar. Geprüft werden jetzt die beantragten Werte (ID, Frage, Antwort, Sortierung)
+und die Detailzuordnung; echte Abweichungen bleiben Fehler. Eine neue Speicherung
+entfernt außerdem die Veröffentlichungserfolgsmeldung des vorherigen Auftrags.
+Adminruntime und Pflege-Modul verwenden dafür Cacheversion **v141**. Keine
+Migration ist für diese beiden Korrekturen nötig. Anschließend bestanden
+**27/27 Unitprüfungen und 50/50 Admin-/Knowledge-Browserfälle**, einschließlich
+mobiler Bedienung und Suche schließen/anderes Event öffnen. Belege:
+`exports/p0-20261001/manual-faq-unit.log`, `faq-browser.log`.
 
-## Woran erkenne ich, dass die Änderung öffentlich angekommen ist?
+Lokaler Lauf vor Wiederaufnahme von P0 am 01.10.2026: `npm run test:code` bestand mit allen
+technischen Testgruppen und **225/225 Browsertests**. Die gezielten Gruppen
+`test:manual-maintenance` und `test:personal-history` bestanden jeweils
+**26/26**; die Browserabnahme umfasst **35** Admin-/Knowledgefälle sowie die
+bestehenden und neuen Planner-, Profil-, Detail-, Kontrast- und Mobilfälle.
+Der mobile Bestätigungsdialog wurde außerdem anhand des Screenshots geprüft.
+`git diff --check` bestand. Belege: `exports/acute-20261001/test-code-green.log`,
+`admin-browser-final.log`, `personal-unit-final.log`, `manual-unit-final.log`.
+Die Browsertransporte sind kontrollierte lokale Testantworten; diese Ergebnisse
+ersetzen keine reale SQL-/RLS-Laufzeitprüfung und keinen produktiven Schreibtest.
 
-**In der Datenbank gespeichert und neu geladen** bestätigt nur das Speichern.
-Erst **Öffentlich aktualisiert: Normale Detailseite geprüft** bestätigt zusätzlich
-den Vergleich mit dem anonymen Live-Katalog und die tatsächlich geladene
-normale Detailseite. Bei einer nächsten Ausgabe werden auch Karte und Liste
-mit den gespeicherten Werten neu geladen. **Öffentliche Detailseite öffnen**
-führt zur überprüften Seite.
+`test:all`, `prepare-package` und `verify-package` wurden ebenfalls ausgeführt
+und blockierten am unveränderten 36-Spalten-Fallback gegenüber dem aktuellen
+42-Spaltenschema. Es entstand kein freigegebenes Releasepaket. Die tatsächlichen
+ersten Aufrufe von `test:manual-maintenance:local` und `test:rls:local` scheiterten
+vor der SQL-Abnahme an der gestoppten lokalen Engine. Die vorhandene Podman-
+Maschine `sporteventmap` wurde bei Wiederaufnahme von P0 gestartet; eine
+Neuinstallation war nicht nötig. Im isolierten Workflowstack bestanden danach
+**64 Migrationen, 247 SQL-Assertions und die vorhandene RLS-Suite (23/23)**.
+Zusätzlich bestanden deren bestehenden Knowledge-/Legacy-SQLtests (14/18
+Assertions). Die vorausgegangenen SQL-Fehler waren falsche Fixtureannahmen zu
+Triggerfolgen, privaten Schema-ACLs und uneindeutige Variablen-/Spaltenbezüge;
+Berechtigungen und Qualitätsregeln wurden dafür nicht gelockert.
 
-Bei **noch nicht vollständig verifiziert** oder einem Abruffehler:
-**Öffentlichen Stand erneut prüfen**. Das prüft erneut, ohne einen weiteren
-Datensatz zu speichern. Historische Ausgaben erscheinen im Archiv; Karte und
-Liste zeigen jeweils die nächste geeignete Ausgabe.
+Der erneute vollständige technische Lauf bestand anschließend mit **239/239
+Browsertests**, sämtlichen Scriptgruppen und Layoutprüfungen
+(`exports/p0-20261001/test-code-resumed.log`). Nach dem FAQ-Fix folgten die oben
+genannten 27 Unit- und 50 gezielten Browserprüfungen sowie erneut bestandene
+Releaseentrypoint- und Static-Smoke-Prüfungen.
 
-Im normalen Onlinebetrieb ist pro Änderung kein Export oder Deployment nötig.
-Bei einem Datenbankausfall kann ein klar gekennzeichneter älterer Export
-erscheinen. Diese Ausfalldaten werden durch manuelles Speichern nicht erneuert;
-dafür bleibt das bestehende vollständige Datenrelease mit seinen Qualitätsgates nötig.
+Die echte lokale Browserabnahme bestand zusätzlich **19/19 Abläufe** mit
+tatsächlicher Authentifizierung, PostgREST, SQL-Speicherung und unabhängigem
+anonymem Detailaufruf; erfolgreiche Speicherantworten sind hier nicht simuliert.
+Abgedeckt sind Konflikt/Retry, Zusatzdetails, neue Edition, Zugriffsschutz und
+zehn konkrete persönliche Teilnahmen, darunter acht eigene archivierte
+Editionen. Die mobilen Ergebnisfelder speichern Finished → DNF → Finished,
+persönliche Archivierung und die Rücknahme eines Abschlussstatus dauerhaft;
+Cloud-Readback/Neuladen und Badgewechsel zwischen fünf und vier Finishes bestehen
+ohne neue persönliche Zeilen. Beleg für diese Browserabläufe:
+`exports/manual-workflow-acceptance/run-k7ZfiZ/acceptance-report.json`.
+Alle Beteiligten und Events sind synthetische lokale Testdaten; Produktion
+wurde nicht verändert.
 
-Unter **Prüfergebnis** lassen sich auch **Noch keine neue Ausgabe angekündigt**
-und **Quelle nicht erreichbar** dokumentieren. Dabei keine Feldbestätigungen
-markieren. Beide Ergebnisse sind keine Bestätigung alter Werte.
+Der separate Lauf `npm run test:manual-maintenance:local` bestand ebenfalls:
+**213 SQL-Assertions**, tatsächliche Commit-/Readback-/Retry-Sitzungen und zwei
+gleichzeitig schreibende Datenbanksitzungen mit genau einem Commit und einem
+Versionskonflikt (`exports/p0-20261001/sql-resumed-green.log`). Beide Teststacks
+wurden durch ihre Runner bereinigt. Die anschließende Podman-Containerliste war
+leer; die eigens gestartete Maschine wurde wieder gestoppt.
+
+Geänderte akute Anwendungspfade: `js/manual-event-maintenance.js`, die
+persönlichen Lade-/Sync- und Profilfunktionen in `js/supabase.js`, Planner in
+`js/events.js`, öffentlicher Renderer `js/event-detail-live.js` sowie seine
+Cacheadressen in `js/event-detail.js`/`event-detail.html`. `index.html`,
+`js/i18n.js` und die bestehenden Releaseprüfungen führen die passenden
+Beschriftungen, Runtimeadressen und Regressionen nach. Der schmale UI-Paketweg
+nimmt die bereits vorbereiteten P0-Oberflächenabhängigkeiten mit; Datenartefakte
+und Katalogfreigaben bleiben gesondert geschützt.
+
+Die E2E-Regressionssuite verwendet kontrollierte Antworten; die gesonderte
+Workflowabnahme verwendet den echten isolierten lokalen Supabase-Stack. Die neue Migration
+`20261001104403_manual_approved_save.sql` ist lokal getestet, nicht produktiv installiert.
+Ihr SQL-/RLS-Rollbacktest ist in `npm run test:manual-maintenance:local`
+eingebunden. Der genehmigte Backend-/UI-Rollout bleibt erforderlich. Für tatsächlich
+archivierte Editionen benötigt der Planner außerdem
+`20261001112438_own_planner_archived_editions.sql` (ebenfalls lokal getestet und
+noch nicht produktiv installiert).
+Die Migration ergänzt ausschließlich den begrenzten Lese-RPC; persönliche
+Datensätze, Referenzen und Tabellen-RLS werden nicht verändert.
+Siehe [UI-Release](UI_ONLY_RELEASE.md) und [Local Publish](LOCAL_PUBLISH.md).
+
+Zum Nachtesten die vorhandene lokale Podman-Maschine bei Bedarf starten und
+`npm run test:manual-maintenance:local`, anschließend
+`npm run test:manual-workflow:local` ausführen. Beide verwenden eigene temporäre
+Stacks. Der zweite Befehl enthält die vollständige bestehende RLS-Suite und die
+Browserabnahme mit echter lokaler Authentifizierung. Deren Workdir-Freigabe
+prüft exakten Pfad, Ownership-Metadaten, Projekt-ID, lokalen API-Endpunkt und
+Containerlabel; verbundene Cloudprojekte sind ausgeschlossen.
+Im Admin ein optionales Feld ändern oder leeren, speichern, einmal bestätigen
+und anschließend erneut öffnen sowie in einer unabhängigen Besuchersitzung
+Suche und Details prüfen. Abbrechen darf nichts schreiben. Eine Verschiebung
+über den Jahreswechsel muss dieselbe Edition behalten; die ausdrückliche neue
+Edition muss ihre alte Ausgabe erhalten. Mit einem ausschließlich lokalen
+Testkonto eine Edition planen, archivieren, Ergebnis nachtragen, ab-/anmelden
+und ursprüngliche UUID, Ergebnis, Zähler und Badgefortschritt vergleichen.
+Vergangen ohne Finish und DNF/DNS/DSQ dürfen keinen Finish-Badge erzeugen.
+Die vorbereiteten SQL-Tests kapseln Testdaten und rollen alle Schreibvorgänge
+zurück; produktive Konten und Events sind dafür nicht freigegeben.
 
 ## Bestehende Datenwege
+
+### Kompakte Qualitätsübersicht – lokal ergänzt am 01.10.2026
+
+Unter **Datenqualität & Prüfungen → Was Nutzer gerade sehen** stehen nun
+Messzeitpunkt, zukünftige Sucheinstiege insgesamt/Deutschland, deren vollständige
+aktuelle Nachweise im selben Bestand, fehlende Nachweise und überfällige Prüfungen.
+Eventidentitäten, alle veröffentlichten Editionen, Archiv und Entwürfe werden
+separat benannt. Offene Reviews zählen Quellenaufgaben, ausstehende Vorschläge
+und offene Nachfolgekandidaten im gesamten Pflegebestand; sie sind keine Zahl
+fehlerhafter öffentlicher Events. Der JSON-Prüfbericht nutzt denselben Evaluator
+wie der Export und unverändert `get_public_event_freshness_guard`.
+
+Ohne Zugriff oder gültigen Snapshot steht **nicht ermittelt**. Status `verified`
+oder ein erfolgreicher Quellenabruf reichen nicht. Ein angezeigter Exportstand
+hat geprüfte Dateihashes; fehlende ursprüngliche Snapshotzeit bleibt
+**nicht dokumentiert**. Ein Qualitätscheck braucht einen protokollierten
+erfolgreichen Validierungs- oder gebundenen Exportcheck, keinen Crawlzeitpunkt.
+
+Diese Ergänzung und die zwei im P0-Plan genannten Migrationen sind **nur lokal**.
+Bis zur geprüften Installation des Snapshot-RPC kann die neue Anzeige keinen
+aktuellen Bestand ermitteln. Der vorhandene Pflegeweg bleibt unabhängig davon.
+Kein neuer KI-Aufruf, Crawler oder Geocoder ist erforderlich.
 
 | Zweck | Verwendeter Projektbestand |
 | --- | --- |
@@ -154,7 +290,7 @@ markieren. Beide Ergebnisse sind keine Bestätigung alter Werte.
 | Konflikte und Nachfolgekandidaten | `event_change_proposals`, `edition_succession_candidates`, Review-Inbox |
 | Karte und Liste | `public_event_discovery` über `js/event-catalog-loader.js` |
 | Öffentliche Ausgabe | `public_event_archive`, gemeinsamer Live-Renderer für reguläre und dynamische Detailseiten |
-| Saisonplaner und Ergebnisse | `season_planner_events.edition_id`, `edition_results` |
+| Persönlicher Saisonplaner und Ergebniseditor | `season_planner_events.edition_id`, `planner_details.result`; `edition_results` bleibt der gesonderte Ergebnisbestand |
 | Ausfalldaten und statische Seiten | `data/events.csv`, `data/event-editions-public.json`, `event/` |
 
 Die Umsetzung ergänzt den vorhandenen Vanilla-JavaScript-Admin und die

@@ -1,4 +1,7 @@
 let events = [];
+// Personal planning keeps concrete editions independently of Discovery.
+let personalPlannedCatalog = new Map();
+let personalPlanningLoadVersion = 0;
 
 let favorites =
   JSON.parse(
@@ -256,7 +259,7 @@ function normalizeEvents(rawEvents) {
 
 
 function getEventKey(event) {
-  return event.event_key || createEventKey(event);
+  return event._planner_key || event.event_key || createEventKey(event);
 }
 
 
@@ -270,9 +273,116 @@ function isFavorite(event) {
 }
 
 function isPlannedEdition(event) {
-  const aliases = getEventKeyAliases(event);
-  return aliases.some(alias => plannedEditions.includes(alias));
+  const meta = getSeasonPlanMeta();
+  return plannedEditions.some(key => event._planner_key === key || (meta[key]?.edition_id && event.edition_id
+    ? meta[key].edition_id === event.edition_id
+    : getExactPlannedMatches(key, [event]).length === 1));
 }
+
+function getExactPlannedMatches(key, rows) {
+  const reference = cleanValue(key);
+  // An event name/brand alone never identifies a participation year.
+  if (!reference.includes("|") || !/\d{4}/.test(reference)) return [];
+  return rows.filter(event => [event.event_key, createLegacyEventKey(event), createEventKey(event), createLegacyAdminEventKey(event)]
+    .some(value => cleanValue(value).toLowerCase() === reference.toLowerCase()));
+}
+
+function getPersonalPlannedEvents() {
+  const meta = getSeasonPlanMeta();
+  const planned = plannedEditions.map(key => {
+    const entry = meta[key] || {};
+    let event = personalPlannedCatalog.get(key);
+    if (!event) {
+      const matches = entry.edition_id
+        ? events.filter(item => item.edition_id === entry.edition_id)
+        : getExactPlannedMatches(key, events);
+      if (matches.length === 1) event = matches[0];
+    }
+    const savedMatches = entry.edition_id ? events.filter(item => item.edition_id === entry.edition_id) : getExactPlannedMatches(key, events);
+    // A failed additional lookup must not discard an exact public edition that
+    // the current catalog has already loaded. A successful missing/ambiguous
+    // answer remains unresolved and never revives a hidden edition.
+    if (["unavailable", "permission_denied", "owned_archive_unavailable"].includes(event?._planner_resolution) && savedMatches.length === 1) {
+      event = { ...savedMatches[0], _planner_lookup_warning: "Zusätzlicher Archivabruf nicht verfügbar; angezeigt werden die bereits geladenen öffentlichen Katalogangaben." };
+    }
+    const placeholderEntry = !entry.catalog_snapshot && savedMatches.length === 1
+      ? { ...entry, catalog_snapshot: personalPlannerSnapshot(savedMatches[0]) } : entry;
+    return event && !event._planner_resolution ? { ...event, _planner_key: key }
+      : createPersonalPlannerPlaceholder(key, placeholderEntry, event?._planner_resolution || "not_loaded");
+  });
+  const unique = new Map();
+  planned.forEach(event => {
+    const identity = event.edition_id || getEventKey(event);
+    const previous = unique.get(identity);
+    const details = meta[getEventKey(event)] || {};
+    const previousDetails = previous ? meta[getEventKey(previous)] || {} : {};
+    if (!previous || (["pending", "error"].includes(details._sync_state) && !["pending", "error"].includes(previousDetails._sync_state)) ||
+        (details.planner_details?.result?.finish_status && !previousDetails.planner_details?.result?.finish_status)) unique.set(identity, event);
+  });
+  return [...unique.values()];
+}
+
+function createPersonalPlannerPlaceholder(key, entry, resolution) {
+  const saved = entry.catalog_snapshot || {};
+  const messages = {
+    unavailable: "Archiv konnte nicht geladen werden.", permission_denied: "Archivzugriff derzeit nicht erlaubt.",
+    owned_archive_unavailable: "Das persönliche Archiv ist derzeit nicht verfügbar; die benötigte Archivfunktion kann noch fehlen.",
+    not_publicly_available: "Die gespeicherte Edition ist derzeit nicht öffentlich verfügbar.",
+    ambiguous: "Die gespeicherte Referenz ist nicht eindeutig einer Edition zugeordnet.",
+    unresolved_reference: "Die gespeicherte Referenz benennt keine eindeutige Jahresedition.", not_loaded: "Edition noch nicht aufgelöst."
+  };
+  return { _planner_key: key, event_key: key, edition_id: entry.edition_id || null,
+    event_name: saved.event_name || "Gespeicherte Edition", date: saved.date || "", end_date: saved.end_date || "",
+    city: saved.city || "", country: saved.country || "", sport: saved.sport || "", distance: saved.distance || "",
+    race_formats: Array.isArray(saved.race_formats) ? saved.race_formats : [], event_status: "unknown", _planner_resolution: resolution,
+    _planner_saved_facts: Boolean(saved.event_name),
+    _planner_unresolved: `${messages[resolution] || messages.unavailable} Angaben zur gespeicherten Edition derzeit nicht bestätigt; die Planung bleibt erhalten.` };
+}
+
+function getPersonalParticipationState(event, now = new Date()) {
+  const result = getSeasonPlannerDetails(event).result || {};
+  const status = cleanValue(result.finish_status).toLowerCase();
+  const finished = ["finished", "finisher"].includes(status);
+  const hasOutcome = finished || ["dnf", "dns", "dsq", "cancelled", "other"].includes(status);
+  const startDate = event._planner_unresolved ? null : parseSeasonDate(event.date);
+  const endDate = startDate ? parseSeasonEndDate(event.end_date || event.date) : null;
+  const today = new Date(now); today.setHours(0, 0, 0, 0);
+  const exactStart = /T\d{2}:\d{2}.*(?:Z|[+-]\d{2}:\d{2})$/i.test(cleanValue(event.date));
+  const exactEnd = /T\d{2}:\d{2}.*(?:Z|[+-]\d{2}:\d{2})$/i.test(cleanValue(event.end_date));
+  let temporal = !endDate || endDate < startDate ? "unknown" : getLocalDateStart(endDate) < today ? "past" : "upcoming";
+  if (temporal !== "unknown" && exactEnd && endDate <= now) temporal = "past";
+  else if (temporal === "upcoming" && ((exactStart && startDate <= now) || getLocalDateStart(startDate) < today)) temporal = "ongoing";
+  // A clock time without a documented timezone cannot establish today's start.
+  if (temporal === "upcoming" && !exactStart && (cleanValue(event.start_time) || /[T\s]\d{1,2}:\d{2}/.test(cleanValue(event.date))) && getLocalDateStart(startDate).getTime() === today.getTime()) temporal = "unknown";
+  const catalog = event._planner_unresolved ? "unavailable" : cleanValue(event.event_status).toLowerCase() || "unknown";
+  return { temporal, catalog, personal: status || "planned", finished, hasOutcome,
+    isUpcoming: temporal === "upcoming" && (!status || status === "planned") && !hasOutcome && !["cancelled", "inactive", "completed", "date_unconfirmed", "postponed"].includes(catalog) };
+}
+
+function notifyPersonalPlanningChange() {
+  if (typeof window.dispatchEvent === "function") window.dispatchEvent(new Event("personalplanningchange"));
+}
+
+async function refreshPersonalPlannedCatalog() {
+  if (typeof window.loadPersonalPlannedEditions !== "function") return;
+  const version = ++personalPlanningLoadVersion;
+  const loaded = await window.loadPersonalPlannedEditions(plannedEditions.map(key => ({ event_id: key, edition_id: getSeasonPlanMeta()[key]?.edition_id || null })));
+  if (version !== personalPlanningLoadVersion) return;
+  personalPlannedCatalog = new Map(loaded.map(event => [event._planner_key, event]));
+  const meta = getSeasonPlanMeta();
+  loaded.forEach(event => {
+    if (!event._planner_resolution && (!meta[event._planner_key]?.edition_id || meta[event._planner_key].edition_id === event.edition_id)) {
+      meta[event._planner_key] = { ...(meta[event._planner_key] || {}), edition_id: event.edition_id || null, catalog_snapshot: personalPlannerSnapshot(event) };
+    }
+  });
+  saveSeasonPlanMeta(meta);
+  notifyPersonalPlanningChange();
+  if (document.getElementById("seasonPlannerModal")?.classList.contains("open")) renderSeasonPlanner();
+}
+
+window.getPersonalPlannedEvents = getPersonalPlannedEvents;
+window.getPersonalParticipationState = getPersonalParticipationState;
+window.refreshPersonalPlannedCatalog = refreshPersonalPlannedCatalog;
 
 
 function saveFavorites() {
@@ -313,7 +423,10 @@ function migrateLocalPlanningKeys(eventList) {
     }
 
     const legacyMetaKey = aliases.find(alias =>
-      alias !== canonicalKey && storedMeta[alias]
+      alias !== canonicalKey && storedMeta[alias] &&
+      !plannedEditions.includes(alias) &&
+      getExactPlannedMatches(alias, eventList).length === 1 &&
+      (!storedMeta[alias].edition_id || storedMeta[alias].edition_id === event.edition_id)
     );
 
     if (legacyMetaKey) {
@@ -350,8 +463,10 @@ function migrateLocalPlanningKeys(eventList) {
 }
 
 function applyRemotePlanningState(state = {}) {
+  const previousUser = localStorage.getItem("personalPlanningUser");
+  const reset = state.clear === true || (state.userId && previousUser && state.userId !== previousUser);
   const localMeta =
-    getSeasonPlanMeta();
+    reset ? {} : getSeasonPlanMeta();
   const remoteMeta =
     state.seasonMeta || {};
   const mergedMeta =
@@ -368,63 +483,21 @@ function applyRemotePlanningState(state = {}) {
       normalizeSeasonMetaEntry(
         remoteEntry || {}
       );
+    const rawDetails = isPlainPlannerObject(remoteEntry?.planner_details) ? remoteEntry.planner_details : {};
+    const pending = ["pending", "error"].includes(localEntry._sync_state);
+    const details = pending ? localEntry.planner_details : mergePersonalPlannerDetails(localEntry.planner_details, rawDetails);
 
     mergedMeta[eventKey] =
       normalizeSeasonMetaEntry({
         ...localEntry,
         ...normalizedRemote,
+        ...(pending ? localEntry : {}),
         note:
-          normalizedRemote.note ||
+          (pending ? localEntry.note : normalizedRemote.note) ||
           localEntry.note ||
           "",
         planner_details:
-          normalizePlannerDetails(
-            {
-              ...localEntry.planner_details,
-              ...normalizedRemote.planner_details,
-              goals: {
-                ...localEntry.planner_details.goals,
-                ...normalizedRemote.planner_details.goals
-              },
-              logistics: {
-                ...localEntry.planner_details.logistics,
-                ...normalizedRemote.planner_details.logistics
-              },
-              equipment: {
-                ...localEntry.planner_details.equipment,
-                ...normalizedRemote.planner_details.equipment,
-                checked: {
-                  ...localEntry.planner_details.equipment?.checked,
-                  ...normalizedRemote.planner_details.equipment?.checked
-                },
-                items: [
-                  ...new Set([
-                    ...(localEntry.planner_details.equipment?.items || []),
-                    ...(normalizedRemote.planner_details.equipment?.items || [])
-                  ])
-                ]
-              },
-              nutrition: {
-                ...localEntry.planner_details.nutrition,
-                ...normalizedRemote.planner_details.nutrition,
-                entries: [
-                  ...(localEntry.planner_details.nutrition?.entries || []),
-                  ...(normalizedRemote.planner_details.nutrition?.entries || [])
-                ]
-              },
-              post_race: {
-                ...localEntry.planner_details.post_race,
-                ...normalizedRemote.planner_details.post_race
-              },
-              result: {
-                ...localEntry.planner_details.result,
-                ...normalizedRemote.planner_details.result
-              }
-            },
-            normalizedRemote.note ||
-            localEntry.note ||
-            ""
-          )
+          normalizePlannerDetails(details, pending ? localEntry.note : normalizedRemote.note || localEntry.note || "")
       });
     });
 
@@ -435,8 +508,20 @@ function applyRemotePlanningState(state = {}) {
 
   plannedEditions =
     Array.isArray(state.plannedEditions)
-      ? [...new Set(state.plannedEditions)]
+      ? [...new Set([...state.plannedEditions, ...(reset ? [] : plannedEditions.filter(key => ["pending", "error"].includes(localMeta[key]?._sync_state)))])]
       : [];
+
+  if (reset) personalPlannedCatalog.clear();
+  if (reset) personalPlanningLoadVersion += 1;
+  if (reset) window.cancelPersonalPlanningLoad?.();
+  if (state.clear) localStorage.removeItem("personalPlanningUser");
+  else if (state.userId) localStorage.setItem("personalPlanningUser", state.userId);
+  if (Array.isArray(state.plannedEvents)) personalPlannedCatalog = new Map(state.plannedEvents.filter(event =>
+    !mergedMeta[event._planner_key]?.edition_id || mergedMeta[event._planner_key].edition_id === event.edition_id
+  ).map(event => [event._planner_key, event]));
+  personalPlannedCatalog.forEach((event, key) => {
+    if (mergedMeta[key] && !event._planner_resolution) mergedMeta[key].catalog_snapshot = personalPlannerSnapshot(event);
+  });
 
   saveFavorites();
   savePlannedEditions();
@@ -447,6 +532,8 @@ function applyRemotePlanningState(state = {}) {
       mergedMeta
     )
   );
+  notifyPersonalPlanningChange();
+  if (!state.clear && (!Array.isArray(state.plannedEvents) || plannedEditions.some(key => !state.plannedEditions?.includes(key)))) void refreshPersonalPlannedCatalog();
 
   if (
     typeof renderEventList === "function" &&
@@ -469,6 +556,19 @@ function applyRemotePlanningState(state = {}) {
   ) {
     renderSeasonPlanner();
   }
+}
+
+function mergePersonalPlannerDetails(local, remote) {
+  const next = { ...(isPlainPlannerObject(local) ? local : {}) };
+  Object.entries(isPlainPlannerObject(remote) ? remote : {}).forEach(([key, value]) => {
+    next[key] = isPlainPlannerObject(value) ? mergePersonalPlannerDetails(next[key], value) : value;
+  });
+  return next;
+}
+
+function personalPlannerSnapshot(event) {
+  return Object.fromEntries(["event_name", "date", "end_date", "city", "country", "sport", "distance", "race_formats"]
+    .filter(field => event[field] !== undefined).map(field => [field, event[field]]));
 }
 
 window.applyRemotePlanningState =
@@ -1666,11 +1766,26 @@ function parseCsvLine(line, delimiter = ";") {
 }
 
 function parseEventsCsv(text) {
-  const lines =
-    String(text || "")
-      .replace(/^\uFEFF/, "")
-      .split(/\r?\n/)
-      .filter(line => line.trim());
+  // Match the exporter CSV contract even when a manual description contains
+  // quoted line breaks and the optional PapaParse CDN is unavailable.
+  const lines = [];
+  const source = String(text || "").replace(/^\uFEFF/, "");
+  let record = "";
+  let quoted = false;
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
+    if (char === '"') {
+      if (quoted && source[index + 1] === '"') { record += '""'; index += 1; continue; }
+      quoted = !quoted;
+    }
+    if ((char === "\n" || char === "\r") && !quoted) {
+      if (record.trim()) lines.push(record);
+      record = "";
+      if (char === "\r" && source[index + 1] === "\n") index += 1;
+    } else record += char;
+  }
+  if (quoted) throw new Error("CSV has an unterminated quoted field.");
+  if (record.trim()) lines.push(record);
 
   if (!lines.length) {
     return [];
@@ -1901,6 +2016,7 @@ async function loadEvents(callback) {
     }
 
     migrateLocalPlanningKeys(events);
+    await refreshPersonalPlannedCatalog();
     loadedEvents = events;
 
     if (typeof window.updateLandingEventCount === "function") {
@@ -2725,16 +2841,24 @@ function toggleFavorite(event) {
 
 function toggleSeasonPlan(event) {
   const key = getEventKey(event);
-  const aliases = new Set(getEventKeyAliases(event));
-  const wasPlanned = plannedEditions.some(item => aliases.has(item));
+  const aliases = new Set(getPersonalPlannedEvents().filter(item =>
+    getEventKey(item) === key || (event.edition_id && item.edition_id === event.edition_id)
+  ).map(getEventKey));
+  const wasPlanned = aliases.size > 0;
 
   plannedEditions = plannedEditions.filter(item => !aliases.has(item));
   if (!wasPlanned) {
     plannedEditions.push(key);
+    const meta = getSeasonPlanMeta();
+    meta[key] = { ...(meta[key] || {}), edition_id: event.edition_id || null,
+      catalog_snapshot: { event_name: event.event_name } };
+    saveSeasonPlanMeta(meta);
+    personalPlannedCatalog.set(key, event);
   }
 
   const isNowPlanned = !wasPlanned;
   savePlannedEditions();
+  notifyPersonalPlanningChange();
 
   if (typeof window.syncSeasonEditionToSupabase === "function") {
     window.syncSeasonEditionToSupabase(event, isNowPlanned);
@@ -3272,15 +3396,33 @@ function setSeasonMetaEntry(eventKey, entryPatch = {}) {
   const next =
     normalizeSeasonMetaEntry({
       ...previous,
-      ...entryPatch
+      ...entryPatch,
+      edition_id: findSeasonEventByKey(eventKey)?.edition_id || previous.edition_id || null,
+      _sync_revision: Number(previous._sync_revision || 0) + 1,
+      _sync_state: "pending",
+      _sync_message: "Auf diesem Gerät gespeichert; Cloudbestätigung ausstehend."
     });
 
   meta[eventKey] =
     next;
 
   saveSeasonPlanMeta(meta);
+  notifyPersonalPlanningChange();
   return next;
 }
+
+function setPersonalPlannerSyncState(eventKey, revision, state, message, owner) {
+  if (owner && localStorage.getItem("personalPlanningUser") !== owner) return;
+  const meta = getSeasonPlanMeta();
+  if (!meta[eventKey] || meta[eventKey]._sync_revision !== revision) return;
+  meta[eventKey] = { ...meta[eventKey], _sync_state: state, _sync_message: message };
+  saveSeasonPlanMeta(meta);
+  notifyPersonalPlanningChange();
+  document.querySelectorAll("[data-planner-sync-status]").forEach(node => {
+    if (node.dataset.plannerSyncStatus === eventKey) node.textContent = message;
+  });
+}
+window.setPersonalPlannerSyncState = setPersonalPlannerSyncState;
 
 function setNestedPlannerDetail(details, path, value) {
   const parts =
@@ -3596,7 +3738,7 @@ function seasonPlannerText(key, fallback = "") {
 
 function isSeasonEventPast(event) {
   const eventDate =
-    parseSeasonEndDate(event.date);
+    parseSeasonEndDate(event.end_date || event.date);
 
   if (!eventDate) {
     return false;
@@ -3964,7 +4106,7 @@ function getSeasonDistanceFromResult(result = {}, event) {
 }
 
 function findSeasonEventByKey(eventKey) {
-  return events.find(event =>
+  return getPersonalPlannedEvents().find(event =>
     getEventKey(event) === eventKey
   );
 }
@@ -6249,7 +6391,7 @@ function renderSeasonResultPanel({
   hasResult
 }) {
   const isPast =
-    isSeasonEventPast(event);
+    isSeasonEventPast(event) || getPersonalParticipationState(event).hasOutcome || Boolean(event._planner_unresolved);
   const editMode =
     result.edit_mode === true ||
     result.edit_mode === "true";
@@ -8023,12 +8165,7 @@ function groupSeasonEventsByMonth(eventsForSeason) {
 }
 
 function getFavoriteEventsForSeason() {
-  if (typeof events === "undefined") {
-    return [];
-  }
-
-  return events
-    .filter(event => isPlannedEdition(event))
+  return getPersonalPlannedEvents()
     .sort((first, second) => {
       const firstDate =
         parseSeasonDate(first.date);
@@ -8244,6 +8381,8 @@ function renderSeasonListEvent(event, closeWarnings, favoriteEvents) {
 }
 
 function createLocalSeasonDate(year, month, day, hours = 8, minutes = 0, seconds = 0) {
+  if (![year, month, day, hours, minutes, seconds].every(value => Number.isFinite(Number(value))) ||
+      Number(hours) < 0 || Number(hours) > 23 || Number(minutes) < 0 || Number(minutes) > 59 || Number(seconds) < 0 || Number(seconds) > 59) return null;
   const date =
     new Date(
       Number(year),
@@ -8255,7 +8394,7 @@ function createLocalSeasonDate(year, month, day, hours = 8, minutes = 0, seconds
       0
     );
 
-  return Number.isNaN(date.getTime())
+  return Number.isNaN(date.getTime()) || date.getFullYear() !== Number(year) || date.getMonth() !== Number(month) - 1 || date.getDate() !== Number(day)
     ? null
     : date;
 }
@@ -8272,6 +8411,14 @@ function parseSeasonDateRange(value) {
 
   const text =
     cleanValue(value);
+  const instant = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.\d{1,3})?)?(Z|[+-](\d{2}):(\d{2}))$/i.exec(text);
+  if (instant) {
+    const valid = createLocalSeasonDate(instant[1], instant[2], instant[3], instant[4], instant[5], instant[6] || 0);
+    if (!valid || Number(instant[8] || 0) > 14 || Number(instant[9] || 0) > 59 || (Number(instant[8]) === 14 && Number(instant[9]) !== 0)) return { start: null, end: null };
+    const parsed = new Date(text);
+    return Number.isNaN(parsed.getTime()) ? { start: null, end: null } : { start: parsed, end: new Date(parsed.getTime()) };
+  }
+  if (/[Zz]|[+-]\d{2}:\d{2}/.test(text) && /T\d/.test(text)) return { start: null, end: null };
 
   if (!text) {
     return {
@@ -8316,7 +8463,7 @@ function parseSeasonDateRange(value) {
   const validDates =
     dates.filter(Boolean);
 
-  if (!validDates.length) {
+  if (!validDates.length || validDates.length !== dates.length) {
     return {
       start: null,
       end: null
@@ -8379,17 +8526,7 @@ function getSeasonDayDifferenceFromToday(value) {
 }
 
 function getUpcomingSeasonEvents(favoriteEvents) {
-  const today =
-    new Date();
-
-  today.setHours(0, 0, 0, 0);
-
-  return favoriteEvents.filter(event => {
-    const date =
-      parseSeasonEndDate(event.date);
-
-    return date && date >= today;
-  }).sort((first, second) =>
+  return favoriteEvents.filter(event => getPersonalParticipationState(event).isUpcoming).sort((first, second) =>
     parseSeasonDate(first.date).getTime() -
     parseSeasonDate(second.date).getTime()
   );
@@ -8693,7 +8830,7 @@ function renderSeasonEventList(
     sortByDateAsc(second, first);
   const upcomingEvents =
     favoriteEvents
-      .filter(event => !isSeasonEventPast(event))
+      .filter(event => getPersonalParticipationState(event).isUpcoming)
       .sort(sortByDateAsc);
   const nextRaceKey =
     upcomingEvents[0]
@@ -8705,14 +8842,14 @@ function renderSeasonEventList(
       events: upcomingEvents
     },
     {
-      title: "Completed",
+      title: "Results",
       events:
         favoriteEvents
           .filter(event => {
             const details =
               getSeasonPlannerDetailsForEvent(event);
 
-            return isSeasonEventPast(event) &&
+            return getPersonalParticipationState(event).hasOutcome &&
               !(details.post_race?.archived === true ||
                 details.post_race?.archived === "true");
           })
@@ -8726,12 +8863,28 @@ function renderSeasonEventList(
             const details =
               getSeasonPlannerDetailsForEvent(event);
 
-            return isSeasonEventPast(event) &&
+            return (getPersonalParticipationState(event).hasOutcome || isSeasonEventPast(event)) &&
               (details.post_race?.archived === true ||
                 details.post_race?.archived === "true");
           })
           .sort(sortByDateDesc)
-    }
+    },
+    { title: "Past · result pending", events: favoriteEvents.filter(event => {
+      const state = getPersonalParticipationState(event);
+      return state.temporal === "past" && !state.hasOutcome && !getSeasonPlannerDetails(event).post_race?.archived;
+    }).sort(sortByDateDesc) },
+    { title: "Started / ongoing", events: favoriteEvents.filter(event => {
+      const state = getPersonalParticipationState(event);
+      return state.temporal === "ongoing" && !state.hasOutcome;
+    }) },
+    { title: "Cancelled / inactive", events: favoriteEvents.filter(event => {
+      const state = getPersonalParticipationState(event);
+      return !state.hasOutcome && state.temporal !== "past" && ["cancelled", "inactive", "completed"].includes(state.catalog);
+    }) },
+    { title: "Edition / date to confirm", events: favoriteEvents.filter(event => {
+      const state = getPersonalParticipationState(event);
+      return (state.temporal === "unknown" || ["date_unconfirmed", "postponed"].includes(state.catalog)) && !state.hasOutcome && !["cancelled", "inactive", "completed"].includes(state.catalog);
+    }) }
   ].filter(group => group.events.length);
 
   const renderSelector = event => {
@@ -8742,7 +8895,7 @@ function renderSeasonEventList(
     const details =
       getSeasonPlannerDetailsForEvent(event);
     const isPast =
-      isSeasonEventPast(event);
+      isSeasonEventPast(event) || getPersonalParticipationState(event).hasOutcome;
     const daysUntil =
       getSeasonDaysUntil(event);
     const timingLabel =
@@ -9126,7 +9279,8 @@ function renderSeasonRaceWorkspace(event, eventKey) {
   const summary = getSeasonResultSummaryItems(event, goals, result);
   const taskSummary = getSeasonWorkspaceTaskSummary(event, details);
   const nextAction = getSeasonWorkspaceNextAction(event, details);
-  const isPast = isSeasonEventPast(event);
+  const participation = getPersonalParticipationState(event);
+  const isPast = participation.temporal === "past" || participation.hasOutcome || Boolean(event._planner_unresolved);
   const hasResult = hasSeasonResult(result);
   const distanceKm = summary.distanceKm;
   const distanceLabel = Number.isFinite(distanceKm)
@@ -9144,7 +9298,7 @@ function renderSeasonRaceWorkspace(event, eventKey) {
     ? ""
     : summary.finishMetric.value;
   const priority = getSeasonPriority(event);
-  const trainingPhase = isPast ? "Completed" : getSeasonTrainingPhase(event);
+  const trainingPhase = participation.hasOutcome ? "Ergebnis dokumentiert" : isPast ? "Vergangen / nicht zugeordnet" : getSeasonTrainingPhase(event);
   const timingLabel = isPast
     ? getSeasonPostRaceStatus(details)
     : getSeasonTimingLabel(event);
@@ -9348,9 +9502,17 @@ function renderSeasonEditableEvent(event) {
 
   const eventKey =
     getEventKey(event);
+  const entry = getSeasonMetaEntry(eventKey);
 
   return `
     <article class="season-event-editor-card" data-testid="planner-event-edit-card">
+      ${event._planner_unresolved ? `<p role="status">${escapeHTML(event._planner_unresolved)} Referenz: ${escapeHTML(eventKey)}</p>` : ""}
+      ${event._planner_saved_facts ? `<p role="status">Gespeicherte frühere Angaben; Datum und Veranstaltungsstatus aktuell nicht bestätigt.</p>` : ""}
+      ${event._planner_owned_archive ? `<p role="status">Eigene archivierte Edition; sie erscheint nicht in der öffentlichen Eventsuche.</p>` : ""}
+      ${event._planner_snapshot_at ? `<p role="status">Gespeicherter öffentlicher Datenstand vom ${escapeHTML(event._planner_snapshot_at)}; Liveabruf derzeit nicht verfügbar.</p>` : ""}
+      ${event._planner_lookup_warning ? `<p role="status">${escapeHTML(event._planner_lookup_warning)}</p>` : ""}
+      <p data-planner-sync-status="${escapeHTML(eventKey)}" role="status">${escapeHTML(entry._sync_message || "Eigene Planung dieser Edition. Änderungen werden zuerst auf diesem Gerät gespeichert.")}</p>
+      ${["pending", "error"].includes(entry._sync_state) ? `<button type="button" data-planner-retry="${escapeHTML(eventKey)}">Cloudspeicherung erneut versuchen</button>` : ""}
       ${renderSeasonRaceWorkspace(event, eventKey)}
     </article>
   `;
@@ -10259,6 +10421,16 @@ function renderSeasonPlanner() {
     });
 
   document
+    .querySelectorAll("[data-planner-retry]")
+    .forEach(button => button.addEventListener("click", async () => {
+      const key = button.dataset.plannerRetry;
+      const entry = getSeasonMetaEntry(key);
+      button.disabled = true;
+      await window.syncSeasonPlanMetaToSupabase?.(key, { priority: entry.priority, distance: entry.distance, planner_details: entry.planner_details });
+      renderSeasonPlannerPreservingView();
+    }));
+
+  document
     .querySelectorAll("[data-season-detail-field]")
     .forEach(field => {
       field.addEventListener("change", () => {
@@ -10286,8 +10458,8 @@ function renderSeasonPlanner() {
 
         if (typeof showToast === "function") {
           showToast(
-            seasonPlannerText("season.detailsSaved", "Planner details saved"),
-            seasonPlannerText("season.detailsSavedCopy", "Your event details were updated.")
+            "Auf diesem Gerät gespeichert",
+            "Cloudbestätigung und Wiederholung stehen beim Event."
           );
         }
 
@@ -10364,8 +10536,8 @@ function renderSeasonPlanner() {
 
         if (typeof showToast === "function") {
           showToast(
-            seasonPlannerText("season.detailsSaved", "Planner details saved"),
-            seasonPlannerText("season.detailsSavedCopy", "Your event details were updated.")
+            "Auf diesem Gerät gespeichert",
+            "Cloudbestätigung und Wiederholung stehen beim Event."
           );
         }
 

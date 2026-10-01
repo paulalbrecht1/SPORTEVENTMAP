@@ -551,3 +551,13 @@ body[data-theme="light"] #adminModal .admin-data-operations-history-row code {
 #adminModal .admin-data-operations-proposal-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 body[data-theme="light"] #adminModal .admin-data-operations-proposal,
 body[data-theme="light"] #adminModal .admin-data-operations-alert { border-color: #d7dee8; background: #fff; color: #172033; }
+#adminModal .catalog-quality-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+#adminModal .catalog-quality-details > div { min-width: 0; padding-bottom: 10px; border-bottom: 1px solid var(--border-color, rgba(128,128,128,.2)); }
+#adminModal .catalog-quality-details dt { font-size: .85rem; opacity: .8; }
+#adminModal .catalog-quality-details dd { margin: 4px 0 0; font-weight: 600; overflow-wrap: anywhere; }
+#catalogQualityDefinition, #catalogQualityBlockers { overflow-wrap: anywhere; }

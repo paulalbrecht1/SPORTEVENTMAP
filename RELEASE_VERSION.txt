@@ -1,4 +1,4 @@
 Sport Event Map - Production Release
-Version: 20260929-ui-only-v98
+Version: 20261001-ui-only-v99
 Build: only from a clean committed source tree; the deployed release.json is authoritative.
-Includes: The event detail location button opens Google Maps at the same coordinates as the existing map pin. Embedded Leaflet/OpenStreetMap maps, pins, button labels and visual styles are unchanged. Existing static HTML changes only shared detail script and stylesheet version URLs; static facts, data exports, verification timestamps and sitemap remain unchanged. No database migration or event data changes.
+Includes: The manual admin review preview displays legacy crawler race formats with their original labels or numeric distances and units. Public detail renderers, styles, embedded maps, pins and Google Maps location links are unchanged. Existing static HTML changes only shared detail script and stylesheet version URLs; static facts, data exports, verification timestamps and sitemap remain unchanged. No database migration or event data export. Separate source-backed manual data corrections are documented in the browser audit.

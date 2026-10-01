@@ -5049,7 +5049,7 @@ async function loadAdminTab(tabName, options = {}) {
     if (!panel || panel.dataset.maintenanceMounted === "true") return;
     try {
       if (!await isCurrentUserAdmin()) throw new Error("Für die Eventpflege ist eine Adminanmeldung erforderlich.");
-      await import("./manual-event-maintenance.js?v=20260929-public-description-v132");
+      await import("./manual-event-maintenance.js?v=20261001-review-preview-v134");
       window.SemManualEventMaintenance.mount({
         root: panel,
         client: supabaseClient,

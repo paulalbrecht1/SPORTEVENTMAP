@@ -57,6 +57,37 @@ async function preview(page) {
   await expect(page.locator("[data-maintenance-preview-box]")).toBeVisible();
 }
 
+test("manual: legacy race proposals remain readable and escaped in the review preview", async ({ page }) => {
+  await fixture(page);
+  const formats = [
+    { type: "distance", unit: "km", value: 3.35, original: "3,35 km" },
+    { type: "distance", unit: "km", value: 25, original: "25 km" },
+    { type: "half_marathon", unit: "km", value: 21.0975, original: "Halbmarathon" },
+    { type: "distance", unit: "km", value: 7.5 },
+    { type: "distance", unit: "m", value: 500 },
+    { type: "distance", unit: "km", value: 5, original: '<img src=x onerror="window.previewInjected=true">' }
+  ];
+  await page.evaluate(async ({ formats, editionId }) => {
+    window.db.proposals = [{ id: "legacy-race-proposal", entity_type: "edition", edition_id: editionId,
+      field_name: "race_formats", old_value: [{ label: "Triathlon", distance_km: 51.5, swim_km: 1.5, bike_km: 40, run_km: 10, elevation_gain_m: 320 }],
+      normalized_value: formats, proposal_status: "pending", source_url: "https://example.test/2026" }];
+    await window.app.loadEvent(7, editionId);
+  }, { formats, editionId });
+  const row = page.locator('[data-maintenance-review-row="legacy-race-proposal"]');
+  for (const value of ["3,35 km", "25 km", "Halbmarathon", "7,5 km", "500 m", "Triathlon (51.5 km)", "Schwimmen: 1.5 km", "Radfahren: 40 km", "Laufen: 10 km", "Höhenmeter: 320 m", formats.at(-1).original]) {
+    await expect(row.locator("p").first()).toContainText(value);
+  }
+  await row.locator("[data-maintenance-review-notes]").fill("Originalausschreibung geprüft; ältere automatisch erfasste Formate als Vorschlag lesbar verglichen.");
+  await row.locator("[data-maintenance-review-preview]").click();
+  const box = row.locator("[data-maintenance-preview-box]");
+  await expect(box).toBeVisible();
+  for (const value of ["3,35 km", "25 km", "Halbmarathon", "7,5 km", "500 m", "Triathlon (51.5 km)", formats.at(-1).original]) await expect(box).toContainText(value);
+  await expect(row.locator("img")).toHaveCount(0);
+  expect(await page.evaluate(() => window.previewInjected)).toBeUndefined();
+  expect(await page.evaluate(() => window.calls)).toEqual([]);
+  expect(await page.evaluate(() => window.db.proposals[0].normalized_value)).toEqual(formats);
+});
+
 for (const width of [390, 1280]) test(`manual: ${width}px date correction, targeted confirmation, preview and DB reload`, async ({ page }) => {
   await fixture(page, "success", { width, height: 900 });
   await expect(page.locator("[data-maintenance-open-source]")).toHaveAttribute("target", "_blank");

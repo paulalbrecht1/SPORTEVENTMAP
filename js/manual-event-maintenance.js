@@ -295,7 +295,14 @@
 
   function display(value) {
     if (value === null || value === undefined || value === "") return "Nicht angegeben";
-    if (Array.isArray(value)) return value.map(row => `${row.label || "Wettbewerb"}${row.distance_km != null ? ` (${row.distance_km} km)` : ""}${FORMAT_DETAILS.filter(([key]) => row[key] != null).map(([key, label, unit]) => ` · ${label}: ${row[key]} ${unit}`).join("")}`).join("; ") || "Keine Wettbewerbe";
+    if (Array.isArray(value)) return value.map(row => {
+      if (!row || typeof row !== "object") return String(row ?? "Wettbewerb");
+      const legacyValue = typeof row.value === "number" || typeof row.value === "string" ? String(row.value).trim() : "";
+      const amount = legacyValue && Number.isFinite(Number(legacyValue)) ? new Intl.NumberFormat("de-DE", { maximumFractionDigits: 20, useGrouping: false }).format(Number(legacyValue)) : legacyValue;
+      const measurement = amount ? [amount, typeof row.unit === "string" ? row.unit.trim() : ""].filter(Boolean).join(" ") : "";
+      const label = row.label || row.original || measurement || "Wettbewerb";
+      return `${label}${row.distance_km != null ? ` (${row.distance_km} km)` : ""}${FORMAT_DETAILS.filter(([key]) => row[key] != null).map(([key, label, unit]) => ` · ${label}: ${row[key]} ${unit}`).join("")}`;
+    }).join("; ") || "Keine Wettbewerbe";
     return STATUS[value] || String(value);
   }
 

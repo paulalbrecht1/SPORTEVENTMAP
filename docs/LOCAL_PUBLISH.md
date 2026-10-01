@@ -11,11 +11,14 @@ requirements below and do not approve a new catalog export.
 ## Local preparation on 1 October 2026
 
 The exporter now requires the reviewed read-only
-`20261001095043_public_catalog_consistent_snapshot.sql` migration. It is prepared
-locally, not installed in production. Without the RPC the export stops and keeps
-the previous files. The separate housekeeping route migration also remains
-unapplied in production. Both passed isolated SQL/RLS acceptance with the full
-64-migration schema; explicit rollout approval is still required. The housekeeper
+`20261001095043_public_catalog_consistent_snapshot.sql` migration. It was installed
+in production with explicit approval on 1 October 2026, together with the separate
+housekeeping route, manual approval and owned Planner archive migrations. The
+exact four-file rollout was rehearsed against an encrypted production restore,
+including code rollback/reapply, before independent production verification.
+Without the RPC the exporter still stops and preserves the previous files.
+All four also passed isolated SQL/RLS acceptance with the full 64-migration schema.
+The housekeeper
 resumes existing automatic validation/aging behavior, unlike the read-only snapshot.
 Do not apply the historical pending migration list blindly.
 

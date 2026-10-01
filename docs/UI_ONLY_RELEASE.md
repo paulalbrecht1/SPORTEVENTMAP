@@ -76,10 +76,12 @@ nicht. Für tatsächlich archivierte Plannereditionen ist außerdem
 `20261001112438_own_planner_archived_editions.sql` nötig: ein Lese-RPC für eigene
 früher öffentliche Editionen, ohne Datenmigration oder globale RLS-Öffnung.
 Der Nutzer hat den Backend-/UI-Rollout am 01.10.2026 ausdrücklich freigegeben.
-Zielversion ist **20261001-ui-only-v141**. Der Ausführungsnachweis wird im
-[P0-Abschlussplan](P0_FINISH_PLAN_20260929.md) ergänzt; die Freigabe allein belegt
-noch keine angewendete Migration oder Veröffentlichung. Die Datenreleasegates
-bleiben unverändert.
+**20261001-ui-only-v141** ist danach produktiv veröffentlicht und unabhängig
+geprüft: 1.049 Dateihashes sowie echte anonyme Desktop-/Mobilprüfungen bestanden.
+Die vier Backendmigrationen sind separat angewendet; alle 50 alten Historyzeilen
+und bestehende Geschäftsdaten blieben erhalten. Der vollständige Nachweis samt
+getestetem Rückweg steht im [P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
+Die Datenreleasegates und der alte Fallbackstand bleiben unverändert.
 
 ```powershell
 node tools/ui-release.js build --base-dir dist --base-url https://<deployment>.sporteventmap.pages.dev --base-release-sha256 <SHA256> --source-commit <COMMIT> --version <VERSION> --out exports/<release>/package

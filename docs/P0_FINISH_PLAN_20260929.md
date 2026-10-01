@@ -1,5 +1,61 @@
 # P0-Abschlussplan – 29. September 2026
 
+## Produktiver Backend-/UI-Rollout – 1. Oktober 2026
+
+**Ausdrücklich freigegeben und abgeschlossen:** Die vier unten genannten
+Migrationen sind produktiv angewendet. Unabhängiger Nachweis um **13:26 UTC**:
+54 Historyeinträge, alle 50 alten Zeilen unverändert, genau vier neue
+Originalmigrationen. Innerhalb der Anwendung blieben 37 Tabellen und beide
+öffentlichen Views vollständig unverändert, ebenso RLS/ACL, Trigger,
+Prüfnachweise und Zeitpläne. Keine produktiven Testdaten angelegt.
+Der vorhandene Housekeeping-Cron verwendet den reparierten Validatorpfad;
+sein nächster planmäßiger Lauf wurde nicht manuell ausgelöst.
+
+**UI v141 ist live:** Quellcommit `5ce4696e91d25f3ca68330640b4587b88982e694`,
+Preview [c0622aa8](https://c0622aa8.sporteventmap.pages.dev), Produktion
+[95f59bbe](https://95f59bbe.sporteventmap.pages.dev). Die Produktionsdomain
+liefert dieselbe `release.json`. Um **13:36 UTC** bestanden **1.049/1.049
+Dateihashes** und **8/8 echte anonyme Browserprüfungen** bei 1440/390 px:
+primäre Discovery, Suche, editionsgleiche Details und keine JS-Fehler.
+Die Preview bestand zusätzlich **14/14 Paket-/Ausfallprüfungen**. Deren erster
+Fehlversuch war ein Test-Routingfehler: Die Helperroute überging die simulierte
+503-Sperre. Der korrigierte Test belegt vier gesperrte Archivabrufe, null
+durchgerutschte Backendantworten und den sichtbaren alten Fallbackstand.
+
+Vorher: verschlüsseltes Produktionsbackup, isolierter Restore und tatsächlicher
+Hin-/Rückweg **50 → 54 → 50 → 54**, jeweils separat nachgelesen und mit
+unveränderten 39 Daten-/View-/Scheduler-Aggregaten. Zwei falsche Erwartungen
+des zusätzlichen Rollout-Wrappers (CR-normalisierter statt raw Hash sowie
+DEFINER statt INVOKER) wurden dort erkannt und korrigiert. Die Originalmigrationen
+blieben unverändert. Eigene Klonressourcen und entschlüsselter Workdir sind
+entfernt; Podman ist wieder gestoppt, das verschlüsselte Backup bleibt erhalten.
+
+Belege: `exports/p0-rollout-20261001/production-backend-result.json`,
+`clone-rehearsal-summary.json`, `public-postflight.json` sowie
+`exports/ui-release-20261001-v141/production-domain-identity.json`,
+`production-hashes.log` und `production-public-smoke.log`. Backend-Rückweg:
+hashgebundenes `code-rollback.sql` im Rolloutordner, ohne alte Geschäftsdaten
+zurückzuschreiben. UI-Rückweg ist das vorherige Cloudflare-Deployment
+[e4a1000e / v99](https://e4a1000e.sporteventmap.pages.dev). Vor jeder Rücknahme
+Driftguards und eventuell spätere Änderungen prüfen; nichts überschreiben.
+
+Anonyme API-/Zugriffstests bestehen produktiv. Speicher-, Ergebnis- und
+Badge-Schreibabnahmen fanden mit echter Auth/DB ausschließlich lokal statt.
+Der öffentliche Snapshot bestätigt um **13:26:37 UTC** unverändert **211/161**
+Sucheinstiege, **7/7** Vollnachweise in den jeweiligen Beständen und **992**
+Archiv-Editionen. Fallback und Sitemap bleiben vom 27.08.2026. Kein Datenrelease,
+Bestandsimport, Push oder neuer Quellenprüfnachweis; Quellstand lokal committed.
+Security-Advisors erneut geprüft: der neue
+[Definer-Hinweis](https://supabase.com/docs/guides/database/database-linter?lint=0029_authenticated_security_definer_function_executable)
+betrifft den bewusst auf eigene Editionen begrenzten Auth-RPC; übrige Hinweise
+sind Bestandsbefunde.
+
+**P0 teilweise abgeschlossen:** Der technische Rollout ist erledigt. Nächster
+Arbeitsschritt bleiben editionsgenaue manuelle Nachweise, beginnend mit Paderborn,
+und später ein regulärer Datenrelease bei erfüllten unveränderten Gates.
+P1 bleibt pausiert. Die folgenden Abschnitte dokumentieren den Stand **vor**
+diesem Rollout; ihre damaligen Angaben „nicht produktiv“ sind damit überholt.
+
 ## Aktuelle lokale Abnahme – 1. Oktober 2026
 
 **Nachfolgende Freigabe am 01.10.2026:** Der Nutzer hat den vorgeschlagenen

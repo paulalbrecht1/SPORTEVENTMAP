@@ -1,6 +1,11 @@
 # Events manuell pflegen
 
-Stand: **lokale Umsetzung vom 01.10.2026**, noch kein produktiver Rollout.
+Stand: **produktiv ausgerollt am 01.10.2026 mit UI v141** und den vier
+vorbereiteten Backendmigrationen. Produktionsdomain und sämtliche 1.049 Dateien
+des unveränderlichen Deployments sind geprüft. Echte anonyme Suche/Details
+bestehen bei 1440/390 px. Speicher-, Ergebnis- und Badge-Schreibtests wurden mit
+echter Auth/DB ausschließlich lokal ausgeführt; keine produktiven Testeinträge.
+Rollout-/Rückwegnachweis: [P0-Abschlussplan](P0_FINISH_PLAN_20260929.md).
 Die neue Produktregel ersetzt die früheren Pflichtprüfhäkchen im normalen
 Pflegeweg. Historische Abnahmen vom September bleiben weiter unten dokumentiert;
 sie weisen die heute vorbereitete Änderung nicht nach.
@@ -229,12 +234,12 @@ und Katalogfreigaben bleiben gesondert geschützt.
 
 Die E2E-Regressionssuite verwendet kontrollierte Antworten; die gesonderte
 Workflowabnahme verwendet den echten isolierten lokalen Supabase-Stack. Die neue Migration
-`20261001104403_manual_approved_save.sql` ist lokal getestet, nicht produktiv installiert.
+`20261001104403_manual_approved_save.sql` ist lokal getestet und inzwischen produktiv installiert.
 Ihr SQL-/RLS-Rollbacktest ist in `npm run test:manual-maintenance:local`
-eingebunden. Der genehmigte Backend-/UI-Rollout bleibt erforderlich. Für tatsächlich
+eingebunden. Der ausdrücklich genehmigte Backend-/UI-Rollout ist abgeschlossen. Für tatsächlich
 archivierte Editionen benötigt der Planner außerdem
 `20261001112438_own_planner_archived_editions.sql` (ebenfalls lokal getestet und
-noch nicht produktiv installiert).
+inzwischen produktiv installiert).
 Die Migration ergänzt ausschließlich den begrenzten Lese-RPC; persönliche
 Datensätze, Referenzen und Tabellen-RLS werden nicht verändert.
 Siehe [UI-Release](UI_ONLY_RELEASE.md) und [Local Publish](LOCAL_PUBLISH.md).

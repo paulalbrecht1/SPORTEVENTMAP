@@ -1,6 +1,21 @@
 # Nächste Umsetzungsstufen
 
-Stand: 29. September 2026
+Stand: 6. Oktober 2026
+
+**Aktuell: P0-Datenabschluss, danach P1.** Der technische Backend-/UI-Rollout,
+Kandidatenkonfliktweg, Faktenbatchgenerator und sichere Editionsfreigabe sind
+bereits umgesetzt. Der gemeinsame lesende Snapshot vom 06.10., 13:41:34 UTC,
+ergibt **193 Discovery (143 Deutschland), fünf gültige Vollnachweise (2,59 %),
+99 vollständige Zeilen (51,30 %) und 992 veröffentlichte Archiv-Editionen**.
+Der [aktuelle P0-/P1-Status](P0_STATUS_20261006.md) führt die tatsächlich offene
+Arbeit zusammen: länger nutzbare Nettozugänge, editionsgenaue Quellenprüfungen
+und regulärer Datenrelease bei unveränderten Gates. P1 bleibt zurückgestellt.
+
+## Historischer Zwischenstand – 29. September 2026
+
+Die folgenden Septemberangaben sind historisch. Ihre damals offenen technischen
+Schritte und der Allgäu-Konflikt sind inzwischen erledigt; sie werden nicht erneut
+eingeplant. Für heutigen Bestand und nächsten Arbeitsblock gilt der obige Status.
 
 **P0 bleibt aktiv.** Die lesende Produktionsmessung nach dem Pilot vom 29.09., 13:26 UTC,
 ergibt 210 Discovery-Einträge (160 Deutschland), 990 Archiv-Editionen,

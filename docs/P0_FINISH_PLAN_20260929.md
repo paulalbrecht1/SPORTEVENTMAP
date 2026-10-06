@@ -1,5 +1,21 @@
 # P0-Abschlussplan – 29. September 2026
 
+## Aktueller Stand – 6. Oktober 2026
+
+**P0 bleibt offen; P1 bleibt zurückgestellt.** Der technische Rollout ist
+abgeschlossen. Der neue gemeinsame lesende Snapshot vom 06.10., 13:41:34 UTC,
+misst **193 Discovery / 143 Deutschland / fünf gültige Vollnachweise / 992
+veröffentlichte Archiv-Editionen**. Vollständigkeit 99 / 193 = 51,30 %.
+Bis genau 400 fehlen heute mindestens 207 Nettozugänge und 215 Vollnachweise;
+bei ausschließlich frischen Zugängen und fünf weiter gültigen Bestandsnachweisen
+zusätzlich acht Bestandsreviews. Zeitbedingte Abgänge erhöhen den Bedarf.
+
+Der [aktuelle Status und direkte Arbeitsweg](P0_STATUS_20261006.md) enthält
+Kandidatenlücke, Quellenbefunde, neue Reviewpriorisierung, Kohortenprojektionen
+und den geprüften Diagnoseplan. Die vorhandene Technik wird weiterverwendet;
+Qualitätsgates bleiben unverändert. Die folgenden Abschnitte dokumentieren die
+älteren Messungen und Rollouts und gelten nicht als heutiger Bestandsnachweis.
+
 ## Produktiver Backend-/UI-Rollout – 1. Oktober 2026
 
 **Ausdrücklich freigegeben und abgeschlossen:** Die vier unten genannten

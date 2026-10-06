@@ -11,7 +11,8 @@ const dataOpsStyles = fs.readFileSync(new URL("../../css/data-operations.css", i
 const actualFunctions = adminSource.slice(adminSource.indexOf("function renderCatalogQualityReport()"), adminSource.indexOf('document.getElementById("downloadCatalogQualityReport")?.addEventListener'));
 const dateFunction = adminSource.slice(adminSource.indexOf("function formatDataOpsDate("), adminSource.indexOf("function setDataOpsKpi("));
 const escapeFunction = adminSource.slice(adminSource.indexOf("function escapeAdminHTML("), adminSource.indexOf("function safeAdminUrl("));
-const qualityMarkup = adminSource.match(/<div class="data-freshness-priorities">\s*<strong>Datenqualität und Freigabe<\/strong>[\s\S]*?<\/div>/)?.[0];
+const qualityMarkup = adminSource.match(/<div class="data-freshness-priorities">[\s\S]*?<\/div>/g)
+  ?.find(markup => markup.includes('id="catalogQualityDefinition"'));
 
 function syntheticData() {
   const measured = new Date(), measuredAt = measured.toISOString();

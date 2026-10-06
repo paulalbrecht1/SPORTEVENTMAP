@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 
 const admin = fs.readFileSync(new URL("../../js/supabase.js", import.meta.url), "utf8");
 const styles = fs.readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+const accountTextRuntime = admin.slice(
+  admin.indexOf("function accountUiText("),
+  admin.indexOf("function setButtonLoading(")
+);
 const dialogRuntime = admin.slice(
   admin.indexOf("function buildContentVerificationEvidence("),
   admin.indexOf("function renderEditionLifecycleInbox(")
@@ -64,6 +68,7 @@ async function openReview(page, type = "freshness_review") {
     const setButtonLoading = (button, loading) => { button.disabled = loading; };
     const getFriendlyErrorMessage = (error, fallback) => error.message || fallback;
     const loadDataOperations = async () => {};
+    ${accountTextRuntime}
     ${dialogRuntime}
     ${actionRuntime}
     const start = document.getElementById("start");

@@ -2,6 +2,7 @@ import { expect, openPlanner, prepareApp, selectPlannerTab, test } from "./helpe
 
 async function ownArchivedFixture(page) {
   await prepareApp(page);
+  await page.evaluate(() => setAppLanguage('de'));
   await page.waitForFunction(() => typeof loadRemotePlanningState === "function");
   await page.evaluate(() => {
     window.actualPersonalPlannerSync = window.syncSeasonPlanMetaToSupabase;

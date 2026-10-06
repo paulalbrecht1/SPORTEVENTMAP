@@ -3,6 +3,10 @@ import { expect, test } from "@playwright/test";
 
 const admin = fs.readFileSync(new URL("../../js/supabase.js", import.meta.url), "utf8");
 const styles = fs.readFileSync(new URL("../../css/style.css", import.meta.url), "utf8");
+const accountTextRuntime = admin.slice(
+  admin.indexOf("function accountUiText("),
+  admin.indexOf("function setButtonLoading(")
+);
 const dialogRuntime = admin.slice(admin.indexOf("function buildProposalCloseRequest("), admin.indexOf("function buildContentVerificationEvidence("));
 const handlerStart = admin.indexOf("async function handleDataOpsAction(");
 const handlerEnd = admin.lastIndexOf("\n[", admin.indexOf("dataOpsElements.country,", handlerStart));
@@ -34,6 +38,7 @@ async function startReview(page, action = "reject-proposal", result = null, prop
     const setButtonLoading = (button,loading) => { button.disabled=loading; };
     const setDataOpsStatus = (text,type) => { document.getElementById('status').textContent=text; window.statusType=type; };
     const loadDataOperations = async () => { setDataOpsStatus('Übersicht neu geladen.','success'); };
+    ${accountTextRuntime}
     ${errorRuntime}
     ${urlRuntime}
     ${dialogRuntime}

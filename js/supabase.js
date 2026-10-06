@@ -6762,60 +6762,21 @@ async function loadSourceMonitorRecent(table, columns, limit = 1000) {
 }
 
 async function loadSourceMonitorActiveJobs() {
-  const rows = [];
-  const pageSize = 1000;
-  let from = 0;
-  let totalCount = null;
-  while (rows.length < 100000) {
-    const { data, error, count } = await supabaseClient
-      .from("source_crawl_jobs")
-      .select("id,source_id,status,created_at", { count: "exact" })
-      .in("status", ["queued", "processing", "retry_scheduled"])
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: false })
-      .range(from, from + pageSize - 1);
-    if (error) return { rows: null, error };
-    const pageRows = data || [];
-    if (totalCount === null && Number.isFinite(count)) totalCount = count;
-    rows.push(...pageRows);
-    if (!pageRows.length || (totalCount !== null && rows.length >= totalCount)) {
-      return { rows: totalCount === null ? rows : rows.slice(0, totalCount), error: null };
-    }
-    from += pageRows.length;
-  }
-  return {
-    rows: null,
-    error: new Error("Zu viele aktive Source-Monitor-Jobs; Freshness-Aktionen bleiben gesperrt.")
-  };
+  const result = await loadAdminTablePages("source_crawl_jobs", "id,source_id,status,created_at", null, [], {
+    exactCount: false,
+    configureQuery: query => query.in("status", ["queued", "processing", "retry_scheduled"]).order("id", { ascending: false })
+  });
+  return result.truncated ? { rows: null, truncated: true,
+    error: new Error("Zu viele aktive Source-Monitor-Jobs; Freshness-Aktionen bleiben gesperrt.") } : result;
 }
 
 async function loadFreshnessBlockingFeedback() {
-  const rows = [];
-  const pageSize = 1000;
-  let from = 0;
-  let totalCount = null;
-  while (rows.length < 100000) {
-    const { data, error, count } = await supabaseClient
-      .from("user_feedback")
-      .select("id,event_id,category,status,created_at", { count: "exact" })
-      .eq("category", "incorrect_event_data")
-      .in("status", ["reviewed", "planned"])
-      .order("created_at", { ascending: false })
-      .order("id", { ascending: true })
-      .range(from, from + pageSize - 1);
-    if (error) return { rows: null, error };
-    const pageRows = data || [];
-    if (totalCount === null && Number.isFinite(count)) totalCount = count;
-    rows.push(...pageRows);
-    if (!pageRows.length || (totalCount !== null && rows.length >= totalCount)) {
-      return { rows: totalCount === null ? rows : rows.slice(0, totalCount), error: null };
-    }
-    from += pageRows.length;
-  }
-  return {
-    rows: null,
-    error: new Error("Zu viele offene Datenfehler-Meldungen; Freshness-Aktionen bleiben gesperrt.")
-  };
+  const result = await loadAdminTablePages("user_feedback", "id,event_id,category,status,created_at", null, ["id"], {
+    exactCount: false,
+    configureQuery: query => query.eq("category", "incorrect_event_data").in("status", ["reviewed", "planned"])
+  });
+  return result.truncated ? { rows: null, truncated: true,
+    error: new Error("Zu viele offene Datenfehler-Meldungen; Freshness-Aktionen bleiben gesperrt.") } : result;
 }
 
 function sourceMonitorLatestBy(rows, key) {
@@ -7246,7 +7207,38 @@ async function handleStageFourAction(button) {
   }
 }
 
-async function loadDataOperations({ throwOnError = false } = {}) {
+async function loadBoundedAdminTasks(loaders) {
+  const results = new Array(loaders.length);
+  let nextIndex = 0;
+  async function worker() {
+    while (nextIndex < loaders.length) {
+      const index = nextIndex++;
+      try {
+        results[index] = await loaders[index]();
+      } catch (error) {
+        results[index] = { rows: null, error, truncated: false };
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(3, loaders.length) }, worker));
+  return results;
+}
+
+function loadDataOpsTablePages(tableName, selectFields, sinceDate = null, stableTieBreakFields = ["id"]) {
+  return loadAdminTablePages(tableName, selectFields, sinceDate, stableTieBreakFields, { exactCount: false });
+}
+
+let dataOpsLoadQueue = Promise.resolve();
+
+async function loadDataOperations(options = {}) {
+  // Every caller gets a fresh snapshot, including reloads after a write. Keep
+  // entire runs serial so overlapping tab/refresh calls share the SQL budget.
+  const load = dataOpsLoadQueue.then(() => loadDataOperationsSnapshot(options));
+  dataOpsLoadQueue = load.then(() => {}, () => {});
+  return load;
+}
+
+async function loadDataOperationsSnapshot({ throwOnError = false } = {}) {
   if (!dataOpsElements.panel) {
     if (throwOnError) throw new Error("Data Operations ist nicht verfügbar. Bitte neu laden.");
     return;
@@ -7255,29 +7247,36 @@ async function loadDataOperations({ throwOnError = false } = {}) {
   dataOpsMeasuredAt = null;
   catalogQualityReport = null;
   renderCatalogQualityReport();
-  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult] = await Promise.all([
-    loadAdminTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
-    loadAdminTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at,updated_at,race_formats,legacy_distance,predecessor_edition_id,generated_from_candidate_id,generated_from_source_id"),
-    loadAdminTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
-    loadAdminTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
-    loadAdminTablePages("event_change_proposals", "id,event_id,edition_id,source_id,crawl_id,entity_type,rule_code,field_name,old_value,proposed_value,normalized_value,applied_value,proposed_changes,observed_values,confidence,confidence_reasons,change_type,extraction_method,extractor_version,evidence,source_context,validation_warnings,priority,locked_field,reason,source_url,proposal_status,detected_at,reviewed_at,rejection_reason,next_review_at,created_at"),
-    loadAdminTablePages("data_workflow_alerts", "id,source_id,event_id,edition_id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
-    loadAdminTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
-    loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
-    loadSourceMonitorActiveJobs(),
-    loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
-    loadAdminTablePages("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,fingerprint,created_at,reviewed_at", null, ["id"]),
-    loadFreshnessBlockingFeedback(),
-    loadAdminTablePages("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
-    loadAdminTablePages("admin_freshness_attestation_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
-    loadAdminTablePages("edition_succession_candidates", "id,event_id,source_id,crawl_result_id,draft_edition_id,predecessor_edition_id,candidate_year,candidate_start_date,candidate_end_date,candidate_status,source_url,confidence,confirmed_confidence,validation_status,validation_reasons,validated_at,first_detected_at,updated_at")
+  const [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult] = await loadBoundedAdminTasks([
+    () => loadDataOpsTablePages("events", "id,event_name,canonical_name,slug,sport,country,city,address,latitude,longitude,distance,description,official_url,event_url,status,event_status,publication_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at"),
+    () => loadDataOpsTablePages("event_editions", "id,event_id,edition_year,edition_slug,start_date,end_date,start_time,registration_url,registration_status,source_url,edition_status,publication_status,discovery_status,results_status,verification_status,data_confidence,needs_review,review_priority,last_verified_at,next_check_at,created_at,updated_at,race_formats,legacy_distance,predecessor_edition_id,generated_from_candidate_id,generated_from_source_id"),
+    () => loadDataOpsTablePages("validation_issues", "id,event_id,edition_id,severity,rule_code,description,status,created_at,resolved_at"),
+    () => loadDataOpsTablePages("event_sources", "id,event_id,edition_id,source_type,source_url,source_host,is_active,crawl_status,consecutive_failures,last_error_type,last_error,last_http_status,last_final_url,last_duration_ms,last_content_type,last_content_length,last_change_status,last_semantic_hash,last_normalization_version,last_pinned_ip,last_fetched_at,next_fetch_at,created_at"),
+    () => loadDataOpsTablePages("event_change_proposals", "id,event_id,edition_id,source_id,crawl_id,entity_type,rule_code,field_name,old_value,proposed_value,normalized_value,applied_value,proposed_changes,observed_values,confidence,confidence_reasons,change_type,extraction_method,extractor_version,evidence,source_context,validation_warnings,priority,locked_field,reason,source_url,proposal_status,detected_at,reviewed_at,rejection_reason,next_review_at,created_at"),
+    () => loadDataOpsTablePages("data_workflow_alerts", "id,source_id,event_id,edition_id,alert_scope,alert_code,severity,title,description,alert_status,occurrence_count,last_detected_at,metadata"),
+    () => loadDataOpsTablePages("data_workflow_runs", "id,job_type,run_status,started_at,finished_at,processed_count,changed_count,error_count,error_message"),
+    () => loadSourceMonitorRecent("source_crawl_jobs", "id,source_id,event_id,edition_id,priority,scheduled_at,attempt_count,max_attempts,status,last_processed_at,completed_at,error_type,error_message,trigger_source,created_at"),
+    () => loadSourceMonitorActiveJobs(),
+    () => loadSourceMonitorRecent("source_crawl_results", "id,job_id,source_id,event_id,edition_id,fetched_at,http_status,final_url,redirect_count,response_time_ms,content_type,content_length,content_hash,previous_content_hash,semantic_hash,previous_semantic_hash,normalization_version,change_confidence,change_reasons,pinned_ip,change_status,processing_status,error_type,error_message,worker_version,created_at"),
+    () => loadDataOpsTablePages("source_review_tasks", "id,source_id,event_id,edition_id,crawl_result_id,task_type,status,priority,title,description,fingerprint,created_at,reviewed_at", null, ["id"]),
+    () => loadFreshnessBlockingFeedback(),
+    () => loadDataOpsTablePages("admin_review_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
+    () => loadDataOpsTablePages("admin_freshness_attestation_inbox", "item_type,item_id,event_id,edition_id,priority,title,description,confidence,status,created_at,batch_action,metadata", null, ["item_type", "item_id"]),
+    () => loadDataOpsTablePages("edition_succession_candidates", "id,event_id,source_id,crawl_result_id,draft_edition_id,predecessor_edition_id,candidate_year,candidate_start_date,candidate_end_date,candidate_status,source_url,confidence,confirmed_confidence,validation_status,validation_reasons,validated_at,first_detected_at,updated_at")
   ]);
-  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult].find(result => result.error);
+  const failed = [eventsResult, editionsResult, issuesResult, sourcesResult, proposalsResult, alertsResult, runsResult, jobsResult, activeJobsResult, crawlResultsResult, reviewsResult, feedbackBlockersResult, lifecycleResult, freshnessAttestationResult, successionResult].find(result => result.error || result.truncated);
   if (failed) {
+    editionLifecycleInbox = [];
+    renderEditionLifecycleInbox();
     await loadCatalogQualityReport();
     renderDataFreshnessOverview();
-    setDataOpsStatus(dataOpsText("admin.dataOps.schemaUnavailable", "Data Operations schema unavailable. Check the migration and admin RLS."), "error");
-    console.error("Data Operations load failed:", failed.error);
+    const error = failed.error || new Error("Data Operations exceeded the complete-load row limit.");
+    const code = String(error.code || "");
+    const message = String(error.message || "Unknown load failure");
+    setDataOpsStatus(code === "57014"
+      ? adminUiFormatted("Loading Data Operations exceeded the database time limit. Refresh before reviewing.", "Das Laden der Data Operations hat das Zeitlimit der Datenbank überschritten. Vor der Prüfung neu laden.")
+      : adminUiFormatted("Data Operations could not be loaded completely. Refresh before reviewing.", "Data Operations konnten nicht vollständig geladen werden. Vor der Prüfung neu laden."), "error");
+    console.error(`Data Operations load failed: ${code ? `${code}: ` : ""}${message}`);
     if (throwOnError) throw new Error("Aktueller Datenstand konnte nicht vollständig geladen werden. Keine Freigabe möglich.");
     return;
   }
@@ -10229,19 +10228,20 @@ async function loadAdminTablePages(
   tableName,
   selectFields,
   sinceDate = null,
-  stableTieBreakFields = []
+  stableTieBreakFields = [],
+  { exactCount = true, configureQuery = query => query } = {}
 ) {
   const rows = [];
   let from = 0;
   let totalCount = null;
 
-  while (rows.length < ADMIN_ANALYTICS_ROW_LIMIT) {
+  while (rows.length <= ADMIN_ANALYTICS_ROW_LIMIT) {
+    const atRowLimit = rows.length === ADMIN_ANALYTICS_ROW_LIMIT;
+    if (atRowLimit && exactCount) break;
     let query =
       supabaseClient
         .from(tableName)
-        .select(selectFields, {
-          count: "exact"
-        })
+        .select(selectFields, exactCount ? { count: "exact" } : {})
         .order("created_at", {
           ascending: false
         });
@@ -10252,7 +10252,8 @@ async function loadAdminTablePages(
 
     query = query.range(
       from,
-      from + ADMIN_ANALYTICS_PAGE_SIZE - 1
+      atRowLimit ? from : exactCount ? from + ADMIN_ANALYTICS_PAGE_SIZE - 1
+        : Math.min(from + ADMIN_ANALYTICS_PAGE_SIZE - 1, ADMIN_ANALYTICS_ROW_LIMIT - 1)
     );
 
     if (sinceDate) {
@@ -10262,6 +10263,8 @@ async function loadAdminTablePages(
           sinceDate
         );
     }
+
+    query = configureQuery(query);
 
     const {
       data,
@@ -10278,6 +10281,7 @@ async function loadAdminTablePages(
     }
 
     if (
+      exactCount &&
       totalCount === null &&
       Number.isFinite(count)
     ) {
@@ -10286,6 +10290,15 @@ async function loadAdminTablePages(
 
     const pageRows =
       data || [];
+
+    if (!exactCount && (!Array.isArray(data) || data.some(row =>
+      !row || typeof row !== "object" || Array.isArray(row) ||
+      stableTieBreakFields.some(field => row[field] == null)
+    ))) return { rows: null, error: new Error(`Unvollständige Antwort beim Laden von ${tableName}.`), truncated: false };
+
+    // Count-free callers prove completion with an empty page. Probe one row
+    // at the cap so exactly 100,000 rows are complete, but 100,001 are not.
+    if (atRowLimit) return { rows, error: null, truncated: pageRows.length > 0 };
 
     rows.push(...pageRows);
 

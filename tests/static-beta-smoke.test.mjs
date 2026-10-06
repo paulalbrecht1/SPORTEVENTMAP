@@ -646,7 +646,7 @@ assert.match(
 );
 assert.match(
   html,
-  /value="active" selected>Active reviews/
+  /value="active" selected\b[^>]*>Active reviews/
 );
 assert.match(
   supabaseSource,

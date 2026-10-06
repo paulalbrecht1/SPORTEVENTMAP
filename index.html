@@ -43,20 +43,20 @@
   class="beta-banner"
 >
   <div>
-    <strong>BETA VERSION</strong>
+    <strong data-i18n-text="BETA VERSION">BETA VERSION</strong>
     <span>Sport Event Map is in closed beta. Event data is reviewed continuously, and your feedback helps improve the product.</span>
   </div>
   <button
     type="button"
     id="betaFeedbackBtn"
-  >
+   data-i18n-text="Give feedback">
     Feedback geben
   </button>
   <button
     type="button"
     id="openWelcomeBtn"
     class="beta-guide-btn"
-  >
+   data-i18n-text="Beta guide">
     Beta guide
   </button>
   <button
@@ -65,7 +65,7 @@
     class="beta-close-btn"
     aria-label="Hide beta banner"
     title="Hide beta banner"
-  >
+   data-i18n-title-text="Hide beta banner" data-i18n-aria-label-text="Hide beta banner">
     &times;
   </button>
 </div>
@@ -83,19 +83,19 @@
       </a>
 
       <nav class="sem-desktop-nav" aria-label="Primary navigation">
-        <a class="active" href="#/home" data-landing-route="home" aria-current="page">Home</a>
-        <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/events" data-landing-route="events">Event Wiki</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
+        <a class="active" href="#/home" data-landing-route="home" aria-current="page" data-i18n-text="Home">Home</a>
+        <a href="#/discovery" data-landing-route="discovery" data-i18n-text="Discovery">Discovery</a>
+        <a href="#/events" data-landing-route="events" data-i18n-text="Event Wiki">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner" data-i18n-text="Season Planner">Season Planner</a>
       </nav>
 
       <div class="sem-header-actions">
-        <select id="landingLanguageSelect" class="app-language-select" aria-label="Language">
+        <select id="landingLanguageSelect" class="app-language-select" aria-label="Language" data-i18n-aria-label-text="Language">
           <option value="en">EN</option>
           <option value="de">DE</option>
         </select>
-        <button class="sem-auth-button" id="landingAuthBtn" type="button">Login</button>
-        <a class="sem-button sem-button-primary sem-header-cta" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+        <button class="sem-auth-button" id="landingAuthBtn" type="button" data-i18n-text="Login">Login</button>
+        <a class="sem-button sem-button-primary sem-header-cta" href="#/discovery" data-landing-route="discovery" data-i18n-text="Explore Events">Explore Events</a>
         <button
           class="sem-menu-button"
           id="landingMenuBtn"
@@ -103,7 +103,7 @@
           aria-label="Open navigation"
           aria-controls="landingMobileMenu"
           aria-expanded="false"
-        >
+         data-i18n-aria-label-text="Open navigation">
           <span aria-hidden="true"></span>
         </button>
       </div>
@@ -114,18 +114,18 @@
   <nav class="sem-mobile-menu" id="landingMobileMenu" aria-label="Mobile navigation" aria-hidden="true" inert>
     <div class="sem-mobile-menu-head">
       <strong>Navigation</strong>
-      <button id="landingMenuCloseBtn" type="button" aria-label="Close navigation">&times;</button>
+      <button id="landingMenuCloseBtn" type="button" aria-label="Close navigation" data-i18n-aria-label-text="Close navigation">&times;</button>
     </div>
     <div class="sem-mobile-menu-scroll">
-      <a href="#/home" data-landing-route="home">Home</a>
-      <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-      <a href="#/events" data-landing-route="events">Event Wiki</a>
-      <a href="#/planner" data-landing-route="planner">Season Planner</a>
-      <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button">Login</button>
-      <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery">Explore Events</a>
+      <a href="#/home" data-landing-route="home" data-i18n-text="Home">Home</a>
+      <a href="#/discovery" data-landing-route="discovery" data-i18n-text="Discovery">Discovery</a>
+      <a href="#/events" data-landing-route="events" data-i18n-text="Event Wiki">Event Wiki</a>
+      <a href="#/planner" data-landing-route="planner" data-i18n-text="Season Planner">Season Planner</a>
+      <button id="landingMobileAuthBtn" class="sem-mobile-auth" type="button" data-i18n-text="Login">Login</button>
+      <a class="sem-button sem-button-primary" href="#/discovery" data-landing-route="discovery" data-i18n-text="Explore Events">Explore Events</a>
       <div class="sem-mobile-menu-language">
         <label for="landingMobileLanguageSelect" data-i18n="language.label">Language</label>
-        <select id="landingMobileLanguageSelect" class="app-language-select" aria-label="Language">
+        <select id="landingMobileLanguageSelect" class="app-language-select" aria-label="Language" data-i18n-aria-label-text="Language">
           <option value="en">EN</option>
           <option value="de">DE</option>
         </select>
@@ -149,8 +149,8 @@
           <h1 id="sem-home-title">Find your next race.<br><span>Build your entire season.</span></h1>
           <p class="sem-hero-description">Discover running, trail, ultra and triathlon events across Germany and Europe. Compare races, save your favorites and turn them into a realistic season plan.</p>
           <div class="sem-actions">
-            <button class="sem-button sem-button-primary" type="button" id="landingDiscoverBtn">Explore Events</button>
-            <button class="sem-button sem-button-secondary" type="button" id="landingSeasonBtn">Open Season Planner</button>
+            <button class="sem-button sem-button-primary" type="button" id="landingDiscoverBtn" data-i18n-text="Explore Events">Explore Events</button>
+            <button class="sem-button sem-button-secondary" type="button" id="landingSeasonBtn" data-i18n-text="Open Season Planner">Open Season Planner</button>
           </div>
           <p class="sem-hero-note"><span aria-hidden="true">✓</span> No spreadsheets. No scattered race tabs. Everything in one place.</p>
         </div>
@@ -163,22 +163,22 @@
           <div class="sem-preview-shell" aria-hidden="true">
             <div class="sem-preview-topbar">
               <b>Sport Event Map</b>
-              <span>Discovery</span>
-              <span>Season Planner</span>
+              <span data-i18n-text="Discovery">Discovery</span>
+              <span data-i18n-text="Season Planner">Season Planner</span>
               <i></i>
             </div>
             <div class="sem-preview-body">
               <aside class="sem-preview-list">
-                <div class="sem-mini-search">Find your next race...</div>
-                <div class="sem-mini-filters"><span>Running</span><span>2026</span></div>
+                <div class="sem-mini-search" data-i18n-text="Find your next race...">Find your next race...</div>
+                <div class="sem-mini-filters"><span data-i18n-text="Running">Running</span><span>2026</span></div>
                 <article class="sem-mini-event">
-                  <span class="sem-mini-status">Registration open</span>
+                  <span class="sem-mini-status" data-i18n-text="Registration open">Registration open</span>
                   <strong>Berlin Half Marathon</strong>
                   <small>12 Apr 2026 · Berlin</small>
                   <b>21.1 km</b>
                 </article>
                 <article class="sem-mini-event sem-mini-event-muted">
-                  <span class="sem-mini-status">Registration open</span>
+                  <span class="sem-mini-status" data-i18n-text="Registration open">Registration open</span>
                   <strong>Black Forest Trail</strong>
                   <small>9 May 2026 · Freiburg</small>
                 </article>
@@ -190,7 +190,7 @@
                 <i class="sem-pin sem-pin-two"></i>
                 <i class="sem-pin sem-pin-three"></i>
                 <article class="sem-next-race-card">
-                  <div><span>Next race</span><b>Berlin Half Marathon</b></div>
+                  <div><span data-i18n-text="Next race">Next race</span><b>Berlin Half Marathon</b></div>
                   <strong>84 <small>days</small></strong>
                   <em>A</em>
                 </article>
@@ -287,8 +287,8 @@
     <section class="sem-section sem-spotlight" aria-labelledby="sem-discovery-title">
       <div class="sem-container sem-spotlight-grid">
         <div class="sem-spotlight-copy">
-          <p class="sem-eyebrow">Event discovery</p>
-          <h2 id="sem-discovery-title">Explore events without losing context</h2>
+          <p class="sem-eyebrow" data-i18n-text="Event discovery">Event discovery</p>
+          <h2 id="sem-discovery-title" data-i18n-text="Explore events without losing context">Explore events without losing context</h2>
           <p>Search, filter and open event details while the map and event list remain synchronized.</p>
           <a class="sem-text-link" href="#/discovery" data-landing-route="discovery">Explore the map <span aria-hidden="true">→</span></a>
         </div>
@@ -297,7 +297,7 @@
           <div class="sem-discovery-ui" aria-hidden="true">
             <div class="sem-discovery-controls">
               <div class="sem-ui-search">Search events, cities and distances</div>
-              <div class="sem-ui-chip-row"><span>Running</span><span>Germany</span><span>Apr – Oct</span></div>
+              <div class="sem-ui-chip-row"><span data-i18n-text="Running">Running</span><span data-i18n-text="Germany">Germany</span><span>Apr – Oct</span></div>
               <p><strong data-landing-event-count>—</strong> matching events</p>
             </div>
             <div class="sem-discovery-results">
@@ -317,11 +317,11 @@
       <div class="sem-container sem-spotlight-grid">
         <div class="sem-spotlight-copy">
           <p class="sem-eyebrow">Season planner</p>
-          <h2 id="sem-planner-title">Build a season you can actually execute</h2>
+          <h2 id="sem-planner-title" data-i18n-text="Build a season you can actually execute">Build a season you can actually execute</h2>
           <p>Prioritize your races, avoid crowded race periods and keep every important event in one personal overview.</p>
           <ul class="sem-check-list">
-            <li>Countdown to the next race</li>
-            <li>A/B/C race priorities</li>
+            <li data-i18n-text="Countdown to the next race">Countdown to the next race</li>
+            <li data-i18n-text="A/B/C race priorities">A/B/C race priorities</li>
             <li>Calendar and season overview</li>
             <li>Goals, notes and race results</li>
           </ul>
@@ -331,7 +331,7 @@
           <div class="sem-browser-bar" aria-hidden="true"><span></span><span></span><span></span><strong>My 2026 season</strong></div>
           <div class="sem-planner-ui" aria-hidden="true">
             <div class="sem-planner-summary">
-              <div><span>Next race</span><strong>Berlin Half Marathon</strong><small>12 Apr · Priority A</small></div>
+              <div><span data-i18n-text="Next race">Next race</span><strong>Berlin Half Marathon</strong><small>12 Apr · Priority A</small></div>
               <b>84 <small>days</small></b>
             </div>
             <div class="sem-season-stats"><span><b>5</b> planned races</span><span><b>2</b> key races</span><span><b>24</b> weeks</span></div>
@@ -355,13 +355,13 @@
         </div>
         <div class="sem-sport-explorer">
           <div class="sem-sport-tabs" role="tablist" aria-label="Endurance sports">
-            <button type="button" id="sportTabRunning" role="tab" aria-selected="true" aria-controls="sportPanelRunning" data-sport-tab="running">Running</button>
+            <button type="button" id="sportTabRunning" role="tab" aria-selected="true" aria-controls="sportPanelRunning" data-sport-tab="running" data-i18n-text="Running">Running</button>
             <button type="button" id="sportTabTrail" role="tab" aria-selected="false" aria-controls="sportPanelTrail" data-sport-tab="trail">Trail Running</button>
             <button type="button" id="sportTabUltra" role="tab" aria-selected="false" aria-controls="sportPanelUltra" data-sport-tab="ultra">Ultra Running</button>
             <button type="button" id="sportTabTriathlon" role="tab" aria-selected="false" aria-controls="sportPanelTriathlon" data-sport-tab="triathlon">Triathlon</button>
           </div>
           <div class="sem-sport-panel" id="sportPanelRunning" role="tabpanel" aria-labelledby="sportTabRunning" data-sport-panel="running">
-            <span class="sem-sport-mark">5K—42K</span><div><h3>Running</h3><p>Find road races from local 5K events to major city marathons.</p></div>
+            <span class="sem-sport-mark">5K—42K</span><div><h3 data-i18n-text="Running">Running</h3><p>Find road races from local 5K events to major city marathons.</p></div>
           </div>
           <div class="sem-sport-panel" id="sportPanelTrail" role="tabpanel" aria-labelledby="sportTabTrail" data-sport-panel="trail" hidden>
             <span class="sem-sport-mark">TRAIL</span><div><h3>Trail Running</h3><p>Compare terrain, elevation, distance and event location.</p></div>
@@ -401,16 +401,16 @@
         <p>Discover the right event. Build a better season.</p>
       </div>
       <nav aria-label="Footer navigation">
-        <a href="#/discovery" data-landing-route="discovery">Discovery</a>
-        <a href="#/events" data-landing-route="events">Event Wiki</a>
-        <a href="#/planner" data-landing-route="planner">Season Planner</a>
+        <a href="#/discovery" data-landing-route="discovery" data-i18n-text="Discovery">Discovery</a>
+        <a href="#/events" data-landing-route="events" data-i18n-text="Event Wiki">Event Wiki</a>
+        <a href="#/planner" data-landing-route="planner" data-i18n-text="Season Planner">Season Planner</a>
         <button type="button" id="homeAddEventBtn">Submit an event</button>
       </nav>
-      <nav aria-label="Legal links">
+      <nav aria-label="Legal links" data-i18n-aria-label-text="Legal links">
         <a href="imprint.html">Imprint</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="legal.html">Terms</a>
-        <a href="mailto:kontakt@sporteventmap.com">Contact</a>
+        <a href="privacy.html" data-i18n-text="Privacy">Privacy</a>
+        <a href="legal.html" data-i18n-text="Terms">Terms</a>
+        <a href="mailto:kontakt@sporteventmap.com" data-i18n-text="Contact">Contact</a>
       </nav>
     </div>
     <div class="sem-container sem-footer-bottom">
@@ -463,7 +463,7 @@
     href="index.html#/home"
     id="brandHomeLink"
     class="brand"
-    aria-label="Sport Event Map Home"
+    aria-label="Sport Event Map Home" data-i18n-aria-label-text="Sport Event Map Home"
   >
     <img
       class="brand-icon"
@@ -480,7 +480,7 @@
     type="button"
     aria-controls="sidebar"
     aria-expanded="false"
-  >
+   data-i18n-text="Filters">
     Filters
   </button>
 
@@ -488,11 +488,11 @@
 
   <div id="topbar-center">
 
-    <nav id="platformNav" class="platform-nav" aria-label="Platform navigation">
-      <a href="#/home" data-platform-route="home" data-testid="nav-home">Home</a>
-      <a href="#/discovery" data-platform-route="discovery" data-testid="nav-discovery">Discovery</a>
-      <a href="#/events" data-platform-route="events">Event Wiki</a>
-      <a href="#/planner" data-platform-route="planner" data-testid="nav-season-planner">Season Planner</a>
+    <nav id="platformNav" class="platform-nav" aria-label="Platform navigation" data-i18n-aria-label-text="Platform navigation">
+      <a href="#/home" data-platform-route="home" data-testid="nav-home" data-i18n-text="Home">Home</a>
+      <a href="#/discovery" data-platform-route="discovery" data-testid="nav-discovery" data-i18n-text="Discovery">Discovery</a>
+      <a href="#/events" data-platform-route="events" data-i18n-text="Event Wiki">Event Wiki</a>
+      <a href="#/planner" data-platform-route="planner" data-testid="nav-season-planner" data-i18n-text="Season Planner">Season Planner</a>
     </nav>
 
     <div id="topbar-search">
@@ -505,7 +505,7 @@
         enterkeyhint="search"
         placeholder="Find your next race..."
         autocomplete="off"
-      />
+      data-i18n-placeholder-text="Find your next race...">
 
       <div
         id="searchSuggestions"
@@ -526,14 +526,14 @@
         hidden
         aria-hidden="true"
         tabindex="-1"
-      >
+       data-i18n-text="Season Planner">
         Season Planner
       </button>
 
       <button
         id="addEventBtn"
         style="display:none;"
-      >
+       data-i18n-text="+ Add Event">
         + Add Event
       </button>
 
@@ -545,7 +545,7 @@
         id="topbarLanguageSelect"
         class="app-language-select"
         aria-label="Language"
-      >
+       data-i18n-aria-label-text="Language">
         <option value="en">EN</option>
         <option value="de">DE</option>
       </select>
@@ -557,11 +557,11 @@
         Admin
       </button>
 
-      <button id="loginBtn">
+      <button id="loginBtn" data-i18n-text="Login">
         Login
       </button>
 
-      <button id="registerBtn">
+      <button id="registerBtn" data-i18n-text="Register">
         Register
       </button>
 
@@ -569,7 +569,7 @@
         id="profileBtn"
         data-testid="nav-profile"
         style="display:none;"
-      >
+       data-i18n-text="Profile">
         Profile
       </button>
 
@@ -580,7 +580,7 @@
       <button
         id="logoutBtn"
         style="display:none;"
-      >
+       data-i18n-text="Logout">
         Logout
       </button>
 
@@ -612,11 +612,11 @@
     </button>
   </div>
   <div class="platform-mobile-menu-scroll">
-    <a href="#/home" data-platform-route="home">Home</a>
-    <a href="#/discovery" data-platform-route="discovery">Discovery</a>
-    <a href="#/events" data-platform-route="events">Event Wiki</a>
-    <a href="#/planner" data-platform-route="planner">Season Planner</a>
-    <a href="#/submit" data-platform-route="submit">Event einreichen</a>
+    <a href="#/home" data-platform-route="home" data-i18n-text="Home">Home</a>
+    <a href="#/discovery" data-platform-route="discovery" data-i18n-text="Discovery">Discovery</a>
+    <a href="#/events" data-platform-route="events" data-i18n-text="Event Wiki">Event Wiki</a>
+    <a href="#/planner" data-platform-route="planner" data-i18n-text="Season Planner">Season Planner</a>
+    <a href="#/submit" data-platform-route="submit" data-i18n-text="Submit Event">Event einreichen</a>
     <a
       href="#/admin"
       data-platform-route="admin"
@@ -624,10 +624,10 @@
       style="display:none;"
     >Admin</a>
     <div class="platform-mobile-menu-actions" aria-label="Account and feedback" data-i18n-aria-label="nav.accountAndFeedback">
-      <button type="button" data-platform-mobile-action="loginBtn">Login</button>
-      <button type="button" data-platform-mobile-action="registerBtn">Register</button>
-      <button type="button" data-platform-mobile-action="profileBtn" hidden>Profile</button>
-      <button type="button" data-platform-mobile-action="logoutBtn" hidden>Logout</button>
+      <button type="button" data-platform-mobile-action="loginBtn" data-i18n-text="Login">Login</button>
+      <button type="button" data-platform-mobile-action="registerBtn" data-i18n-text="Register">Register</button>
+      <button type="button" data-platform-mobile-action="profileBtn" hidden data-i18n-text="Profile">Profile</button>
+      <button type="button" data-platform-mobile-action="logoutBtn" hidden data-i18n-text="Logout">Logout</button>
       <button type="button" data-platform-mobile-action="feedbackBtn">Feedback</button>
     </div>
     <div class="platform-mobile-menu-info" role="group" aria-labelledby="platformMobileInfoTitle">
@@ -652,49 +652,49 @@
   >
     <div class="platform-page-shell">
       <div class="platform-page-hero">
-        <span>Event Wiki</span>
-        <h1 id="eventWikiTitle">Event guides built for race decisions.</h1>
-        <p>
+        <span data-i18n-text="Event Wiki">Event Wiki</span>
+        <h1 id="eventWikiTitle" data-i18n-text="Event guides built for race decisions.">Event guides built for race decisions.</h1>
+        <p data-i18n-text="Event Wiki is the knowledge area for verified detail information on endurance events, from course profile and cut-off times to race guide links, registration details and planning notes.">
           Event Wiki is the knowledge area for verified detail information on
           endurance events, from course profile and cut-off times to race guide
           links, registration details and planning notes.
         </p>
         <div class="platform-page-actions">
-          <a href="#/discovery" data-platform-route="discovery">Explore events on the map</a>
-          <a href="#/submit" data-platform-route="submit">Submit event information</a>
+          <a href="#/discovery" data-platform-route="discovery" data-i18n-text="Explore events on the map">Explore events on the map</a>
+          <a href="#/submit" data-platform-route="submit" data-i18n-text="Submit event information">Submit event information</a>
         </div>
       </div>
 
       <div class="platform-feature-grid event-wiki-feature-grid">
         <article>
-          <span>Course</span>
-          <h2>Course information</h2>
-          <p>Route character, surface, aid stations, pacers and PB potential will be shown in a consistent structure.</p>
+          <span data-i18n-text="Course">Course</span>
+          <h2 data-i18n-text="Course information">Course information</h2>
+          <p data-i18n-text="Route character, surface, aid stations, pacers and PB potential will be shown in a consistent structure.">Route character, surface, aid stations, pacers and PB potential will be shown in a consistent structure.</p>
         </article>
         <article>
           <span>Cut-offs</span>
-          <h2>Cut-off times</h2>
-          <p>Race-day limits, intermediate cut-offs and triathlon check-in windows will be separated from generic notes.</p>
+          <h2 data-i18n-text="Cut-off times">Cut-off times</h2>
+          <p data-i18n-text="Race-day limits, intermediate cut-offs and triathlon check-in windows will be separated from generic notes.">Race-day limits, intermediate cut-offs and triathlon check-in windows will be separated from generic notes.</p>
         </article>
         <article>
-          <span>Elevation</span>
-          <h2>Elevation and difficulty</h2>
-          <p>Elevation gain, terrain, wind, heat, technical trails or open-water conditions will be marked when verified.</p>
+          <span data-i18n-text="Elevation">Elevation</span>
+          <h2 data-i18n-text="Elevation and difficulty">Elevation and difficulty</h2>
+          <p data-i18n-text="Elevation gain, terrain, wind, heat, technical trails or open-water conditions will be marked when verified.">Elevation gain, terrain, wind, heat, technical trails or open-water conditions will be marked when verified.</p>
         </article>
         <article>
-          <span>Race guide</span>
-          <h2>Bib pickup and race guide</h2>
-          <p>Start documents, official race guide links, bag drop and medical information will stay close to the event facts.</p>
+          <span data-i18n-text="Race guide">Race guide</span>
+          <h2 data-i18n-text="Bib pickup and race guide">Bib pickup and race guide</h2>
+          <p data-i18n-text="Start documents, official race guide links, bag drop and medical information will stay close to the event facts.">Start documents, official race guide links, bag drop and medical information will stay close to the event facts.</p>
         </article>
         <article>
-          <span>Registration</span>
-          <h2>Registration and prices</h2>
-          <p>Entry status, price phases, lottery rules, sold-out notes and official registration links will remain source-based.</p>
+          <span data-i18n-text="Registration">Registration</span>
+          <h2 data-i18n-text="Registration and prices">Registration and prices</h2>
+          <p data-i18n-text="Entry status, price phases, lottery rules, sold-out notes and official registration links will remain source-based.">Entry status, price phases, lottery rules, sold-out notes and official registration links will remain source-based.</p>
         </article>
         <article>
-          <span>Preparation</span>
-          <h2>Experience and planning tips</h2>
-          <p>Event-specific atmosphere, target group, logistics and preparation notes will be added only when they can be checked.</p>
+          <span data-i18n-text="Preparation">Preparation</span>
+          <h2 data-i18n-text="Experience and planning tips">Experience and planning tips</h2>
+          <p data-i18n-text="Event-specific atmosphere, target group, logistics and preparation notes will be added only when they can be checked.">Event-specific atmosphere, target group, logistics and preparation notes will be added only when they can be checked.</p>
         </article>
       </div>
     </div>
@@ -706,7 +706,7 @@
     data-platform-page="planner"
     aria-labelledby="plannerPageTitle"
   >
-    <h1 id="plannerPageTitle" class="sr-only">Season Planner</h1>
+    <h1 id="plannerPageTitle" class="sr-only" data-i18n-text="Season Planner">Season Planner</h1>
     <div id="plannerPageMount" class="planner-page-mount">
       <section
         id="plannerAuthRequired"
@@ -751,58 +751,58 @@
     <div class="platform-page-shell">
       <div class="platform-page-hero">
         <span>Community</span>
-        <h1 id="communityPageTitle">A place for event questions, travel and shared race plans.</h1>
-        <p>
+        <h1 id="communityPageTitle" data-i18n-text="A place for event questions, travel and shared race plans.">A place for event questions, travel and shared race plans.</h1>
+        <p data-i18n-text="Community is planned as a practical layer around events: questions and answers, rideshares, shared lodging, race reports, organizer news and finding people for training or race day.">
           Community is planned as a practical layer around events: questions
           and answers, rideshares, shared lodging, race reports, organizer news
           and finding people for training or race day.
         </p>
         <div class="platform-page-actions">
-          <a href="#/discovery" data-platform-route="discovery">Browse events first</a>
-          <button type="button" id="communitySuggestFeatureBtn">Suggest a community feature</button>
+          <a href="#/discovery" data-platform-route="discovery" data-i18n-text="Browse events first">Browse events first</a>
+          <button type="button" id="communitySuggestFeatureBtn" data-i18n-text="Suggest a community feature">Suggest a community feature</button>
         </div>
       </div>
 
       <div class="community-search-placeholder">
-        <label for="communityEventSearch">Search event</label>
+        <label for="communityEventSearch" data-i18n-text="Search event">Search event</label>
         <input
           id="communityEventSearch"
           type="text"
           placeholder="e.g. Berlin Marathon, IRONMAN Hamburg, Trail..."
           autocomplete="off"
-        />
+        data-i18n-placeholder-text="e.g. Berlin Marathon, IRONMAN Hamburg, Trail...">
       </div>
 
       <div class="platform-feature-grid community-card-grid">
         <article>
           <span>Q&A</span>
-          <h2>Questions and answers</h2>
-          <p>Ask event-specific questions about course, cut-off, bib pickup, heat, waves or logistics.</p>
+          <h2 data-i18n-text="Questions and answers">Questions and answers</h2>
+          <p data-i18n-text="Ask event-specific questions about course, cut-off, bib pickup, heat, waves or logistics.">Ask event-specific questions about course, cut-off, bib pickup, heat, waves or logistics.</p>
         </article>
         <article>
-          <span>Ride share</span>
-          <h2>Find rideshares</h2>
-          <p>Coordinate travel with athletes heading to the same start area or city.</p>
+          <span data-i18n-text="Ride share">Ride share</span>
+          <h2 data-i18n-text="Find rideshares">Find rideshares</h2>
+          <p data-i18n-text="Coordinate travel with athletes heading to the same start area or city.">Coordinate travel with athletes heading to the same start area or city.</p>
         </article>
         <article>
-          <span>Stay</span>
-          <h2>Share lodging or rental cars</h2>
-          <p>Prepare shared hotel, apartment or rental car plans around crowded race weekends.</p>
+          <span data-i18n-text="Stay">Stay</span>
+          <h2 data-i18n-text="Share lodging or rental cars">Share lodging or rental cars</h2>
+          <p data-i18n-text="Prepare shared hotel, apartment or rental car plans around crowded race weekends.">Prepare shared hotel, apartment or rental car plans around crowded race weekends.</p>
         </article>
         <article>
-          <span>Stories</span>
-          <h2>Race reports</h2>
-          <p>Collect practical experience from athletes who already raced the event.</p>
+          <span data-i18n-text="Stories">Stories</span>
+          <h2 data-i18n-text="Race reports">Race reports</h2>
+          <p data-i18n-text="Collect practical experience from athletes who already raced the event.">Collect practical experience from athletes who already raced the event.</p>
         </article>
         <article>
           <span>News</span>
-          <h2>Organizer updates</h2>
-          <p>Keep relevant organizer news close to the event instead of spreading it across channels.</p>
+          <h2 data-i18n-text="Organizer updates">Organizer updates</h2>
+          <p data-i18n-text="Keep relevant organizer news close to the event instead of spreading it across channels.">Keep relevant organizer news close to the event instead of spreading it across channels.</p>
         </article>
         <article>
           <span>Buddies</span>
-          <h2>Find training or race buddies</h2>
-          <p>Find people preparing for the same distance, event month or race-day goal.</p>
+          <h2 data-i18n-text="Find training or race buddies">Find training or race buddies</h2>
+          <p data-i18n-text="Find people preparing for the same distance, event month or race-day goal.">Find people preparing for the same distance, event month or race-day goal.</p>
         </article>
       </div>
     </div>
@@ -810,9 +810,9 @@
 </main>
 
   <div id="mobileDiscoveryViews" role="group" aria-label="Event view">
-    <button id="mobileMapViewBtn" type="button" aria-pressed="true" aria-controls="map">Map</button>
+    <button id="mobileMapViewBtn" type="button" aria-pressed="true" aria-controls="map" data-i18n-text="Map">Map</button>
     <button id="mobileListViewBtn" type="button" aria-pressed="false" aria-controls="mobileDiscoveryResults">
-      <span id="mobileListViewLabel">List</span>
+      <span id="mobileListViewLabel" data-i18n-text="List">List</span>
       <span id="mobileResultCount" aria-live="polite">0</span>
     </button>
   </div>
@@ -823,7 +823,7 @@
     <section id="mobileDiscoveryResults" aria-label="Event results" hidden></section>
 
     <!-- SIDEBAR -->
-    <div id="sidebar" role="complementary" aria-label="Events and filters" aria-hidden="true">
+    <div id="sidebar" role="complementary" aria-label="Events and filters" aria-hidden="true" data-i18n-aria-label-text="Events and filters">
 
       <div class="discovery-panel-mobile-header">
         <strong id="discoveryPanelTitle">Events &amp; Filter</strong>
@@ -833,7 +833,7 @@
           data-testid="discovery-panel-close"
           aria-label="Events &amp; Filter schließen"
           title="Events &amp; Filter schließen"
-        >
+         data-i18n-title-text="Close events and filters" data-i18n-aria-label-text="Close events and filters">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
@@ -843,68 +843,66 @@
 
         <div class="filter-select-card filter-sort-card">
 
-          <label for="sortSelect">
+          <label for="sortSelect" data-i18n-text="Sort">
             Sort
           </label>
 
         <select id="sortSelect">
 
 
-     <option value="date" selected> By date </option>
-     <option value="name"> Alphabetical </option>
+     <option value="date" selected data-i18n-text="By date"> By date </option>
+     <option value="name" data-i18n-text="Alphabetical"> Alphabetical </option>
   </select>
 
         </div>
 
         <div class="filter-select-card filter-country-card">
 
-          <label for="countryFilter">
+          <label for="countryFilter" data-i18n-text="Country">
             Country
           </label>
 
           <select id="countryFilter">
-            <option value="all">All countries</option>
-            <option value="DE">Germany</option>
-            <option value="AT">Austria</option>
-            <option value="CH">Switzerland</option>
+            <option value="all" data-i18n-text="All countries">All countries</option>
+            <option value="DE" data-i18n-text="Germany">Germany</option>
+            <option value="AT" data-i18n-text="Austria">Austria</option>
+            <option value="CH" data-i18n-text="Switzerland">Switzerland</option>
           </select>
 
         </div>
 
         <div class="filter-select-card filter-date-card">
 
-          <label for="dateFilter">
+          <label for="dateFilter" data-i18n-text="Date">
             Date
           </label>
 
   <select id="dateFilter">
-  <option value="all"> All events </option>
-  <option value="upcoming"> Upcoming </option>
-  <option value="thisYear"> This year </option>
-  <option value="next30"> Next 30 days </option>
-  <option value="custom"> Custom range </option>
+  <option value="all" data-i18n-text="All events"> All events </option>
+  <option value="upcoming" data-i18n-text="Upcoming"> Upcoming </option>
+  <option value="thisYear" data-i18n-text="This year"> This year </option>
+  <option value="next30" data-i18n-text="Next 30 days"> Next 30 days </option>
+  <option value="custom" data-i18n-text="Custom range"> Custom range </option>
   </select>
 
   <div id="dateRangeFilter">
 
-    <div class="date-range-title">
+    <div class="date-range-title" data-i18n-text="Date range">
       Date range
     </div>
 
     <label>
-      From
+      <span data-i18n-text="From">From</span>
       <input
         type="date"
-        id="dateFromFilter"
-      />
+        id="dateFromFilter">
     </label>
 
     <label>
-      To
+      <span data-i18n-text="To">To</span>
       <input
         type="date"
-        id="dateToFilter"
-      />
+        id="dateToFilter">
     </label>
 
     <div class="date-range-actions">
@@ -912,14 +910,14 @@
       <button
         type="button"
         id="applyDateRangeFilter"
-      >
+       data-i18n-text="Apply range">
         Apply range
       </button>
 
       <button
         type="button"
         id="clearDateRangeFilter"
-      >
+       data-i18n-text="Reset">
         Reset
       </button>
 
@@ -937,7 +935,7 @@
             class="filter-accordion-toggle"
             aria-expanded="true"
           >
-            <span>
+            <span data-i18n-text="Sport">
               Sport
             </span>
           </button>
@@ -950,7 +948,7 @@
             class="filter-chip active"
             data-filter="All"
             data-testid="filter-sport-all"
-          >
+           data-i18n-text="All">
             All
           </button>
 
@@ -958,7 +956,7 @@
             class="filter-chip"
             data-filter="Running"
             data-testid="filter-sport-running"
-          >
+           data-i18n-text="Running">
             Running
           </button>
 
@@ -992,11 +990,11 @@
             aria-expanded="false"
             id="distanceFilterToggle"
           >
-            <span>
+            <span data-i18n-text="Distance">
               Distance
             </span>
 
-            <strong id="distanceFilterCount">
+            <strong id="distanceFilterCount" data-i18n-text="Any">
               Any
             </strong>
           </button>
@@ -1006,7 +1004,7 @@
         <div id="distanceFilters">
 
           <div class="distance-filter-group">
-            <span class="distance-filter-group-title">
+            <span class="distance-filter-group-title" data-i18n-text="Running">
               Running
             </span>
 
@@ -1031,7 +1029,7 @@
                 class="distance-filter-chip"
                 data-distance-filter="half"
                 type="button"
-              >
+               data-i18n-text="Half Marathon">
                 Half Marathon
               </button>
 
@@ -1071,7 +1069,7 @@
                 class="distance-filter-chip"
                 data-distance-filter="tri-sprint"
                 type="button"
-              >
+               data-i18n-text="Sprint Tri">
                 Sprint Tri
               </button>
 
@@ -1079,7 +1077,7 @@
                 class="distance-filter-chip"
                 data-distance-filter="tri-olympic"
                 type="button"
-              >
+               data-i18n-text="Olympic Tri">
                 Olympic Tri
               </button>
 
@@ -1087,7 +1085,7 @@
                 class="distance-filter-chip"
                 data-distance-filter="tri-middle"
                 type="button"
-              >
+               data-i18n-text="Middle Tri">
                 Middle Tri
               </button>
 
@@ -1095,7 +1093,7 @@
                 class="distance-filter-chip"
                 data-distance-filter="tri-full"
                 type="button"
-              >
+               data-i18n-text="Full Tri">
                 Full Tri
               </button>
             </div>
@@ -1113,7 +1111,7 @@
             type="button"
             id="applyMobileFiltersBtn"
             data-testid="filter-apply"
-          >
+           data-i18n-text="Apply filters">
             Apply filters
           </button>
 
@@ -1121,13 +1119,13 @@
             type="button"
             id="resetFiltersBtn"
             data-testid="filter-reset"
-          >
+           data-i18n-text="Reset filters">
             Reset filters
           </button>
 
         </div>
 
-        <div class="filter-group-label active-filter-label">
+        <div class="filter-group-label active-filter-label" data-i18n-text="Active filters">
           Active filters
         </div>
 
@@ -1145,7 +1143,7 @@
         <button
           type="button"
           id="toggleEventCardDensity"
-        >
+         data-i18n-text="Detailed cards">
           Detailed cards
         </button>
 
@@ -1190,8 +1188,8 @@
         aria-live="polite"
       >
         <span class="map-loading-spinner" aria-hidden="true"></span>
-        <strong id="mapLoadingMessage">Loading events…</strong>
-        <span>Preparing the map and filters.</span>
+        <strong id="mapLoadingMessage" data-i18n-text="Loading events…">Loading events…</strong>
+        <span data-i18n-text="Preparing the map and filters.">Preparing the map and filters.</span>
       </div>
     </div>
 
@@ -1200,12 +1198,12 @@
       class="event-map-legend"
       data-testid="map-legend"
       aria-label="Event marker colors"
-    >
-      <strong id="eventMapLegendTitle">Event types</strong>
+     data-i18n-aria-label-text="Event marker colors">
+      <strong id="eventMapLegendTitle" data-i18n-text="Event types">Event types</strong>
       <div class="event-map-legend-list">
         <span class="event-map-legend-item">
           <i class="event-map-legend-swatch" aria-hidden="true"></i>
-          <span id="eventMapLegendRunning">Running</span>
+          <span id="eventMapLegendRunning" data-i18n-text="Running">Running</span>
         </span>
         <span class="event-map-legend-item">
           <i class="event-map-legend-swatch event-map-legend-swatch--ultra" aria-hidden="true"></i>
@@ -1228,34 +1226,34 @@
     aria-label="Kartenwerkzeuge öffnen"
     aria-controls="mapToolsMenu"
     aria-expanded="false"
-  ><span class="map-tool-symbol" aria-hidden="true">&#9881;</span><span class="sr-only">Map Tools</span></button>
+   data-i18n-title-text="Open map tools" data-i18n-aria-label-text="Open map tools"><span class="map-tool-symbol" aria-hidden="true">&#9881;</span><span class="sr-only" data-i18n-text="Map Tools">Map Tools</span></button>
 
-  <div id="mapToolsMenu" role="toolbar" aria-label="Kartenwerkzeuge">
+  <div id="mapToolsMenu" role="toolbar" aria-label="Kartenwerkzeuge" data-i18n-aria-label-text="Map Tools">
 
     <button
       id="locateBtn"
       type="button"
       title="Eigenen Standort anzeigen"
       aria-label="Eigenen Standort anzeigen"
-    ><span class="map-tool-symbol" aria-hidden="true">&#128205;</span><span class="sr-only">Location</span></button>
+    ><span class="map-tool-symbol" aria-hidden="true">&#128205;</span><span class="sr-only" data-i18n-text="Location">Location</span></button>
 
     <button
       id="favoritesBtn"
       type="button"
       title="Nur Favoriten anzeigen"
       aria-label="Nur Favoriten anzeigen"
-    ><span class="map-tool-symbol" aria-hidden="true">&#10084;</span><span class="sr-only">Favorites</span></button>
+    ><span class="map-tool-symbol" aria-hidden="true">&#10084;</span><span class="sr-only" data-i18n-text="Favorites">Favorites</span></button>
 
     <button
       id="mapStyleBtn"
       type="button"
       title="Kartenstil wechseln"
       aria-label="Kartenstil wechseln"
-    ><span class="map-tool-symbol" aria-hidden="true">&#128506;</span><span class="sr-only">Map style</span></button>
+    ><span class="map-tool-symbol" aria-hidden="true">&#128506;</span><span class="sr-only" data-i18n-text="Map style">Map style</span></button>
 
-    <select id="mapStyleSelect" aria-label="Map style">
+    <select id="mapStyleSelect" aria-label="Map style" data-i18n-aria-label-text="Map style">
       <option value="standard"> Standard </option>
-      <option value="light"> Light </option>
+      <option value="light" data-i18n-text="Light"> Light </option>
       <option value="outdoor"> Outdoor </option>
     </select>
 
@@ -1270,7 +1268,7 @@
 
          <div id="drawerContent">
 
-         <div class="drawer-placeholder">
+         <div class="drawer-placeholder" data-i18n-text="Select an event to view details.">
 
       Select an event to view details.
 
@@ -1320,90 +1318,90 @@
 
   <div class="event-modal-card">
 
-    <button id="closeEventModal" aria-label="Close event form">
+    <button id="closeEventModal" aria-label="Close event form" data-i18n-aria-label-text="Close event form">
       &times;
     </button>
 
-    <h2>
+    <h2 data-i18n-text="Add Event">
       Add Event
     </h2>
 
     <label>
-      Event Name <span class="required-marker">*</span>
-      <input id="eventNameInput" placeholder="Berlin Marathon" required />
+      <span data-i18n-text="Event Name">Event Name</span> <span class="required-marker">*</span>
+      <input id="eventNameInput" placeholder="Berlin Marathon" required>
     </label>
 
     <label>
-      Sport <span class="required-marker">*</span>
+      <span data-i18n-text="Sport">Sport</span> <span class="required-marker">*</span>
       <select id="eventSportInput" required>
-        <option value="">Select sport</option>
-        <option value="Running">Running</option>
+        <option value="" data-i18n-text="Select sport">Select sport</option>
+        <option value="Running" data-i18n-text="Running">Running</option>
         <option value="Triathlon">Triathlon</option>
         <option value="Ultramarathon">Ultramarathon</option>
       </select>
     </label>
 
     <label>
-      Date <span class="required-marker">*</span>
-      <input id="eventDateInput" placeholder="06.09.2026" required />
+      <span data-i18n-text="Date">Date</span> <span class="required-marker">*</span>
+      <input id="eventDateInput" placeholder="06.09.2026" required>
     </label>
 
     <label>
-      Address / Venue
-      <input id="eventAddressInput" placeholder="Olympiastadion" />
+      <span data-i18n-text="Address / Venue">Address / Venue</span>
+      <input id="eventAddressInput" placeholder="Olympiastadion" data-i18n-placeholder-text="Olympic Stadium">
     </label>
 
     <label>
-      City <span class="required-marker">*</span>
-      <input id="eventCityInput" placeholder="Berlin" required />
+      <span data-i18n-text="City">City</span> <span class="required-marker">*</span>
+      <input id="eventCityInput" placeholder="Berlin" required>
     </label>
 
     <label>
-      Country <span class="required-marker">*</span>
-      <input id="eventCountryInput" placeholder="Germany" required />
+      <span data-i18n-text="Country">Country</span> <span class="required-marker">*</span>
+      <input id="eventCountryInput" placeholder="Germany" required data-i18n-placeholder-text="Germany">
     </label>
 
     <label>
-      Distance <span class="required-marker">*</span>
-      <input id="eventDistanceInput" placeholder="Marathon" required />
+      <span data-i18n-text="Distance">Distance</span> <span class="required-marker">*</span>
+      <input id="eventDistanceInput" placeholder="Marathon" required>
     </label>
 
     <label>
-      Event URL <span class="required-marker">*</span>
-      <input id="eventUrlInput" placeholder="https://..." required />
+      <span data-i18n-text="Event URL">Event URL</span> <span class="required-marker">*</span>
+      <input id="eventUrlInput" placeholder="https://..." required>
     </label>
 
     <div class="event-stats-fields">
 
       <label>
-        Participants
+        <span data-i18n-text="Participants">Participants</span>
         <input
           id="eventParticipantsInput"
           type="number"
           min="0"
           placeholder="Example: 37000"
-        />
+        data-i18n-placeholder-text="Example: 37000">
       </label>
 
       <label>
-        Course profile
+        <span data-i18n-text="Course profile">Course profile</span>
         <select id="eventCourseTypeInput">
-          <option value="">Select profile</option>
-          <option value="Flat course">Flat course</option>
-          <option value="Rolling course">Rolling course</option>
-          <option value="Hilly course">Hilly course</option>
-          <option value="Elevation gain">Elevation gain</option>
+          <option value="" data-i18n-text="Select profile">Select profile</option>
+          <option value="Flat course" data-i18n-text="Flat course">Flat course</option>
+          <option value="Rolling course" data-i18n-text="Rolling course">Rolling course</option>
+          <option value="Hilly course" data-i18n-text="Hilly course">Hilly course</option>
+          <option value="Elevation gain" data-i18n-text="Elevation gain">Elevation gain</option>
         </select>
       </label>
 
       <label>
-        Elevation gain
+        <span data-i18n-text="Elevation gain">Elevation gain</span>
         <input
           id="eventElevationInput"
           type="number"
           min="0"
           placeholder="Meters"
-        />
+        data-i18n-placeholder-text="Meters">
       </label>
 
       <label>
@@ -1411,14 +1409,14 @@
         <input
           id="eventHighlightInput"
           placeholder="Example: city finish, scenic trail, fast course"
-        />
+        data-i18n-placeholder-text="Example: city finish, scenic trail, fast course">
       </label>
 
     </div>
 
     <div id="eventSubmitPreview">
-      <strong>Preview</strong>
-      <span>Fill in the event details to preview the submission.</span>
+      <strong data-i18n-text="Preview">Preview</strong>
+      <span data-i18n-text="Fill in the event details to preview the submission.">Fill in the event details to preview the submission.</span>
     </div>
 
     <div
@@ -1429,15 +1427,14 @@
     ></div>
 
     <label class="event-honeypot" aria-hidden="true">
-      Website
+      <span data-i18n-text="Website">Website</span>
       <input
         id="eventWebsiteInput"
         tabindex="-1"
-        autocomplete="off"
-      />
+        autocomplete="off">
     </label>
 
-    <button id="submitEventBtn">
+    <button id="submitEventBtn" data-i18n-text="Submit Event">
       Submit Event
     </button>
 
@@ -1451,33 +1448,32 @@
 
   <div class="auth-card">
 
-    <button id="closeAuthModal" aria-label="Close sign-in modal">
+    <button id="closeAuthModal" aria-label="Close sign-in modal" data-i18n-aria-label-text="Close sign-in modal">
       &times;
     </button>
 
-    <h2 id="authTitle">
+    <h2 id="authTitle" data-i18n-text="Login">
       Login
     </h2>
 
     <label>
-      Email
+      <span data-i18n-text="Email">Email</span>
       <input
         type="email"
         id="authEmail"
-        placeholder="you@example.com"
-      />
+        placeholder="you@example.com">
     </label>
 
     <label>
-      Password
+      <span data-i18n-text="Password">Password</span>
       <input
         type="password"
         id="authPassword"
         placeholder="Password"
-      />
+      data-i18n-placeholder-text="Password">
     </label>
 
-    <button id="authSubmitBtn">
+    <button id="authSubmitBtn" data-i18n-text="Continue">
       Continue
     </button>
 
@@ -1485,7 +1481,7 @@
       id="passwordResetBtn"
       type="button"
       class="auth-secondary-btn"
-    >
+     data-i18n-text="Forgot password?">
       Forgot password?
     </button>
 
@@ -1499,16 +1495,16 @@
 
   <div class="profile-card">
 
-    <button id="closeProfileModal" aria-label="Close profile">
+    <button id="closeProfileModal" aria-label="Close profile" data-i18n-aria-label-text="Close profile">
       &times;
     </button>
 
     <div class="profile-header">
-      <span>Profile</span>
-      <h2>
+      <span data-i18n-text="Profile">Profile</span>
+      <h2 data-i18n-text="Account Settings">
         Account Settings
       </h2>
-      <p>
+      <p data-i18n-text="Manage your login details and track your race achievements.">
         Manage your login details and track your race achievements.
       </p>
     </div>
@@ -1526,47 +1522,46 @@
 
     <section class="profile-section profile-account-section">
       <div class="profile-section-heading">
-        <h3>
+        <h3 data-i18n-text="Account">
           Account
         </h3>
-        <span>Login</span>
+        <span data-i18n-text="Login">Login</span>
       </div>
 
       <div class="profile-account-card">
-        <span>Email address</span>
+        <span data-i18n-text="Email address">Email address</span>
         <strong id="profileEmail">-</strong>
-        <p>
+        <p data-i18n-text="This is the email connected to your Sport Event Map account.">
           This is the email connected to your Sport Event Map account.
         </p>
       </div>
 
       <form class="profile-form-grid" id="profileEmailForm">
         <label>
-          <span>New email address</span>
+          <span data-i18n-text="New email address">New email address</span>
           <input
             type="email"
             id="profileNewEmail"
             placeholder="name@example.com"
-            autocomplete="email"
-          />
+            autocomplete="email">
         </label>
         <button
           type="button"
           id="profileEmailBtn"
           class="profile-secondary-btn"
-        >
+         data-i18n-text="Change Email">
           Change Email
         </button>
       </form>
 
-      <p class="profile-settings-hint">
+      <p class="profile-settings-hint" data-i18n-text="Email changes may require confirmation through a link sent by Supabase.">
         Email changes may require confirmation through a link sent by Supabase.
       </p>
     </section>
 
     <section class="profile-section profile-achievements-section">
       <div class="profile-section-heading">
-        <h3>
+        <h3 data-i18n-text="Achievements">
           Achievements
         </h3>
         <span id="profileCompletedCount">0 races</span>
@@ -1578,10 +1573,10 @@
 
     <section class="profile-section profile-completed-archive-section">
       <div class="profile-section-heading">
-        <h3>
+        <h3 data-i18n-text="Race history">
           Race history
         </h3>
-        <span>Race history</span>
+        <span data-i18n-text="Race history">Race history</span>
       </div>
       <button
         type="button"
@@ -1590,7 +1585,7 @@
         aria-expanded="false"
         aria-controls="profileCompletedArchivePanel"
       >
-        <span>View race history</span>
+        <span data-i18n-text="View race history">View race history</span>
         <span class="profile-completed-toggle-chevron" aria-hidden="true"></span>
       </button>
       <div
@@ -1599,11 +1594,11 @@
         hidden
       >
         <div class="profile-completed-filterbar" id="profileCompletedFilterbar">
-          <button type="button" class="active" data-profile-completed-filter="all">All</button>
+          <button type="button" class="active" data-profile-completed-filter="all" data-i18n-text="All">All</button>
           <button type="button" data-profile-completed-filter="finisher">Finisher</button>
           <button type="button" data-profile-completed-filter="dnf_dns">DNF/DNS/DSQ</button>
-          <button type="button" data-profile-completed-filter="with_result">With result</button>
-          <button type="button" data-profile-completed-filter="without_result">Without result</button>
+          <button type="button" data-profile-completed-filter="with_result" data-i18n-text="With result">With result</button>
+          <button type="button" data-profile-completed-filter="without_result" data-i18n-text="Without result">Without result</button>
         </div>
         <div id="profileCompletedArchiveList" class="profile-completed-archive-list"></div>
       </div>
@@ -1611,30 +1606,30 @@
 
     <section class="profile-section profile-security-section">
       <div class="profile-section-heading">
-        <h3>
+        <h3 data-i18n-text="Password">
           Password
         </h3>
-        <span>Security</span>
+        <span data-i18n-text="Security">Security</span>
       </div>
       <label>
-        <span class="profile-new-password-label">New Password</span>
+        <span class="profile-new-password-label" data-i18n-text="New Password">New Password</span>
         <input
           type="password"
           id="profileNewPassword"
           placeholder="At least 8 characters"
-        />
+        data-i18n-placeholder-text="At least 8 characters">
       </label>
 
       <label>
-        <span class="profile-repeat-password-label">Repeat Password</span>
+        <span class="profile-repeat-password-label" data-i18n-text="Repeat Password">Repeat Password</span>
         <input
           type="password"
           id="profileRepeatPassword"
           placeholder="Repeat password"
-        />
+        data-i18n-placeholder-text="Repeat password">
       </label>
 
-      <button id="profilePasswordBtn">
+      <button id="profilePasswordBtn" data-i18n-text="Update Password">
         Update Password
       </button>
 
@@ -1642,17 +1637,17 @@
         id="profilePasswordResetBtn"
         class="profile-secondary-btn"
         type="button"
-      >
+       data-i18n-text="Send Password Reset Email">
         Send Password Reset Email
       </button>
     </section>
 
     <section class="profile-section profile-logout-section">
       <div>
-        <h3>
+        <h3 data-i18n-text="Logout">
           Logout
         </h3>
-        <p class="profile-settings-hint">
+        <p class="profile-settings-hint" data-i18n-text="Sign out on this device. Your saved races and season plan stay connected to your account.">
           Sign out on this device. Your saved races and season plan stay connected to your account.
         </p>
       </div>
@@ -1661,7 +1656,7 @@
         id="profileLogoutBtn"
         class="profile-danger-btn"
         type="button"
-      >
+       data-i18n-text="Logout">
         Logout
       </button>
     </section>
@@ -1676,33 +1671,33 @@
   <div class="season-planner-card">
 
     <div class="season-planner-header">
-      <span>Season Planning</span>
-      <h2>Your Race Calendar</h2>
-      <p>
+      <span data-i18n-text="Season Planning">Season Planning</span>
+      <h2 data-i18n-text="Your Race Calendar">Your Race Calendar</h2>
+      <p data-i18n-text="Organize A-, B- and C-races, track spacing and keep your training calendar realistic.">
         Organize A-, B- and C-races, track spacing and keep your training calendar realistic.
       </p>
     </div>
 
-    <div class="season-tabs" role="tablist" aria-label="Season Planner sections">
-      <button type="button" id="seasonTabOverview" class="season-tab active" role="tab" aria-selected="true" aria-controls="seasonOverviewPanel" tabindex="0" data-season-tab="overview" data-testid="planner-tab-overview">Overview</button>
+    <div class="season-tabs" role="tablist" aria-label="Season Planner sections" data-i18n-aria-label-text="Season Planner sections">
+      <button type="button" id="seasonTabOverview" class="season-tab active" role="tab" aria-selected="true" aria-controls="seasonOverviewPanel" tabindex="0" data-season-tab="overview" data-testid="planner-tab-overview" data-i18n-text="Overview">Overview</button>
       <button type="button" id="seasonTabEvents" class="season-tab" role="tab" aria-selected="false" aria-controls="seasonEventsPanel" tabindex="-1" data-season-tab="events" data-testid="planner-tab-events">Events</button>
-      <button type="button" id="seasonTabCalendar" class="season-tab" role="tab" aria-selected="false" aria-controls="seasonCalendarPanel" tabindex="-1" data-season-tab="calendar" data-testid="planner-tab-calendar">Calendar</button>
+      <button type="button" id="seasonTabCalendar" class="season-tab" role="tab" aria-selected="false" aria-controls="seasonCalendarPanel" tabindex="-1" data-season-tab="calendar" data-testid="planner-tab-calendar" data-i18n-text="Calendar">Calendar</button>
     </div>
 
     <div class="season-tab-panel active" id="seasonOverviewPanel" role="tabpanel" aria-labelledby="seasonTabOverview" data-testid="planner-overview-panel">
 
       <div class="season-overview-hero">
         <div class="season-next-card">
-          <span>Next race</span>
-          <strong id="seasonCountdown" data-testid="planner-countdown">No saved upcoming event</strong>
+          <span data-i18n-text="Next race">Next race</span>
+          <strong id="seasonCountdown" data-testid="planner-countdown" data-i18n-text="No saved upcoming event">No saved upcoming event</strong>
           <em id="seasonNextEventName"></em>
           <div class="season-next-meta">
             <div>
-              <span>Date</span>
+              <span data-i18n-text="Date">Date</span>
               <strong id="seasonNextDate">-</strong>
             </div>
             <div>
-              <span>Location</span>
+              <span data-i18n-text="Location">Location</span>
               <strong id="seasonNextPlace">-</strong>
             </div>
           </div>
@@ -1710,25 +1705,25 @@
 
         <div class="season-kpi-grid">
           <div>
-            <span>Planned Events</span>
+            <span data-i18n-text="Planned Events">Planned Events</span>
             <strong id="seasonSavedCount">0</strong>
           </div>
 
           <div>
-            <span>Upcoming</span>
+            <span data-i18n-text="Upcoming">Upcoming</span>
             <strong id="seasonUpcomingCount">0</strong>
           </div>
 
           <div class="season-score-kpi">
             <div class="season-score-heading">
-              <span>Season Score</span>
+              <span data-i18n-text="Season Score">Season Score</span>
               <button
                 type="button"
                 id="seasonScoreInfoBtn"
                 class="season-score-info-btn"
                 title="Click for more information"
                 aria-label="Click for more information about the Season Score"
-              >
+               data-i18n-title-text="Click for more information" data-i18n-aria-label-text="Click for more information about the Season Score">
                 i
               </button>
             </div>
@@ -1738,14 +1733,14 @@
       </div>
 
       <div class="season-countdown-section">
-        <div class="season-section-title">
+        <div class="season-section-title" data-i18n-text="Upcoming Countdowns">
           Upcoming Countdowns
         </div>
         <div id="seasonCountdownCards"></div>
       </div>
 
       <div class="season-health-card">
-        <div class="season-section-title">
+        <div class="season-section-title" data-i18n-text="Season Health">
           Season Health
         </div>
         <div id="seasonOverviewSummary"></div>
@@ -1754,16 +1749,16 @@
 
       <div class="season-cockpit-grid">
         <div class="season-focus-card">
-          <div class="season-section-title">
+          <div class="season-section-title" data-i18n-text="Priority Focus">
             Priority Focus
           </div>
           <div class="season-focus-layout">
             <div>
-              <span class="season-subtitle">Key races</span>
+              <span class="season-subtitle" data-i18n-text="Key races">Key races</span>
               <div id="seasonOverviewARaces"></div>
             </div>
             <div>
-              <span class="season-subtitle">Sport mix</span>
+              <span class="season-subtitle" data-i18n-text="Sport mix">Sport mix</span>
               <div id="seasonOverviewSportMix"></div>
             </div>
           </div>
@@ -1772,8 +1767,8 @@
         <div class="season-training-card">
           <div class="season-section-title season-title-with-info">
             <div class="season-title-copy">
-              <span>Training Block</span>
-              <small>Longest time gap between two upcoming planned races.</small>
+              <span data-i18n-text="Training Block">Training Block</span>
+              <small data-i18n-text="Longest time gap between two upcoming planned races.">Longest time gap between two upcoming planned races.</small>
             </div>
             <button
               type="button"
@@ -1781,21 +1776,21 @@
               class="season-score-info-btn"
               title="Click for more information"
               aria-label="Click for more information about Training Blocks"
-            >
+             data-i18n-title-text="Click for more information" data-i18n-aria-label-text="Click for more information about Training Blocks">
               i
             </button>
           </div>
           <div id="seasonTrainingBlock"></div>
           <div id="seasonTrainingBlocks"></div>
           <div class="season-training-opportunity">
-            <span class="season-subtitle">Training opportunity</span>
+            <span class="season-subtitle" data-i18n-text="Training opportunity">Training opportunity</span>
             <div id="seasonTrainingOpportunity"></div>
           </div>
         </div>
       </div>
 
       <div class="season-recommendation-section">
-        <div class="season-section-title">
+        <div class="season-section-title" data-i18n-text="Recommended Events">
           Recommended Events
         </div>
         <div id="seasonRecommendedEvents"></div>
@@ -1810,15 +1805,15 @@
 
     <div class="season-tab-panel" id="seasonEventsPanel" role="tabpanel" aria-labelledby="seasonTabEvents" data-testid="planner-events-panel">
       <div class="season-events-workspace">
-        <aside class="season-events-list-panel" aria-label="Planned races">
-          <div class="season-section-title">
+        <aside class="season-events-list-panel" aria-label="Planned races" data-i18n-aria-label-text="Planned races">
+          <div class="season-section-title" data-i18n-text="Planned Races">
             Planned Races
           </div>
-          <p>Select a race to edit priority, goals, strategy, logistics and results.</p>
+          <p data-i18n-text="Select a race to edit priority, goals, strategy, logistics and results.">Select a race to edit priority, goals, strategy, logistics and results.</p>
           <div id="seasonEventList" data-testid="planner-event-list"></div>
         </aside>
 
-        <section class="season-events-editor-panel" aria-label="Selected race planner">
+        <section class="season-events-editor-panel" aria-label="Selected race planner" data-i18n-aria-label-text="Selected race planner">
           <button type="button" id="seasonEventsBackButton" class="season-events-back-button" data-testid="planner-events-back">
             <span aria-hidden="true">&larr;</span>
             Alle Rennen
@@ -1833,36 +1828,36 @@
       <div class="season-calendar-section">
         <div class="season-calendar-header">
           <div>
-            <div class="season-section-title">
+            <div class="season-section-title" data-i18n-text="Season Calendar">
               Season Calendar
             </div>
-            <p>Your saved races as a month-by-month season plan with spacing and priority context.</p>
+            <p data-i18n-text="Your saved races as a month-by-month season plan with spacing and priority context.">Your saved races as a month-by-month season plan with spacing and priority context.</p>
           </div>
           <div class="season-calendar-view-toggle">
-            <button type="button" class="active" data-season-calendar-view="month">Month</button>
-            <button type="button" data-season-calendar-view="list">Year</button>
+            <button type="button" class="active" data-season-calendar-view="month" data-i18n-text="Month">Month</button>
+            <button type="button" data-season-calendar-view="list" data-i18n-text="Year">Year</button>
           </div>
         </div>
         <div id="seasonTimeline" data-testid="planner-calendar"></div>
       </div>
 
       <div class="season-export-card">
-        <span>Calendar Export & Sync</span>
-        <strong>Download a standard calendar import file for all saved races.</strong>
-        <p>
+        <span data-i18n-text="Calendar Export &amp; Sync">Calendar Export & Sync</span>
+        <strong data-i18n-text="Download a standard calendar import file for all saved races.">Download a standard calendar import file for all saved races.</strong>
+        <p data-i18n-text="The download is an .ics calendar file, the standard format used by Apple Calendar, Outlook and Google Calendar import.">
           The download is an .ics calendar file, the standard format used by Apple Calendar, Outlook and Google Calendar import.
         </p>
         <div class="season-export-actions">
           <button
             type="button"
             id="exportSeasonCalendarBtn"
-          >
+           data-i18n-text="Download Calendar File">
             Download Calendar File
           </button>
           <button
             type="button"
             id="addNextRaceGoogleBtn"
-          >
+           data-i18n-text="Add Next Race to Google Calendar">
             Add Next Race to Google Calendar
           </button>
         </div>
@@ -1878,49 +1873,49 @@
 
   <div class="season-score-info-card">
 
-    <button id="closeSeasonBalanceInfo" aria-label="Close season balance information">
+    <button id="closeSeasonBalanceInfo" aria-label="Close season balance information" data-i18n-aria-label-text="Close season balance information">
       &times;
     </button>
 
-    <span class="season-score-info-kicker">Season Balance</span>
-    <h2>
+    <span class="season-score-info-kicker" data-i18n-text="Season Balance">Season Balance</span>
+    <h2 data-i18n-text="What Season Balance means">
       What Season Balance means
     </h2>
-    <p>
+    <p data-i18n-text="Season Balance describes how demanding your saved race calendar looks overall. It combines race volume, race difficulty, priorities and tight recovery windows into one simple planning signal.">
       Season Balance describes how demanding your saved race calendar looks overall. It combines race volume, race difficulty, priorities and tight recovery windows into one simple planning signal.
     </p>
 
     <div class="season-score-info-grid">
       <article>
-        <strong>Race difficulty</strong>
-        <p>
+        <strong data-i18n-text="Race difficulty">Race difficulty</strong>
+        <p data-i18n-text="Shorter races count as lighter load. Marathons, ultras, 70.3 races and full-distance triathlons increase the planning load.">
           Shorter races count as lighter load. Marathons, ultras, 70.3 races and full-distance triathlons increase the planning load.
         </p>
       </article>
 
       <article>
-        <strong>Race volume</strong>
-        <p>
+        <strong data-i18n-text="Race volume">Race volume</strong>
+        <p data-i18n-text="More saved races increase the load. A busy calendar is not automatically bad, but it needs more careful spacing.">
           More saved races increase the load. A busy calendar is not automatically bad, but it needs more careful spacing.
         </p>
       </article>
 
       <article>
-        <strong>Priorities</strong>
-        <p>
+        <strong data-i18n-text="Priorities">Priorities</strong>
+        <p data-i18n-text="A-races count more strongly than B-, C- or training races, because they usually need more preparation and recovery focus.">
           A-races count more strongly than B-, C- or training races, because they usually need more preparation and recovery focus.
         </p>
       </article>
 
       <article>
-        <strong>Recovery conflicts</strong>
-        <p>
+        <strong data-i18n-text="Recovery conflicts">Recovery conflicts</strong>
+        <p data-i18n-text="If two races are closer together than the recommended recovery window, Season Balance becomes more demanding.">
           If two races are closer together than the recommended recovery window, Season Balance becomes more demanding.
         </p>
       </article>
     </div>
 
-    <p class="season-score-info-note">
+    <p class="season-score-info-note" data-i18n-text="Use Season Balance as a quick reality check: if it says demanding, review whether every race belongs in your season or whether some should stay as C-races or training events.">
       Use Season Balance as a quick reality check: if it says demanding, review whether every race belongs in your season or whether some should stay as C-races or training events.
     </p>
 
@@ -1932,42 +1927,42 @@
 
   <div class="season-score-info-card">
 
-    <button id="closeSportMixInfo" aria-label="Close race mix information">
+    <button id="closeSportMixInfo" aria-label="Close race mix information" data-i18n-aria-label-text="Close race mix information">
       &times;
     </button>
 
-    <span class="season-score-info-kicker">Race Mix</span>
-    <h2>
+    <span class="season-score-info-kicker" data-i18n-text="Race Mix">Race Mix</span>
+    <h2 data-i18n-text="How Race Mix helps your planning">
       How Race Mix helps your planning
     </h2>
-    <p>
+    <p data-i18n-text="Race Mix shows what kind of season you are building. It highlights your dominant sport type and the distances that appear most often in your plan.">
       Race Mix shows what kind of season you are building. It highlights your dominant sport type and the distances that appear most often in your plan.
     </p>
 
     <div class="season-score-info-grid">
       <article>
-        <strong>Season focus</strong>
-        <p>
+        <strong data-i18n-text="Season focus">Season focus</strong>
+        <p data-i18n-text="A clear dominant sport can be useful when you are preparing for one main goal, such as a marathon or triathlon season.">
           A clear dominant sport can be useful when you are preparing for one main goal, such as a marathon or triathlon season.
         </p>
       </article>
 
       <article>
-        <strong>Sport distribution</strong>
-        <p>
+        <strong data-i18n-text="Sport distribution">Sport distribution</strong>
+        <p data-i18n-text="Running, triathlon and ultra events are separated so you can quickly see whether your calendar fits your actual training focus.">
           Running, triathlon and ultra events are separated so you can quickly see whether your calendar fits your actual training focus.
         </p>
       </article>
 
       <article>
-        <strong>Distance focus</strong>
-        <p>
+        <strong data-i18n-text="Distance focus">Distance focus</strong>
+        <p data-i18n-text="Repeated distances show what kind of preparation your season demands, for example shorter races, marathons, ultras or triathlon formats.">
           Repeated distances show what kind of preparation your season demands, for example shorter races, marathons, ultras or triathlon formats.
         </p>
       </article>
     </div>
 
-    <p class="season-score-info-note">
+    <p class="season-score-info-note" data-i18n-text="Use Race Mix as a quick reality check. If your plan contains very different race types, make sure your training blocks still match the most important goals.">
       Use Race Mix as a quick reality check. If your plan contains very different race types, make sure your training blocks still match the most important goals.
     </p>
 
@@ -1979,49 +1974,49 @@
 
   <div class="season-score-info-card">
 
-    <button id="closeTrainingBlockInfo" aria-label="Close training block information">
+    <button id="closeTrainingBlockInfo" aria-label="Close training block information" data-i18n-aria-label-text="Close training block information">
       &times;
     </button>
 
-    <span class="season-score-info-kicker">Training Block</span>
-    <h2>
+    <span class="season-score-info-kicker" data-i18n-text="Training Block">Training Block</span>
+    <h2 data-i18n-text="How Training Blocks are read">
       How Training Blocks are read
     </h2>
-    <p>
+    <p data-i18n-text="Training Blocks show the time between two upcoming planned races. Past races are not included, so this stays focused on the season ahead.">
       Training Blocks show the time between two upcoming planned races. Past races are not included, so this stays focused on the season ahead.
     </p>
 
     <div class="season-score-info-grid">
       <article>
-        <strong>Under 7 days</strong>
-        <p>
+        <strong data-i18n-text="Under 7 days">Under 7 days</strong>
+        <p data-i18n-text="Very tight spacing. This is usually more recovery and logistics than meaningful training.">
           Very tight spacing. This is usually more recovery and logistics than meaningful training.
         </p>
       </article>
 
       <article>
-        <strong>7-21 days</strong>
-        <p>
+        <strong data-i18n-text="7-21 days">7-21 days</strong>
+        <p data-i18n-text="A short block. Useful for recovery, light sharpening or maintaining fitness.">
           A short block. Useful for recovery, light sharpening or maintaining fitness.
         </p>
       </article>
 
       <article>
-        <strong>22-56 days</strong>
-        <p>
+        <strong data-i18n-text="22-56 days">22-56 days</strong>
+        <p data-i18n-text="A strong planning window. Often enough time for a focused training phase between races.">
           A strong planning window. Often enough time for a focused training phase between races.
         </p>
       </article>
 
       <article>
-        <strong>More than 56 days</strong>
-        <p>
+        <strong data-i18n-text="More than 56 days">More than 56 days</strong>
+        <p data-i18n-text="A longer build phase. Good for base work, a new focus block or preparing for an A-race.">
           A longer build phase. Good for base work, a new focus block or preparing for an A-race.
         </p>
       </article>
     </div>
 
-    <p class="season-score-info-note">
+    <p class="season-score-info-note" data-i18n-text="The goal is not to fill every gap. Good seasons usually alternate races, recovery and focused build phases.">
       The goal is not to fill every gap. Good seasons usually alternate races, recovery and focused build phases.
     </p>
 
@@ -2033,56 +2028,56 @@
 
   <div class="season-score-info-card">
 
-    <button id="closeSeasonScoreInfo" aria-label="Close season score information">
+    <button id="closeSeasonScoreInfo" aria-label="Close season score information" data-i18n-aria-label-text="Close season score information">
       &times;
     </button>
 
-    <span class="season-score-info-kicker">Season Score</span>
-    <h2>
+    <span class="season-score-info-kicker" data-i18n-text="Season Score">Season Score</span>
+    <h2 data-i18n-text="How your season score is calculated">
       How your season score is calculated
     </h2>
-    <p>
+    <p data-i18n-text="The Season Score is a planning signal from 0 to 100. It is not a medical training metric. It helps you spot whether your race calendar looks realistic, balanced and recoverable.">
       The Season Score is a planning signal from 0 to 100. It is not a medical training metric. It helps you spot whether your race calendar looks realistic, balanced and recoverable.
     </p>
 
     <div class="season-score-info-grid">
       <article>
-        <strong>Recovery windows</strong>
-        <p>
+        <strong data-i18n-text="Recovery windows">Recovery windows</strong>
+        <p data-i18n-text="Races scheduled too closely together reduce the score. Larger races such as marathons, ultras and triathlons need more recovery time than shorter events.">
           Races scheduled too closely together reduce the score. Larger races such as marathons, ultras and triathlons need more recovery time than shorter events.
         </p>
       </article>
 
       <article>
-        <strong>Priority balance</strong>
-        <p>
+        <strong data-i18n-text="Priority balance">Priority balance</strong>
+        <p data-i18n-text="Too many A-races lower the score. A strong season usually has a few main goals and supporting B- or C-races around them.">
           Too many A-races lower the score. A strong season usually has a few main goals and supporting B- or C-races around them.
         </p>
       </article>
 
       <article>
-        <strong>Monthly density</strong>
-        <p>
+        <strong data-i18n-text="Monthly density">Monthly density</strong>
+        <p data-i18n-text="If too many races sit in the same month, the score drops. The planner rewards a calendar that spreads load more evenly.">
           If too many races sit in the same month, the score drops. The planner rewards a calendar that spreads load more evenly.
         </p>
       </article>
 
       <article>
-        <strong>Average spacing</strong>
-        <p>
+        <strong data-i18n-text="Average spacing">Average spacing</strong>
+        <p data-i18n-text="Very short gaps are risky. Extremely long gaps are only lightly marked, because they may still be useful training blocks.">
           Very short gaps are risky. Extremely long gaps are only lightly marked, because they may still be useful training blocks.
         </p>
       </article>
     </div>
 
     <div class="season-score-info-scale">
-      <div><span>84-100</span><strong>Excellent</strong></div>
-      <div><span>68-83</span><strong>Good</strong></div>
-      <div><span>45-67</span><strong>Busy</strong></div>
-      <div><span>0-44</span><strong>Overloaded</strong></div>
+      <div><span>84-100</span><strong data-i18n-text="Excellent">Excellent</strong></div>
+      <div><span>68-83</span><strong data-i18n-text="Good">Good</strong></div>
+      <div><span>45-67</span><strong data-i18n-text="Busy">Busy</strong></div>
+      <div><span>0-44</span><strong data-i18n-text="Overloaded">Overloaded</strong></div>
     </div>
 
-    <p class="season-score-info-note">
+    <p class="season-score-info-note" data-i18n-text="Use the score as a decision helper: review tight recovery gaps, reduce unnecessary A-races and keep your season focused on the races that matter most.">
       Use the score as a decision helper: review tight recovery gaps, reduce unnecessary A-races and keep your season focused on the races that matter most.
     </p>
 
@@ -2095,11 +2090,11 @@
 
   <div class="app-message-card">
 
-    <button id="closeAppMessage" aria-label="Close message">
+    <button id="closeAppMessage" aria-label="Close message" data-i18n-aria-label-text="Close message">
       &times;
     </button>
 
-    <h2 id="appMessageTitle">
+    <h2 id="appMessageTitle" data-i18n-text="Notice">
       Notice
     </h2>
 
@@ -2121,24 +2116,24 @@
       id="closeWelcomeModal"
       type="button"
       aria-label="Close welcome"
-    >
+     data-i18n-aria-label-text="Close welcome">
       &times;
     </button>
 
-    <span>CLOSED BETA</span>
+    <span data-i18n-text="CLOSED BETA">CLOSED BETA</span>
 
-    <h2>
+    <h2 data-i18n-text="Welcome to Sport Event Map">
       Willkommen bei Sport Event Map
     </h2>
 
-    <p class="welcome-copy">
+    <p class="welcome-copy" data-i18n-text="The platform is ready to use, but event data and planning workflows are still being refined with beta feedback.">
       The platform is ready to use, but event data and planning workflows are still being refined with beta feedback.
     </p>
 
     <ol>
-      <li>Find endurance events with the map, search and filters.</li>
-      <li>Save races and organize your season with priorities.</li>
-      <li>Send feedback when data is missing, outdated or unclear.</li>
+      <li data-i18n-text="Find endurance events with the map, search and filters.">Find endurance events with the map, search and filters.</li>
+      <li data-i18n-text="Save races and organize your season with priorities.">Save races and organize your season with priorities.</li>
+      <li data-i18n-text="Send feedback when data is missing, outdated or unclear.">Send feedback when data is missing, outdated or unclear.</li>
     </ol>
 
     <div class="welcome-actions">
@@ -2146,14 +2141,14 @@
         id="skipWelcomeBtn"
         type="button"
         class="secondary"
-      >
+       data-i18n-text="Skip">
         Skip
       </button>
 
       <button
         id="startWelcomeBtn"
         type="button"
-      >
+       data-i18n-text="Continue exploring">
         Continue exploring
       </button>
     </div>
@@ -2168,15 +2163,15 @@
 
   <div class="feedback-card">
 
-    <button id="closeFeedbackModal" aria-label="Close feedback">
+    <button id="closeFeedbackModal" aria-label="Close feedback" data-i18n-aria-label-text="Close feedback">
       &times;
     </button>
 
-    <h2>
+    <h2 data-i18n-text="How helpful was Sport Event Map today?">
       Wie hilfreich war Sport Event Map heute?
     </h2>
 
-    <p>
+    <p data-i18n-text="Help improve the closed beta. Please keep personal or sensitive information out of your message.">
       Help improve the closed beta. Please keep personal or sensitive information out of your message.
     </p>
 
@@ -2187,69 +2182,68 @@
     </p>
 
     <div class="feedback-prompt-list">
-      <span>Helpful prompts for beta testing</span>
+      <span data-i18n-text="Helpful prompts for beta testing">Helpful prompts for beta testing</span>
       <ul>
-        <li>Did you find an event you would actually consider?</li>
-        <li>Was the Season Planner useful?</li>
-        <li>What would make you come back next week?</li>
-        <li>Which event was missing or incorrect?</li>
+        <li data-i18n-text="Did you find an event you would actually consider?">Did you find an event you would actually consider?</li>
+        <li data-i18n-text="Was the Season Planner useful?">Was the Season Planner useful?</li>
+        <li data-i18n-text="What would make you come back next week?">What would make you come back next week?</li>
+        <li data-i18n-text="Which event was missing or incorrect?">Which event was missing or incorrect?</li>
       </ul>
     </div>
 
     <div class="feedback-form-grid">
       <label>
-        Category
+        <span data-i18n-text="Category">Category</span>
         <select id="feedbackCategory">
-          <option value="bug">Bug</option>
-          <option value="usability">Usability</option>
-          <option value="incorrect_event_data">Incorrect event data</option>
-          <option value="missing_event">Missing event</option>
-          <option value="season_planner">Season Planner</option>
-          <option value="improvement">Improvement idea</option>
-          <option value="other">Other</option>
+          <option value="bug" data-i18n-text="Bug">Bug</option>
+          <option value="usability" data-i18n-text="Usability">Usability</option>
+          <option value="incorrect_event_data" data-i18n-text="Incorrect event data">Incorrect event data</option>
+          <option value="missing_event" data-i18n-text="Missing event">Missing event</option>
+          <option value="season_planner" data-i18n-text="Season Planner">Season Planner</option>
+          <option value="improvement" data-i18n-text="Improvement idea">Improvement idea</option>
+          <option value="other" data-i18n-text="Other">Other</option>
         </select>
       </label>
 
       <label>
-        Product area
+        <span data-i18n-text="Product area">Product area</span>
         <select id="feedbackProductArea">
-          <option value="event_map">Event Map</option>
-          <option value="event_details">Event Details</option>
-          <option value="filters">Search & Filters</option>
-          <option value="favorites">Favorites</option>
-          <option value="season_planner">Season Planner</option>
-          <option value="profile_auth">Profile & Login</option>
-          <option value="event_submission">Event Submission</option>
+          <option value="event_map" data-i18n-text="Event Map">Event Map</option>
+          <option value="event_details" data-i18n-text="Event Details">Event Details</option>
+          <option value="filters" data-i18n-text="Search &amp; Filters">Search & Filters</option>
+          <option value="favorites" data-i18n-text="Favorites">Favorites</option>
+          <option value="season_planner" data-i18n-text="Season Planner">Season Planner</option>
+          <option value="profile_auth" data-i18n-text="Profile &amp; Login">Profile & Login</option>
+          <option value="event_submission" data-i18n-text="Event Submission">Event Submission</option>
           <option value="admin">Admin</option>
-          <option value="other">Other</option>
+          <option value="other" data-i18n-text="Other">Other</option>
         </select>
       </label>
     </div>
 
     <label>
-      Short description
+      <span data-i18n-text="Short description">Short description</span>
       <input
         id="feedbackSummary"
         type="text"
         maxlength="180"
         placeholder="What happened or what should improve?"
-      />
+      data-i18n-placeholder-text="What happened or what should improve?">
     </label>
 
     <input
       type="hidden"
       id="feedbackRating"
-      value=""
-    />
+      value="">
 
     <div
       class="feedback-rating-options"
       aria-label="Feedback rating"
-    >
-      <button type="button" data-feedback-rating="5" aria-label="Very helpful">&#128512;</button>
-      <button type="button" data-feedback-rating="4" aria-label="Helpful">&#128578;</button>
-      <button type="button" data-feedback-rating="3" aria-label="Okay">&#128528;</button>
-      <button type="button" data-feedback-rating="2" aria-label="Not helpful">&#128577;</button>
+     data-i18n-aria-label-text="Feedback rating">
+      <button type="button" data-feedback-rating="5" aria-label="Very helpful" data-i18n-aria-label-text="Very helpful">&#128512;</button>
+      <button type="button" data-feedback-rating="4" aria-label="Helpful" data-i18n-aria-label-text="Helpful">&#128578;</button>
+      <button type="button" data-feedback-rating="3" aria-label="Okay" data-i18n-aria-label-text="Okay">&#128528;</button>
+      <button type="button" data-feedback-rating="2" aria-label="Not helpful" data-i18n-aria-label-text="Not helpful">&#128577;</button>
     </div>
 
     <label>
@@ -2259,32 +2253,32 @@
         rows="5"
         maxlength="2000"
         placeholder="Steps, expected result, or additional context."
-      ></textarea>
+       data-i18n-placeholder-text="Steps, expected result, or additional context."></textarea>
     </label>
 
     <div class="feedback-form-grid">
       <label>
-        Related event (optional)
+        <span data-i18n-text="Related event (optional)">Related event (optional)</span>
         <input
           id="feedbackEventId"
           type="text"
           maxlength="160"
           placeholder="Event name or event ID"
-        />
+        data-i18n-placeholder-text="Event name or event ID">
       </label>
 
       <label>
-        Screenshot note (optional)
+        <span data-i18n-text="Screenshot note (optional)">Screenshot note (optional)</span>
         <input
           id="feedbackScreenshotHint"
           type="text"
           maxlength="240"
           placeholder="Example: Screenshot available on request"
-        />
+        data-i18n-placeholder-text="Example: Screenshot available on request">
       </label>
     </div>
 
-    <button id="submitFeedbackBtn">
+    <button id="submitFeedbackBtn" data-i18n-text="Send feedback">
       Send feedback
     </button>
 
@@ -2298,21 +2292,21 @@
 
   <div class="admin-card">
 
-    <button id="closeAdminModal" aria-label="Close admin dashboard">
+    <button id="closeAdminModal" aria-label="Close admin dashboard" data-i18n-aria-label-text="Close admin dashboard">
       &times;
     </button>
 
     <div class="admin-dashboard-header">
       <div>
-        <span class="admin-eyebrow">Produktsteuerung</span>
-        <h2>
+        <span class="admin-eyebrow" data-i18n-text="Product management">Produktsteuerung</span>
+        <h2 data-i18n-text="Admin area">
           Adminbereich
         </h2>
-        <p>Verl&auml;ssliche Produktkennzahlen verstehen und Feedback bearbeiten.</p>
+        <p data-i18n-text="Understand reliable product metrics and manage feedback.">Verl&auml;ssliche Produktkennzahlen verstehen und Feedback bearbeiten.</p>
       </div>
       <div class="admin-header-actions">
-        <span id="adminLastUpdated">Noch nicht aktualisiert</span>
-        <button type="button" id="refreshAdminDashboardBtn">
+        <span id="adminLastUpdated" data-i18n-text="Not refreshed yet">Noch nicht aktualisiert</span>
+        <button type="button" id="refreshAdminDashboardBtn" data-i18n-text="Refresh">
           Aktualisieren
         </button>
       </div>
@@ -2320,7 +2314,7 @@
 
 
 
-    <div class="admin-tabs" role="tablist" aria-label="Adminbereiche">
+    <div class="admin-tabs" role="tablist" aria-label="Adminbereiche" data-i18n-aria-label-text="Admin sections">
 
       <button
         type="button"
@@ -2338,7 +2332,7 @@
         data-admin-tab="eventMaintenance"
         role="tab"
         aria-selected="false"
-      >Events pflegen</button>
+       data-i18n-text="Maintain events">Events pflegen</button>
       <button
         type="button"
         class="admin-tab"
@@ -2372,7 +2366,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Pending submissions">
           Pending submissions
         </span>
 
@@ -2384,7 +2378,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Approved submissions">
           Approved submissions
         </span>
 
@@ -2399,7 +2393,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Rejected submissions">
           Rejected submissions
         </span>
 
@@ -2414,7 +2408,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Pending without coordinates">
           Pending without coordinates
         </span>
 
@@ -2426,7 +2420,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Approved last 30 days">
           Approved last 30 days
         </span>
 
@@ -2441,7 +2435,7 @@
 
       <div class="admin-stat-card">
 
-        <span>
+        <span data-i18n-text="Rejected last 30 days">
           Rejected last 30 days
         </span>
 
@@ -2460,61 +2454,61 @@
 
       <div class="admin-section-heading">
         <div>
-          <h3>
+          <h3 data-i18n-text="Pending submissions">
             Pending submissions
           </h3>
-          <p id="pendingEventsSummary">Loading submissions...</p>
+          <p id="pendingEventsSummary" data-i18n-text="Loading submissions...">Loading submissions...</p>
         </div>
-        <button type="button" id="refreshPendingEventsBtn">
+        <button type="button" id="refreshPendingEventsBtn" data-i18n-text="Refresh">
           Refresh
         </button>
       </div>
 
       <div class="admin-review-toolbar">
         <label>
-          Search
+          <span data-i18n-text="Search">Search</span>
           <input
             type="search"
             id="pendingEventSearch"
             placeholder="Event, city or country"
-          />
+          data-i18n-placeholder-text="Event, city or country">
         </label>
         <label>
-          Readiness
+          <span data-i18n-text="Readiness">Readiness</span>
           <select id="pendingEventFilter">
-            <option value="all">All submissions</option>
-            <option value="ready">Ready to approve</option>
-            <option value="issues">Needs attention</option>
-            <option value="coordinates">Missing coordinates</option>
-            <option value="website">Invalid website</option>
-            <option value="date">Missing date</option>
-            <option value="registration">Registration status unclear</option>
-            <option value="source">Source not official</option>
+            <option value="all" data-i18n-text="All submissions">All submissions</option>
+            <option value="ready" data-i18n-text="Ready to approve">Ready to approve</option>
+            <option value="issues" data-i18n-text="Needs attention">Needs attention</option>
+            <option value="coordinates" data-i18n-text="Missing coordinates">Missing coordinates</option>
+            <option value="website" data-i18n-text="Invalid website">Invalid website</option>
+            <option value="date" data-i18n-text="Missing date">Missing date</option>
+            <option value="registration" data-i18n-text="Registration status unclear">Registration status unclear</option>
+            <option value="source" data-i18n-text="Source not official">Source not official</option>
           </select>
         </label>
         <label>
-          Sort
+          <span data-i18n-text="Sort">Sort</span>
           <select id="pendingEventSort">
-            <option value="oldest">Oldest first</option>
-            <option value="newest">Newest first</option>
-            <option value="issues">Issues first</option>
-            <option value="name">Event name</option>
+            <option value="oldest" data-i18n-text="Oldest first">Oldest first</option>
+            <option value="newest" data-i18n-text="Newest first">Newest first</option>
+            <option value="issues" data-i18n-text="Issues first">Issues first</option>
+            <option value="name" data-i18n-text="Event name">Event name</option>
           </select>
         </label>
         <label>
-          Batch
+          <span data-i18n-text="Batch">Batch</span>
           <select id="pendingBatchFilter">
-            <option value="all">All batches</option>
+            <option value="all" data-i18n-text="All batches">All batches</option>
           </select>
         </label>
       </div>
 
       <div class="admin-review-bulkbar">
         <span id="pendingBulkSelectionCount">0 selected</span>
-        <button type="button" id="approveSelectedPendingBtn">
+        <button type="button" id="approveSelectedPendingBtn" data-i18n-text="Approve selected ready">
           Approve selected ready
         </button>
-        <button type="button" id="approveVisibleReadyBtn">
+        <button type="button" id="approveVisibleReadyBtn" data-i18n-text="Approve all visible ready">
           Approve all visible ready
         </button>
       </div>
@@ -2535,47 +2529,47 @@
 
       <div class="admin-section-heading">
         <div>
-          <h3>
+          <h3 data-i18n-text="Data Quality Review">
             Data Quality Review
           </h3>
-          <p>Read-only review of the curated CSV. Changes continue through the import workflow.</p>
+          <p data-i18n-text="Read-only review of the curated CSV. Changes continue through the import workflow.">Read-only review of the curated CSV. Changes continue through the import workflow.</p>
         </div>
-        <button type="button" id="refreshDataQualityBtn">
+        <button type="button" id="refreshDataQualityBtn" data-i18n-text="Recheck CSV">
           Recheck CSV
         </button>
       </div>
 
       <div class="admin-quality-summary">
         <div>
-          <span>Active approved events</span>
+          <span data-i18n-text="Active approved events">Active approved events</span>
           <strong id="activeApprovedEventsCount">0</strong>
         </div>
         <div>
-          <span>Progress to 1,000</span>
+          <span data-i18n-text="Progress to 1,000">Progress to 1,000</span>
           <strong id="eventGoalProgressCount">0%</strong>
         </div>
         <div>
-          <span>Needs review</span>
+          <span data-i18n-text="Needs review">Needs review</span>
           <strong id="qualityReviewCount">0</strong>
         </div>
         <div>
-          <span>Outdated date</span>
+          <span data-i18n-text="Outdated date">Outdated date</span>
           <strong id="missingStatsCount">0</strong>
         </div>
         <div>
-          <span>No official website</span>
+          <span data-i18n-text="No official website">No official website</span>
           <strong id="urlReviewCount">0</strong>
         </div>
         <div>
-          <span>Possible duplicates</span>
+          <span data-i18n-text="Possible duplicates">Possible duplicates</span>
           <strong id="possibleDuplicateCount">0</strong>
         </div>
         <div>
-          <span>Missing coordinates</span>
+          <span data-i18n-text="Missing coordinates">Missing coordinates</span>
           <strong id="missingQualityCoordsCount">0</strong>
         </div>
         <div>
-          <span>Average quality score</span>
+          <span data-i18n-text="Average quality score">Average quality score</span>
           <strong id="averageQualityScore">0</strong>
         </div>
       </div>
@@ -2583,7 +2577,7 @@
       <div class="admin-quality-progress">
         <span>
           <strong id="eventGoalProgressLabel">0 of 1,000 launch-ready events</strong>
-          <em>Quality-first launch target</em>
+          <em data-i18n-text="Quality-first launch target">Quality-first launch target</em>
         </span>
         <div class="admin-quality-progress-track">
           <span id="eventGoalProgressBar"></span>
@@ -2592,29 +2586,29 @@
 
       <div class="admin-quality-priority">
         <div>
-          <h4>Priority queue</h4>
-          <p>Only real issues appear here: official website, date, coordinates, source, duplicates and stale checks.</p>
+          <h4 data-i18n-text="Priority queue">Priority queue</h4>
+          <p data-i18n-text="Only real issues appear here: official website, date, coordinates, source, duplicates and stale checks.">Only real issues appear here: official website, date, coordinates, source, duplicates and stale checks.</p>
         </div>
-        <select id="qualityReviewSort" aria-label="Quality review sort">
-          <option value="priority">Review priority</option>
-          <option value="score">Lowest quality score</option>
-          <option value="name">Event name</option>
-          <option value="date">Event date</option>
+        <select id="qualityReviewSort" aria-label="Quality review sort" data-i18n-aria-label-text="Quality review sort">
+          <option value="priority" data-i18n-text="Review priority">Review priority</option>
+          <option value="score" data-i18n-text="Lowest quality score">Lowest quality score</option>
+          <option value="name" data-i18n-text="Event name">Event name</option>
+          <option value="date" data-i18n-text="Event date">Event date</option>
         </select>
       </div>
 
       <div class="admin-quality-bulkbar">
         <span id="qualityBulkSelectionCount">0 selected</span>
-        <select id="qualityBulkAction" aria-label="Bulk quality action">
-          <option value="">Choose bulk action</option>
-          <option value="date_expected">Mark as date expected</option>
-          <option value="needs_review">Mark as needs review</option>
-          <option value="archive">Archive selected</option>
-          <option value="confirm_valid">Confirm still valid</option>
-          <option value="approve">Approve selected</option>
-          <option value="last_checked">Update last checked</option>
+        <select id="qualityBulkAction" aria-label="Bulk quality action" data-i18n-aria-label-text="Bulk quality action">
+          <option value="" data-i18n-text="Choose bulk action">Choose bulk action</option>
+          <option value="date_expected" data-i18n-text="Mark as date expected">Mark as date expected</option>
+          <option value="needs_review" data-i18n-text="Mark as needs review">Mark as needs review</option>
+          <option value="archive" data-i18n-text="Archive selected">Archive selected</option>
+          <option value="confirm_valid" data-i18n-text="Confirm still valid">Confirm still valid</option>
+          <option value="approve" data-i18n-text="Approve selected">Approve selected</option>
+          <option value="last_checked" data-i18n-text="Update last checked">Update last checked</option>
         </select>
-        <button type="button" id="applyQualityBulkActionBtn">
+        <button type="button" id="applyQualityBulkActionBtn" data-i18n-text="Apply">
           Apply
         </button>
       </div>
@@ -2622,30 +2616,30 @@
 
       <div class="admin-quality-breakdown">
         <section>
-          <h4>Events by sport</h4>
+          <h4 data-i18n-text="Events by sport">Events by sport</h4>
           <div id="qualitySportBreakdown"></div>
         </section>
         <section>
-          <h4>Events by country</h4>
+          <h4 data-i18n-text="Events by country">Events by country</h4>
           <div id="qualityCountryBreakdown"></div>
         </section>
       </div>
 
       <div class="admin-quality-grid">
         <div>
-          <h4>Registration status unknown</h4>
+          <h4 data-i18n-text="Registration status unknown">Registration status unknown</h4>
           <div id="statusReviewList"></div>
         </div>
         <div>
-          <h4>Date outdated or expected</h4>
+          <h4 data-i18n-text="Date outdated or expected">Date outdated or expected</h4>
           <div id="dateReviewList"></div>
         </div>
         <div>
-          <h4>Coordinate issues</h4>
+          <h4 data-i18n-text="Coordinate issues">Coordinate issues</h4>
           <div id="coordinateReviewList"></div>
         </div>
         <div>
-          <h4>Website/source issues</h4>
+          <h4 data-i18n-text="Website/source issues">Website/source issues</h4>
           <div id="officialWebsiteReviewList"></div>
         </div>
       </div>
@@ -2662,13 +2656,13 @@
       <div class="admin-table-section admin-knowledge-workspace">
         <div class="admin-section-heading">
           <div>
-            <span class="admin-eyebrow">Event Knowledge Base</span>
-            <h3>
+            <span class="admin-eyebrow" data-i18n-text="Event Knowledge Base">Event Knowledge Base</span>
+            <h3 data-i18n-text="Maintain detail pages">
               Detailseiten pflegen
             </h3>
-            <p>Bearbeite strukturierte Detaildaten, Quellen und FAQ für die statisch generierten Event-Guides.</p>
+            <p data-i18n-text="Edit structured details, sources and FAQs for the generated event guides.">Bearbeite strukturierte Detaildaten, Quellen und FAQ für die statisch generierten Event-Guides.</p>
           </div>
-          <button type="button" id="refreshEventKnowledgeBtn">
+          <button type="button" id="refreshEventKnowledgeBtn" data-i18n-text="Refresh">
             Refresh
           </button>
         </div>
@@ -2677,227 +2671,227 @@
           <label>
             Event
             <select id="knowledgeEventSelect">
-              <option value="">Event auswählen</option>
+              <option value="" data-i18n-text="Choose an event">Event auswählen</option>
             </select>
           </label>
           <label>
-            Slug
-            <input id="knowledgeEventSlug" type="text" placeholder="event-slug-2026" />
+            <span data-i18n-text="Slug">Slug</span>
+            <input id="knowledgeEventSlug" type="text" placeholder="event-slug-2026">
           </label>
           <label>
             Status
             <select id="knowledgeVerificationStatus">
-              <option value="draft">Draft</option>
-              <option value="partially_verified">Partially verified</option>
-              <option value="verified_official_source">Verified official source</option>
-              <option value="needs_review">Needs review</option>
+              <option value="draft" data-i18n-text="Draft">Draft</option>
+              <option value="partially_verified" data-i18n-text="Partially verified">Partially verified</option>
+              <option value="verified_official_source" data-i18n-text="Verified official source">Verified official source</option>
+              <option value="needs_review" data-i18n-text="Needs review">Needs review</option>
             </select>
           </label>
           <label class="admin-knowledge-public-toggle">
-            <input id="knowledgeIsPublic" type="checkbox" />
+            <input id="knowledgeIsPublic" type="checkbox">
             Public
           </label>
         </div>
 
-        <p id="eventKnowledgeStatus" class="admin-section-status" aria-live="polite">
+        <p id="eventKnowledgeStatus" class="admin-section-status" aria-live="polite" data-i18n-text="Select an event to edit its details.">
           Waehle ein Event, um Detaildaten zu bearbeiten.
         </p>
 
         <section class="admin-knowledge-research-panel">
           <div class="admin-knowledge-section-header">
             <div>
-              <h4>Research</h4>
-              <p>Starte einen Tool-Job für fehlende Detaildaten. Ergebnisse landen als Review-Vorschläge und werden nie automatisch public.</p>
+              <h4 data-i18n-text="Research">Research</h4>
+              <p data-i18n-text="Start a research job for missing details. Results are review proposals and are never published automatically.">Starte einen Tool-Job für fehlende Detaildaten. Ergebnisse landen als Review-Vorschläge und werden nie automatisch public.</p>
             </div>
-            <button type="button" id="startKnowledgeResearchBtn">
+            <button type="button" id="startKnowledgeResearchBtn" data-i18n-text="Start Research">
               Start Research
             </button>
           </div>
 
           <div class="admin-knowledge-research-grid">
             <label>
-              Scope
+              <span data-i18n-text="Scope">Scope</span>
               <select id="knowledgeResearchScope">
-                <option value="all">All events</option>
-                <option value="high">High priority only</option>
-                <option value="current">Current selected event</option>
-                <option value="missing-entry-fee">Missing entry fee</option>
-                <option value="missing-cutoff">Missing cutoff</option>
-                <option value="missing-start-time">Missing start time</option>
-                <option value="missing-elevation">Missing elevation</option>
-                <option value="missing-sources">Missing sources</option>
+                <option value="all" data-i18n-text="All events">All events</option>
+                <option value="high" data-i18n-text="High priority only">High priority only</option>
+                <option value="current" data-i18n-text="Current selected event">Current selected event</option>
+                <option value="missing-entry-fee" data-i18n-text="Missing entry fee">Missing entry fee</option>
+                <option value="missing-cutoff" data-i18n-text="Missing cutoff">Missing cutoff</option>
+                <option value="missing-start-time" data-i18n-text="Missing start time">Missing start time</option>
+                <option value="missing-elevation" data-i18n-text="Missing elevation">Missing elevation</option>
+                <option value="missing-sources" data-i18n-text="Missing sources">Missing sources</option>
               </select>
             </label>
             <label>
-              Limit
-              <input id="knowledgeResearchLimit" type="number" min="1" max="100" value="10" />
+              <span data-i18n-text="Limit">Limit</span>
+              <input id="knowledgeResearchLimit" type="number" min="1" max="100" value="10">
             </label>
           </div>
 
           <div class="admin-knowledge-research-command">
-            <span>Tool command</span>
+            <span data-i18n-text="Tool command">Tool command</span>
             <code id="knowledgeResearchCommand">npm run research:event-knowledge -- --scope high --limit 10</code>
           </div>
 
           <div class="admin-knowledge-research-progress">
             <div>
               <span>Status</span>
-              <strong id="knowledgeResearchJobStatus">queued</strong>
+              <strong id="knowledgeResearchJobStatus" data-i18n-text="queued">queued</strong>
             </div>
             <div>
-              <span>Current event</span>
+              <span data-i18n-text="Current event">Current event</span>
               <strong id="knowledgeResearchCurrentEvent">-</strong>
             </div>
             <div>
-              <span>Processed</span>
+              <span data-i18n-text="Processed">Processed</span>
               <strong id="knowledgeResearchProcessed">0 / 0</strong>
             </div>
             <div>
-              <span>Found fields</span>
+              <span data-i18n-text="Found fields">Found fields</span>
               <strong id="knowledgeResearchFoundFields">0</strong>
             </div>
             <div>
-              <span>Errors</span>
+              <span data-i18n-text="Errors">Errors</span>
               <strong id="knowledgeResearchErrorCount">0</strong>
             </div>
           </div>
 
-          <p id="knowledgeResearchStatus" class="admin-section-status" aria-live="polite">
+          <p id="knowledgeResearchStatus" class="admin-section-status" aria-live="polite" data-i18n-text="Research jobs run through the local tool script. Refresh after the job completes to review proposals.">
             Research jobs run through the local tool script. Refresh after the job completes to review proposals.
           </p>
         </section>
 
         <form id="eventKnowledgeForm" class="admin-knowledge-form">
           <section>
-            <h4>Basis</h4>
+            <h4 data-i18n-text="Basics">Basis</h4>
             <div class="admin-knowledge-grid">
-              <label>Event name<input name="event_name" data-knowledge-table="details" /></label>
-              <label>Series<input name="event_series" data-knowledge-table="details" /></label>
-              <label>Sport<input name="sport_type" data-knowledge-table="details" /></label>
-              <label>Date<input name="date" data-knowledge-table="details" /></label>
-              <label>City<input name="city" data-knowledge-table="details" /></label>
-              <label>Country<input name="country" data-knowledge-table="details" /></label>
-              <label>Region<input name="region" data-knowledge-table="details" /></label>
-              <label>Organizer<input name="organizer" data-knowledge-table="details" /></label>
-              <label>Official website<input name="official_website" type="url" data-knowledge-table="details" /></label>
-              <label>Registration URL<input name="registration_url" type="url" data-knowledge-table="details" /></label>
-              <label>Last checked<input name="last_checked" type="date" data-knowledge-table="details" /></label>
-              <label>Event status<input name="event_status" data-knowledge-table="details" /></label>
+              <label><span data-i18n-text="Event name">Event name</span><input name="event_name" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Series">Series</span><input name="event_series" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Sport">Sport</span><input name="sport_type" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Date">Date</span><input name="date" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="City">City</span><input name="city" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Country">Country</span><input name="country" data-knowledge-table="details"></label>
+              <label>Region<input name="region" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Organizer">Organizer</span><input name="organizer" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Official website">Official website</span><input name="official_website" type="url" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Registration URL">Registration URL</span><input name="registration_url" type="url" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Last checked">Last checked</span><input name="last_checked" type="date" data-knowledge-table="details"></label>
+              <label><span data-i18n-text="Event status">Event status</span><input name="event_status" data-knowledge-table="details"></label>
             </div>
           </section>
 
           <section>
-            <h4>Registration</h4>
+            <h4 data-i18n-text="Registration">Registration</h4>
             <div class="admin-knowledge-grid">
-              <label>Status<input name="registration_status" data-knowledge-table="registration" /></label>
-              <label>Opens<input name="registration_open_date" data-knowledge-table="registration" /></label>
-              <label>Closes<input name="registration_close_date" data-knowledge-table="registration" /></label>
-              <label>Fee min<input name="entry_fee_min" data-knowledge-table="registration" /></label>
-              <label>Fee max<input name="entry_fee_max" data-knowledge-table="registration" /></label>
-              <label>Currency<input name="currency" data-knowledge-table="registration" /></label>
-              <label>Price tiers (JSON array)<textarea name="price_tiers" rows="4" data-knowledge-table="registration" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
-              <label>Lottery<select name="lottery_available" data-knowledge-table="registration" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
-              <label>Transfer policy<textarea name="transfer_possible" rows="2" data-knowledge-table="registration"></textarea></label>
-              <label>Qualification<textarea name="qualification_required" rows="2" data-knowledge-table="registration"></textarea></label>
-              <label>Refund policy<textarea name="refund_policy" rows="2" data-knowledge-table="registration"></textarea></label>
+              <label>Status<input name="registration_status" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Opens">Opens</span><input name="registration_open_date" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Closes">Closes</span><input name="registration_close_date" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Fee min">Fee min</span><input name="entry_fee_min" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Fee max">Fee max</span><input name="entry_fee_max" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Currency">Currency</span><input name="currency" data-knowledge-table="registration"></label>
+              <label><span data-i18n-text="Price tiers (JSON array)">Price tiers (JSON array)</span><textarea name="price_tiers" rows="4" data-knowledge-table="registration" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
+              <label><span data-i18n-text="Lottery">Lottery</span><select name="lottery_available" data-knowledge-table="registration" data-knowledge-boolean="true"><option value="" data-i18n-text="Unknown">Unknown</option><option value="true" data-i18n-text="Yes">Yes</option><option value="false" data-i18n-text="No">No</option></select></label>
+              <label><span data-i18n-text="Transfer policy">Transfer policy</span><textarea name="transfer_possible" rows="2" data-knowledge-table="registration"></textarea></label>
+              <label><span data-i18n-text="Qualification">Qualification</span><textarea name="qualification_required" rows="2" data-knowledge-table="registration"></textarea></label>
+              <label><span data-i18n-text="Refund policy">Refund policy</span><textarea name="refund_policy" rows="2" data-knowledge-table="registration"></textarea></label>
             </div>
           </section>
 
           <section>
-            <h4>Course</h4>
+            <h4 data-i18n-text="Course">Course</h4>
             <div class="admin-knowledge-grid">
-              <label>Distances<textarea name="distances" rows="2" data-knowledge-table="course" data-knowledge-array="true"></textarea></label>
-              <label>Main distance<input name="main_distance" data-knowledge-table="course" /></label>
-              <label>Course type<input name="course_type" data-knowledge-table="course" /></label>
-              <label>Surface<input name="surface" data-knowledge-table="course" /></label>
-              <label>Start<input name="start_location" data-knowledge-table="course" /></label>
-              <label>Finish<input name="finish_location" data-knowledge-table="course" /></label>
-              <label>Same start / finish<select name="start_finish_same_place" data-knowledge-table="course" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
-              <label>Official course map<input name="course_map_url" type="url" data-knowledge-table="course" /></label>
-              <label>Swim distance<input name="swim_distance" data-knowledge-table="course" /></label>
-              <label>Swim location<input name="swim_location" data-knowledge-table="course" /></label>
-              <label>Bike distance<input name="bike_distance" data-knowledge-table="course" /></label>
-              <label>Bike laps<input name="bike_laps" data-knowledge-table="course" /></label>
-              <label>Run distance<input name="run_distance" data-knowledge-table="course" /></label>
-              <label>Run course<textarea name="run_character" rows="2" data-knowledge-table="course"></textarea></label>
-              <label>Elevation gain<input name="elevation_gain" data-knowledge-table="course" /></label>
-              <label>Difficulty<input name="difficulty_rating" data-knowledge-table="course" /></label>
-              <label>PB potential<input name="personal_best_potential" data-knowledge-table="course" /></label>
-              <label>Course character<textarea name="course_character" rows="3" data-knowledge-table="course"></textarea></label>
-              <label>Beginner friendly<textarea name="beginner_friendly" rows="2" data-knowledge-table="course"></textarea></label>
+              <label><span data-i18n-text="Distances">Distances</span><textarea name="distances" rows="2" data-knowledge-table="course" data-knowledge-array="true"></textarea></label>
+              <label><span data-i18n-text="Main distance">Main distance</span><input name="main_distance" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Course type">Course type</span><input name="course_type" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Surface">Surface</span><input name="surface" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Start location">Startort</span><input name="start_location" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Finish">Finish</span><input name="finish_location" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Same start / finish">Same start / finish</span><select name="start_finish_same_place" data-knowledge-table="course" data-knowledge-boolean="true"><option value="" data-i18n-text="Unknown">Unknown</option><option value="true" data-i18n-text="Yes">Yes</option><option value="false" data-i18n-text="No">No</option></select></label>
+              <label><span data-i18n-text="Official course map">Official course map</span><input name="course_map_url" type="url" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Swim distance">Swim distance</span><input name="swim_distance" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Swim location">Swim location</span><input name="swim_location" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Bike distance">Bike distance</span><input name="bike_distance" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Bike laps">Bike laps</span><input name="bike_laps" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Run distance">Run distance</span><input name="run_distance" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Run course">Run course</span><textarea name="run_character" rows="2" data-knowledge-table="course"></textarea></label>
+              <label><span data-i18n-text="Elevation gain">Elevation gain</span><input name="elevation_gain" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Difficulty">Difficulty</span><input name="difficulty_rating" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="PB potential">PB potential</span><input name="personal_best_potential" data-knowledge-table="course"></label>
+              <label><span data-i18n-text="Course character">Course character</span><textarea name="course_character" rows="3" data-knowledge-table="course"></textarea></label>
+              <label><span data-i18n-text="Beginner friendly">Beginner friendly</span><textarea name="beginner_friendly" rows="2" data-knowledge-table="course"></textarea></label>
             </div>
           </section>
 
           <section>
-            <h4>Race Day</h4>
+            <h4 data-i18n-text="Race Day">Race Day</h4>
             <div class="admin-knowledge-grid">
-              <label>Start time<input name="start_time" data-knowledge-table="race_day" /></label>
-              <label>Total cutoff<input name="total_cutoff" data-knowledge-table="race_day" /></label>
-              <label>Swim cutoff<input name="swim_cutoff" data-knowledge-table="race_day" /></label>
-              <label>Bike cutoff<input name="bike_cutoff" data-knowledge-table="race_day" /></label>
-              <label>Run cutoff<input name="run_cutoff" data-knowledge-table="race_day" /></label>
-              <label>Intermediate cutoffs (JSON array)<textarea name="intermediate_cutoffs" rows="4" data-knowledge-table="race_day" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
-              <label>Wave starts<textarea name="wave_start" rows="2" data-knowledge-table="race_day"></textarea></label>
-              <label>Timing system<input name="timing_system" data-knowledge-table="race_day" /></label>
-              <label>Baggage<textarea name="bag_drop" rows="2" data-knowledge-table="race_day"></textarea></label>
-              <label>Aid stations<textarea name="aid_stations" rows="2" data-knowledge-table="race_day"></textarea></label>
-              <label>Bib pickup<textarea name="bib_pickup_info" rows="2" data-knowledge-table="race_day"></textarea></label>
-              <label>Medical support<textarea name="medical_support" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label><span data-i18n-text="Start time">Start time</span><input name="start_time" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Total cutoff">Total cutoff</span><input name="total_cutoff" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Swim cutoff">Swim cutoff</span><input name="swim_cutoff" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Bike cutoff">Bike cutoff</span><input name="bike_cutoff" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Run cutoff">Run cutoff</span><input name="run_cutoff" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Intermediate cutoffs (JSON array)">Intermediate cutoffs (JSON array)</span><textarea name="intermediate_cutoffs" rows="4" data-knowledge-table="race_day" data-knowledge-array="true" data-knowledge-json="true"></textarea></label>
+              <label><span data-i18n-text="Wave starts">Wave starts</span><textarea name="wave_start" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label><span data-i18n-text="Timing system">Timing system</span><input name="timing_system" data-knowledge-table="race_day"></label>
+              <label><span data-i18n-text="Baggage">Baggage</span><textarea name="bag_drop" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label><span data-i18n-text="Aid stations">Aid stations</span><textarea name="aid_stations" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label><span data-i18n-text="Bib pickup">Bib pickup</span><textarea name="bib_pickup_info" rows="2" data-knowledge-table="race_day"></textarea></label>
+              <label><span data-i18n-text="Medical support">Medical support</span><textarea name="medical_support" rows="2" data-knowledge-table="race_day"></textarea></label>
             </div>
           </section>
 
           <section>
-            <h4>Travel, Weather & Statistics</h4>
+            <h4 data-i18n-text="Travel, Weather &amp; Statistics">Travel, Weather & Statistics</h4>
             <div class="admin-knowledge-grid">
-              <label>Airport<input name="nearest_airport" data-knowledge-table="travel" /></label>
-              <label>Train station<input name="nearest_train_station" data-knowledge-table="travel" /></label>
-              <label>Public transport<textarea name="public_transport_info" rows="2" data-knowledge-table="travel"></textarea></label>
-              <label>Parking<textarea name="parking_info" rows="2" data-knowledge-table="travel"></textarea></label>
-              <label>Accommodation<textarea name="accommodation_info" rows="2" data-knowledge-table="travel"></textarea></label>
-              <label>Typical weather<textarea name="typical_weather" rows="2" data-knowledge-table="weather"></textarea></label>
-              <label>Temperature<input name="average_temperature" data-knowledge-table="weather" /></label>
-              <label>Heat risk<input name="heat_risk" data-knowledge-table="weather" /></label>
-              <label>Planning tips<textarea name="planning_tips" rows="2" data-knowledge-table="weather"></textarea></label>
-              <label>Participants<input name="participant_count" data-knowledge-table="statistics" /></label>
-              <label>Historic significance<textarea name="historic_significance" rows="2" data-knowledge-table="statistics"></textarea></label>
-              <label>Championship status<input name="championship_status" data-knowledge-table="statistics" /></label>
-              <label>World major<select name="world_major" data-knowledge-table="statistics" data-knowledge-boolean="true"><option value="">Unknown</option><option value="true">Yes</option><option value="false">No</option></select></label>
+              <label><span data-i18n-text="Airport">Airport</span><input name="nearest_airport" data-knowledge-table="travel"></label>
+              <label><span data-i18n-text="Train station">Train station</span><input name="nearest_train_station" data-knowledge-table="travel"></label>
+              <label><span data-i18n-text="Public transport">Public transport</span><textarea name="public_transport_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label><span data-i18n-text="Parking">Parking</span><textarea name="parking_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label><span data-i18n-text="Accommodation">Accommodation</span><textarea name="accommodation_info" rows="2" data-knowledge-table="travel"></textarea></label>
+              <label><span data-i18n-text="Typical weather">Typical weather</span><textarea name="typical_weather" rows="2" data-knowledge-table="weather"></textarea></label>
+              <label><span data-i18n-text="Temperature">Temperature</span><input name="average_temperature" data-knowledge-table="weather"></label>
+              <label><span data-i18n-text="Heat risk">Heat risk</span><input name="heat_risk" data-knowledge-table="weather"></label>
+              <label><span data-i18n-text="Planning tips">Planning tips</span><textarea name="planning_tips" rows="2" data-knowledge-table="weather"></textarea></label>
+              <label><span data-i18n-text="Participants">Participants</span><input name="participant_count" data-knowledge-table="statistics"></label>
+              <label><span data-i18n-text="Historic significance">Historic significance</span><textarea name="historic_significance" rows="2" data-knowledge-table="statistics"></textarea></label>
+              <label><span data-i18n-text="Championship status">Championship status</span><input name="championship_status" data-knowledge-table="statistics"></label>
+              <label><span data-i18n-text="World major">World major</span><select name="world_major" data-knowledge-table="statistics" data-knowledge-boolean="true"><option value="" data-i18n-text="Unknown">Unknown</option><option value="true" data-i18n-text="Yes">Yes</option><option value="false" data-i18n-text="No">No</option></select></label>
             </div>
           </section>
 
           <section>
-            <h4>Editorial</h4>
+            <h4 data-i18n-text="Editorial">Editorial</h4>
             <div class="admin-knowledge-grid">
-              <label>Why it stands out<textarea name="why_this_event_stands_out" rows="3" data-knowledge-table="editorial"></textarea></label>
-              <label>Known / atmosphere<textarea name="atmosphere" rows="3" data-knowledge-table="editorial"></textarea></label>
-              <label>Good fit for<textarea name="good_fit_for" rows="3" data-knowledge-table="editorial"></textarea></label>
-              <label>Not ideal for<textarea name="not_ideal_for" rows="3" data-knowledge-table="editorial"></textarea></label>
-              <label>Planning context<textarea name="planning_context" rows="3" data-knowledge-table="editorial"></textarea></label>
-              <label>SEO summary<textarea name="seo_summary" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="Why it stands out">Why it stands out</span><textarea name="why_this_event_stands_out" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="Known / atmosphere">Known / atmosphere</span><textarea name="atmosphere" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="Good fit for">Good fit for</span><textarea name="good_fit_for" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="Not ideal for">Not ideal for</span><textarea name="not_ideal_for" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="Planning context">Planning context</span><textarea name="planning_context" rows="3" data-knowledge-table="editorial"></textarea></label>
+              <label><span data-i18n-text="SEO summary">SEO summary</span><textarea name="seo_summary" rows="3" data-knowledge-table="editorial"></textarea></label>
             </div>
           </section>
 
           <section>
             <div class="admin-knowledge-section-header">
-              <h4>Sources</h4>
-              <button type="button" id="addKnowledgeSourceBtn">Add source</button>
+              <h4 data-i18n-text="Sources">Sources</h4>
+              <button type="button" id="addKnowledgeSourceBtn" data-i18n-text="Add source">Add source</button>
             </div>
             <div id="knowledgeSourcesList" class="admin-knowledge-list"></div>
           </section>
 
           <section>
             <div class="admin-knowledge-section-header">
-              <h4>FAQ</h4>
-              <button type="button" id="addKnowledgeFaqBtn">Add FAQ</button>
+              <h4 data-i18n-text="FAQ">FAQ</h4>
+              <button type="button" id="addKnowledgeFaqBtn" data-i18n-text="Add FAQ">Add FAQ</button>
             </div>
             <div id="knowledgeFaqList" class="admin-knowledge-list"></div>
           </section>
 
           <div class="admin-knowledge-actions">
-            <button type="button" id="loadEventKnowledgeBtn">
+            <button type="button" id="loadEventKnowledgeBtn" data-i18n-text="Load selected">
               Load selected
             </button>
-            <button type="button" id="saveEventKnowledgeBtn">
+            <button type="button" id="saveEventKnowledgeBtn" data-i18n-text="Save Knowledge">
               Save Knowledge
             </button>
           </div>
@@ -2913,53 +2907,53 @@
       <div class="admin-table-section admin-knowledge-audit-workspace">
         <div class="admin-section-heading">
           <div>
-            <span class="admin-eyebrow">Knowledge Enrichment</span>
-            <h3>
+            <span class="admin-eyebrow" data-i18n-text="Knowledge Enrichment">Knowledge Enrichment</span>
+            <h3 data-i18n-text="Audit &amp; Review Queue">
               Audit & Review Queue
             </h3>
-            <p>Prüfe fehlende Knowledge-Daten, öffne Research Tasks und übernimm nur geprüfte Kandidaten in Supabase.</p>
+            <p data-i18n-text="Review missing details, open research tasks and transfer only verified candidates to the database.">Prüfe fehlende Knowledge-Daten, öffne Research Tasks und übernimm nur geprüfte Kandidaten in Supabase.</p>
           </div>
-          <button type="button" id="refreshKnowledgeAuditBtn">
+          <button type="button" id="refreshKnowledgeAuditBtn" data-i18n-text="Refresh">
             Refresh
           </button>
         </div>
 
         <div class="admin-knowledge-audit-summary">
           <div>
-            <span>Events audited</span>
+            <span data-i18n-text="Events audited">Events audited</span>
             <strong id="knowledgeAuditTotalCount">0</strong>
           </div>
           <div>
-            <span>Average completion</span>
+            <span data-i18n-text="Average completion">Average completion</span>
             <strong id="knowledgeAuditAverageScore">0%</strong>
           </div>
           <div>
-            <span>High priority</span>
+            <span data-i18n-text="High priority">High priority</span>
             <strong id="knowledgeAuditHighCount">0</strong>
           </div>
           <div>
-            <span>Review tasks</span>
+            <span data-i18n-text="Review tasks">Review tasks</span>
             <strong id="knowledgeAuditReviewCount">0</strong>
           </div>
         </div>
 
         <div class="admin-knowledge-audit-toolbar">
           <label>
-            Priority
+            <span data-i18n-text="Priority">Priority</span>
             <select id="knowledgeAuditPriorityFilter">
-              <option value="high">High priority</option>
-              <option value="medium">Medium priority</option>
-              <option value="low">Low priority</option>
-              <option value="all">All priorities</option>
+              <option value="high" data-i18n-text="High priority">High priority</option>
+              <option value="medium" data-i18n-text="Medium priority">Medium priority</option>
+              <option value="low" data-i18n-text="Low priority">Low priority</option>
+              <option value="all" data-i18n-text="All priorities">All priorities</option>
             </select>
           </label>
           <label>
-            Search
-            <input id="knowledgeAuditSearch" type="search" placeholder="Event, city or missing field" />
+            <span data-i18n-text="Search">Search</span>
+            <input id="knowledgeAuditSearch" type="search" placeholder="Event, city or missing field" data-i18n-placeholder-text="Event, city or missing field">
           </label>
         </div>
 
-        <p id="knowledgeAuditStatus" class="admin-section-status" aria-live="polite">
+        <p id="knowledgeAuditStatus" class="admin-section-status" aria-live="polite" data-i18n-text="Run npm run audit:event-knowledge and npm run enrich:event-knowledge to create the review queue.">
           Run npm run audit:event-knowledge and npm run enrich:event-knowledge to create the review queue.
         </p>
 
@@ -2975,59 +2969,57 @@
 
       <div class="admin-import-panel admin-staging-panel">
 
-        <h3>
+        <h3 data-i18n-text="Event Staging Workflow">
           Event Staging Workflow
         </h3>
-        <p>
+        <p data-i18n-text="New events should enter the pending review list first. Approve only events with official websites, current dates, coordinates, sport, distance and a clear source.">
           New events should enter the pending review list first. Approve only events with official websites, current dates, coordinates, sport, distance and a clear source.
         </p>
 
         <div class="admin-staging-steps">
-          <span>1. Stage as pending</span>
-          <span>2. Check quality reasons</span>
-          <span>3. Resolve duplicates</span>
-          <span>4. Approve or reject</span>
-          <span>5. Update existing event when annual dates change</span>
+          <span data-i18n-text="1. Stage as pending">1. Stage as pending</span>
+          <span data-i18n-text="2. Check quality reasons">2. Check quality reasons</span>
+          <span data-i18n-text="3. Resolve duplicates">3. Resolve duplicates</span>
+          <span data-i18n-text="4. Approve or reject">4. Approve or reject</span>
+          <span data-i18n-text="5. Update existing event when annual dates change">5. Update existing event when annual dates change</span>
         </div>
 
       </div>
 
       <div class="admin-import-panel">
 
-        <h3>
+        <h3 data-i18n-text="World Triathlon Staging">
           World Triathlon Staging
         </h3>
-        <p>
+        <p data-i18n-text="Preview first, then save as pending. Imported rows still require admin review before they become public.">
           Preview first, then save as pending. Imported rows still require admin review before they become public.
         </p>
 
         <div class="admin-import-fields">
 
           <label>
-            Start
+            <span data-i18n-text="Start date">Startdatum</span>
             <input
               type="date"
-              id="wtStartDate"
-            />
+              id="wtStartDate">
           </label>
 
           <label>
-            End
+            <span data-i18n-text="End">End</span>
             <input
               type="date"
-              id="wtEndDate"
-            />
+              id="wtEndDate">
           </label>
 
         </div>
 
         <div class="admin-import-actions">
 
-          <button id="previewWorldTriathlonBtn">
+          <button id="previewWorldTriathlonBtn" data-i18n-text="Preview">
             Preview
           </button>
 
-          <button id="saveWorldTriathlonBtn">
+          <button id="saveWorldTriathlonBtn" data-i18n-text="Save Pending">
             Save Pending
           </button>
 
@@ -3041,60 +3033,59 @@
 
       <div class="admin-import-panel admin-data-workflow-panel">
 
-        <h3>
+        <h3 data-i18n-text="Local CSV Staging Import">
           Local CSV Staging Import
         </h3>
 
-        <p>
+        <p data-i18n-text="Load a validated staging CSV, review the rows, then save them to Supabase as non-public staging events.">
           Load a validated staging CSV, review the rows, then save them to Supabase as non-public staging events.
         </p>
 
         <div class="admin-local-import-controls">
           <label>
-            Staging CSV
+            <span data-i18n-text="Staging CSV">Staging CSV</span>
             <input
               type="file"
               id="adminStagingCsvInput"
-              accept=".csv,text/csv"
-            />
+              accept=".csv,text/csv">
           </label>
-          <button type="button" id="previewStagingCsvBtn">
+          <button type="button" id="previewStagingCsvBtn" data-i18n-text="Preview CSV">
             Preview CSV
           </button>
-          <button type="button" id="saveStagingCsvBtn" disabled>
+          <button type="button" id="saveStagingCsvBtn" disabled data-i18n-text="Save to review queue">
             Save to review queue
           </button>
         </div>
 
-        <p id="adminStagingImportStatus" class="admin-import-status">
+        <p id="adminStagingImportStatus" class="admin-import-status" data-i18n-text="Choose a file like data/imports/staging/germany-road-running-batch-01.staging.csv.">
           Choose a file like data/imports/staging/germany-road-running-batch-01.staging.csv.
         </p>
 
         <div id="adminStagingPreviewList"></div>
 
-        <h3>
+        <h3 data-i18n-text="CSV Data Workflow">
           CSV Data Workflow
         </h3>
 
-        <p>
+        <p data-i18n-text="Use this area as the manual checklist before adding large event batches to the map.">
           Use this area as the manual checklist before adding large event batches to the map.
         </p>
 
         <div class="admin-data-workflow-grid">
 
-          <a href="docs/NO_CODE_DATA_IMPORT.md" target="_blank" rel="noopener noreferrer">
+          <a href="docs/NO_CODE_DATA_IMPORT.md" target="_blank" rel="noopener noreferrer" data-i18n-text="Import Guide">
             Import Guide
           </a>
 
-          <a href="data/imports/review/events-local-running-expanded-report.html" target="_blank" rel="noopener noreferrer">
+          <a href="data/imports/review/events-local-running-expanded-report.html" target="_blank" rel="noopener noreferrer" data-i18n-text="Latest Import Report">
             Latest Import Report
           </a>
 
-          <a href="data/imports/review/events-local-running-expanded-url-review.csv" target="_blank" rel="noopener noreferrer">
+          <a href="data/imports/review/events-local-running-expanded-url-review.csv" target="_blank" rel="noopener noreferrer" data-i18n-text="URL Review CSV">
             URL Review CSV
           </a>
 
-          <a href="data/imports/review/events.local-running-expanded.review.csv" target="_blank" rel="noopener noreferrer">
+          <a href="data/imports/review/events.local-running-expanded.review.csv" target="_blank" rel="noopener noreferrer" data-i18n-text="Rows Needing Review">
             Rows Needing Review
           </a>
 
@@ -3118,7 +3109,7 @@
             <button type="button" id="refreshDataOperationsBtn" data-i18n="admin.refresh">Aktualisieren</button>
           </div>
         </div>
-        <div class="admin-data-operations-kpis" aria-label="Data Operations Kennzahlen">
+        <div class="admin-data-operations-kpis" aria-label="Data Operations Kennzahlen" data-i18n-aria-label-text="Data operations metrics">
           <div><span data-i18n="admin.totalEvents">Events</span><strong id="dataOpsTotalEvents">0</strong></div>
           <div><span data-i18n="admin.totalEditions">Austragungen</span><strong id="dataOpsTotalEditions">0</strong></div>
           <div><span data-i18n="admin.verifiedEvents">Verifiziert</span><strong id="dataOpsVerifiedEvents">0</strong></div>
@@ -3130,17 +3121,17 @@
           <div><span data-i18n="admin.criticalIssues">Kritische Fehler</span><strong id="dataOpsCriticalIssues">0</strong></div>
           <div><span data-i18n="admin.warningIssues">Warnungen</span><strong id="dataOpsWarningIssues">0</strong></div>
           <div><span data-i18n="admin.pastWithoutNext">Vergangen ohne Folgeaustragung</span><strong id="dataOpsPastWithoutNext">0</strong></div>
-          <div><span>Fällige Quellen</span><strong id="dataOpsDueSources">0</strong></div>
-          <div><span>Offene Vorschläge</span><strong id="dataOpsPendingProposals">0</strong></div>
-          <div><span>Workflow-Alarme</span><strong id="dataOpsOpenAlerts">0</strong></div>
+          <div><span data-i18n-text="Due sources">Fällige Quellen</span><strong id="dataOpsDueSources">0</strong></div>
+          <div><span data-i18n-text="Open proposals">Offene Vorschläge</span><strong id="dataOpsPendingProposals">0</strong></div>
+          <div><span data-i18n-text="Workflow alerts">Workflow-Alarme</span><strong id="dataOpsOpenAlerts">0</strong></div>
         </div>
         <div class="admin-data-operations-filters">
           <label><span data-i18n="admin.country">Land</span><select id="dataOpsCountryFilter"><option value="" data-i18n="admin.all">Alle</option></select></label>
           <label><span data-i18n="admin.sport">Sportart</span><select id="dataOpsSportFilter"><option value="" data-i18n="admin.all">Alle</option></select></label>
-          <label><span data-i18n="admin.eventStatus">Eventstatus</span><select id="dataOpsEventStatusFilter"><option value="" data-i18n="admin.all">Alle</option><option value="active">active</option><option value="inactive">inactive</option></select></label>
-          <label><span data-i18n="admin.verificationStatus">Verifizierungsstatus</span><select id="dataOpsVerificationFilter"><option value="" data-i18n="admin.all">Alle</option><option value="verified">verified</option><option value="unverified">unverified</option><option value="stale">stale</option><option value="needs_review">needs_review</option><option value="source_unreachable">source_unreachable</option></select></label>
-          <label><span data-i18n="admin.severity">Schweregrad</span><select id="dataOpsSeverityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="critical">critical</option><option value="error">error</option><option value="warning">warning</option><option value="info">info</option></select></label>
-          <label><span data-i18n="admin.reviewPriority">Prüfpriorität</span><select id="dataOpsPriorityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="high">high</option><option value="medium">medium</option><option value="low">low</option></select></label>
+          <label><span data-i18n="admin.eventStatus">Eventstatus</span><select id="dataOpsEventStatusFilter"><option value="" data-i18n="admin.all">Alle</option><option value="active" data-i18n-text="active">active</option><option value="inactive" data-i18n-text="inactive">inactive</option></select></label>
+          <label><span data-i18n="admin.verificationStatus">Verifizierungsstatus</span><select id="dataOpsVerificationFilter"><option value="" data-i18n="admin.all">Alle</option><option value="verified" data-i18n-text="verified">verified</option><option value="unverified" data-i18n-text="unverified">unverified</option><option value="stale" data-i18n-text="stale">stale</option><option value="needs_review" data-i18n-text="needs_review">needs_review</option><option value="source_unreachable" data-i18n-text="source_unreachable">source_unreachable</option></select></label>
+          <label><span data-i18n="admin.severity">Schweregrad</span><select id="dataOpsSeverityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="critical" data-i18n-text="critical">critical</option><option value="error" data-i18n-text="error">error</option><option value="warning" data-i18n-text="warning">warning</option><option value="info" data-i18n-text="info">info</option></select></label>
+          <label><span data-i18n="admin.reviewPriority">Prüfpriorität</span><select id="dataOpsPriorityFilter"><option value="" data-i18n="admin.all">Alle</option><option value="high" data-i18n-text="high">high</option><option value="medium" data-i18n-text="medium">medium</option><option value="low" data-i18n-text="low">low</option></select></label>
           <label><span data-i18n="admin.lastCheckFrom">Letzte Prüfung ab</span><input id="dataOpsLastCheckFilter" type="date"></label>
           <label><span data-i18n="admin.nextCheckUntil">Nächste Prüfung bis</span><input id="dataOpsNextCheckFilter" type="date"></label>
         </div>
@@ -3157,21 +3148,21 @@
         </div>
         <div class="admin-data-operations-grid admin-data-operations-review-grid">
           <section>
-            <div class="admin-data-operations-section-heading"><div><h4>Automatische Änderungsvorschläge</h4><p id="dataOpsProposalResultCount">0 offen</p></div></div>
-            <div class="proposal-review-filters" aria-label="Filter für Änderungsvorschläge">
-              <label>Status<select id="dataOpsProposalStatusFilter"><option value="pending">pending</option><option value="">Alle</option><option value="accepted">accepted</option><option value="rejected">rejected</option><option value="edited_and_accepted">edited_and_accepted</option><option value="superseded">superseded</option><option value="expired">expired</option></select></label>
-              <label>Änderung<select id="dataOpsProposalTypeFilter"><option value="">Alle</option></select></label>
-              <label>Feld<select id="dataOpsProposalFieldFilter"><option value="">Alle</option></select></label>
-              <label>Confidence<select id="dataOpsProposalConfidenceFilter"><option value="0">Alle</option><option value="0.9">≥ 90%</option><option value="0.75">≥ 75%</option><option value="0.5">≥ 50%</option></select></label>
-              <label>Quelle<select id="dataOpsProposalSourceFilter"><option value="">Alle</option></select></label>
-              <label>Domain<select id="dataOpsProposalDomainFilter"><option value="">Alle</option></select></label>
-              <label>Priorität<select id="dataOpsProposalPriorityFilter"><option value="">Alle</option><option value="critical">critical</option><option value="high">high</option><option value="medium">medium</option><option value="low">low</option></select></label>
-              <label>Alter<select id="dataOpsProposalAgeFilter"><option value="">Alle</option><option value="1">≤ 1 Tag</option><option value="7">≤ 7 Tage</option><option value="30">≤ 30 Tage</option></select></label>
+            <div class="admin-data-operations-section-heading"><div><h4 data-i18n-text="Automatic change proposals">Automatische Änderungsvorschläge</h4><p id="dataOpsProposalResultCount">0 offen</p></div></div>
+            <div class="proposal-review-filters" aria-label="Filter für Änderungsvorschläge" data-i18n-aria-label-text="Change proposal filters">
+              <label>Status<select id="dataOpsProposalStatusFilter"><option value="pending" data-i18n-text="pending">pending</option><option value="" data-i18n-text="All">Alle</option><option value="accepted" data-i18n-text="accepted">accepted</option><option value="rejected" data-i18n-text="rejected">rejected</option><option value="edited_and_accepted" data-i18n-text="edited_and_accepted">edited_and_accepted</option><option value="superseded" data-i18n-text="superseded">superseded</option><option value="expired" data-i18n-text="expired">expired</option></select></label>
+              <label><span data-i18n-text="Change">Änderung</span><select id="dataOpsProposalTypeFilter"><option value="" data-i18n-text="All">Alle</option></select></label>
+              <label><span data-i18n-text="Field">Feld</span><select id="dataOpsProposalFieldFilter"><option value="" data-i18n-text="All">Alle</option></select></label>
+              <label>Confidence<select id="dataOpsProposalConfidenceFilter"><option value="0" data-i18n-text="All">Alle</option><option value="0.9">≥ 90%</option><option value="0.75">≥ 75%</option><option value="0.5">≥ 50%</option></select></label>
+              <label><span data-i18n-text="Source">Quelle</span><select id="dataOpsProposalSourceFilter"><option value="" data-i18n-text="All">Alle</option></select></label>
+              <label>Domain<select id="dataOpsProposalDomainFilter"><option value="" data-i18n-text="All">Alle</option></select></label>
+              <label><span data-i18n-text="Priority">Priorität</span><select id="dataOpsProposalPriorityFilter"><option value="" data-i18n-text="All">Alle</option><option value="critical" data-i18n-text="critical">critical</option><option value="high" data-i18n-text="high">high</option><option value="medium" data-i18n-text="medium">medium</option><option value="low" data-i18n-text="low">low</option></select></label>
+              <label><span data-i18n-text="Age">Alter</span><select id="dataOpsProposalAgeFilter"><option value="" data-i18n-text="All">Alle</option><option value="1" data-i18n-text="≤ 1 day">≤ 1 Tag</option><option value="7" data-i18n-text="≤ 7 days">≤ 7 Tage</option><option value="30" data-i18n-text="≤ 30 days">≤ 30 Tage</option></select></label>
             </div>
             <div id="dataOpsProposalsList" class="admin-data-operations-list" aria-live="polite"></div>
           </section>
           <section>
-            <div class="admin-data-operations-section-heading"><div><h4>Workflow-Monitoring</h4><p id="dataOpsAlertResultCount">0 offen</p></div></div>
+            <div class="admin-data-operations-section-heading"><div><h4 data-i18n-text="Workflow monitoring">Workflow-Monitoring</h4><p id="dataOpsAlertResultCount">0 offen</p></div></div>
             <div id="dataOpsAlertsList" class="admin-data-operations-list" aria-live="polite"></div>
           </section>
         </div>
@@ -3189,23 +3180,23 @@
       <div class="admin-table-section admin-analytics-workspace">
         <div class="admin-analytics-header">
           <div>
-             <span class="admin-eyebrow">Entscheidungsrelevante Kennzahlen</span>
+             <span class="admin-eyebrow" data-i18n-text="Decision-relevant metrics">Entscheidungsrelevante Kennzahlen</span>
             <h3>
               Analytics
             </h3>
-             <p>Zeitraumwerte stammen aus erfassten Produktaktionen. Planner-Best&auml;nde sind die jeweils letzte gemeldete Anzahl.</p>
+             <p data-i18n-text="Period metrics come from recorded product actions. Planner totals are the latest reported counts.">Zeitraumwerte stammen aus erfassten Produktaktionen. Planner-Best&auml;nde sind die jeweils letzte gemeldete Anzahl.</p>
           </div>
           <div class="admin-analytics-controls">
             <label>
-               Zeitraum
+               <span data-i18n-text="Period">Zeitraum</span>
               <select id="adminAnalyticsRange">
-                 <option value="7">Letzte 7 Tage</option>
-                 <option value="30" selected>Letzte 30 Tage</option>
-                 <option value="90">Letzte 90 Tage</option>
-                 <option value="all">Gesamter Zeitraum</option>
+                 <option value="7" data-i18n-text="Last 7 days">Letzte 7 Tage</option>
+                 <option value="30" selected data-i18n-text="Last 30 days">Letzte 30 Tage</option>
+                 <option value="90" data-i18n-text="Last 90 days">Letzte 90 Tage</option>
+                 <option value="all" data-i18n-text="All time">Gesamter Zeitraum</option>
               </select>
             </label>
-            <button type="button" id="refreshAdminAnalyticsBtn">
+            <button type="button" id="refreshAdminAnalyticsBtn" data-i18n-text="Refresh">
                Aktualisieren
             </button>
           </div>
@@ -3213,81 +3204,81 @@
 
         <div class="analytics-section-heading">
           <div>
-             <h4>Kern-KPIs</h4>
-             <p id="analyticsRangeLabel">Letzte 30 Tage</p>
+             <h4 data-i18n-text="Core metrics">Kern-KPIs</h4>
+             <p id="analyticsRangeLabel" data-i18n-text="Last 30 days">Letzte 30 Tage</p>
           </div>
         </div>
 
         <div class="analytics-dashboard-grid analytics-kpi-grid">
           <div class="analytics-card analytics-card-primary">
-             <span>Aktive Besucher</span>
+             <span data-i18n-text="Active visitors">Aktive Besucher</span>
             <strong id="analyticsTotalAccounts">0</strong>
-             <em>Eindeutige erfasste Nutzer oder Besucher im Zeitraum</em>
+             <em data-i18n-text="Unique recorded users or visitors in the period">Eindeutige erfasste Nutzer oder Besucher im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-             <span>Event-Detailaufrufe</span>
+             <span data-i18n-text="Event detail views">Event-Detailaufrufe</span>
             <strong id="analyticsActiveUsers7d">0</strong>
-             <em>Erfasste &Ouml;ffnungen im Zeitraum</em>
+             <em data-i18n-text="Recorded opens in the period">Erfasste &Ouml;ffnungen im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-             <span>Erreichte Events</span>
+             <span data-i18n-text="Events reached">Erreichte Events</span>
             <strong id="analyticsActiveUsers30d">0</strong>
-             <em>Eindeutige Events mit Detailaufruf</em>
+             <em data-i18n-text="Unique events with detail views">Eindeutige Events mit Detailaufruf</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-             <span>Planner-Hinzuf&uuml;gungen</span>
+             <span data-i18n-text="Planner additions">Planner-Hinzuf&uuml;gungen</span>
             <strong id="analyticsReturningUsers7d">0</strong>
-             <em>Erfasste Hinzuf&uuml;gungen im Zeitraum</em>
+             <em data-i18n-text="Recorded additions in the period">Erfasste Hinzuf&uuml;gungen im Zeitraum</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-             <span>Zuletzt gemeldete Planner-Events</span>
+             <span data-i18n-text="Latest reported planned events">Zuletzt gemeldete Planner-Events</span>
             <strong id="analyticsReturningUsers30d">0</strong>
-             <em>Letzter erfasster Bestand je Planner</em>
+             <em data-i18n-text="Latest reported total per planner">Letzter erfasster Bestand je Planner</em>
           </div>
           <div class="analytics-card analytics-card-primary">
-             <span>&Oslash; Events pro Planner</span>
+             <span data-i18n-text="Average events per planner">&Oslash; Events pro Planner</span>
             <strong id="analyticsTotalSessions">0</strong>
-             <em>Durchschnitt der letzten Bestandssignale</em>
+             <em data-i18n-text="Average of the latest reported totals">Durchschnitt der letzten Bestandssignale</em>
           </div>
           <div class="analytics-card analytics-card-primary" hidden>
-            <span>Searches</span>
+            <span data-i18n-text="Searches">Searches</span>
             <strong id="analyticsSearchesKpi">0</strong>
-            <em>Searches performed</em>
+            <em data-i18n-text="Searches performed">Searches performed</em>
           </div>
           <div class="analytics-card analytics-card-primary" hidden>
-            <span>Favorites Added</span>
+            <span data-i18n-text="Favorites Added">Favorites Added</span>
             <strong id="analyticsFavoritesAddedKpi">0</strong>
-            <em>Planning intent</em>
+            <em data-i18n-text="Planning intent">Planning intent</em>
           </div>
           <div class="analytics-card analytics-card-primary" hidden>
-            <span>Planner Users</span>
+            <span data-i18n-text="Planner Users">Planner Users</span>
             <strong id="analyticsPlannerUsersKpi">0</strong>
-            <em>Opened or added races</em>
+            <em data-i18n-text="Opened or added races">Opened or added races</em>
           </div>
           <div class="analytics-card analytics-card-primary" hidden>
-            <span>Planner Adds</span>
+            <span data-i18n-text="Planner Adds">Planner Adds</span>
             <strong id="analyticsPlannerEventsAddedKpi">0</strong>
-            <em>Races added</em>
+            <em data-i18n-text="Races added">Races added</em>
           </div>
           <div class="analytics-card analytics-card-primary" hidden>
             <span>Feedback</span>
             <strong id="analyticsFeedbackSubmissionsKpi">0</strong>
-            <em>Submitted feedback</em>
+            <em data-i18n-text="Submitted feedback">Submitted feedback</em>
           </div>
         </div>
 
         <div class="analytics-insight-strip">
           <div>
-             <strong>Datenbasis</strong>
-             <span id="analyticsRetentionInsight">Datenquellen werden gepr&uuml;ft.</span>
+             <strong data-i18n-text="Data basis">Datenbasis</strong>
+             <span id="analyticsRetentionInsight" data-i18n-text="Data sources are being checked.">Datenquellen werden gepr&uuml;ft.</span>
           </div>
           <div>
-             <strong>Event-Interesse</strong>
-             <span id="analyticsDiscoveryInsight">Event-Aktionen werden geladen.</span>
+             <strong data-i18n-text="Event interest">Event-Interesse</strong>
+             <span id="analyticsDiscoveryInsight" data-i18n-text="Loading event actions.">Event-Aktionen werden geladen.</span>
           </div>
           <div>
-             <strong>Saisonplanung</strong>
-             <span id="analyticsPlanningInsight">Planner-Bestand wird geladen.</span>
+             <strong data-i18n-text="Season Planning">Saisonplanung</strong>
+             <span id="analyticsPlanningInsight" data-i18n-text="Loading planner totals.">Planner-Bestand wird geladen.</span>
           </div>
         </div>
 
@@ -3295,16 +3286,16 @@
           <section class="analytics-detail-panel" hidden>
             <div class="analytics-panel-heading">
               <div>
-                <h4>Retention & Returning Users</h4>
-                <p>Do testers come back after the first visit?</p>
+                <h4 data-i18n-text="Retention &amp; Returning Users">Retention & Returning Users</h4>
+                <p data-i18n-text="Do testers come back after the first visit?">Do testers come back after the first visit?</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-              <div><span>New vs returning</span><strong id="analyticsNewReturningSplit">-</strong></div>
-              <div><span>Avg sessions/user</span><strong id="analyticsAvgSessionsPerUser">0</strong></div>
-              <div><span>2+ visits</span><strong id="analyticsUsers2Visits">0</strong></div>
-              <div><span>3+ visits</span><strong id="analyticsUsers3Visits">0</strong></div>
-              <div><span>5+ visits</span><strong id="analyticsUsers5Visits">0</strong></div>
+              <div><span data-i18n-text="New vs returning">New vs returning</span><strong id="analyticsNewReturningSplit">-</strong></div>
+              <div><span data-i18n-text="Avg sessions/user">Avg sessions/user</span><strong id="analyticsAvgSessionsPerUser">0</strong></div>
+              <div><span data-i18n-text="2+ visits">2+ visits</span><strong id="analyticsUsers2Visits">0</strong></div>
+              <div><span data-i18n-text="3+ visits">3+ visits</span><strong id="analyticsUsers3Visits">0</strong></div>
+              <div><span data-i18n-text="5+ visits">5+ visits</span><strong id="analyticsUsers5Visits">0</strong></div>
             </div>
             <div id="analyticsRetentionTable" class="analytics-table-list"></div>
           </section>
@@ -3312,23 +3303,23 @@
           <section class="analytics-detail-panel" hidden>
             <div class="analytics-panel-heading">
               <div>
-                <h4>Search</h4>
-                <p>What people search for and whether searches lead to event opens.</p>
+                <h4 data-i18n-text="Search">Search</h4>
+                <p data-i18n-text="What people search for and whether searches lead to event opens.">What people search for and whether searches lead to event opens.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-              <div><span>Total searches</span><strong id="analyticsTotalSearches">0</strong></div>
-              <div><span>Searches/user</span><strong id="analyticsSearchesPerUser">0</strong></div>
-              <div><span>Zero results</span><strong id="analyticsZeroResultSearches">0</strong></div>
-              <div><span>Search &rarr; open</span><strong id="analyticsSearchClickRate">0%</strong></div>
+              <div><span data-i18n-text="Total searches">Total searches</span><strong id="analyticsTotalSearches">0</strong></div>
+              <div><span data-i18n-text="Searches/user">Searches/user</span><strong id="analyticsSearchesPerUser">0</strong></div>
+              <div><span data-i18n-text="Zero results">Zero results</span><strong id="analyticsZeroResultSearches">0</strong></div>
+              <div><span data-i18n-text="Search → open">Search &rarr; open</span><strong id="analyticsSearchClickRate">0%</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                <h5>Top search terms</h5>
+                <h5 data-i18n-text="Top search terms">Top search terms</h5>
                 <div id="analyticsTopSearchTerms" class="analytics-table-list"></div>
               </div>
               <div>
-                <h5>Most used filters</h5>
+                <h5 data-i18n-text="Most used filters">Most used filters</h5>
                 <div id="analyticsMostUsedFilters" class="analytics-table-list"></div>
               </div>
             </div>
@@ -3337,50 +3328,50 @@
           <section class="analytics-detail-panel">
             <div class="analytics-panel-heading">
               <div>
-                 <h4>Event-Interesse</h4>
-                 <p>Detailaufrufe und Planner-Aktionen im gew&auml;hlten Zeitraum.</p>
+                 <h4 data-i18n-text="Event interest">Event-Interesse</h4>
+                 <p data-i18n-text="Detail views and planner actions in the selected period.">Detailaufrufe und Planner-Aktionen im gew&auml;hlten Zeitraum.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-               <div><span>Detailaufrufe</span><strong id="analyticsEventDetailOpens">0</strong></div>
-               <div><span>Planner-Adds / Aufrufe</span><strong id="analyticsFavoriteConversionRate">0%</strong></div>
+               <div><span data-i18n-text="Detail views">Detailaufrufe</span><strong id="analyticsEventDetailOpens">0</strong></div>
+               <div><span data-i18n-text="Planner additions / views">Planner-Adds / Aufrufe</span><strong id="analyticsFavoriteConversionRate">0%</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                 <h5>Meiste Detailaufrufe</h5>
+                 <h5 data-i18n-text="Most detail views">Meiste Detailaufrufe</h5>
                 <div id="analyticsMostViewedEvents" class="analytics-table-list"></div>
               </div>
               <div>
-                 <h5>Meiste Planner-Adds im Zeitraum</h5>
+                 <h5 data-i18n-text="Most planner additions in the period">Meiste Planner-Adds im Zeitraum</h5>
                 <div id="analyticsMostFavoritedEvents" class="analytics-table-list"></div>
               </div>
             </div>
-             <h5>Meiste Klicks auf offizielle Websites</h5>
+             <h5 data-i18n-text="Most clicks on official websites">Meiste Klicks auf offizielle Websites</h5>
             <div id="analyticsMostExternalClicks" class="analytics-table-list"></div>
           </section>
 
           <section class="analytics-detail-panel">
             <div class="analytics-panel-heading">
               <div>
-                <h4>Season Planner</h4>
-                 <p>Zeitraum-Aktionen und der jeweils letzte gemeldete Planner-Bestand werden getrennt ausgewiesen.</p>
+                <h4 data-i18n-text="Season Planner">Season Planner</h4>
+                 <p data-i18n-text="Period actions and the latest reported planner total are shown separately.">Zeitraum-Aktionen und der jeweils letzte gemeldete Planner-Bestand werden getrennt ausgewiesen.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-               <div><span>Planner-Aufrufe</span><strong id="analyticsPlannerOpens">0</strong></div>
-               <div><span>Erfasste Planner</span><strong id="analyticsPlannerUsers">0</strong></div>
-               <div><span>Hinzuf&uuml;gungen im Zeitraum</span><strong id="analyticsPlannerEventsAdded">0</strong></div>
-               <div><span>&Oslash; beim letzten Signal</span><strong id="analyticsAvgPlannedEvents">0</strong></div>
-               <div><span>Empfehlungsklicks</span><strong id="analyticsRecommendationClicks">0</strong></div>
-               <div><span>Planner-Conversion</span><strong id="analyticsPlannerConversionRate">0%</strong></div>
+               <div><span data-i18n-text="Planner views">Planner-Aufrufe</span><strong id="analyticsPlannerOpens">0</strong></div>
+               <div><span data-i18n-text="Recorded planners">Erfasste Planner</span><strong id="analyticsPlannerUsers">0</strong></div>
+               <div><span data-i18n-text="Additions in the period">Hinzuf&uuml;gungen im Zeitraum</span><strong id="analyticsPlannerEventsAdded">0</strong></div>
+               <div><span data-i18n-text="Average at last report">&Oslash; beim letzten Signal</span><strong id="analyticsAvgPlannedEvents">0</strong></div>
+               <div><span data-i18n-text="Recommendation clicks">Empfehlungsklicks</span><strong id="analyticsRecommendationClicks">0</strong></div>
+               <div><span data-i18n-text="Planner conversion">Planner-Conversion</span><strong id="analyticsPlannerConversionRate">0%</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                 <h5>Planner-Gr&ouml;&szlig;en (letztes Signal)</h5>
+                 <h5 data-i18n-text="Planner sizes (latest report)">Planner-Gr&ouml;&szlig;en (letztes Signal)</h5>
                 <div id="analyticsPriorityMix" class="analytics-table-list"></div>
               </div>
               <div>
-                 <h5>Meiste Adds im Zeitraum</h5>
+                 <h5 data-i18n-text="Most additions in the period">Meiste Adds im Zeitraum</h5>
                 <div id="analyticsMostPlannedEventsV2" class="analytics-table-list"></div>
               </div>
             </div>
@@ -3390,21 +3381,21 @@
             <div class="analytics-panel-heading">
               <div>
                 <h4>Feedback</h4>
-                <p>Quality of beta feedback and open product issues.</p>
+                <p data-i18n-text="Quality of beta feedback and open product issues.">Quality of beta feedback and open product issues.</p>
               </div>
             </div>
             <div class="analytics-mini-grid">
-              <div><span>Total feedback</span><strong id="analyticsFeedbackTotal">0</strong></div>
-              <div><span>New feedback</span><strong id="analyticsFeedbackNew">0</strong></div>
-              <div><span>By rating</span><strong id="analyticsFeedbackByRating">-</strong></div>
+              <div><span data-i18n-text="Total feedback">Total feedback</span><strong id="analyticsFeedbackTotal">0</strong></div>
+              <div><span data-i18n-text="New feedback">New feedback</span><strong id="analyticsFeedbackNew">0</strong></div>
+              <div><span data-i18n-text="By rating">By rating</span><strong id="analyticsFeedbackByRating">-</strong></div>
             </div>
             <div class="analytics-two-column">
               <div>
-                <h5>Feedback by category</h5>
+                <h5 data-i18n-text="Feedback by category">Feedback by category</h5>
                 <div id="analyticsFeedbackByCategory" class="analytics-table-list"></div>
               </div>
               <div>
-                <h5>Latest feedback</h5>
+                <h5 data-i18n-text="Latest feedback">Latest feedback</h5>
                 <div id="analyticsLatestFeedback" class="analytics-table-list"></div>
               </div>
             </div>
@@ -3429,84 +3420,84 @@
         <div class="admin-feedback-workspace">
           <div class="admin-feedback-heading">
             <div>
-               <h4>Feedback bearbeiten</h4>
-               <p>Feedback filtern, priorisieren und den Bearbeitungsstatus pflegen.</p>
+               <h4 data-i18n-text="Manage feedback">Feedback bearbeiten</h4>
+               <p data-i18n-text="Filter and prioritize feedback and manage its processing status.">Feedback filtern, priorisieren und den Bearbeitungsstatus pflegen.</p>
             </div>
-            <button type="button" id="refreshAdminFeedbackBtn">
+            <button type="button" id="refreshAdminFeedbackBtn" data-i18n-text="Refresh">
                Aktualisieren
             </button>
           </div>
 
           <div class="admin-feedback-filters">
             <label>
-              Category
+              <span data-i18n-text="Category">Category</span>
               <select id="feedbackCategoryFilter">
-                <option value="">All categories</option>
-                <option value="bug">Bug</option>
-                <option value="usability">Usability</option>
-                <option value="incorrect_event_data">Incorrect event data</option>
-                <option value="missing_event">Missing event</option>
-                <option value="season_planner">Season Planner</option>
-                <option value="improvement">Improvement idea</option>
-                <option value="other">Other</option>
+                <option value="" data-i18n-text="All categories">All categories</option>
+                <option value="bug" data-i18n-text="Bug">Bug</option>
+                <option value="usability" data-i18n-text="Usability">Usability</option>
+                <option value="incorrect_event_data" data-i18n-text="Incorrect event data">Incorrect event data</option>
+                <option value="missing_event" data-i18n-text="Missing event">Missing event</option>
+                <option value="season_planner" data-i18n-text="Season Planner">Season Planner</option>
+                <option value="improvement" data-i18n-text="Improvement idea">Improvement idea</option>
+                <option value="other" data-i18n-text="Other">Other</option>
               </select>
             </label>
 
             <label>
               Status
               <select id="feedbackStatusFilter">
-                <option value="active" selected>Active reviews</option>
-                <option value="">All statuses</option>
-                <option value="new">New</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="planned">Planned</option>
-                <option value="resolved">Resolved</option>
-                <option value="rejected">Rejected</option>
+                <option value="active" selected data-i18n-text="Active reviews">Active reviews</option>
+                <option value="" data-i18n-text="All statuses">All statuses</option>
+                <option value="new" data-i18n-text="New">New</option>
+                <option value="reviewed" data-i18n-text="Reviewed">Reviewed</option>
+                <option value="planned" data-i18n-text="Planned">Planned</option>
+                <option value="resolved" data-i18n-text="Resolved">Resolved</option>
+                <option value="rejected" data-i18n-text="Rejected">Rejected</option>
               </select>
             </label>
 
             <label>
-              Product area
+              <span data-i18n-text="Product area">Product area</span>
               <select id="feedbackAreaFilter">
-                <option value="">All areas</option>
-                <option value="event_map">Event Map</option>
-                <option value="event_details">Event Details</option>
-                <option value="filters">Search & Filters</option>
-                <option value="favorites">Favorites</option>
-                <option value="season_planner">Season Planner</option>
-                <option value="profile_auth">Profile & Login</option>
-                <option value="event_submission">Event Submission</option>
+                <option value="" data-i18n-text="All areas">All areas</option>
+                <option value="event_map" data-i18n-text="Event Map">Event Map</option>
+                <option value="event_details" data-i18n-text="Event Details">Event Details</option>
+                <option value="filters" data-i18n-text="Search &amp; Filters">Search & Filters</option>
+                <option value="favorites" data-i18n-text="Favorites">Favorites</option>
+                <option value="season_planner" data-i18n-text="Season Planner">Season Planner</option>
+                <option value="profile_auth" data-i18n-text="Profile &amp; Login">Profile & Login</option>
+                <option value="event_submission" data-i18n-text="Event Submission">Event Submission</option>
                 <option value="admin">Admin</option>
-                <option value="other">Other</option>
+                <option value="other" data-i18n-text="Other">Other</option>
               </select>
             </label>
 
             <label>
-              Date
+              <span data-i18n-text="Date">Date</span>
               <select id="feedbackDateFilter">
-                <option value="">All time</option>
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
+                <option value="" data-i18n-text="All time">All time</option>
+                <option value="7" data-i18n-text="Last 7 days">Last 7 days</option>
+                <option value="30" data-i18n-text="Last 30 days">Last 30 days</option>
               </select>
             </label>
           </div>
 
           <div class="admin-feedback-summary">
             <div>
-              <span>New</span>
+              <span data-i18n-text="New">New</span>
               <strong id="adminFeedbackNewCount">0</strong>
             </div>
             <div>
-              <span>Planned</span>
+              <span data-i18n-text="Planned">Planned</span>
               <strong id="adminFeedbackPlannedCount">0</strong>
             </div>
             <div>
-              <span>Resolved</span>
+              <span data-i18n-text="Resolved">Resolved</span>
               <strong id="adminFeedbackResolvedCount">0</strong>
             </div>
           </div>
 
-          <p id="adminFeedbackSummary" class="admin-section-status">Loading feedback...</p>
+          <p id="adminFeedbackSummary" class="admin-section-status" data-i18n-text="Loading feedback...">Loading feedback...</p>
           <div id="adminFeedbackManagementList" aria-live="polite"></div>
         </div>
       </div>
@@ -3519,15 +3510,15 @@
 
 
 <footer id="discoveryFooter" class="discovery-footer">
-  <nav id="legalLinks" aria-label="Rechtliche Hinweise und Kontakt">
-    <a href="imprint.html">Impressum</a>
-    <a href="privacy.html">Datenschutz</a>
-    <a href="legal.html">Nutzungsbedingungen</a>
-    <a href="mailto:kontakt@sporteventmap.com">Kontakt</a>
-    <a href="index.html#landing" id="landingFooterLink">Landingpage</a>
+  <nav id="legalLinks" aria-label="Rechtliche Hinweise und Kontakt" data-i18n-aria-label-text="Legal information and contact">
+    <a href="imprint.html" data-i18n-text="Legal notice">Impressum</a>
+    <a href="privacy.html" data-i18n-text="Privacy">Datenschutz</a>
+    <a href="legal.html" data-i18n-text="Terms of use">Nutzungsbedingungen</a>
+    <a href="mailto:kontakt@sporteventmap.com" data-i18n-text="Contact">Kontakt</a>
+    <a href="index.html#landing" id="landingFooterLink" data-i18n-text="Landing page">Landingpage</a>
     <button type="button" id="legalFeedbackLink">Feedback</button>
   </nav>
-  <span class="discovery-footer-note">Public beta - event data may change.</span>
+  <span class="discovery-footer-note" data-i18n-text="Public beta - event data may change.">Public beta - event data may change.</span>
 </footer>
 
 
@@ -3536,23 +3527,28 @@
   defer
   src="js/config.js?v=20260706-header-nav-v67"
 ></script>
-<script defer src="js/i18n.js?v=20261001-history-labels-v139"></script>
+<script defer src="js/ui-translations.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/admin-ui-translations.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/i18n.js?v=20261006-bilingual-v140"></script>
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
-  data-supabase-src="js/supabase.js?v=20261001-admin-faq-readback-v141"
+  data-supabase-src="js/supabase.js?v=20261006-bilingual-v142"
 ></script>
 
 <script defer src="js/data-freshness-health.js?v=20260810-freshness-overview-v1"></script>
 <script defer src="js/catalog-quality-report.js?v=20261001-v1"></script>
 <script defer src="js/event-catalog-loader.js?v=20261001-catalog-integrity-v2"></script>
-<script defer src="js/event-description.js?v=20260929-public-description-v132"></script>
-<script defer src="js/events.js?v=20261001-planner-history-v138"></script>
+<script defer src="js/event-content-translations.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/event-description-translations.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/event-description-translations-extra.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/event-description.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/events.js?v=20261006-bilingual-v140"></script>
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
-<script defer src="js/map.js?v=20260929-ui-only-v94"></script>
-<script defer src="js/search.js?v=20260827-mobile-stability-v72"></script>
-<script defer src="js/app.js?v=20260929-ui-runtime-v128"></script>
-<script defer src="js/mobile-discovery.js?v=20260907-v1"></script>
+<script defer src="js/map.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/search.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/app.js?v=20261006-bilingual-v140"></script>
+<script defer src="js/mobile-discovery.js?v=20261006-bilingual-v140"></script>
 
 </body>
 </html>

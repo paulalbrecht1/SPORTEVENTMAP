@@ -83,6 +83,62 @@ async function responsive(page) {
 }
 
 for (const mode of ['static', 'dynamic']) {
+  test(`${mode} published German description catalog loads and updates the page and metadata`, async ({ page }) => {
+    const description = archive.find(row => row.description?.startsWith('Der 15. Brunsberglauf')).description;
+    const state = { event: { ...canonical(), description }, details: [] };
+    const { url } = await setup(page, state, mode);
+    await page.goto(url); await settled(page);
+    await expect(page.locator('#liveDetailDescription')).toHaveText(description);
+    await page.locator('#eventDetailLanguageSelect').selectOption('en');
+    await expect(page.locator('#liveDetailDescription')).toContainText('The 15th Brunsberglauf');
+    await expect(page.locator('#liveDetailDescription')).toContainText('6 September 2026');
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /The 15th Brunsberglauf/);
+    expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).description).toBe(description);
+    await page.locator('#eventDetailLanguageSelect').selectOption('de');
+    await expect(page.locator('#liveDetailDescription')).toHaveText(description);
+  });
+
+  test(`${mode} a missing translation catalog keeps cleaned original descriptions visible`, async ({ page }) => {
+    const state = { event: { ...canonical(), description: 'Start am Fluss. Imported from verified staging batch.' }, details: [] };
+    const { url } = await setup(page, state, mode);
+    await page.route('**/js/event-content-translations.js?**', route => route.abort());
+    await page.goto(url); await settled(page);
+    await expect(page.locator('#liveDetailDescription')).toHaveText('Start am Fluss.');
+    await page.locator('#eventDetailLanguageSelect').selectOption('en');
+    await expect(page.locator('#liveDetailDescription')).toHaveText('Start am Fluss.');
+    await expect(page.locator('#liveDetailSport')).toHaveText('Running');
+  });
+
+  test(`${mode} detail values, supplied translations and published prose switch both ways without mutating source facts`, async ({ page }) => {
+    const description = 'A broad city running programme built around a notably flat marathon route.';
+    const knowledge = details();
+    knowledge[0].course = { course_type: 'Road city marathon', surface: 'Road / asphalt',
+      course_character: { de: 'Die Strecke führt am Fluss entlang.', en: 'The course follows the river.' } };
+    knowledge[0].faq = [{ question: { de: 'Wo ist der Start?', en: 'Where is the start?' },
+      answer: { de: 'Der Start ist im Park.', en: 'The start is in the park.' } }];
+    const state = { event: { ...canonical(), description, sport: 'Running', country: 'Germany' }, details: knowledge };
+    const { url, errors } = await setup(page, state, mode);
+    await page.goto(url); await settled(page);
+    await expect(page.locator('html')).toHaveAttribute('data-sem-public-detail-knowledge-state', 'verified');
+    for (const language of ['de', 'en', 'de']) {
+      await page.locator('#eventDetailLanguageSelect').selectOption(language);
+      await openDetails(page);
+      await expect(page.locator('#liveDetailSport')).toHaveText(language === 'de' ? 'Laufen' : 'Running');
+      await expect(page.locator('#liveDetailLocation')).toHaveText(language === 'de' ? 'Berlin, Deutschland' : 'Berlin, Germany');
+      await expect(page.locator('#liveDetailDescription')).toHaveText(language === 'de'
+        ? 'Ein vielseitiges Stadtlaufprogramm rund um eine besonders flache Marathonstrecke.' : description);
+      await expect(page.locator('[data-knowledge-field="course.surface"]')).toContainText(language === 'de' ? 'Straße / Asphalt' : 'Road / asphalt');
+      await expect(page.locator('[data-knowledge-field="course.course_character"]')).toContainText(language === 'de'
+        ? 'Die Strecke führt am Fluss entlang.' : 'The course follows the river.');
+      await expect(page.locator('#faq')).toContainText(language === 'de' ? 'Wo ist der Start?' : 'Where is the start?');
+      await expect(page.locator('#competitions')).toContainText(language === 'de' ? 'Halbmarathon' : 'Half Marathon');
+      await expect(page.locator('#liveDetailNavigation')).toHaveAttribute('aria-label', language === 'de' ? 'Eventdetails' : 'Event details');
+      expect(JSON.parse(await page.locator('#sem-public-detail-data').textContent()).description).toBe(description);
+      expect(JSON.parse(await page.locator('#sem-public-detail-knowledge-data').textContent())[0].course.surface).toBe('Road / asphalt');
+    }
+    expect(errors).toEqual([]);
+  });
+
   test(`${mode} a manual approval exposes exactly approved knowledge without renewing source checks`, async ({ page }) => {
     const row = { ...details()[0], verification_status: 'needs_review', sources: [],
       last_checked: '2026-09-01',
@@ -121,8 +177,8 @@ for (const mode of ['static', 'dynamic']) {
     await expect(formats).toHaveCount(2);
     for (const language of ['de', 'en', 'de']) {
       await page.locator('#eventDetailLanguageSelect').selectOption(language);
-      await expect(formats.nth(0)).toHaveText('10-km-Lauf');
-      await expect(formats.nth(1)).toContainText('Jubiläum 2027 / 10-km-Lauf');
+      await expect(formats.nth(0)).toHaveText(language === 'en' ? '10 km Run' : '10-km-Lauf');
+      await expect(formats.nth(1)).toContainText(language === 'en' ? 'Jubiläum 2027 / 10 km Run' : 'Jubiläum 2027 / 10-km-Lauf');
       await expect(formats.nth(1)).toContainText('12 km');
     }
   });
@@ -198,7 +254,9 @@ for (const mode of ['static', 'dynamic']) {
       if (phase === 'corrected') { state.event = { ...state.event, description: 'Korrigierte Kernbeschreibung.', participant_limit: 900 }; await page.reload(); await settled(page); }
       if (phase === 'english') await page.locator('#eventDetailLanguageSelect').selectOption('en');
       await openDetails(page);
-      for (const value of richValues) await expect(page.locator('main')).toContainText(value);
+      for (const value of richValues) await expect(page.locator('main')).toContainText(phase === 'english'
+        ? ({ 'Frühbuchung': 'Early bird', 'Regulär': 'Regular', 'Welle A': 'Wave A', 'Welle B': 'Wave B', '18 Jahre': '18 years' }[value] || value)
+        : value);
       await expect(page.locator('#registration .race-guide-table')).toHaveCount(1);
       await expect(page.locator('#registration .race-guide-table tbody tr')).toHaveCount(2);
       await expect(page.locator('#race-day .race-guide-table').first()).toBeVisible();
@@ -229,8 +287,10 @@ test('real Berlin exported knowledge remains available in both public detail pat
   for (const mode of ['static', 'dynamic']) {
     const { url } = await setup(page, state, mode);
     await page.goto(url); await settled(page); await openDetails(page);
-    for (const value of ['The event began in 1974', 'Runner waves: 08:45', 'Water points at km 5', '18 years on race day']) await expect(page.locator('main')).toContainText(value);
+    for (const value of ['Die Veranstaltung begann 1974', 'Startwellen für Läufer: 08:45', 'Wasserstellen bei km 5', '18 Jahre am Renntag']) await expect(page.locator('main')).toContainText(value);
     await page.locator('#eventDetailLanguageSelect').selectOption('en');
+    await openDetails(page);
+    for (const value of ['The event began in 1974', 'Runner waves: 08:45', 'Water points at km 5', '18 years on race day']) await expect(page.locator('main')).toContainText(value);
     await expect(page.locator('#race-day')).toBeVisible();
     await expect(page.locator('#sources')).toContainText('2026');
   }

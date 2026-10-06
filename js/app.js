@@ -4,6 +4,10 @@ const sidebar =
 const toggleBtn =
   document.getElementById("toggleSidebar");
 
+function appUiText(sourceText) {
+  return window.uiText?.(sourceText) || sourceText;
+}
+
 const WELCOME_SEEN_KEY =
   "sportEventMap.betaWelcomeSeen";
 
@@ -82,16 +86,22 @@ function updateSidebarToggleState() {
 
   const isExpanded =
     !sidebar.classList.contains("closed");
+  const isGerman =
+    window.getAppLanguage?.() === "de";
 
   const actionLabel =
     isExpanded
-      ? "Events & Filter schließen"
-      : "Events & Filter öffnen";
+      ? (isGerman ? "Events & Filter schließen" : "Close events and filters")
+      : (isGerman ? "Events & Filter öffnen" : "Open events and filters");
   const activeFilterCount =
     Number(toggleBtn.dataset.activeFilterCount || 0);
+  const activeFilterLabel =
+    isGerman
+      ? (activeFilterCount === 1 ? "aktiver Filter" : "aktive Filter")
+      : (activeFilterCount === 1 ? "active filter" : "active filters");
   const accessibleLabel =
     activeFilterCount > 0
-      ? `${actionLabel}, ${activeFilterCount} aktive Filter`
+      ? `${actionLabel}, ${activeFilterCount} ${activeFilterLabel}`
       : actionLabel;
 
   toggleBtn.setAttribute(
@@ -129,6 +139,8 @@ function syncSidebarState() {
 
 window.updateSidebarToggleState =
   updateSidebarToggleState;
+
+document.addEventListener("app-language-changed", updateSidebarToggleState);
 
 // Keep every filter trigger on the same state transition. The legacy mobile
 // trigger lives in search.js, which is loaded before this file, so expose the
@@ -776,8 +788,8 @@ function openEventRoute(slug, attempt = 0) {
 
     if (typeof showAppMessage === "function") {
       showAppMessage(
-        "Event not found",
-        "Dieses Event konnte in der aktuellen Event-Datenbank nicht gefunden werden."
+        appUiText("Event not found"),
+        appUiText("This event could not be found in the current event database.")
       );
     }
 
@@ -811,8 +823,8 @@ function openSubmitEventFlow() {
 
   if (typeof showAppMessage === "function") {
     showAppMessage(
-      "Login required",
-      "Bitte logge dich ein, um ein Event einzureichen."
+      appUiText("Login required"),
+      appUiText("Please log in to submit an event.")
     );
   }
 
@@ -835,8 +847,8 @@ function openAdminFlow() {
 
   if (typeof showAppMessage === "function") {
     showAppMessage(
-      "Admin login required",
-      "Der Adminbereich ist nur für berechtigte Admin-Accounts sichtbar."
+      appUiText("Admin login required"),
+      appUiText("The admin area is only available to authorized admin accounts.")
     );
   }
 
@@ -1865,8 +1877,8 @@ document
           item => item.data
         ),
         {
-          emptyTitle: "No favorites yet",
-          emptyText: "Speichere Events über das Herzsymbol.",
+          emptyTitle: appUiText("No favorites yet"),
+          emptyText: appUiText("Save events using the heart icon."),
           showReset: false
         }
       );
@@ -1977,8 +1989,8 @@ document
       error => {
         if (typeof showAppMessage === "function") {
           showAppMessage(
-            "Location unavailable",
-            "Your browser could not access your location. Please check location permissions."
+            appUiText("Location unavailable"),
+            appUiText("Your browser could not access your location. Please check location permissions.")
           );
         }
         else {

@@ -113,12 +113,13 @@ test("the actual admin button still requires an admin role before opening or loa
   }
 });
 
-function routeHarness() {
+function routeHarness(language = "en") {
   const timers = [], opened = [], messages = [], sdkCalls = [], uiChanges = [];
   let found = null, finishSdk;
   const sdk = new Promise(resolve => { finishSdk = resolve; });
   const context = vm.createContext({
     PLATFORM_ROUTES: new Set(["home", "discovery", "events", "admin"]),
+    localStorage: { getItem: key => key === "sportEventMapLanguage" ? language : null },
     window: {
       location: { hash: `#/event/${eventSlug}` },
       setTimeout: (callback, delay) => timers.push({ callback, delay }),
@@ -133,8 +134,18 @@ function routeHarness() {
     showAppMessage: (...args) => messages.push(args),
     suppressEventRouteUpdate: false
   });
+  vm.runInContext(read("js/ui-translations.js"), context, { timeout: 1000 });
+  context.window.SEM_UI_TRANSLATIONS = context.SEM_UI_TRANSLATIONS;
+  const languageSource = read("js/i18n.js");
+  vm.runInContext(languageSource.slice(0, languageSource.indexOf("\nfunction uiText")), context, { timeout: 1000 });
+  for (const name of ["getAppLanguage", "uiText"]) {
+    const fn = languageSource.match(new RegExp(`function ${name}\\([^]*?\\r?\\n\\}`));
+    assert.ok(fn, `${name} must be exercised from actual language source`);
+    vm.runInContext(fn[0], context, { timeout: 1000 });
+  }
+  context.window.uiText = context.uiText;
   const source = read("js/app.js");
-  for (const name of ["getPlatformHashRoute", "openEventRoute"]) {
+  for (const name of ["appUiText", "getPlatformHashRoute", "openEventRoute"]) {
     const fn = source.match(new RegExp(`function ${name}\\([^]*?\\r?\\n\\}`));
     assert.ok(fn, `${name} must be exercised from actual app source`);
     vm.runInContext(fn[0], context, { timeout: 1000 });
@@ -204,8 +215,8 @@ test("leaving the event route cancels both pending SDK work and scheduled event 
   }
 });
 
-test("unknown event retries are bounded and end with one honest not-found message", async () => {
-  const harness = routeHarness();
+for (const language of ["en", "de"]) test(`unknown event retries are bounded and end with one honest not-found message (${language})`, async () => {
+  const harness = routeHarness(language);
   harness.start();
   await harness.settleSdk();
   let calls = 0, totalDelay = 0;
@@ -217,7 +228,13 @@ test("unknown event retries are bounded and end with one honest not-found messag
   assert.ok(totalDelay <= 20_000, "catalog wait must stay bounded");
   assert.equal(harness.timers.length, 0);
   assert.equal(harness.messages.length, 1);
-  assert.match(harness.messages[0][0], /not found/i);
+  assert.deepEqual(harness.messages[0], language === "de" ? [
+    "Event nicht gefunden",
+    "Dieses Event konnte in der aktuellen Event-Datenbank nicht gefunden werden."
+  ] : [
+    "Event not found",
+    "This event could not be found in the current event database."
+  ]);
   assert.deepEqual(harness.opened, []);
 });
 

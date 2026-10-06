@@ -9,6 +9,10 @@ const require = createRequire(import.meta.url);
 const ui = require('../tools/ui-release.js');
 const BASE_URL = 'https://1547ae47.sporteventmap.pages.dev';
 const BUILD_TIME = new Date('2026-09-08T11:30:00.000Z');
+const LOCALIZATION_OVERLAY_PATHS = [
+  'js/search.js', 'js/ui-translations.js', 'js/admin-ui-translations.js', 'js/event-content-translations.js',
+  'js/event-description-translations.js', 'js/event-description-translations-extra.js'
+];
 const put = (root, relative, bytes) => { const file = path.join(root, relative); fs.mkdirSync(path.dirname(file), { recursive: true }); fs.writeFileSync(file, bytes); };
 const git = (root, ...args) => execFileSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] }).trim();
 const commit = root => { git(root, 'add', '.'); git(root, '-c', 'user.name=UI release fixture', '-c', 'user.email=fixture@example.invalid', '-c', 'commit.gpgsign=false', 'commit', '-qm', 'Committed UI fixture'); return git(root, 'rev-parse', 'HEAD'); };
@@ -26,7 +30,7 @@ function fixture() {
   put(root, 'data/events.csv', 'Committed but unreleased newer data must never be copied.');
   const sourceCommit = commit(root), baseDir = path.join(root, 'dist'); fs.mkdirSync(baseDir);
   for (const relative of ui.RUNTIME_PATHS) {
-    if (['js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/mobile-discovery.js', 'css/mobile-discovery.css'].includes(relative)) continue;
+    if (['js/freshness-batch-review.js', 'js/manual-event-maintenance.js', 'js/mobile-discovery.js', 'css/mobile-discovery.css', ...LOCALIZATION_OVERLAY_PATHS.filter(file => file !== 'js/search.js')].includes(relative)) continue;
     put(baseDir, relative, ui.OVERLAY_PATHS.includes(relative) ? `/* old deployed ${relative} */\n` : fs.readFileSync(path.join(root, relative)));
   }
   for (const relative of ['index.html', 'about.html', 'contact.html', 'imprint.html', 'legal.html', 'privacy.html']) put(baseDir, relative, '<html><head></head><body>Original v84</body></html>');
@@ -69,7 +73,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.release_scope, 'ui_only'); assert.equal(built.data_updated, false); assert.equal(built.full_data_quality_release, false);
     assert.equal(built.built_at, BUILD_TIME.toISOString()); assert.equal(built.base_release.built_at, '2026-09-01T11:25:56.965Z');
     assert.equal(built.base_release.original_data_timestamps.catalog_exported_at, '2026-08-27T07:41:01.290Z');
-    assert.equal(Object.keys(built.overlay_files).length, 25);
+    assert.equal(Object.keys(built.overlay_files).length, 31);
     assert.deepEqual(ui.artifactInventory(f.baseDir), f.entries, 'Build never changes dist');
     for (const name of ['first', 'second']) {
       const before = fs.readFileSync(path.join(f.baseDir, 'event/'+name+'/index.html'), 'utf8');
@@ -82,6 +86,10 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     assert.equal(built.overlay_files['js/app.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/app.js'));
     assert.equal(built.overlay_files['js/event-detail.js'].source_git_blob, git(f.root, 'rev-parse', 'HEAD:js/event-detail.js'));
     assert.ok(fs.readFileSync(path.join(f.output, 'js/event-detail.js')).equals(fs.readFileSync(path.join(f.root, 'js/event-detail.js'))), 'Reviewed detail navigation code must be overlaid from the exact committed source');
+    for (const relative of LOCALIZATION_OVERLAY_PATHS) {
+      assert.equal(built.overlay_files[relative].source_git_blob, git(f.root, 'rev-parse', `HEAD:${relative}`));
+      assert.ok(fs.readFileSync(path.join(f.output, relative)).equals(fs.readFileSync(path.join(f.root, relative))), `${relative} must match the reviewed committed source`);
+    }
     assert.ok(fs.readFileSync(path.join(f.output, 'index.html'), 'utf8').includes('content="ui_only"'));
     assert.ok(fs.readFileSync(path.join(f.output, 'RELEASE_VERSION.txt'), 'utf8').includes('20260908-ui-only-v85'));
     await ui.verifyUiRelease(f.options, f.dependencies);
@@ -89,7 +97,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
       const before = fs.readFileSync(path.join(f.output, 'release.json'));
       await assert.rejects(ui.buildUiRelease(f.options, f.dependencies), /Refusing existing/); assert.ok(fs.readFileSync(path.join(f.output, 'release.json')).equals(before));
     });
-    for (const relative of ['data/events.csv', 'data/event-editions-public.json', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'docs/NO_CODE_DATA_IMPORT.md', 'js/search.js']) {
+    for (const relative of ['data/events.csv', 'data/event-editions-public.json', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'docs/NO_CODE_DATA_IMPORT.md', 'js/theme.js']) {
       await t.test(`protected tampering is rejected even if the output manifest is recomputed: ${relative}`, async () => {
         const target = path.join(f.output, relative), before = fs.readFileSync(target), releaseBytes = fs.readFileSync(path.join(f.output, 'release.json'));
         try {
@@ -105,6 +113,7 @@ test('UI-only package binds the actual committed CRLF source, immutable base and
     }
     await t.test('unknown output file rejected', async () => { put(f.output, 'unexpected.js', 'extra'); try { await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /Protected|Unexpected/); } finally { fs.unlinkSync(path.join(f.output, 'unexpected.js')); } });
     await t.test('current UI bytes cannot be changed independently of committed source', async () => { const target = path.join(f.output, 'js/app.js'), before = fs.readFileSync(target); try { fs.appendFileSync(target, 'tamper'); await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /Overlay bytes differ/); } finally { fs.writeFileSync(target, before); } });
+    for (const relative of LOCALIZATION_OVERLAY_PATHS) await t.test(`localization overlay cannot be changed independently of committed source: ${relative}`, async () => { const target = path.join(f.output, relative), before = fs.readFileSync(target); try { fs.appendFileSync(target, 'tamper'); await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /Overlay bytes differ/); } finally { fs.writeFileSync(target, before); } });
     await t.test('truthful UI scope and original data age cannot be rewritten', async () => { const target = path.join(f.output, 'release.json'), before = fs.readFileSync(target); try { const forged = JSON.parse(before); forged.data_updated = true; forged.base_release.original_data_timestamps.archive_exported_at = BUILD_TIME.toISOString(); put(f.output, 'release.json', JSON.stringify(forged)); await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /UI manifest differs/); } finally { fs.writeFileSync(target, before); } });
     await t.test('dirty source and stale Git identity rejected', async () => { const target = path.join(f.root, 'js/app.js'), before = fs.readFileSync(target); try { fs.appendFileSync(target, 'dirty'); await assert.rejects(ui.verifyUiRelease(f.options, f.dependencies), /clean committed source/); } finally { fs.writeFileSync(target, before); } await assert.rejects(ui.verifyUiRelease({ ...f.options, sourceCommit: '1'.repeat(40) }, f.dependencies), /source HEAD differs/); });
     await t.test('source mutation during remote await is rejected', async () => { const target = path.join(f.root, 'js/app.js'), before = fs.readFileSync(target); try { await assert.rejects(ui.verifyUiRelease(f.options, { ...f.dependencies, fetchImpl: async (...args) => { const response = await f.dependencies.fetchImpl(...args); fs.appendFileSync(target, 'racing source mutation'); return response; } }), /clean committed source|Source changed/); } finally { fs.writeFileSync(target, before); } });
@@ -130,7 +139,7 @@ test('base validation covers unlisted files and all catalog/static hashes', asyn
 test('new dependencies and committed credentials fail before output creation', async t => {
   const f = fixture();
   try {
-    await t.test('non-overlay changed runtime cannot slip in', async () => { fs.appendFileSync(path.join(f.root, 'js/search.js'), 'changed runtime'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /runtime dependency differs/); assert.equal(fs.existsSync(f.output), false); fs.writeFileSync(path.join(f.root, 'js/search.js'), fs.readFileSync(path.join(f.baseDir, 'js/search.js'))); f.options.sourceCommit = commit(f.root); });
+    await t.test('non-overlay changed runtime cannot slip in', async () => { assert.equal(ui.OVERLAY_PATHS.includes('js/theme.js'), false); fs.appendFileSync(path.join(f.root, 'js/theme.js'), 'changed runtime'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /runtime dependency differs/); assert.equal(fs.existsSync(f.output), false); fs.writeFileSync(path.join(f.root, 'js/theme.js'), fs.readFileSync(path.join(f.baseDir, 'js/theme.js'))); f.options.sourceCommit = commit(f.root); });
     await t.test('missing dynamically required module is rejected', async () => { const source = ui.sourceSnapshot(f.root, f.options.sourceCommit), base = ui.validateBaseRelease(f.baseDir, f.options.baseReleaseSha256), overlay = ui.makeOverlay(source, { version: f.options.version, git_commit: f.options.sourceCommit, built_at: BUILD_TIME.toISOString() }); overlay.set('index.html', Buffer.from('<html><head><script src="js/unreviewed-module.js"></script></head></html>')); assert.throws(() => ui.assertRuntime(base, source, overlay), /Missing UI dependency/); });
     await t.test('committed secret rejected by real build, not merely dirty-tree check', async () => { fs.appendFileSync(path.join(f.root, 'js/app.js'), '\nconst client_secret="this-is-a-realistic-secret-value";'); const head = commit(f.root); await assert.rejects(ui.buildUiRelease({ ...f.options, sourceCommit: head }, f.dependencies), /Potential private credential/); assert.equal(fs.existsSync(f.output), false); });
   } finally { dispose(f.root); }
@@ -155,15 +164,15 @@ test('static detail cache refresh requires exactly one existing script and style
 });
 
 test('URL contract, exact allowlist and focused secret detection', () => {
-  assert.equal(ui.OVERLAY_PATHS.length, 25);
-  for (const file of ['css/data-operations.css', 'js/catalog-quality-report.js', 'js/event-catalog-loader.js']) {
+  assert.equal(ui.OVERLAY_PATHS.length, 31);
+  for (const file of ['css/data-operations.css', 'js/catalog-quality-report.js', 'js/event-catalog-loader.js', ...LOCALIZATION_OVERLAY_PATHS]) {
     assert.ok(ui.OVERLAY_PATHS.includes(file));
     assert.ok(ui.RUNTIME_PATHS.includes(file));
   }
   assert.equal(ui.OVERLAY_PATHS.includes('js/event-description.js'), true);
   assert.equal(ui.OVERLAY_PATHS.includes('js/event-detail.js'), true);
   assert.equal(ui.OVERLAY_PATHS.includes('js/map.js'), true);
-  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/search.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
+  for (const forbidden of ['data/events.csv', 'event/first/index.html', 'sitemap.xml', 'js/config.js', 'js/event-detail-supabase.js', 'js/theme.js', '_routes.json', '_worker.js', 'docs/NO_CODE_DATA_IMPORT.md']) assert.equal(ui.OVERLAY_PATHS.includes(forbidden), false);
   assert.equal(ui.validateBaseUrl(`${BASE_URL}/`), BASE_URL);
   for (const url of ['http://1547ae47.sporteventmap.pages.dev', 'https://sporteventmap.com', 'https://sporteventmap.pages.dev', 'https://123456789.sporteventmap.pages.dev', `${BASE_URL}:443`, `${BASE_URL}/path`, `${BASE_URL}?x=1`, `${BASE_URL}#x`, 'https://user@1547ae47.sporteventmap.pages.dev', 'https://1547ae47.sporteventmap.pages.dev.evil.invalid']) assert.throws(() => ui.validateBaseUrl(url));
   const jwt = role => `${Buffer.from('{"alg":"HS256"}').toString('base64url')}.${Buffer.from(JSON.stringify({ role })).toString('base64url')}.signature`;

@@ -354,7 +354,7 @@ function createEventMarkerPresentation(event) {
 
   return {
     type,
-    title: meta.title,
+    title: window.uiText?.(meta.title) || meta.title,
     icon: L.divIcon({
       className: `custom-marker custom-marker--${type}`,
       html:
@@ -397,10 +397,11 @@ function initMap() {
     if (mapElement) {
       mapElement.innerHTML = `
         <div class="map-unavailable">
-          <strong>Map temporarily unavailable</strong>
-          <span>The event database is loaded. Please refresh once the map library is available again.</span>
+          <strong data-i18n-text="Map temporarily unavailable">Map temporarily unavailable</strong>
+          <span data-i18n-text="The event database is loaded. Please refresh once the map library is available again.">The event database is loaded. Please refresh once the map library is available again.</span>
         </div>
       `;
+      window.applyUiLanguage?.(mapElement);
     }
   }
 
@@ -412,9 +413,20 @@ function initMap() {
   map.addLayer(markerLayer);
 
   setupMapLayoutRefresh();
+  localizeMapControls();
 
   return map;
 }
+
+function localizeMapControls() {
+  [[".leaflet-control-zoom-in", "Zoom in"], [".leaflet-control-zoom-out", "Zoom out"]].forEach(([selector, label]) => {
+    document.querySelectorAll(selector).forEach(control => {
+      control.setAttribute("title", window.uiText?.(label) || label);
+      control.setAttribute("aria-label", window.uiText?.(label) || label);
+    });
+  });
+}
+document.addEventListener("app-language-changed", localizeMapControls);
 
 function setDiscoveryMapLoading(isLoading, message = "Loading events…") {
   const mapElement =
@@ -425,7 +437,8 @@ function setDiscoveryMapLoading(isLoading, message = "Loading events…") {
     document.getElementById("mapLoadingMessage");
 
   if (messageElement) {
-    messageElement.textContent = message;
+    messageElement.setAttribute("data-i18n-text", message);
+    messageElement.textContent = window.uiText?.(message) || message;
   }
 
   if (mapElement) {
@@ -996,10 +1009,11 @@ function refreshEvents(options = {}) {
   if (list) {
     list.innerHTML = `
       <div class="event-list-empty event-list-loading">
-        <strong>Loading events</strong>
-        <span>Preparing the map and event list.</span>
+        <strong data-i18n-text="Loading events">Loading events</strong>
+        <span data-i18n-text="Preparing the map and event list.">Preparing the map and event list.</span>
       </div>
     `;
+    window.applyUiLanguage?.(list);
   }
 
   clearMarkers();

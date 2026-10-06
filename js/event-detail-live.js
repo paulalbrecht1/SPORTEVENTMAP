@@ -4,6 +4,7 @@
   const byId = id => document.getElementById(id);
   const staticPage = !byId('liveDetailContent');
   const staticConfig = window.sportEventMapDetailConfig?.event;
+  const staticI18n = window.sportEventMapDetailI18n;
   let staticPrepared = false, coreRendered = false, guardSettled = false, loadSettled = false, liveResponse = false;
   let richSettled = false, richLive = false, richRendered = false, detailMap = null, detailMarker = null, mapCoordinates = '', mapPromise = null;
   let preservedFacts = [], preservedSections = [];
@@ -42,6 +43,9 @@
   let event = null, notice = 'loading', snapshotDate = '', richRecords = [], coreVerified = false;
   const t = key => labels[language][key] || key;
   const text = value => typeof value === 'string' || typeof value === 'number' ? String(value).trim() : '';
+  const localized = value => window.SportEventMapDescriptions?.localizeEventText(value, language) ?? text(value);
+  const fieldValue = (record, key) => window.SportEventMapDescriptions?.localizedField(record, key, language) ?? record?.[key];
+  const descriptionText = () => window.SportEventMapDescriptions?.localizedDescription(event, language) ?? text(event?.description);
   const slug = location.pathname.match(/^\/event\/([a-z0-9]+(?:-[a-z0-9]+)*)\/(?:index\.html)?$/)?.[1] || new URLSearchParams(location.search).get('event') || '';
   const validSlug = /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug) && slug.length <= 240;
   const fields = 'event_id,edition_id,event_name,sport,date,end_date,start_time,city,country,address,latitude,longitude,distance,description,event_url,official_url,registration_url,organizer_name,organizer_url,source_url,last_checked,event_status,edition_slug,edition_year,registration_status,race_formats,price_min,price_max,currency,participant_limit';
@@ -172,11 +176,12 @@
     return typeof value === 'boolean' || typeof value === 'number' || Boolean(text(value) && !/^(unknown|not (?:yet )?(?:officially confirmed|verified|available)|needs review|n\/a|tba|tbd)\b/i.test(text(value)));
   }
   function valueText(value) {
+    value = window.SportEventMapDescriptions?.localizedValue(value, language) ?? value;
     if (typeof value === 'boolean') return t(value ? 'yes' : 'no');
     if (typeof value === 'number') return number(value);
     if (Array.isArray(value)) return value.filter(useful).map(valueText).filter(Boolean).join(' · ');
     if (value && typeof value === 'object') return Object.entries(value).filter(([key, item]) => labels[language][key] && useful(item)).map(([key, item]) => `${t(key)}: ${valueText(item)}`).join(' · ');
-    return clockTime(value);
+    return clockTime(localized(value));
   }
   function hasFieldSource(record, section, field) {
     // The public RPC exposes only approvals whose audited value still matches.
@@ -219,7 +224,7 @@
     if (!useful(value) || !hasFieldSource(record, section, field)) return '';
     if (/cutoff$/.test(field) && (!/\b\d{1,3}(?:[.,]\d+)?\s*(?:h|hours?|hrs?|min|minutes?|stunden?|minuten?)\b|\b\d{1,2}:[0-5]\d\b/i.test(formatted) || /withdraw|refund|registration|entry|cancel|transfer|rücktritt|anmeld|abmeld|erstatt|storn|\b(?:before|prior|vor)\b/i.test(formatted))) return '';
     if (field === 'start_time' && (!/\b(?:[01]?\d|2[0-3]):[0-5]\d\b|\b\d{1,2}\s*(?:am|pm|uhr)\b/i.test(formatted) || /cutoff|registration|anmeld|before|prior|\bvor\b/i.test(formatted))) return '';
-    return value;
+    return fieldValue(record[section], field);
   }
   function richValue(section, field) {
     // A static detail export must never restore a canonical value that was
@@ -255,14 +260,14 @@
       const rows = value.filter(row => row && typeof row === 'object' && useful(row.price)).map(row => {
         const until = text(row.until), date = /^\d{4}-\d{2}-\d{2}$/.test(until) ? new Date(until) : null;
         const formattedUntil = date && Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === until ? displayDate(until) : row.until;
-        return [row.tier, tierPrice(row), formattedUntil, row.note];
+        return [fieldValue(row, 'tier'), tierPrice(row), formattedUntil, fieldValue(row, 'note')];
       });
       const hasNotes = rows.some(row => useful(row[3]));
       content = detailTable(hasNotes ? ['tier', 'price', 'until', 'details'] : ['tier', 'price', 'until'], rows);
     } else if (field === 'intermediate_cutoffs' && Array.isArray(value)) {
-      content = detailTable(['point', 'time'], value.filter(row => row && useful(row.time)).map(row => [row.point, clockTime(row.time)]));
+      content = detailTable(['point', 'time'], value.filter(row => row && useful(row.time)).map(row => [fieldValue(row, 'point'), clockTime(row.time)]));
     } else if (field === 'wave_start' && Array.isArray(value)) {
-      content = detailTable(['wave', 'time', 'blocks'], value.map(row => [row.wave || row.label, clockTime(row.time || row.start_time), row.blocks || row.corral]));
+      content = detailTable(['wave', 'time', 'blocks'], value.map(row => [fieldValue(row, 'wave') || fieldValue(row, 'label'), clockTime(row.time || row.start_time), fieldValue(row, 'blocks') || fieldValue(row, 'corral')]));
     } else if (field.endsWith('_url')) {
       if (safeUrl(value)) content = externalLink(value, t(field), 'event-detail-secondary race-guide-inline-action');
     } else {
@@ -317,7 +322,7 @@
       }
       const questions = [];
       for (const record of richRecords) for (const [index, item] of (Array.isArray(record.faq) ? record.faq : []).entries()) {
-        const id = String(item?.id ?? index), question = text(item?.question), answer = text(item?.answer);
+        const id = String(item?.id ?? index), question = localized(fieldValue(item, 'question')), answer = localized(fieldValue(item, 'answer'));
         if (!question || !answer || !hasFieldSource(record, 'faq', id)) continue;
         const accordion = node('details', 'race-guide-accordion'); accordion.dataset.knowledgeField = 'faq.' + id;
         accordion.append(node('summary', '', question), node('div', 'live-detail-copy', answer)); questions.push(accordion);
@@ -347,7 +352,7 @@
     order.forEach(id => { const item = byId(id); if (item?.parentNode === container) container.append(item); });
     const sourceNodes = richRecords.flatMap(record => (record.sources || []).filter(source => safeUrl(source.source_url) && verifiedDate(source.last_verified)).map(source => {
       const anchor = externalLink(source.source_url, '');
-      anchor.append(node('strong', '', text(source.source_label) || t('source')), node('span', '', `${t('sourceChecked')}: ${displayDate(source.last_verified)}`)); return anchor;
+      anchor.append(node('strong', '', localized(fieldValue(source, 'source_label')) || t('source')), node('span', '', `${t('sourceChecked')}: ${displayDate(source.last_verified)}`)); return anchor;
     }));
     if (richLive && staticPage) { const source = byId('sources'); [...source.children].filter(child => !['liveDetailChecked', 'liveDetailSource', 'liveDetailSources'].includes(child.id)).forEach(child => child.remove()); source.prepend(sectionHeading('sources')); }
     byId('liveDetailSources').replaceChildren(...sourceNodes);
@@ -365,7 +370,7 @@
   }
   function distanceLabel(value, distanceKm) {
     let includesDistance = false;
-    const label = text(value).replace(/\b(\d+(?:[.,]\d+)?)(\s*[-‐‑‒–—]\s*|\s*)km\b/gi, (_match, amount, separator) => {
+    const label = localized(value).replace(/\b(\d+(?:[.,]\d+)?)(\s*[-‐‑‒–—]\s*|\s*)km\b/gi, (_match, amount, separator) => {
       const kilometers = Number(amount.replace(',', '.'));
       if (numeric(distanceKm) && kilometers === Number(distanceKm)) includesDistance = true;
       return /[-‐‑‒–—]/.test(separator) ? number(kilometers) + separator + 'km' : unit(kilometers, 'kilometer');
@@ -384,7 +389,7 @@
       if (!format || typeof format !== 'object' || Array.isArray(format)) continue;
       const key = JSON.stringify(stable(format)); if (seen.has(key)) continue; seen.add(key);
       const item = node('li', 'race-guide-info-box'); item.dataset.publicRaceFormat = '';
-      const { label, includesDistance: distanceInLabel } = distanceLabel(format.label, format.distance_km);
+      const { label, includesDistance: distanceInLabel } = distanceLabel(fieldValue(format, 'label'), format.distance_km);
       const hasLegs = ['swim_km', 'bike_km', 'run_km'].filter(field => numeric(format[field])).length > 1;
       const details = [['distance_km', '', 'kilometer'], ['swim_km', 'swim', 'kilometer'], ['bike_km', 'bike', 'kilometer'], ['run_km', 'run', 'kilometer'], ['elevation_gain_m', 'elevation', 'meter']].flatMap(([field, key, measurement]) => numeric(format[field]) && !(field === 'distance_km' && (distanceInLabel || hasLegs)) ? [(key ? t(key) + ': ' : '') + unit(format[field], measurement)] : []);
       if (!label && !details.length) continue;
@@ -410,7 +415,7 @@
       ensureSection('logistics').append(subsection); mapCoordinates = '';
     }
     subsection.querySelector('h3').textContent = t('eventLocation');
-    subsection.querySelector('.live-detail-map-address').textContent = text(event.address) || [event.city, event.country].map(text).filter(Boolean).join(', ');
+    subsection.querySelector('.live-detail-map-address').textContent = text(event.address) || [text(event.city), localized(event.country)].filter(Boolean).join(', ');
     subsection.querySelector('.event-detail-map-note').textContent = t('approxLocation');
     byId('eventDetailMap').setAttribute('aria-label', t('eventLocation'));
     byId('liveDetailMapLink').href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(coordinates)}`;
@@ -437,8 +442,8 @@
       document.querySelectorAll('script[type="application/ld+json"]').forEach(node => node.remove());
       schema = node('script'); schema.id = 'liveDetailSchema'; schema.type = 'application/ld+json'; document.head.append(schema);
     }
-    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: event.event_name, description: event.description || undefined, startDate: isoDate(event.date), endDate: event.end_date || undefined, url: location.origin + location.pathname + location.search, eventStatus: 'https://schema.org/' + ({ cancelled: 'EventCancelled', postponed: 'EventPostponed' }[event.event_status] || 'EventScheduled'), location: { '@type': 'Place', name: text(event.city), address: text(event.address), geo: event.latitude != null && event.longitude != null ? { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } : undefined } });
-    for (const [attribute, key, value] of [['name', 'description', event.description], ['property', 'og:description', event.description], ['property', 'og:title', event.event_name]]) {
+    schema.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Event', name: event.event_name, description: descriptionText() || undefined, inLanguage: language, startDate: isoDate(event.date), endDate: event.end_date || undefined, url: location.origin + location.pathname + location.search, eventStatus: 'https://schema.org/' + ({ cancelled: 'EventCancelled', postponed: 'EventPostponed' }[event.event_status] || 'EventScheduled'), location: { '@type': 'Place', name: text(event.city), address: text(event.address), geo: event.latitude != null && event.longitude != null ? { '@type': 'GeoCoordinates', latitude: event.latitude, longitude: event.longitude } : undefined } });
+    for (const [attribute, key, value] of [['name', 'description', descriptionText()], ['property', 'og:description', descriptionText()], ['property', 'og:title', event.event_name]]) {
       const existing = [...document.querySelectorAll(`meta[${attribute}="${key}"]`)];
       if (!text(value)) { existing.forEach(item => item.remove()); continue; }
       if (!existing.length) { const item = node('meta'); item.setAttribute(attribute, key); document.head.append(item); existing.push(item); }
@@ -447,22 +452,32 @@
   }
   function render() {
     if (event) prepareStaticPage();
+    // Generated documents keep their older label dictionary and fallback guide.
+    // Update both as well as the canonical live sections on every language switch.
+    staticI18n?.applyLanguage?.();
     document.documentElement.lang = language;
     byId('eventDetailLanguageSelect').value = language;
     byId('eventDetailLanguageSelect').setAttribute('aria-label', t('language'));
     document.querySelectorAll('[data-live-i18n]').forEach(el => { el.textContent = t(el.dataset.liveI18n); });
+    byId('liveDetailRetry').textContent = t('retry');
+    (byId('liveDetailNavigation') || document.querySelector('.event-detail-tabs'))?.setAttribute('aria-label', language === 'de' ? 'Eventdetails' : 'Event details');
+    if (staticPage) document.querySelectorAll('.event-detail-shell p, .event-detail-shell strong, .event-detail-shell td, .event-detail-shell summary, .event-detail-shell li, .event-detail-shell span, .event-detail-shell a, .event-detail-shell h3').forEach(element => {
+      if (element.children.length || element.hasAttribute('data-detail-i18n') || element.hasAttribute('data-live-i18n') || element.closest('#liveDetailFacts, #competitions, #liveDetailSections:not(:has([data-detail-i18n])), .event-detail-header') || element.id?.startsWith('liveDetail')) return;
+      if (!element.dataset.originalDetailText) element.dataset.originalDetailText = element.textContent;
+      element.textContent = localized(element.dataset.originalDetailText);
+    });
     byId('liveDetailStatus').hidden = !notice;
     byId('liveDetailStatus').textContent = notice ? t(notice) + (notice === 'snapshot' ? displayDate(snapshotDate) : '') : '';
     if (byId('liveDetailKnowledgeNotice')) byId('liveDetailKnowledgeNotice').textContent = language === 'de' ? 'Zusätzliche Detailangaben: Gespeicherter Quellenstand. Aktuelle Detailangaben konnten nicht geladen werden.' : 'Additional details: saved source information. Current details could not be loaded.';
-    if (!event) return;
+    if (!event) { if (!staticPage) document.title = `${language === 'de' ? 'Eventdetails' : 'Event details'} · Sport Event Map`; return; }
     renderMetadata();
     document.title = `${text(event.event_name)} · ${text(event.edition_year) || text(event.date)} | Sport Event Map`;
     byId('liveDetailName').textContent = text(event.event_name);
-    byId('liveDetailSport').textContent = text(event.sport);
-    const locationLabel = [event.city, event.country].map(text).filter(Boolean).join(', ');
+    byId('liveDetailSport').textContent = localized(event.sport);
+    const locationLabel = [text(event.city), localized(event.country)].filter(Boolean).join(', ');
     byId('liveDetailLocation').textContent = locationLabel;
-    byId('liveDetailDescription').textContent = text(event.description);
-    byId('description').hidden = !text(event.description);
+    byId('liveDetailDescription').textContent = descriptionText();
+    byId('description').hidden = !descriptionText();
     byId('liveDetailChecked').hidden = !coreVerified || !verifiedDate(event.last_checked);
     byId('liveDetailChecked').textContent = coreVerified && verifiedDate(event.last_checked) ? `${t('checked')}: ${displayDate(event.last_checked)}` : '';
     const registrationStatus = text(event.registration_status).replace(/^registration_/, '');
@@ -470,7 +485,7 @@
     const facts = [
       ['date', event.date ? displayDate(isoDate(event.date)) : ''],
       ['end_date', event.end_date && isoDate(event.end_date) !== isoDate(event.date) ? displayDate(isoDate(event.end_date)) : ''],
-      ['location', locationLabel], ['sport', text(event.sport)],
+      ['location', locationLabel], ['sport', localized(event.sport)],
       ['distance', hasFormats ? '' : distanceLabel(event.distance).label],
       ['start_time', clockTime(event.start_time)],
       ['registration', ['open','closed','sold_out','not_open','cancelled'].includes(registrationStatus) ? t(registrationStatus) : ''],
@@ -494,7 +509,7 @@
     coreRendered = true;
     markPublicState();
   }
-  window.sportEventMapDetailI18n = { translate: t };
+  window.sportEventMapDetailI18n = { translate: key => labels[language][key] || staticI18n?.translate?.(key) || key, getLanguage: () => language };
   byId('eventDetailLanguageSelect').addEventListener('change', e => {
     language = e.target.value === 'en' ? 'en' : 'de';
     try { localStorage.setItem('sportEventMapLanguage', language); } catch { /* Storage is optional. */ }
@@ -549,6 +564,15 @@
     } catch { /* A missing freshness decision must not create a verified badge. */ }
   }
   async function load() {
+    // Translation availability must not determine whether the factual source
+    // description is visible. Load catalogs in order; the policy is independent.
+    for (const file of ['event-content-translations', 'event-description-translations', 'event-description-translations-extra']) {
+      try { await import(`./${file}.js?v=20261006-bilingual-v138`); }
+      catch { /* Unknown translations retain the original text. */ }
+    }
+    try {
+      await import('./event-description.js?v=20261006-bilingual-v138');
+    } catch { /* Keep factual originals visible if translation assets cannot load. */ }
     if (!validSlug) { notice = 'invalid'; render(); return; }
     render();
     let rows;
@@ -578,7 +602,6 @@
     // Never render a raw import note while the shared display policy is loading.
     let publicDescription = '';
     try {
-      await import('./event-description.js?v=20260929-public-description-v132');
       publicDescription = window.SportEventMapDescriptions?.cleanPublicEventDescription(rows[0].description) || '';
     } catch { /* Missing description policy fails closed without hiding other facts. */ }
     event = { ...rows[0], description: text(publicDescription) };

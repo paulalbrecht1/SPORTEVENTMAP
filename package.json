@@ -47,7 +47,7 @@
     "supabase:reset": "supabase db reset --local --no-seed",
     "supabase:status": "supabase status",
     "test:rls:local": "node tests/local-rls-security.test.mjs",
-    "test:static": "node tests/static-beta-smoke.test.mjs",
+    "test:static": "node tests/static-beta-smoke.test.mjs && node --test tests/bilingual-search.test.mjs",
     "test:catalog-loader": "node tests/event-catalog-loader.test.mjs",
     "test:data-freshness": "node tests/data-freshness-health.test.mjs && node tests/data-quality-stabilization.test.mjs && node tests/freshness-review-verification.test.mjs && node tests/freshness-batch-review.test.mjs && node --test tests/catalog-quality-report.test.mjs",
     "audit:catalog-snapshot": "node tools/report-catalog-quality.js",

@@ -73,6 +73,516 @@ function cleanValue(value) {
   return String(value || "").trim();
 }
 
+// UI copy is translated at render time. Stored event names, notes, field values,
+// identifiers and option values remain untouched when the language changes.
+const EVENT_UI_TEXT_PAIRS = [
+  ["Participants","Teilnehmer"],
+  ["Course","Strecke"],
+  ["Highlight","Besonderheit"],
+  ["More event details will be added soon.","Weitere Eventdetails werden bald ergänzt."],
+  ["Previous","Zurück"],
+  ["Next","Weiter"],
+  ["Official Website","Offizielle Website"],
+  ["Toggle favorite","Favorit umschalten"],
+  ["Close event details","Eventdetails schließen"],
+  ["Saved in Season","In der Saison gespeichert"],
+  ["Add to Season","Zur Saison hinzufügen"],
+  ["Copy event link","Eventlink kopieren"],
+  ["Share","Teilen"],
+  ["Saving...","Wird gespeichert..."],
+  ["Verify before registering","Vor der Anmeldung prüfen"],
+  ["Event data may change. The official organizer website is the source of truth.","Eventdaten können sich ändern. Maßgeblich ist die offizielle Veranstalterwebsite."],
+  ["Last checked","Zuletzt geprüft"],
+  ["Open detail page","Detailseite öffnen"],
+  ["Link copied","Link kopiert"],
+  ["The event link has been copied.","Der Eventlink wurde kopiert."],
+  ["Favorite added","Favorit hinzugefügt"],
+  ["Favorite removed","Favorit entfernt"],
+  ["This race was added to your favorites.","Dieses Rennen wurde zu deinen Favoriten hinzugefügt."],
+  ["This race was removed from your saved events.","Dieses Rennen wurde aus deinen Favoriten entfernt."],
+  ["No matching events found","Keine passenden Events gefunden"],
+  ["Adjust your search or filters.","Passe deine Suche oder Filter an."],
+  ["Reset filters","Filter zurücksetzen"],
+  ["Collapse list and show map","Liste verkleinern und Karte anzeigen"],
+  ["Expand event list","Eventliste vergrößern"],
+  ["Compact cards","Kompakte Karten"],
+  ["Comfortable cards","Ausführliche Karten"],
+  ["Map","Karte"],
+  ["List","Liste"],
+  ["Timed Ultra","Zeitlauf-Ultra"],
+  ["Goal type","Zieltyp"],
+  ["Just participate","Einfach teilnehmen"],
+  ["Have fun","Spaß haben"],
+  ["Finish","Finishen"],
+  ["Personal best","Persönliche Bestzeit"],
+  ["Target time","Bestimmte Zielzeit"],
+  ["Placement goal","Platzierungsziel"],
+  ["Training / test race","Training / Testwettkampf"],
+  ["Custom goal","Eigenes Ziel"],
+  ["Not selected yet","Noch nicht gewählt"],
+  ["Open","Offen"],
+  ["Done","Erledigt"],
+  ["Not needed","Nicht benötigt"],
+  ["Planned","Geplant"],
+  ["Booked","Gebucht"],
+  ["Confirmed","Geklärt"],
+  ["Reviewed","Geprüft"],
+  ["Updated","Gepflegt"],
+  ["Date","Datum"],
+  ["Distance","Distanz"],
+  ["Priority","Priorität"],
+  ["Goal","Ziel"],
+  ["Registration","Anmeldung"],
+  ["Travel","Reise"],
+  ["Accommodation","Unterkunft"],
+  ["Race documents","Startunterlagen"],
+  ["Race strategy","Rennstrategie","Race Strategy"],
+  ["Equipment","Ausrüstung"],
+  ["Nutrition","Verpflegung"],
+  ["Notes","Notizen"],
+  ["Result","Ergebnis"],
+  ["Rating","Bewertung"],
+  ["Reflection","Reflexion"],
+  ["Lessons learned","Erkenntnisse","Learnings"],
+  ["Result link","Ergebnislink"],
+  ["Overall place","Gesamtplatz"],
+  ["Gender place","Platzierung nach Geschlecht","Gender-Platz"],
+  ["Age group place","Altersklassenplatz"],
+  ["Category","Kategorie"],
+  ["Elevation gain","Höhenmeter"],
+  ["Distance before withdrawal","Abbruchdistanz"],
+  ["Reason","Grund"],
+  ["Comment","Kommentar"],
+  ["Checkpoint splits","Zwischenzeiten","Checkpoint-Splits"],
+  ["Target overall place","Ziel Gesamtplatz"],
+  ["Target gender place","Ziel Platzierung nach Geschlecht","Ziel Gender-Platz"],
+  ["Target age group place","Ziel Altersklasse"],
+  ["Previous personal best","Bisherige Bestzeit"],
+  ["Desired improvement","Gewünschte Verbesserung"],
+  ["e.g. 30 seconds","z. B. 30 Sekunden"],
+  ["Training purpose","Trainingszweck"],
+  ["Intensity goal","Belastungsziel"],
+  ["Fitness test, long run, speed work...","Formtest, langer Lauf, Tempoarbeit..."],
+  ["Easy, controlled, race pace...","locker, kontrolliert, Renntempo...","locker, kontrolliert, Race Pace..."],
+  ["Describe your goal...","Beschreibe dein Ziel frei..."],
+  ["What would make a good race day for you?","Was wäre für dich ein guter Renntag?"],
+  ["First choose what this event should mean to you.","Wähle zuerst, was dieses Event für dich sein soll."],
+  ["You can plan without a target time. Fun, training or simply taking part are valid goals.","Du kannst ohne Zielzeit planen. Spaßlauf, Training oder einfach teilnehmen sind gültige Ziele."],
+  ["Swim","Schwimmen"],
+  ["Bike","Rad"],
+  ["Run","Laufen"],
+  ["General","Allgemein"],
+  ["Transition / other","Wechselzone / Sonstiges"],
+  ["Personal additions","Persönliche Ergänzungen"],
+  ["Add your own item.","Füge einen eigenen Punkt hinzu."],
+  ["Add","Hinzufügen"],
+  ["Equipment is marked as not needed for this event.","Ausrüstung ist für dieses Event als nicht benötigt markiert.","Equipment ist für dieses Event als nicht benötigt markiert."],
+  ["You can set this section back to Open or Planned and add your own items at any time.","Du kannst den Bereich jederzeit wieder auf Offen oder Geplant stellen und eigene Punkte ergänzen."],
+  ["No equipment has been planned yet.","Noch keine Ausrüstung geplant."],
+  ["An automatic equipment list could not be created for this event.","Für dieses Event konnte keine automatische Ausrüstung-Liste erstellt werden.","Für dieses Event konnte keine automatische Equipment-Liste erstellt werden."],
+  ["You can still add your own equipment items.","Du kannst weiterhin eigene Ausrüstungpunkte hinzufügen.","Du kannst weiterhin eigene Equipmentpunkte hinzufügen."],
+  ["No nutrition plan has been created for this event yet.","Für dieses Event wurde noch kein Verpflegungsplan erstellt."],
+  ["No nutrition is needed during the race.","Keine Verpflegung während des Rennens nötig."],
+  ["For short races you can choose Water only or Not needed.","Für kurze Rennen kannst du „Nur Wasser“ oder „Nicht benötigt“ wählen."],
+  ["Add entry","Eintrag hinzufügen"],
+  ["Basic plan","Grundplan"],
+  ["What went well?","Was lief gut?"],
+  ["What would you like to keep doing?","Was möchtest du beibehalten?"],
+  ["What was difficult?","Was war schwierig?"],
+  ["What cost energy or did not work?","Was hat Energie gekostet oder nicht funktioniert?"],
+  ["What would you change next time?","Was nächstes Mal ändern?"],
+  ["What would you adjust?","Was würdest du anpassen?"],
+  ["What worked for nutrition?","Was hat bei der Verpflegung funktioniert?"],
+  ["Which equipment worked well or caused problems?","Welches Ausrüstung war gut oder problematisch?","Welches Equipment war gut oder problematisch?"],
+  ["Would you take part again?","Wieder teilnehmen?"],
+  ["Yes, no, maybe...","Ja, Nein, Vielleicht..."],
+  ["Key lessons","Wichtigste Erkenntnisse","Wichtigste Learnings"],
+  ["What will you take into your next event?","Was nimmst du für das nächste Event mit?"],
+  ["What was the reason?","Was war der Grund?"],
+  ["Reason or comment...","Grund oder Kommentar..."],
+  ["Race report","Rennbericht"],
+  ["How did the race go?","Wie lief das Rennen?"],
+  ["How did your race go?","Wie lief dein Rennen?"],
+  ["Preparation","Vorbereitung"],
+  ["View preparation","Vorbereitung ansehen"],
+  ["Open preparation","Vorbereitung öffnen"],
+  ["Goal & race strategy","Ziel & Rennstrategie","Ziel & Race Strategy"],
+  ["Travel & bookings","Reise & Buchungen"],
+  ["Bib number","Startnummer"],
+  ["Travel note","Reisenotiz"],
+  ["Hotel, train, start area, collection...","Hotel, Zug, Startbereich, Abholung..."],
+  ["Personal note","Persönliche Notiz"],
+  ["Training, logistics, focus...","Training, Logistik, Fokus..."],
+  ["Goal note","Zielnotiz"],
+  ["Goal, strategy, pacing...","Ziel, Strategie, Pacings..."],
+  ["Personal reflection","Persönliche Reflexion"],
+  ["Tasks","Aufgaben"],
+  ["Planning status","Planungsstatus"],
+  ["Planning progress","Planungsstand"],
+  ["Subtle planning progress","Dezenter Planungsfortschritt"],
+  ["Pacing and race tactics","Pacing und Renntaktik"],
+  ["Intensity, pacing, key sections...","Intensität, Pacing, Schlüsselstellen..."],
+  ["What would you like to remember for this race?","Was möchtest du dir für dieses Rennen merken?"],
+  ["Race guide & race documents","Wettkampfunterlagen & Startunterlagen","Race Guide & Startunterlagen"],
+  ["Medical certificate","Medizinische Bescheinigung"],
+  ["Course knowledge","Streckenkenntnis"],
+  ["Further preparation","Weitere Vorbereitung"],
+  ["Race guide, mandatory equipment, your own items...","Wettkampfunterlagen, Pflichtausrüstung, eigene Punkte...","Race Guide, Pflichtausrüstung, eigene Punkte..."],
+  ["Start location","Startort"],
+  ["Location or address","Ort oder Adresse"],
+  ["Parking / transfer","Parken / Transfer"],
+  ["Logistics note","Logistiknotiz"],
+  ["Arrival, collection, supporters, important times...","Anreise, Ausgabe, Begleitpersonen, wichtige Uhrzeiten..."],
+  ["Arrival","Anreise"],
+  ["Finish time","Finishzeit"],
+  ["Withdrawal time","Abbruchzeit"],
+  ["Basic result","Grundlegendes Ergebnis"],
+  ["Official result URL","Offizielle Ergebnis-URL"],
+  ["Open official result","Offizielles Ergebnis öffnen"],
+  ["No result recorded yet.","Noch kein Ergebnis eingetragen."],
+  ["Not rated yet","Noch nicht bewertet"],
+  ["Before the start","Vor dem Start"],
+  ["During the race","Während des Rennens"],
+  ["After the race","Nach dem Rennen"],
+  ["Next step","Nächster Schritt"],
+  ["Next useful step:","Nächster sinnvoller Schritt:"],
+  ["Result recorded","Ergebnis eingetragen"],
+  ["Finish status set","Zielstatus gesetzt","Finish Status gesetzt"],
+  ["Personal rating added","Persönliche Bewertung ergänzt"],
+  ["Race review completed","Rennrückblick abgeschlossen","Rennreview abgeschlossen"],
+  ["Event date available","Eventdatum vorhanden"],
+  ["Distance selected","Distanz festgelegt"],
+  ["Priority selected","Priorität festgelegt"],
+  ["Registration completed","Anmeldung abgeschlossen"],
+  ["Race goal selected","Rennziel gewählt"],
+  ["Race guide and documents reviewed","Wettkampfunterlagen und Startunterlagen geprüft","Race Guide und Startunterlagen geprüft"],
+  ["Add result","Ergebnis eintragen"],
+  ["Reflect on the race","Rennen kurz reflektieren"],
+  ["Add review","Rückblick ergänzen","Review ergänzen"],
+  ["No open steps","Keine offenen Schritte"],
+  ["Set event priority","Eventpriorität festlegen"],
+  ["Edit event","Event bearbeiten"],
+  ["Complete registration","Anmeldung abschließen"],
+  ["Check registration","Anmeldung prüfen"],
+  ["Set your personal race goal","Persönliches Rennziel festlegen"],
+  ["Set goal","Ziel festlegen"],
+  ["Review race guide and documents","Wettkampfunterlagen und Startunterlagen prüfen","Race Guide und Startunterlagen prüfen"],
+  ["Plan equipment","Ausrüstung planen"],
+  ["Open equipment","Ausrüstung öffnen","Equipment öffnen"],
+  ["Create nutrition strategy","Verpflegungsstrategie erstellen"],
+  ["Plan nutrition","Verpflegung planen"],
+  ["Planning complete","Planung vollständig"],
+  ["Ready","Planung bereit"],
+  ["Still open","Noch offen"],
+  ["Available","Vorhanden"],
+  ["Edit","Bearbeiten"],
+  ["Save view","Ansicht speichern"],
+  ["Retry cloud saving","Cloudspeicherung erneut versuchen"],
+  ["Changes are saved automatically.","Änderungen werden automatisch gespeichert."],
+  ["Can be recorded after the event.","Kann nach dem Event eingetragen werden."],
+  ["The results section stays compact until race day.","Der Ergebnisbereich bleibt bis zum Renntag bewusst kompakt.","Der Ergebnisbereich bleibt bis zum Race Day bewusst kompakt."],
+  ["This does not block your planning progress.","Das blockiert deinen Planungsstatus nicht."],
+  ["Remains in past events and statistics.","Bleibt in vergangenen Rennen und Statistiken erhalten.","Bleibt in Past Events und Statistiken erhalten."],
+  ["Your archived edition; it does not appear in the public event search.","Eigene archivierte Edition; sie erscheint nicht in der öffentlichen Eventsuche."],
+  ["Previously saved information; the date and event status are currently unconfirmed.","Gespeicherte frühere Angaben; Datum und Veranstaltungsstatus aktuell nicht bestätigt."],
+  ["Automatically from event data:","Automatisch aus Eventdaten:"],
+  ["Planning by","Planung nach"],
+  ["Training phase","Trainingsphase"],
+  ["Use your target time, race strategy and notes to connect the current block with realistic expectations.","Nutze Zielzeit, Rennstrategie und Notizen, um den aktuellen Block mit realistischen Erwartungen zu verbinden.","Nutze Zielzeit, Race Strategy und Notizen, um den aktuellen Block mit realistischen Erwartungen zu verbinden."],
+  ["Build your season","Baue deine Saison auf"],
+  ["Add your first race.","Füge dein erstes Rennen hinzu."],
+  ["No planned races yet","Noch keine Rennen geplant"],
+  ["Save events from the map to build your editable season.","Speichere Events von der Karte, um deine Saison zu planen."],
+  ["No race selected","Kein Rennen ausgewählt"],
+  ["Select a race","Rennen auswählen"],
+  ["Choose a planned race on the left to edit goals, logistics, strategy and result data.","Wähle links ein geplantes Rennen aus, um Ziele, Logistik, Strategie und Ergebnisse zu bearbeiten."],
+  ["Start planning","Planung beginnen"],
+  ["Save races to calculate your season score.","Speichere Rennen, um deine Saisonbewertung zu berechnen."],
+  ["Select an A-Race","A-Rennen auswählen"],
+  ["Select an A-Race to unlock this metric.","Wähle ein A-Rennen aus, um diese Kennzahl anzuzeigen."],
+  ["More races needed","Weitere Rennen benötigt"],
+  ["Add more races to analyse training blocks.","Füge weitere Rennen hinzu, um Trainingsblöcke auszuwerten."],
+  ["Add at least two upcoming races to analyse training blocks.","Füge mindestens zwei kommende Rennen hinzu, um Trainingsblöcke auszuwerten."],
+  ["No recommendations yet","Noch keine Empfehlungen"],
+  ["Save your first race to unlock event recommendations.","Speichere dein erstes Rennen, um Eventempfehlungen zu erhalten."],
+  ["No recommendations found","Keine Empfehlungen gefunden"],
+  ["Add more races or vary sport, distance and timing to improve recommendations.","Füge weitere Rennen hinzu oder variiere Sportart, Distanz und Zeitraum für bessere Empfehlungen."],
+  ["No countdowns yet","Noch keine Countdowns"],
+  ["Save upcoming races to see your next important starts.","Speichere kommende Rennen, um deine nächsten wichtigen Starts zu sehen."],
+  ["No additional countdowns yet","Noch keine weiteren Countdowns"],
+  ["Add more upcoming races to compare your next starts.","Füge weitere kommende Rennen hinzu, um deine nächsten Starts zu vergleichen."],
+  ["No scheduled races","Keine terminierten Rennen"],
+  ["Add dated races to build your calendar.","Füge Rennen mit Datum hinzu, um deinen Kalender zu erstellen."],
+  ["No A races selected yet.","Noch keine A-Rennen ausgewählt."],
+  ["No distance focus yet.","Noch kein Distanzfokus."],
+  ["No sport distribution yet.","Noch keine Sportartenverteilung."],
+  ["No sport mix yet.","Noch kein Sportartenmix."],
+  ["Season Balance","Saisonbalance"],
+  ["Saved races","Gespeicherte Rennen"],
+  ["Average spacing","Durchschnittlicher Abstand"],
+  ["Season window","Saisonzeitraum"],
+  ["Next focus","Nächster Fokus"],
+  ["Season focus","Saisonfokus"],
+  ["Race Mix","Rennmix"],
+  ["Race Timing","Rennabstände"],
+  ["Race Overview","Rennübersicht"],
+  ["Sport distribution","Sportartenverteilung"],
+  ["Distance focus","Distanzfokus"],
+  ["Until next A-Race","Bis zum nächsten A-Rennen"],
+  ["Best opportunity for focused training.","Beste Gelegenheit für gezieltes Training."],
+  ["Longest gap","Längste Pause"],
+  ["Largest time gap between two upcoming planned races","Größter Abstand zwischen zwei kommenden geplanten Rennen"],
+  ["Between","Zwischen"],
+  ["Based on your current season.","Basierend auf deiner aktuellen Saison."],
+  ["Plenty of time to build fitness.","Viel Zeit für den Formaufbau."],
+  ["Time to sharpen race-specific fitness.","Zeit, die wettkampfspezifische Form zu schärfen."],
+  ["Race approaching. Focus on execution.","Das Rennen naht. Konzentriere dich auf die Umsetzung."],
+  ["Upcoming","Bevorstehend"],
+  ["Results","Ergebnisse"],
+  ["Archive","Archiv"],
+  ["Past · result pending","Vergangen · Ergebnis offen"],
+  ["Started / ongoing","Gestartet / läuft"],
+  ["Cancelled / inactive","Abgesagt / inaktiv"],
+  ["Edition / date to confirm","Austragung / Datum zu bestätigen"],
+  ["Calendar","Kalender"],
+  ["Next Race","Nächstes Rennen"],
+  ["Races","Rennen"],
+  ["Race Review","Rennrückblick"],
+  ["Result & Review","Ergebnis & Rückblick"],
+  ["Goal & Race Strategy","Ziel & Rennstrategie"],
+  ["Travel & Logistics","Reise & Logistik"],
+  ["Equipment & Nutrition","Ausrüstung & Verpflegung"],
+  ["Post-Race Status","Status nach dem Rennen"],
+  ["Swim split","Schwimmzeit"],
+  ["Bike split","Radzeit"],
+  ["Run split","Laufzeit"],
+  ["Finish Status","Zielstatus"],
+  ["Age Group","Altersklasse"],
+  ["Overall","Gesamt"],
+  ["Gender","Geschlecht"],
+  ["DNF Details","DNF-Details"],
+  ["DSQ comment","DSQ Kommentar"],
+  ["Previous month","Vorheriger Monat"],
+  ["Next month","Nächster Monat"],
+  ["No saved events","Keine gespeicherten Events"],
+  ["Calendar ready","Kalender bereit"],
+  ["Your season calendar file was downloaded.","Dein Saisonkalender wurde heruntergeladen."],
+  ["No upcoming race","Kein bevorstehendes Rennen"],
+  ["Calendar export unavailable","Kalenderexport nicht verfügbar"],
+  ["This event has no valid date, so it cannot be opened in Google Calendar.","Dieses Event hat kein gültiges Datum und kann deshalb nicht in Google Kalender geöffnet werden."],
+  ["Detailed cards","Ausführliche Karten"],
+  ["Water only","Nur Wasser"],
+  ["Own nutrition","Eigene Verpflegung"],
+  ["Organizer nutrition","Verpflegung des Veranstalters"],
+  ["Combination","Kombination"],
+  ["Time of day","Uhrzeit"],
+  ["Race time","Rennzeit"],
+  ["Course point","Streckenpunkt"],
+  ["Still incomplete","Noch unvollständig"],
+  ["Remove nutrition entry","Verpflegungseintrag entfernen"],
+  ["Add your own equipment item","Eigenen Ausrüstungpunkt hinzufügen","Eigenen Equipmentpunkt hinzufügen"],
+  ["Remove equipment item","Ausrüstungpunkt entfernen","Equipmentpunkt entfernen"],
+  ["Gel, water, drink...","Gel, Wasser, Drink..."],
+  ["Amount","Menge"],
+  ["Fluid","Flüssigkeit"],
+  ["Note","Hinweis"],
+  ["km 10, 40 min, aid station 3","km 10, 40 min, Station 3"],
+  ["Wetsuit","Neoprenanzug"],
+  ["Swimming goggles","Schwimmbrille"],
+  ["Swim cap","Badekappe"],
+  ["Bicycle","Fahrrad"],
+  ["Helmet","Helm"],
+  ["Cycling shoes","Radschuhe"],
+  ["Running shoes","Laufschuhe"],
+  ["Race belt","Startnummernband"],
+  ["Repair kit","Reparaturset"],
+  ["Water bottles","Trinkflaschen"],
+  ["Trail shoes","Trail-Schuhe"],
+  ["Running pack","Laufrucksack"],
+  ["Mandatory equipment","Pflichtausrüstung"],
+  ["Headlamp","Stirnlampe"],
+  ["Emergency blanket","Rettungsdecke"],
+  ["Rain jacket","Regenjacke"],
+  ["Change of clothes","Wechselkleidung"],
+  ["Socks","Socken"],
+  ["Cap or visor","Cap oder Visor"],
+  ["Towel","Handtuch"],
+  ["Sunscreen","Sonnencreme"],
+  ["Transition bag","Wechselbeutel"],
+  ["Race clothing","Wettkampfkleidung"],
+  ["Watch","Uhr"],
+  ["Check event date","Eventdatum prüfen"],
+  ["Select distance","Distanz auswählen"],
+  ["Set race priority","Wettkampfpriorität setzen","Race-Priorität setzen"],
+  ["Select event goal","Eventziel auswählen"],
+  ["Review race documents","Startunterlagen prüfen"],
+  ["Plan nutrition","Verpflegung klären"],
+  ["Add personal note","Persönliche Notiz hinzufügen"],
+  ["Fully documented","Vollständig dokumentiert"],
+  ["Ready for race day","Bereit für den Renntag"],
+  ["Add rating","Bewertung ergänzen"],
+  ["Add lessons learned","Erkenntnisse ergänzen","Learnings ergänzen"],
+  ["Add result link","Ergebnislink ergänzen"],
+  ["Add splits","Zwischenzeiten ergänzen","Splits ergänzen"],
+  ["Restore from archive","Aus Archiv zurückholen"],
+  ["Move to archive","Im Archiv ablegen"],
+  ["Registration confirmed","Anmeldung bestätigt"],
+  ["No personal note yet.","Noch keine persönliche Notiz."],
+  ["No goal type selected yet","Noch kein Zieltyp gewählt"],
+  ["No equipment planned yet","Noch keine Ausrüstung geplant"],
+  ["Can be added after the event","Kann nach dem Event ergänzt werden"],
+  ["Reflection added","Reflexion ergänzt"],
+  ["Event details are not complete yet","Eventdetails noch nicht vollständig"],
+  ["All important items are resolved","Alle wichtigen Punkte geklärt"],
+  ["Record your finish status, official time and placing for your season review.","Halte Zielstatus, offizielle Zeit und Platzierung für deinen Saisonrückblick fest.","Halte Finish Status, offizielle Zeit und Platzierung für deinen Saisonrückblick fest."],
+  ["Note what went well and what you would do differently next time.","Notiere, was gut lief und was du beim nächsten Rennen anders machen möchtest."],
+  ["Your result and race review are fully documented.","Ergebnis und Rennrückblick sind vollständig dokumentiert.","Ergebnis und Rennreview sind vollständig dokumentiert."],
+  ["Classify this as an A, B, C or training race.","Ordne das Rennen als A-, B-, C- oder Trainingsrennen ein."],
+  ["Check your registration before making further travel or race plans.","Prüfe den Meldestatus, bevor du weitere Reise- oder Rennplanung festlegst."],
+  ["Decide whether you are racing for a time, as training or just for fun.","Lege fest, ob du auf Zeit, als Training oder einfach zum Spaß startest."],
+  ["Check collection, required documents and important race-day times.","Kontrolliere Ausgabe, Pflichtunterlagen und wichtige Zeiten für den Renntag."],
+  ["Review the suggested packing list for this event.","Prüfe die automatisch vorgeschlagene Packliste für dieses Event."],
+  ["Decide whether and how you want to fuel during the race.","Lege fest, ob und wie du dich während des Rennens verpflegen möchtest."],
+  ["All currently important items for this race are resolved.","Alle aktuell wichtigen Punkte für dieses Rennen sind geklärt."],
+  ["Race documents reviewed","Startunterlagen geklärt"],
+  ["No travel needed","Keine Reise nötig"],
+  ["Travel arranged","Anreise geklärt"],
+  ["Travel pending","Anreise offen"],
+  ["No accommodation needed","Keine Unterkunft nötig"],
+  ["Accommodation arranged","Unterkunft geklärt"],
+  ["Accommodation pending","Unterkunft offen"],
+  ["Equipment not needed","Ausrüstung nicht benötigt"],
+  ["Equipment planned","Ausrüstung geplant"],
+  ["Equipment pending","Ausrüstung offen"],
+  ["Nutrition not needed","Verpflegung nicht benötigt"],
+  ["Nutrition planned","Verpflegung geplant"],
+  ["Nutrition pending","Verpflegung offen"],
+  ["Result not recorded yet","Ergebnis noch nicht eingetragen"],
+  ["Available after the race","Nach dem Rennen verfügbar"],
+  ["Close editor","Bearbeitung schließen"],
+  ["Date pending","Datum offen"],
+  ["Distance pending","Distanz offen"],
+  ["Registered","Angemeldet"],
+  ["Registration pending","Anmeldung offen"],
+  ["All currently relevant items are resolved.","Alle aktuell relevanten Punkte sind geklärt."],
+  ["Your planning for this edition. Changes are saved on this device first.","Eigene Planung dieser Edition. Änderungen werden zuerst auf diesem Gerät gespeichert."],
+  ["Saved on this device; cloud confirmation pending.","Auf diesem Gerät gespeichert; Cloudbestätigung ausstehend."],
+  ["Saved on this device","Auf diesem Gerät gespeichert"],
+  ["Cloud confirmation and retry are shown with the event.","Cloudbestätigung und Wiederholung stehen beim Event."],
+  ["Past planning data remains available in these sections.","Vergangene Planungsdaten bleiben in den Bereichen weiterhin erreichbar."],
+  ["Today","Heute"],
+  ["Race Week","Rennwoche"],
+  ["Taper","Reduktionsphase"],
+  ["Build Phase","Aufbauphase"],
+  ["Base Phase","Grundlagenphase"],
+  ["Season start","Saisonstart"],
+  ["Gap unclear","Abstand unklar"],
+  ["Around 60,000 athletes","Rund 60.000 Athleten"],
+  ["Flat course with very little elevation gain","Flache Strecke mit sehr wenigen Höhenmetern"],
+  ["World Marathon Major through Berlin, finishing near Brandenburg Gate","World Marathon Major durch Berlin mit Ziel am Brandenburger Tor"],
+  ["37,000+ participants across the race weekend","Über 37.000 Teilnehmer am Rennwochenende"],
+  ["Flat and fast city course","Flache und schnelle Stadtstrecke"],
+  ["Cologne city race with a strong party atmosphere along the route","Kölner Stadtlauf mit ausgelassener Stimmung entlang der Strecke"],
+  ["Alster swim, city bike course and marathon run around the Alster","Schwimmen in der Alster, Radstrecke durch die Stadt und Marathon um die Alster"],
+  ["Full-distance IRONMAN race finishing in central Hamburg","IRONMAN-Langdistanz mit Ziel in der Hamburger Innenstadt"],
+  ["Rhine/Rheinpark race area with swim, bike and run formats","Wettkampf am Rhein und Rheinpark mit Schwimm-, Rad- und Laufstrecken"],
+  ["Sprint, Olympic and middle-distance racing in Cologne","Sprint-, Kurz- und Mitteldistanz in Köln"],
+  ["Germany's largest spring marathon","Deutschlands größter Frühjahrsmarathon"],
+  ["One-lap course through Munich","Eine Runde durch München"],
+  ["World Athletics Road Race Label event","Veranstaltung mit World Athletics Road Race Label"],
+  ["Flat circular road course along both sides of the River Main","Flacher Straßenrundkurs entlang beider Mainufer"],
+  ["Fast city marathon in Germany's financial capital","Schneller Stadtmarathon in Frankfurt"],
+  ["Planning","Planung"],
+  ["Recovery","Erholung"],
+  ["Peak Phase","Wettkampfspezifische Phase"],
+  ["Result pending","Ergebnis ausstehend"],
+  ["Reflection pending","Reflexion ausstehend"],
+  ["Document the race","Rennverlauf dokumentieren"],
+  ["No date","Kein Datum"],
+  ["Done","Fertig"],
+  ["Placing","Platzierung"],
+  ["A Race","A-Rennen"],
+  ["B Race","B-Rennen"],
+  ["C Race","C-Rennen"],
+  ["Maybe","Vielleicht"],
+  ["Very demanding","Sehr anspruchsvoll"],
+  ["Demanding","Anspruchsvoll"],
+  ["Balanced","Ausgewogen"],
+  ["Light","Leicht"],
+  ["Very light","Sehr leicht"],
+  ["Excellent","Ausgezeichnet"],
+  ["Overloaded","Überladen"],
+  ["Busy","Dicht geplant"],
+  ["Good","Gut"],
+  ["Your season is well balanced.","Deine Saison ist gut ausbalanciert."],
+  ["Several races are scheduled too closely together.","Mehrere Rennen liegen zu nah beieinander."],
+  ["Your season has some load or spacing risks.","Deine Saison weist Risiken bei Belastung oder Rennabständen auf."],
+  ["Your season is solid with a few areas to review.","Deine Saison ist solide, einige Punkte solltest du prüfen."],
+  ["Race Ready Phase","Unmittelbare Wettkampfvorbereitung"],
+  ["Specific Training Phase","Spezifische Trainingsphase"],
+  ["Base Building Opportunity","Zeit für den Grundlagenaufbau"],
+  ["Long build","Lange Aufbauphase"],
+  ["Plenty of time for a focused training block.","Viel Zeit für einen gezielten Trainingsblock."],
+  ["Tight spacing","Kurzer Rennabstand"],
+  ["Very little recovery time between races.","Sehr wenig Erholungszeit zwischen den Rennen."],
+  ["Short block","Kurzer Block"],
+  ["Useful for recovery and sharpening, but not a full build.","Geeignet für Erholung und Feinschliff, aber nicht für einen vollständigen Aufbau."],
+  ["Good block","Guter Block"],
+  ["Good window for focused training.","Gutes Zeitfenster für gezieltes Training."],
+  ["Fills a useful training gap in your season.","Füllt ein sinnvolles Trainingsfenster in deiner Saison."],
+  ["Nearby region based on your saved races.","Passende Region auf Basis deiner gespeicherten Rennen."],
+  ["Days","Tage"],
+  ["days","Tage"],
+  ["race","Rennen"],
+  ["races","Rennen"],
+  ["open task","offene Aufgabe"],
+  ["open tasks","offene Aufgaben"],
+  ["day apart","Tag Abstand"],
+  ["days apart","Tage Abstand"],
+  ["recommended","empfohlen"],
+  ["Season Score","Saisonbewertung"],
+  ["Unscheduled","Ohne Termin"],
+  ["Clear","Unauffällig"],
+  ["No races yet","Noch keine Rennen"],
+  ["No race mix yet","Noch kein Rennmix"],
+  ["Review races with short recovery windows before committing.","Prüfe Rennen mit kurzen Erholungszeiten, bevor du dich festlegst."],
+  ["Your saved races currently have no obvious spacing conflicts.","Deine gespeicherten Rennen haben derzeit keine offensichtlichen Terminkonflikte."],
+  ["Add dates to compare months","Füge Termine hinzu, um Monate zu vergleichen"],
+  ["Set an A or B race","Lege ein A- oder B-Rennen fest"],
+  ["Click for more information","Für weitere Informationen klicken"],
+  ["Click for more information about Season Balance","Für weitere Informationen zur Saisonbalance klicken"],
+  ["Click for more information about Race Mix","Für weitere Informationen zum Rennmix klicken"],
+  ["Click for more information about Training Blocks","Für weitere Informationen zu Trainingsblöcken klicken"]
+];
+
+function eventUiText(value) {
+  const pair = EVENT_UI_TEXT_PAIRS.find(texts => texts.includes(value));
+  return pair ? pair[window.getAppLanguage?.() === "de" ? 1 : 0]
+    : typeof window.uiText === "function" ? window.uiText(value) : value;
+}
+
+function eventDisplayValue(value) {
+  return window.SportEventMapDescriptions?.localizeEventText(value, window.getAppLanguage?.() || "en") || value;
+}
+
+function eventMonthDisplay(value) {
+  if (value === "Unscheduled") return eventUiText(value);
+  const date = new Date(`${value} 1, 12:00:00`);
+  return Number.isNaN(date.getTime()) ? value
+    : date.toLocaleDateString(window.getAppLanguage?.() === "de" ? "de-DE" : "en-GB", { month: "long", year: "numeric" });
+}
+
+let currentDrawerEvent = null;
+
+document.addEventListener("app-language-changed", () => {
+  const drawer = document.getElementById("eventDrawer");
+  if (currentDrawerEvent && drawer?.classList.contains("open")) {
+    const scrollTop = drawer.scrollTop;
+    openDrawer(currentDrawerEvent, { languageRefresh: true });
+    drawer.scrollTop = scrollTop;
+  }
+});
+
 
 function createEventKey(event) {
   return [
@@ -1013,15 +1523,15 @@ function parseEventStatDescription(description) {
         return;
       }
 
-      if (key.includes("participant")) {
+      if (key.includes("participant") || key.includes("teilnehmer")) {
         stats.participants = value;
       }
 
-      if (key.includes("course")) {
+      if (key.includes("course") || key.includes("strecke")) {
         stats.course = value;
       }
 
-      if (key.includes("highlight") || key.includes("info")) {
+      if (key.includes("highlight") || key.includes("info") || key.includes("besonderheit")) {
         stats.highlight = value;
       }
     });
@@ -1043,94 +1553,94 @@ function getEventStats(event) {
       match: ["berlin", "marathon"],
       stats: {
         participants:
-          "Around 60,000 athletes",
+          eventUiText("Around 60,000 athletes"),
         course:
-          "Flat course with very little elevation gain",
+          eventUiText("Flat course with very little elevation gain"),
         highlight:
-          "World Marathon Major through Berlin, finishing near Brandenburg Gate"
+          eventUiText("World Marathon Major through Berlin, finishing near Brandenburg Gate")
       }
     },
     {
       match: ["köln", "marathon"],
       stats: {
         participants:
-          "37,000+ participants across the race weekend",
+          eventUiText("37,000+ participants across the race weekend"),
         course:
-          "Flat and fast city course",
+          eventUiText("Flat and fast city course"),
         highlight:
-          "Cologne city race with a strong party atmosphere along the route"
+          eventUiText("Cologne city race with a strong party atmosphere along the route")
       }
     },
     {
       match: ["koln", "marathon"],
       stats: {
         participants:
-          "37,000+ participants across the race weekend",
+          eventUiText("37,000+ participants across the race weekend"),
         course:
-          "Flat and fast city course",
+          eventUiText("Flat and fast city course"),
         highlight:
-          "Cologne city race with a strong party atmosphere along the route"
+          eventUiText("Cologne city race with a strong party atmosphere along the route")
       }
     },
     {
       match: ["ironman", "hamburg"],
       stats: {
         course:
-          "Alster swim, city bike course and marathon run around the Alster",
+          eventUiText("Alster swim, city bike course and marathon run around the Alster"),
         highlight:
-          "Full-distance IRONMAN race finishing in central Hamburg"
+          eventUiText("Full-distance IRONMAN race finishing in central Hamburg")
       }
     },
     {
       match: ["köln", "triathlon"],
       stats: {
         course:
-          "Rhine/Rheinpark race area with swim, bike and run formats",
+          eventUiText("Rhine/Rheinpark race area with swim, bike and run formats"),
         highlight:
-          "Sprint, Olympic and middle-distance racing in Cologne"
+          eventUiText("Sprint, Olympic and middle-distance racing in Cologne")
       }
     },
     {
       match: ["koln", "triathlon"],
       stats: {
         course:
-          "Rhine/Rheinpark race area with swim, bike and run formats",
+          eventUiText("Rhine/Rheinpark race area with swim, bike and run formats"),
         highlight:
-          "Sprint, Olympic and middle-distance racing in Cologne"
+          eventUiText("Sprint, Olympic and middle-distance racing in Cologne")
       }
     },
     {
       match: ["hamburg", "marathon"],
       stats: {
         highlight:
-          "Germany's largest spring marathon"
+          eventUiText("Germany's largest spring marathon")
       }
     },
     {
       match: ["münchen", "marathon"],
       stats: {
         course:
-          "One-lap course through Munich",
+          eventUiText("One-lap course through Munich"),
         highlight:
-          "World Athletics Road Race Label event"
+          eventUiText("World Athletics Road Race Label event")
       }
     },
     {
       match: ["munich", "marathon"],
       stats: {
         course:
-          "One-lap course through Munich",
+          eventUiText("One-lap course through Munich"),
         highlight:
-          "World Athletics Road Race Label event"
+          eventUiText("World Athletics Road Race Label event")
       }
     },
     {
       match: ["frankfurt", "marathon"],
       stats: {
         course:
-          "Flat circular road course along both sides of the River Main",
+          eventUiText("Flat circular road course along both sides of the River Main"),
         highlight:
-          "Fast city marathon in Germany's financial capital"
+          eventUiText("Fast city marathon in Germany's financial capital")
       }
     }
   ];
@@ -1157,21 +1667,21 @@ function createEventStatsMarkup(event) {
     stats.participants
       ? {
           icon: "👥",
-          label: "Participants",
+          label: eventUiText("Participants"),
           value: stats.participants
         }
       : null,
     stats.course
       ? {
           icon: "↗",
-          label: "Course",
+          label: eventUiText("Course"),
           value: stats.course
         }
       : null,
     stats.highlight
       ? {
           icon: "✨",
-          label: "Highlight",
+          label: eventUiText("Highlight"),
           value: stats.highlight
         }
       : null
@@ -1180,7 +1690,7 @@ function createEventStatsMarkup(event) {
   if (!rows.length) {
     return `
       <div class="event-stats-empty">
-        More event details will be added soon.
+        ${escapeHTML(eventUiText("More event details will be added soon."))}
       </div>
     `;
   }
@@ -1190,8 +1700,8 @@ function createEventStatsMarkup(event) {
       <div class="event-stat-row">
         <span class="event-stat-icon">${row.icon}</span>
         <div>
-          <strong>${escapeHTML(row.label)}</strong>
-          <p>${escapeHTML(row.value)}</p>
+          <strong>${escapeHTML(eventUiText(row.label))}</strong>
+          <p>${escapeHTML(eventDisplayValue(eventUiText(row.value)))}</p>
         </div>
       </div>
     `)
@@ -1243,8 +1753,8 @@ function syncEventCardDensityState() {
 
   densityButton.textContent =
     eventCardDensity === "detailed"
-      ? "Compact cards"
-      : "Detailed cards";
+      ? eventUiText("Compact cards")
+      : eventUiText("Detailed cards");
 
   densityButton.setAttribute(
     "aria-pressed",
@@ -1295,20 +1805,20 @@ function updateEventListControls(events) {
   if (fullscreenButton) {
     fullscreenButton.textContent =
       isEventListFullscreen()
-        ? "← Map"
-        : "→ List";
+        ? `← ${eventUiText("Map")}`
+        : `→ ${eventUiText("List")}`;
 
     fullscreenButton.setAttribute(
       "aria-label",
       isEventListFullscreen()
-        ? "Collapse list and show map"
-        : "Expand event list"
+        ? eventUiText("Collapse list and show map")
+        : eventUiText("Expand event list")
     );
 
     fullscreenButton.title =
       isEventListFullscreen()
-        ? "Collapse list and show map"
-        : "Expand event list";
+        ? eventUiText("Collapse list and show map")
+        : eventUiText("Expand event list");
   }
 
   syncEventCardDensityState();
@@ -1333,13 +1843,13 @@ function updateEventListControls(events) {
     "event-list-page-info";
 
   info.textContent =
-    `Page ${eventListPage} of ${pageCount}`;
+    window.getAppLanguage?.() === "de" ? `Seite ${eventListPage} von ${pageCount}` : `Page ${eventListPage} of ${pageCount}`;
 
   const previous =
     document.createElement("button");
 
   previous.type = "button";
-  previous.textContent = "Previous";
+  previous.textContent = eventUiText("Previous");
   previous.disabled = eventListPage <= 1;
   previous.onclick = () => {
     eventListPage -= 1;
@@ -1352,7 +1862,7 @@ function updateEventListControls(events) {
     document.createElement("button");
 
   next.type = "button";
-  next.textContent = "Next";
+  next.textContent = eventUiText("Next");
   next.disabled = eventListPage >= pageCount;
   next.onclick = () => {
     eventListPage += 1;
@@ -1508,14 +2018,14 @@ function getEventFormatLabel(event) {
   }
 
   if (/\b\d{1,2}h\b/i.test(distance)) {
-    return "Timed Ultra";
+    return eventUiText("Timed Ultra");
   }
 
   if (/miles?|ultra|trail|50\s?km|60\s?km|80\s?km|100\s?km/i.test(distance)) {
     return "Ultramarathon";
   }
 
-  return sport || "Event";
+  return eventDisplayValue(sport) || "Event";
 }
 
 const EVENT_STATUS_CONFIG = {
@@ -1691,19 +2201,19 @@ function copyEventLink(event) {
       .then(() => {
         if (typeof showAppMessage === "function") {
           showAppMessage(
-            "Link copied",
-            "The event link has been copied."
+            eventUiText("Link copied"),
+            eventUiText("The event link has been copied.")
           );
         }
       })
       .catch(() => {
-        window.prompt("Copy event link", link);
+        window.prompt(eventUiText("Copy event link"), link);
       });
 
     return;
   }
 
-  window.prompt("Copy event link", link);
+  window.prompt(eventUiText("Copy event link"), link);
 }
 
 async function shareEvent(event) {
@@ -2070,12 +2580,12 @@ function createPopup(event) {
           &#128197; ${escapeHTML(event.date)}
         </span>
         <span>
-          &#128205; ${escapeHTML(event.city)}, ${escapeHTML(event.country)}
+          &#128205; ${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}
         </span>
       </div>
 
       <div class="popup-distance">
-        ${escapeHTML(event.distance)}
+        ${escapeHTML(eventDisplayValue(event.distance))}
       </div>
 
       <a
@@ -2085,7 +2595,7 @@ function createPopup(event) {
         rel="noopener noreferrer"
         data-popup-website="${escapeHTML(getEventKey(event))}"
       >
-        Official Website
+        ${escapeHTML(eventUiText("Official Website"))}
       </a>
 
       ${
@@ -2132,11 +2642,11 @@ function renderEventList(events, options = {}) {
   if (!currentRenderedEvents.length) {
     const emptyTitle =
       options.emptyTitle ||
-      "Keine passenden Events gefunden";
+      eventUiText("No matching events found");
 
     const emptyText =
       options.emptyText ||
-      "Passe deine Suche oder Filter an.";
+      eventUiText("Adjust your search or filters.");
 
     const showReset =
       options.showReset !== false;
@@ -2152,7 +2662,7 @@ function renderEventList(events, options = {}) {
                 type="button"
                 class="event-empty-reset-btn"
               >
-                Filter zurücksetzen
+                ${escapeHTML(eventUiText("Filter zurücksetzen"))}
               </button>
             `
             : ""
@@ -2211,7 +2721,7 @@ function renderEventList(events, options = {}) {
         <button
           class="favorite-btn ${isFavorite(event) ? "active" : ""}"
           type="button"
-          aria-label="Toggle favorite"
+          aria-label="${escapeHTML(eventUiText("Toggle favorite"))}"
           data-testid="event-card-favorite"
         >
           ${isFavorite(event) ? "&#10084;" : "&#9825;"}
@@ -2222,16 +2732,16 @@ function renderEventList(events, options = {}) {
 
       <div class="event-facts-grid">
         <div>
-          <span>${window.t ? window.t("event.date") : "Date"}</span>
+          <span>${window.t ? window.t("event.date") : eventUiText("Date")}</span>
           <strong>${escapeHTML(event.date)}</strong>
         </div>
         <div>
-          <span>${window.t ? window.t("event.distance") : "Distance"}</span>
-          <strong>${escapeHTML(event.distance)}</strong>
+          <span>${window.t ? window.t("event.distance") : eventUiText("Distance")}</span>
+          <strong>${escapeHTML(eventDisplayValue(event.distance))}</strong>
         </div>
         <div class="event-location-fact">
           <span>${window.t ? window.t("event.location") : "Location"}</span>
-          <strong>${escapeHTML(event.city)}, ${escapeHTML(event.country)}</strong>
+          <strong>${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}</strong>
         </div>
       </div>
 
@@ -2377,9 +2887,10 @@ function highlightCard(eventKey) {
 
 
 // DRAWER
-function openDrawer(event) {
+function openDrawer(event, options = {}) {
+  currentDrawerEvent = event;
 
-  if (typeof window.rememberDiscoveryMapViewBeforeEvent === "function") {
+  if (!options.languageRefresh && typeof window.rememberDiscoveryMapViewBeforeEvent === "function") {
     window.rememberDiscoveryMapViewBeforeEvent();
   }
 
@@ -2392,11 +2903,12 @@ function openDrawer(event) {
   const now =
     Date.now();
 
-  if (typeof window.updatePlatformEventRoute === "function") {
+  if (!options.languageRefresh && typeof window.updatePlatformEventRoute === "function") {
     window.updatePlatformEventRoute(event);
   }
 
   if (
+    !options.languageRefresh &&
     typeof trackEvent === "function" &&
     (
       lastTrackedEventOpen.key !== trackedKey ||
@@ -2430,7 +2942,7 @@ function openDrawer(event) {
 
   content.innerHTML = `
 
-    <button id="closeDrawer" data-testid="drawer-close">
+    <button id="closeDrawer" data-testid="drawer-close" aria-label="${escapeHTML(eventUiText("Close event details"))}">
       &times;
     </button>
 
@@ -2453,7 +2965,7 @@ function openDrawer(event) {
 
         <div class="drawer-title-meta">
           ${escapeHTML(event.date)} &middot;
-          ${escapeHTML(event.city)}, ${escapeHTML(event.country)}
+          ${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}
         </div>
 
       </div>
@@ -2463,7 +2975,7 @@ function openDrawer(event) {
       <button
         class="drawer-favorite-btn ${isFavorite(event) ? "active" : ""}"
         type="button"
-        aria-label="Toggle favorite"
+        aria-label="${escapeHTML(eventUiText("Toggle favorite"))}"
         data-event-key="${escapeHTML(getEventKey(event))}"
         data-testid="drawer-favorite"
       >
@@ -2479,21 +2991,21 @@ function openDrawer(event) {
         data-event-key="${escapeHTML(getEventKey(event))}"
         data-testid="drawer-add-to-planner"
       >
-        ${isPlannedEdition(event) ? "Saved in Season" : "Add to Season"}
+        ${isPlannedEdition(event) ? eventUiText("Saved in Season") : eventUiText("Add to Season")}
       </button>
 
       <button
         class="drawer-copy-btn"
         type="button"
       >
-        Copy event link
+        ${escapeHTML(eventUiText("Copy event link"))}
       </button>
 
       <button
         class="drawer-share-btn"
         type="button"
       >
-        Teilen
+        ${escapeHTML(eventUiText("Teilen"))}
       </button>
     </div>
 
@@ -2507,18 +3019,18 @@ function openDrawer(event) {
       <div class="drawer-overview-grid">
 
         <div>
-          <span>${window.t ? window.t("event.date") : "Date"}</span>
+          <span>${window.t ? window.t("event.date") : eventUiText("Date")}</span>
           <strong>${escapeHTML(event.date)}</strong>
         </div>
 
         <div>
-          <span>${window.t ? window.t("event.distance") : "Distance"}</span>
-          <strong>${escapeHTML(event.distance)}</strong>
+          <span>${window.t ? window.t("event.distance") : eventUiText("Distance")}</span>
+          <strong>${escapeHTML(eventDisplayValue(event.distance))}</strong>
         </div>
 
         <div>
           <span>${window.t ? window.t("event.location") : "Location"}</span>
-          <strong>${escapeHTML(event.city)}, ${escapeHTML(event.country)}</strong>
+          <strong>${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}</strong>
         </div>
 
         <div>
@@ -2544,12 +3056,12 @@ function openDrawer(event) {
     </div>
 
     <div class="drawer-trust-note">
-      <strong>Verify before registering</strong>
+      <strong>${escapeHTML(eventUiText("Verify before registering"))}</strong>
       <span>
-        Event data may change. The official organizer website is the source of truth.
+        ${escapeHTML(eventUiText("Event data may change. The official organizer website is the source of truth."))}
         ${
           event.last_checked
-            ? `Last checked: ${escapeHTML(event.last_checked)}.`
+            ? `${escapeHTML(eventUiText("Last checked"))}: ${escapeHTML(event.last_checked)}.`
             : ""
         }
       </span>
@@ -2557,7 +3069,7 @@ function openDrawer(event) {
 
     ${
       detailUrl
-        ? `<a class="drawer-detail-button" href="${detailUrl}">Open detail page</a>`
+        ? `<a class="drawer-detail-button" href="${detailUrl}">${escapeHTML(eventUiText("Open detail page"))}</a>`
         : ""
     }
 
@@ -2568,7 +3080,7 @@ function openDrawer(event) {
       target="_blank"
       rel="noopener noreferrer"
     >
-      ${window.t ? window.t("event.officialWebsite") : "Official Website"}
+      ${window.t ? window.t("event.officialWebsite") : eventUiText("Official Website")}
     </a>
 
   `;
@@ -2625,7 +3137,7 @@ function openDrawer(event) {
         clickEvent.stopPropagation();
 
         drawerSeasonBtn.disabled = true;
-        drawerSeasonBtn.textContent = "Saving...";
+        drawerSeasonBtn.textContent = eventUiText("Saving...");
 
         const added =
           await addEventToSeasonPlanner(event, {
@@ -2642,8 +3154,8 @@ function openDrawer(event) {
 
         drawerSeasonBtn.textContent =
           active
-            ? "Saved in Season"
-            : "Add to Season";
+            ? eventUiText("Saved in Season")
+            : eventUiText("Add to Season");
 
         drawerSeasonBtn.disabled = false;
       }
@@ -2770,11 +3282,11 @@ function toggleFavorite(event) {
   ) {
     showToast(
       isNowFavorite
-        ? "Favorite added"
-        : "Favorite removed",
+        ? eventUiText("Favorite added")
+        : eventUiText("Favorite removed"),
       isNowFavorite
-        ? "This race was added to your Season Planner."
-        : "This race was removed from your saved events."
+        ? eventUiText("This race was added to your favorites.")
+        : eventUiText("This race was removed from your saved events.")
     );
   }
 
@@ -2940,8 +3452,8 @@ function updateFavoriteButtons(event) {
       button.classList.toggle("active", planned);
       button.textContent =
         planned
-          ? "Saved in Season"
-          : "Add to Season";
+          ? eventUiText("Saved in Season")
+          : eventUiText("Add to Season");
     });
 }
 
@@ -3400,7 +3912,7 @@ function setSeasonMetaEntry(eventKey, entryPatch = {}) {
       edition_id: findSeasonEventByKey(eventKey)?.edition_id || previous.edition_id || null,
       _sync_revision: Number(previous._sync_revision || 0) + 1,
       _sync_state: "pending",
-      _sync_message: "Auf diesem Gerät gespeichert; Cloudbestätigung ausstehend."
+      _sync_message: eventUiText("Auf diesem Gerät gespeichert; Cloudbestätigung ausstehend.")
     });
 
   meta[eventKey] =
@@ -3419,7 +3931,7 @@ function setPersonalPlannerSyncState(eventKey, revision, state, message, owner) 
   saveSeasonPlanMeta(meta);
   notifyPersonalPlanningChange();
   document.querySelectorAll("[data-planner-sync-status]").forEach(node => {
-    if (node.dataset.plannerSyncStatus === eventKey) node.textContent = message;
+    if (node.dataset.plannerSyncStatus === eventKey) node.textContent = eventUiText(message);
   });
 }
 window.setPersonalPlannerSyncState = setPersonalPlannerSyncState;
@@ -4398,15 +4910,15 @@ function renderSeasonStatusSelect({
 
   return `
     <label class="season-status-select">
-      <span>${escapeHTML(label)}</span>
+      <span>${escapeHTML(eventUiText(label))}</span>
       <select
         data-season-detail-event="${escapeHTML(eventKey)}"
         data-season-detail-field="${escapeHTML(path)}"
         data-testid="planner-field-${escapeHTML(cleanValue(path).replace(/[^a-zA-Z0-9]+/g, "-").toLowerCase())}"
       >
-        <option value="open" ${normalized === "open" ? "selected" : ""}>Offen</option>
-        <option value="done" ${normalized === "done" ? "selected" : ""}>${escapeHTML(doneLabel)}</option>
-        <option value="not_needed" ${normalized === "not_needed" ? "selected" : ""}>Nicht benötigt</option>
+        <option value="open" ${normalized === "open" ? "selected" : ""}>${escapeHTML(eventUiText("Offen"))}</option>
+        <option value="done" ${normalized === "done" ? "selected" : ""}>${escapeHTML(eventUiText(doneLabel))}</option>
+        <option value="not_needed" ${normalized === "not_needed" ? "selected" : ""}>${escapeHTML(eventUiText("Nicht benötigt"))}</option>
       </select>
     </label>
   `;
@@ -4416,7 +4928,7 @@ function getSeasonGoalTypeLabel(type) {
   const match =
     SEASON_GOAL_TYPES.find(([value]) => value === type);
 
-  return match ? match[1] : "Noch nicht gewählt";
+  return eventUiText(match ? match[1] : eventUiText("Noch nicht gewählt"));
 }
 
 function renderSeasonGoalTypeControl(eventKey, goals) {
@@ -4424,7 +4936,7 @@ function renderSeasonGoalTypeControl(eventKey, goals) {
     cleanValue(goals.goal_type);
 
   return `
-    <div class="season-goal-type-grid" role="group" aria-label="Zieltyp">
+    <div class="season-goal-type-grid" role="group" aria-label="${escapeHTML(eventUiText("Zieltyp"))}">
       ${SEASON_GOAL_TYPES.map(([value, label]) => `
         <button
           type="button"
@@ -4434,7 +4946,7 @@ function renderSeasonGoalTypeControl(eventKey, goals) {
           data-testid="planner-goal-type-${escapeHTML(value)}"
           aria-pressed="${activeType === value ? "true" : "false"}"
         >
-          ${escapeHTML(label)}
+          ${escapeHTML(eventUiText(label))}
         </button>
       `).join("")}
     </div>
@@ -4457,17 +4969,17 @@ function renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetric
       eventKey,
       path: "goals.target_description",
       labelKey: "season.targetDescription",
-      fallback: "Zielnotiz",
+      fallback: eventUiText("Zielnotiz"),
       value: goals.target_description,
       placeholderKey: "season.goalPlaceholder",
-      placeholder: "Was wäre für dich ein guter Renntag?"
+      placeholder: eventUiText("Was wäre für dich ein guter Renntag?")
     });
 
   if (!goalType) {
     return `
       <div class="season-empty-detail">
-        <strong>Wähle zuerst, was dieses Event für dich sein soll.</strong>
-        <span>Du kannst ohne Zielzeit planen. Spaßlauf, Training oder einfach teilnehmen sind gültige Ziele.</span>
+        <strong>${escapeHTML(eventUiText("Wähle zuerst, was dieses Event für dich sein soll."))}</strong>
+        <span>${escapeHTML(eventUiText("Du kannst ohne Zielzeit planen. Spaßlauf, Training oder einfach teilnehmen sind gültige Ziele."))}</span>
       </div>
     `;
   }
@@ -4484,8 +4996,8 @@ function renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetric
   if (goalType === "personal_best") {
     return `
       <div class="season-detail-fields">
-        ${renderSeasonTimeInput({ eventKey, path: "goals.personal_best_time", labelKey: "", fallback: "Bisherige Bestzeit", value: goals.personal_best_time })}
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_improvement", labelKey: "", fallback: "Gewünschte Verbesserung", value: goals.target_improvement, placeholder: "z. B. 30 Sekunden" })}
+        ${renderSeasonTimeInput({ eventKey, path: "goals.personal_best_time", labelKey: "", fallback: eventUiText("Bisherige Bestzeit"), value: goals.personal_best_time })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_improvement", labelKey: "", fallback: eventUiText("Gewünschte Verbesserung"), value: goals.target_improvement, placeholder: eventUiText("z. B. 30 Sekunden") })}
         ${targetTimeField}
         ${goalNote}
       </div>
@@ -4509,9 +5021,9 @@ function renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetric
   if (goalType === "placement") {
     return `
       <div class="season-detail-fields">
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_overall", labelKey: "season.targetPlaceOverall", fallback: "Ziel Gesamtplatz", value: goals.target_place_overall, placeholder: "100", type: "number" })}
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_gender", labelKey: "", fallback: "Ziel Gender-Platz", value: goals.target_place_gender, placeholder: "42", type: "number" })}
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_age_group", labelKey: "season.targetPlaceAgeGroup", fallback: "Ziel Altersklasse", value: goals.target_place_age_group, placeholder: "10", type: "number" })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_overall", labelKey: "season.targetPlaceOverall", fallback: eventUiText("Ziel Gesamtplatz"), value: goals.target_place_overall, placeholder: "100", type: "number" })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_gender", labelKey: "", fallback: eventUiText("Ziel Gender-Platz"), value: goals.target_place_gender, placeholder: "42", type: "number" })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.target_place_age_group", labelKey: "season.targetPlaceAgeGroup", fallback: eventUiText("Ziel Altersklasse"), value: goals.target_place_age_group, placeholder: "10", type: "number" })}
         ${goalNote}
       </div>
     `;
@@ -4520,8 +5032,8 @@ function renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetric
   if (goalType === "training") {
     return `
       <div class="season-detail-fields">
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.training_purpose", labelKey: "", fallback: "Trainingszweck", value: goals.training_purpose, placeholder: "Formtest, langer Lauf, Tempoarbeit..." })}
-        ${renderSeasonPlannerTextField({ eventKey, path: "goals.intensity_goal", labelKey: "", fallback: "Belastungsziel", value: goals.intensity_goal, placeholder: "locker, kontrolliert, Race Pace..." })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.training_purpose", labelKey: "", fallback: eventUiText("Trainingszweck"), value: goals.training_purpose, placeholder: eventUiText("Formtest, langer Lauf, Tempoarbeit...") })}
+        ${renderSeasonPlannerTextField({ eventKey, path: "goals.intensity_goal", labelKey: "", fallback: eventUiText("Belastungsziel"), value: goals.intensity_goal, placeholder: eventUiText("locker, kontrolliert, Race Pace...") })}
         ${goalNote}
       </div>
     `;
@@ -4529,7 +5041,7 @@ function renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetric
 
   return `
     <div class="season-detail-fields">
-      ${renderSeasonPlannerTextarea({ eventKey, path: "goals.custom_goal", labelKey: "", fallback: "Eigenes Ziel", value: goals.custom_goal, placeholder: "Beschreibe dein Ziel frei..." })}
+      ${renderSeasonPlannerTextarea({ eventKey, path: "goals.custom_goal", labelKey: "", fallback: eventUiText("Eigenes Ziel"), value: goals.custom_goal, placeholder: eventUiText("Beschreibe dein Ziel frei...") })}
       ${goalNote}
     </div>
   `;
@@ -4628,7 +5140,7 @@ function getSeasonSportLabel(sportType) {
     running: "Running"
   };
 
-  return labels[sportType] || "Event";
+  return eventDisplayValue(labels[sportType]) || "Event";
 }
 
 function getSeasonAutomaticEquipmentGroups(event) {
@@ -4647,7 +5159,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
       context,
       groups: [
         {
-          title: "Schwimmen",
+          title: eventUiText("Schwimmen"),
           items: [
             "Neoprenanzug",
             "Schwimmbrille",
@@ -4655,7 +5167,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
           ]
         },
         {
-          title: "Rad",
+          title: eventUiText("Rad"),
           items: [
             "Fahrrad",
             "Helm",
@@ -4665,7 +5177,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
           ]
         },
         {
-          title: "Laufen",
+          title: eventUiText("Laufen"),
           items: [
             "Laufschuhe",
             "Startnummernband",
@@ -4674,7 +5186,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
           ]
         },
         {
-          title: "Wechselzone / Sonstiges",
+          title: eventUiText("Wechselzone / Sonstiges"),
           items: [
             "Handtuch",
             "Sonnencreme",
@@ -4702,7 +5214,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
           ]
         },
         {
-          title: "Allgemein",
+          title: eventUiText("Allgemein"),
           items: [
             "Socken",
             "Wettkampfkleidung",
@@ -4720,7 +5232,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
       context,
       groups: [
         {
-          title: "Rad",
+          title: eventUiText("Rad"),
           items: [
             "Fahrrad",
             "Helm",
@@ -4739,7 +5251,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
       context,
       groups: [
         {
-          title: "Schwimmen",
+          title: eventUiText("Schwimmen"),
           items: [
             "Schwimmbrille",
             "Badekappe",
@@ -4755,7 +5267,7 @@ function getSeasonAutomaticEquipmentGroups(event) {
     context,
     groups: [
       {
-        title: "Laufen",
+        title: eventUiText("Laufen"),
         items: [
           "Schuhe",
           "Socken",
@@ -4785,7 +5297,8 @@ function isSeasonEquipmentItemChecked(checked, item) {
   );
 }
 
-function renderSeasonEquipmentItem(item, eventKey, checked) {
+function renderSeasonEquipmentItem(item, eventKey, checked, preset = false) {
+  const displayItem = preset ? eventUiText(item) : item;
   return `
     <label
       class="season-equipment-item"
@@ -4797,12 +5310,12 @@ function renderSeasonEquipmentItem(item, eventKey, checked) {
         data-season-equipment-event="${escapeHTML(eventKey)}"
         ${isSeasonEquipmentItemChecked(checked, item) ? "checked" : ""}
       />
-      <span>${escapeHTML(item)}</span>
+      <span>${escapeHTML(displayItem)}</span>
       <button
         type="button"
         data-season-equipment-delete="${escapeHTML(item)}"
         data-season-equipment-event="${escapeHTML(eventKey)}"
-        aria-label="Equipmentpunkt entfernen: ${escapeHTML(item)}"
+        aria-label="${escapeHTML(eventUiText("Remove equipment item"))}: ${escapeHTML(displayItem)}"
       >
         ×
       </button>
@@ -4861,23 +5374,23 @@ function renderSeasonEquipmentChecklist(event, eventKey, equipment = {}) {
       data-season-equipment-panel="${escapeHTML(eventKey)}"
     >
       <div class="season-status-strip">
-        ${renderSeasonStatusSelect({ eventKey, path: "equipment.status", label: "Equipment", value: status, doneLabel: "Geplant" })}
+        ${renderSeasonStatusSelect({ eventKey, path: "equipment.status", label: eventUiText("Equipment"), value: status, doneLabel: eventUiText("Geplant") })}
       </div>
       ${status === "not_needed" ? `
         <div class="season-empty-detail" data-season-equipment-not-needed="${escapeHTML(eventKey)}">
-          <strong>Equipment ist für dieses Event als nicht benötigt markiert.</strong>
-          <span>Du kannst den Bereich jederzeit wieder auf Offen oder Geplant stellen und eigene Punkte ergänzen.</span>
+          <strong>${escapeHTML(eventUiText("Equipment ist für dieses Event als nicht benötigt markiert."))}</strong>
+          <span>${escapeHTML(eventUiText("Du kannst den Bereich jederzeit wieder auf Offen oder Geplant stellen und eigene Punkte ergänzen."))}</span>
         </div>
       ` : `
         ${preset.context.hasAutoPreset ? `
           <p class="season-equipment-source">
-            Automatisch aus Eventdaten:
-            <strong>${escapeHTML(preset.context.sourceLabel || getSeasonSportLabel(preset.context.sportType))}</strong>
+            ${escapeHTML(eventUiText("Automatisch aus Eventdaten:"))}
+            <strong>${escapeHTML(eventDisplayValue(preset.context.sourceLabel || getSeasonSportLabel(preset.context.sportType)))}</strong>
           </p>
         ` : `
           <div class="season-empty-detail">
-            <strong>Für dieses Event konnte keine automatische Equipment-Liste erstellt werden.</strong>
-            <span>Du kannst weiterhin eigene Equipmentpunkte hinzufügen.</span>
+            <strong>${escapeHTML(eventUiText("Für dieses Event konnte keine automatische Equipment-Liste erstellt werden."))}</strong>
+            <span>${escapeHTML(eventUiText("Du kannst weiterhin eigene Equipmentpunkte hinzufügen."))}</span>
           </div>
         `}
         <div
@@ -4886,10 +5399,10 @@ function renderSeasonEquipmentChecklist(event, eventKey, equipment = {}) {
         >
           ${visibleGroups.map(group => `
             <section class="season-equipment-group">
-              <h4>${escapeHTML(group.title)}</h4>
+              <h4>${escapeHTML(eventUiText(group.title))}</h4>
               <div class="season-equipment-list">
                 ${group.items.map(item =>
-                  renderSeasonEquipmentItem(item, eventKey, checked)
+                  renderSeasonEquipmentItem(item, eventKey, checked, true)
                 ).join("")}
               </div>
             </section>
@@ -4899,7 +5412,7 @@ function renderSeasonEquipmentChecklist(event, eventKey, equipment = {}) {
               class="season-equipment-group season-equipment-custom-group"
               data-season-equipment-custom-group="${escapeHTML(eventKey)}"
             >
-              <h4>Persönliche Ergänzungen</h4>
+              <h4>${escapeHTML(eventUiText("Persönliche Ergänzungen"))}</h4>
               <div
                 class="season-equipment-list"
                 data-season-equipment-custom-list="${escapeHTML(eventKey)}"
@@ -4912,8 +5425,8 @@ function renderSeasonEquipmentChecklist(event, eventKey, equipment = {}) {
           ` : ""}
           ${!hasEquipmentItems ? `
             <div class="season-empty-detail" data-season-equipment-empty="${escapeHTML(eventKey)}">
-              <strong>Noch keine Ausrüstung geplant.</strong>
-              <span>Füge einen eigenen Punkt hinzu.</span>
+              <strong>${escapeHTML(eventUiText("Noch keine Ausrüstung geplant."))}</strong>
+              <span>${escapeHTML(eventUiText("Füge einen eigenen Punkt hinzu."))}</span>
             </div>
           ` : ""}
         </div>
@@ -4923,9 +5436,9 @@ function renderSeasonEquipmentChecklist(event, eventKey, equipment = {}) {
           type="text"
           data-season-equipment-input="${escapeHTML(eventKey)}"
           data-testid="planner-equipment-input"
-          placeholder="Eigenen Equipmentpunkt hinzufügen"
+          placeholder="${escapeHTML(eventUiText("Eigenen Equipmentpunkt hinzufügen"))}"
         />
-        <button type="button" data-season-equipment-add="${escapeHTML(eventKey)}" data-testid="planner-equipment-add">Hinzufügen</button>
+        <button type="button" data-season-equipment-add="${escapeHTML(eventKey)}" data-testid="planner-equipment-add">${escapeHTML(eventUiText("Hinzufügen"))}</button>
       </div>
     </div>
   `;
@@ -5006,7 +5519,7 @@ function ensureSeasonEquipmentCustomList(eventKey) {
     group.dataset.seasonEquipmentCustomGroup =
       eventKey;
     group.innerHTML = `
-      <h4>Persönliche Ergänzungen</h4>
+      <h4>${escapeHTML(eventUiText("Persönliche Ergänzungen"))}</h4>
       <div
         class="season-equipment-list"
         data-season-equipment-custom-list="${escapeHTML(eventKey)}"
@@ -5352,9 +5865,9 @@ function renderSeasonNutritionPlanner(eventKey, nutrition = {}) {
   return `
     <div class="season-nutrition-panel">
       <div class="season-detail-fields">
-        ${renderSeasonStatusSelect({ eventKey, path: "nutrition.status", label: "Verpflegung", value: status, doneLabel: "Geplant" })}
+        ${renderSeasonStatusSelect({ eventKey, path: "nutrition.status", label: eventUiText("Verpflegung"), value: status, doneLabel: eventUiText("Geplant") })}
         <label class="season-detail-field">
-          <span>Grundplan</span>
+          <span>${escapeHTML(eventUiText("Grundplan"))}</span>
           <select data-season-detail-event="${escapeHTML(eventKey)}" data-season-detail-field="nutrition.type">
             ${[
               ["", "Noch nicht gewählt"],
@@ -5364,12 +5877,12 @@ function renderSeasonNutritionPlanner(eventKey, nutrition = {}) {
               ["organizer", "Verpflegung des Veranstalters"],
               ["mixed", "Kombination"]
             ].map(([value, label]) => `
-              <option value="${escapeHTML(value)}" ${type === value ? "selected" : ""}>${escapeHTML(label)}</option>
+              <option value="${escapeHTML(value)}" ${type === value ? "selected" : ""}>${escapeHTML(eventUiText(label))}</option>
             `).join("")}
           </select>
         </label>
         <label class="season-detail-field">
-          <span>Planung nach</span>
+          <span>${escapeHTML(eventUiText("Planung nach"))}</span>
           <select data-season-detail-event="${escapeHTML(eventKey)}" data-season-detail-field="nutrition.timing_mode">
             ${[
               ["clock", "Uhrzeit"],
@@ -5377,51 +5890,51 @@ function renderSeasonNutritionPlanner(eventKey, nutrition = {}) {
               ["distance", "Distanz"],
               ["course_point", "Streckenpunkt"]
             ].map(([value, label]) => `
-              <option value="${escapeHTML(value)}" ${timingMode === value ? "selected" : ""}>${escapeHTML(label)}</option>
+              <option value="${escapeHTML(value)}" ${timingMode === value ? "selected" : ""}>${escapeHTML(eventUiText(label))}</option>
             `).join("")}
           </select>
         </label>
       </div>
       ${status === "not_needed" || type === "not_needed" ? `
         <div class="season-empty-detail">
-          <strong>Keine Verpflegung während des Rennens nötig.</strong>
-          <span>Das blockiert deinen Planungsstatus nicht.</span>
+          <strong>${escapeHTML(eventUiText("Keine Verpflegung während des Rennens nötig."))}</strong>
+          <span>${escapeHTML(eventUiText("Das blockiert deinen Planungsstatus nicht."))}</span>
         </div>
       ` : `
         <div class="season-nutrition-list">
           ${entries.map((entry, index) => `
             <div class="season-nutrition-entry">
-              <strong>${escapeHTML(entry.stage || "Während des Rennens")}</strong>
-              <span>${escapeHTML([entry.trigger, entry.product, entry.amount, entry.fluid].filter(Boolean).join(" · ") || "Noch unvollständig")}</span>
+              <strong>${escapeHTML(eventUiText(entry.stage || "Während des Rennens"))}</strong>
+              <span>${escapeHTML([entry.trigger, entry.product, entry.amount, entry.fluid].filter(Boolean).join(" · ") || eventUiText("Noch unvollständig"))}</span>
               ${entry.note ? `<em>${escapeHTML(entry.note)}</em>` : ""}
               <button
                 type="button"
                 data-season-nutrition-delete="${index}"
                 data-season-nutrition-event="${escapeHTML(eventKey)}"
-                aria-label="Verpflegungseintrag entfernen"
+                aria-label="${escapeHTML(eventUiText("Verpflegungseintrag entfernen"))}"
               >
                 ×
               </button>
             </div>
           `).join("") || `
             <div class="season-empty-detail">
-              <strong>Für dieses Event wurde noch kein Verpflegungsplan erstellt.</strong>
-              <span>Für kurze Rennen kannst du „Nur Wasser“ oder „Nicht benötigt“ wählen.</span>
+              <strong>${escapeHTML(eventUiText("Für dieses Event wurde noch kein Verpflegungsplan erstellt."))}</strong>
+              <span>${escapeHTML(eventUiText("Für kurze Rennen kannst du „Nur Wasser“ oder „Nicht benötigt“ wählen."))}</span>
             </div>
           `}
         </div>
         <div class="season-nutrition-add" data-season-nutrition-form="${escapeHTML(eventKey)}">
           <select data-season-nutrition-stage data-testid="planner-nutrition-stage">
-            <option value="Vor dem Start">Vor dem Start</option>
-            <option value="Während des Rennens">Während des Rennens</option>
-            <option value="Nach dem Rennen">Nach dem Rennen</option>
+            <option value="Vor dem Start">${escapeHTML(eventUiText("Vor dem Start"))}</option>
+            <option value="Während des Rennens">${escapeHTML(eventUiText("Während des Rennens"))}</option>
+            <option value="Nach dem Rennen">${escapeHTML(eventUiText("Nach dem Rennen"))}</option>
           </select>
-          <input type="text" data-season-nutrition-trigger data-testid="planner-nutrition-trigger" placeholder="km 10, 40 min, Station 3" />
-          <input type="text" data-season-nutrition-product data-testid="planner-nutrition-product" placeholder="Gel, Wasser, Drink..." />
-          <input type="text" data-season-nutrition-amount data-testid="planner-nutrition-amount" placeholder="Menge" />
-          <input type="text" data-season-nutrition-fluid data-testid="planner-nutrition-fluid" placeholder="Flüssigkeit" />
-          <input type="text" data-season-nutrition-note data-testid="planner-nutrition-note" placeholder="Hinweis" />
-          <button type="button" data-season-nutrition-add="${escapeHTML(eventKey)}" data-testid="planner-nutrition-add">Eintrag hinzufügen</button>
+          <input type="text" data-season-nutrition-trigger data-testid="planner-nutrition-trigger" placeholder="${escapeHTML(eventUiText("km 10, 40 min, Station 3"))}" />
+          <input type="text" data-season-nutrition-product data-testid="planner-nutrition-product" placeholder="${escapeHTML(eventUiText("Gel, Wasser, Drink..."))}" />
+          <input type="text" data-season-nutrition-amount data-testid="planner-nutrition-amount" placeholder="${escapeHTML(eventUiText("Menge"))}" />
+          <input type="text" data-season-nutrition-fluid data-testid="planner-nutrition-fluid" placeholder="${escapeHTML(eventUiText("Flüssigkeit"))}" />
+          <input type="text" data-season-nutrition-note data-testid="planner-nutrition-note" placeholder="${escapeHTML(eventUiText("Hinweis"))}" />
+          <button type="button" data-season-nutrition-add="${escapeHTML(eventKey)}" data-testid="planner-nutrition-add">${escapeHTML(eventUiText("Eintrag hinzufügen"))}</button>
         </div>
       `}
     </div>
@@ -5500,7 +6013,7 @@ function renderSeasonDistancePresetControl(event, eventKey, result) {
             value="${escapeHTML(option.value)}"
             ${selectedPreset === option.value ? "selected" : ""}
           >
-            ${escapeHTML(option.label)}
+            ${escapeHTML(eventDisplayValue(option.label))}
           </option>
         `).join("")}
       </select>
@@ -5542,7 +6055,7 @@ function renderSeasonDashboardMetric(label, value, options = {}) {
 
   return `
     <span class="season-race-metric ${options.tone ? `season-race-metric-${escapeHTML(options.tone)}` : ""}">
-      <em>${escapeHTML(label)}</em>
+      <em>${escapeHTML(eventUiText(label))}</em>
       <strong>${escapeHTML(value || options.empty || "-")}</strong>
     </span>
   `;
@@ -5552,7 +6065,7 @@ function renderSeasonStatusChip(label, isDone) {
   return `
     <span class="season-status-chip ${isDone ? "is-done" : "is-open"}">
       <b aria-hidden="true">${isDone ? "✓" : "○"}</b>
-      ${escapeHTML(label)}
+      ${escapeHTML(eventUiText(label))}
     </span>
   `;
 }
@@ -5560,7 +6073,7 @@ function renderSeasonStatusChip(label, isDone) {
 function renderSeasonCompactPreview(label, value, emptyText) {
   return `
     <div class="season-compact-preview">
-      <span>${escapeHTML(label)}</span>
+      <span>${escapeHTML(eventUiText(label))}</span>
       <p>${escapeHTML(cleanValue(value) || emptyText)}</p>
     </div>
   `;
@@ -5582,30 +6095,30 @@ function getSeasonTrainingPhase(event) {
     getSeasonDaysUntil(event);
 
   if (daysUntil === null) {
-    return "Planung";
+    return eventUiText("Planung");
   }
 
   if (daysUntil < 0) {
-    return "Recovery";
+    return eventUiText("Recovery");
   }
 
   if (daysUntil <= 7) {
-    return "Race Week";
+    return eventUiText("Race Week");
   }
 
   if (daysUntil <= 21) {
-    return "Taper";
+    return eventUiText("Taper");
   }
 
   if (daysUntil <= 56) {
-    return "Peak Phase";
+    return eventUiText("Peak Phase");
   }
 
   if (daysUntil <= 112) {
-    return "Build Phase";
+    return eventUiText("Build Phase");
   }
 
-  return "Base Phase";
+  return eventUiText("Base Phase");
 }
 
 function getSeasonPlanningAreas(event, details = {}) {
@@ -5721,45 +6234,45 @@ function getSeasonPlanningAreas(event, details = {}) {
   return [
     makeArea({
       key: "date",
-      label: "Datum",
+      label: eventUiText("Datum"),
       done: Boolean(parseSeasonDate(event.date)),
-      next: "Eventdatum prüfen",
+      next: eventUiText("Eventdatum prüfen"),
       important: true
     }),
     makeArea({
       key: "distance",
-      label: "Distanz",
+      label: eventUiText("Distanz"),
       done: hasDistance,
-      next: "Distanz auswählen",
+      next: eventUiText("Distanz auswählen"),
       important: true
     }),
     makeArea({
       key: "priority",
-      label: "Priorität",
+      label: eventUiText("Priorität"),
       done: getSeasonPriority(event) !== "Maybe",
-      next: "Race-Priorität setzen",
+      next: eventUiText("Race-Priorität setzen"),
       important: true
     }),
     makeArea({
       key: "goal",
-      label: "Ziel",
+      label: eventUiText("Ziel"),
       status: goalStatus,
       done:
         goalStatus === "not_needed" ||
         Boolean(goalType || cleanValue(goals.target_description) || cleanValue(goals.target_time)),
-      next: "Eventziel auswählen",
+      next: eventUiText("Eventziel auswählen"),
       important: true
     }),
     makeArea({
       key: "registration",
-      label: "Anmeldung",
+      label: eventUiText("Anmeldung"),
       done: Boolean(logistics.registration_confirmed),
-      next: "Anmeldung prüfen",
+      next: eventUiText("Anmeldung prüfen"),
       important: true
     }),
     makeArea({
       key: "travel",
-      label: "Reise",
+      label: eventUiText("Reise"),
       status: travelStatus,
       done:
         travelStatus === "not_needed" ||
@@ -5769,7 +6282,7 @@ function getSeasonPlanningAreas(event, details = {}) {
     }),
     makeArea({
       key: "accommodation",
-      label: "Unterkunft",
+      label: eventUiText("Unterkunft"),
       status: accommodationStatus,
       done:
         accommodationStatus === "not_needed" ||
@@ -5779,18 +6292,18 @@ function getSeasonPlanningAreas(event, details = {}) {
     }),
     makeArea({
       key: "bib",
-      label: "Startunterlagen",
+      label: eventUiText("Startunterlagen"),
       status: bibStatus,
       done:
         bibStatus === "not_needed" ||
         bibStatus === "done" ||
         Boolean(cleanValue(logistics.bib_number)),
-      next: "Startunterlagen prüfen",
+      next: eventUiText("Startunterlagen prüfen"),
       important: true
     }),
     makeArea({
       key: "strategy",
-      label: "Race Strategy",
+      label: eventUiText("Race Strategy"),
       status: strategyStatus,
       done:
         strategyStatus === "not_needed" ||
@@ -5800,7 +6313,7 @@ function getSeasonPlanningAreas(event, details = {}) {
     }),
     makeArea({
       key: "equipment",
-      label: "Equipment",
+      label: eventUiText("Equipment"),
       status: equipmentStatus,
       done:
         equipmentStatus === "not_needed" ||
@@ -5810,30 +6323,30 @@ function getSeasonPlanningAreas(event, details = {}) {
     }),
     makeArea({
       key: "nutrition",
-      label: "Verpflegung",
+      label: eventUiText("Verpflegung"),
       status: nutritionStatus,
       done:
         nutritionStatus === "not_needed" ||
         nutritionStatus === "done" ||
         nutritionStatus === "planned" ||
         cleanValue(details.nutrition?.type) === "not_needed",
-      next: "Verpflegung klären"
+      next: eventUiText("Verpflegung klären")
     }),
     makeArea({
       key: "notes",
-      label: "Notizen",
+      label: eventUiText("Notizen"),
       status: notesStatus,
       done:
         notesStatus === "not_needed" ||
         notesStatus === "done" ||
         Boolean(note),
-      next: "Persönliche Notiz hinzufügen"
+      next: eventUiText("Persönliche Notiz hinzufügen")
     }),
     makeArea({
       key: "result",
-      label: "Ergebnis",
+      label: eventUiText("Ergebnis"),
       done: !isPast || hasResult,
-      next: "Ergebnis eintragen",
+      next: eventUiText("Ergebnis eintragen"),
       important: isPast
     })
   ];
@@ -5881,8 +6394,8 @@ function getSeasonPreparationSummary(event, details = {}) {
   const openSummary =
     !openAreas.length
       ? isPast
-        ? "Vollständig dokumentiert"
-        : "Bereit für den Renntag"
+        ? eventUiText("Vollständig dokumentiert")
+        : eventUiText("Bereit für den Renntag")
       : openAreas.length === 1
         ? `${openAreas[0].label} noch offen`
         : `${openAreas.length} relevante Punkte offen`;
@@ -5926,8 +6439,9 @@ function renderSeasonDetailPanel({
   tone = "",
   panelKey = ""
 }) {
+  const stableTitle = EVENT_UI_TEXT_PAIRS.find(pair => pair.includes(title))?.[0] || title;
   const testId =
-    `planner-section-${cleanValue(title)
+    `planner-section-${cleanValue(stableTitle)
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
@@ -5938,7 +6452,7 @@ function renderSeasonDetailPanel({
     open ||
     (panelKey && seasonOpenDetailPanels.has(panelKey));
   const panelId =
-    `${testId}-${cleanValue(panelKey || title)
+    `${testId}-${cleanValue(panelKey || stableTitle)
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-+|-+$/g, "") || "panel"}`;
@@ -5954,7 +6468,7 @@ function renderSeasonDetailPanel({
     >
       <summary aria-expanded="${shouldOpen ? "true" : "false"}" aria-controls="${escapeHTML(bodyId)}">
         <span>
-          <strong>${escapeHTML(title)}</strong>
+          <strong>${escapeHTML(eventUiText(title))}</strong>
           <em>${escapeHTML(summary)}</em>
         </span>
       </summary>
@@ -6020,11 +6534,11 @@ function getSeasonResultSummaryItems(event, goals, result) {
 function renderSeasonSplitInputs(eventKey, result) {
   return `
     <div class="season-tri-split-grid">
-      ${renderSeasonTimeField({ eventKey, path: "result.swim_split", label: "Swim split", value: result.swim_split })}
+      ${renderSeasonTimeField({ eventKey, path: "result.swim_split", label: eventUiText("Swim split"), value: result.swim_split })}
       ${renderSeasonTimeField({ eventKey, path: "result.t1", label: "T1", value: result.t1 })}
-      ${renderSeasonTimeField({ eventKey, path: "result.bike_split", label: "Bike split", value: result.bike_split })}
+      ${renderSeasonTimeField({ eventKey, path: "result.bike_split", label: eventUiText("Bike split"), value: result.bike_split })}
       ${renderSeasonTimeField({ eventKey, path: "result.t2", label: "T2", value: result.t2 })}
-      ${renderSeasonTimeField({ eventKey, path: "result.run_split", label: "Run split", value: result.run_split })}
+      ${renderSeasonTimeField({ eventKey, path: "result.run_split", label: eventUiText("Run split"), value: result.run_split })}
     </div>
   `;
 }
@@ -6069,9 +6583,9 @@ function renderSeasonRatingControl(eventKey, result) {
         data-season-detail-event="${escapeHTML(eventKey)}"
         data-season-detail-field="result.personal_rating"
       >
-        <option value="">Noch nicht bewertet</option>
+        <option value="">${escapeHTML(eventUiText("Noch nicht bewertet"))}</option>
         ${ratings.map(([value, label]) => `
-          <option value="${value}" ${active === value ? "selected" : ""}>${escapeHTML(label)}</option>
+          <option value="${value}" ${active === value ? "selected" : ""}>${escapeHTML(eventUiText(label))}</option>
         `).join("")}
       </select>
     </label>
@@ -6136,17 +6650,17 @@ function getSeasonPostRaceStatus(details = {}) {
   }
 
   if (!hasSeasonResult(result)) {
-    return "Ergebnis ausstehend";
+    return eventUiText("Ergebnis ausstehend");
   }
 
   if (
     !hasSeasonReflection(result) ||
     !cleanValue(result.personal_rating)
   ) {
-    return "Reflexion ausstehend";
+    return eventUiText("Reflexion ausstehend");
   }
 
-  return "Vollständig dokumentiert";
+  return eventUiText("Vollständig dokumentiert");
 }
 
 function getSeasonPostRaceNextTask(details = {}) {
@@ -6159,18 +6673,18 @@ function getSeasonPostRaceNextTask(details = {}) {
     isSeasonNonFinishStatus(finishStatus) &&
     !hasSeasonReflection(result)
   ) {
-    return "Rennverlauf dokumentieren";
+    return eventUiText("Rennverlauf dokumentieren");
   }
 
   if (!hasSeasonResult(result)) {
-    return "Ergebnis eintragen";
+    return eventUiText("Ergebnis eintragen");
   }
 
   if (!hasSeasonReflection(result)) {
-    return "Rennen kurz reflektieren";
+    return eventUiText("Rennen kurz reflektieren");
   }
 
-  return "Keine offenen Schritte";
+  return eventUiText("Keine offenen Schritte");
 }
 
 function getSeasonPostRaceReviewAreas(details = {}) {
@@ -6182,53 +6696,53 @@ function getSeasonPostRaceReviewAreas(details = {}) {
   return [
     {
       key: "result",
-      label: "Ergebnis",
+      label: eventUiText("Ergebnis"),
       done: hasSeasonResult(result),
-      next: "Ergebnis eintragen",
+      next: eventUiText("Ergebnis eintragen"),
       important: true
     },
     {
       key: "finish_status",
-      label: "Finish Status",
+      label: eventUiText("Finish Status"),
       done: Boolean(finishStatus),
       next: "Finish Status setzen",
       important: true
     },
     {
       key: "rating",
-      label: "Bewertung",
+      label: eventUiText("Bewertung"),
       done: Boolean(cleanValue(result.personal_rating)),
-      next: "Bewertung ergänzen"
+      next: eventUiText("Bewertung ergänzen")
     },
     {
       key: "reflection",
-      label: "Reflexion",
+      label: eventUiText("Reflexion"),
       done: hasSeasonReflection(result),
       next:
         isSeasonNonFinishStatus(finishStatus)
           ? "Rennverlauf dokumentieren"
-          : "Rennen kurz reflektieren",
+          : eventUiText("Rennen kurz reflektieren"),
       important: true
     },
     {
       key: "learnings",
-      label: "Learnings",
+      label: eventUiText("Learnings"),
       done: Boolean(cleanValue(result.key_learnings)),
-      next: "Learnings ergänzen",
+      next: eventUiText("Learnings ergänzen"),
       optional: true
     },
     {
       key: "result_link",
-      label: "Ergebnislink",
+      label: eventUiText("Ergebnislink"),
       done: Boolean(cleanValue(result.official_result_url)),
-      next: "Ergebnislink ergänzen",
+      next: eventUiText("Ergebnislink ergänzen"),
       optional: true
     },
     {
       key: "splits",
       label: "Splits",
       done: hasSeasonSplits(result),
-      next: "Splits ergänzen",
+      next: eventUiText("Splits ergänzen"),
       optional: true
     }
   ].map(area => ({
@@ -6259,11 +6773,11 @@ function renderSeasonResultSummary(eventKey, event, result, goalDelta) {
           type="button"
           data-season-result-edit="${escapeHTML(eventKey)}"
         >
-          Bearbeiten
+          ${escapeHTML(eventUiText("Bearbeiten"))}
         </button>
         ${officialUrl ? `
           <a href="${escapeHTML(safeUrl(officialUrl))}" target="_blank" rel="noopener noreferrer">
-            Offizielles Ergebnis öffnen
+            ${escapeHTML(eventUiText("Offizielles Ergebnis öffnen"))}
           </a>
         ` : ""}
       </div>
@@ -6295,7 +6809,7 @@ function renderSeasonResultForm(event, eventKey, result, summary, distanceLabel,
   return `
     <div class="season-result-form">
       <section>
-        <span class="season-subtitle">Grundlegendes Ergebnis</span>
+        <span class="season-subtitle">${escapeHTML(eventUiText("Grundlegendes Ergebnis"))}</span>
         <div class="season-detail-fields">
           <label class="season-detail-field">
             <span>${escapeHTML(seasonPlannerText("season.finishStatus", "Finish status"))}</span>
@@ -6311,10 +6825,10 @@ function renderSeasonResultForm(event, eventKey, result, summary, distanceLabel,
               `).join("")}
             </select>
           </label>
-          ${needsFinishTime ? renderSeasonTimeInput({ eventKey, path: "result.finish_time", labelKey: "season.finishTime", fallback: "Finishzeit", value: result.finish_time }) : ""}
+          ${needsFinishTime ? renderSeasonTimeInput({ eventKey, path: "result.finish_time", labelKey: "season.finishTime", fallback: eventUiText("Finishzeit"), value: result.finish_time }) : ""}
           ${showDistance ? renderSeasonDistancePresetControl(event, eventKey, result) : ""}
-          ${showElevation ? renderSeasonPlannerTextField({ eventKey, path: "result.elevation_gain_m", labelKey: "", fallback: "Höhenmeter", value: result.elevation_gain_m, placeholder: "850", type: "number" }) : ""}
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.official_result_url", labelKey: "season.officialResultUrl", fallback: "Offizielle Ergebnis-URL", value: result.official_result_url, placeholder: "https://..." })}
+          ${showElevation ? renderSeasonPlannerTextField({ eventKey, path: "result.elevation_gain_m", labelKey: "", fallback: eventUiText("Höhenmeter"), value: result.elevation_gain_m, placeholder: "850", type: "number" }) : ""}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.official_result_url", labelKey: "season.officialResultUrl", fallback: eventUiText("Offizielle Ergebnis-URL"), value: result.official_result_url, placeholder: "https://..." })}
         </div>
         <div class="season-calculated-summary">
           ${renderSeasonCalculatedMetric("season.distanceKm", "Distanz", distanceLabel)}
@@ -6324,18 +6838,18 @@ function renderSeasonResultForm(event, eventKey, result, summary, distanceLabel,
       </section>
       ${activeStatus === "DNF" ? `
         <section>
-          <span class="season-subtitle">DNF Details</span>
+          <span class="season-subtitle">${escapeHTML(eventUiText("DNF Details"))}</span>
           <div class="season-detail-fields">
-            ${renderSeasonTimeInput({ eventKey, path: "result.dnf_time", labelKey: "", fallback: "Abbruchzeit", value: result.dnf_time })}
-            ${renderSeasonPlannerTextField({ eventKey, path: "result.dnf_distance", labelKey: "", fallback: "Abbruchdistanz", value: result.dnf_distance, placeholder: "km 18" })}
-            ${renderSeasonPlannerTextarea({ eventKey, path: "result.dnf_reason", labelKey: "", fallback: "Grund", value: result.dnf_reason, placeholder: "Was war der Grund?" })}
+            ${renderSeasonTimeInput({ eventKey, path: "result.dnf_time", labelKey: "", fallback: eventUiText("Abbruchzeit"), value: result.dnf_time })}
+            ${renderSeasonPlannerTextField({ eventKey, path: "result.dnf_distance", labelKey: "", fallback: eventUiText("Abbruchdistanz"), value: result.dnf_distance, placeholder: "km 18" })}
+            ${renderSeasonPlannerTextarea({ eventKey, path: "result.dnf_reason", labelKey: "", fallback: eventUiText("Grund"), value: result.dnf_reason, placeholder: eventUiText("Was war der Grund?") })}
           </div>
         </section>
       ` : ""}
       ${activeStatus === "DSQ" ? `
         <section>
-          <span class="season-subtitle">DSQ Kommentar</span>
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.dsq_reason", labelKey: "", fallback: "Kommentar", value: result.dsq_reason, placeholder: "Grund oder Kommentar..." })}
+          <span class="season-subtitle">${escapeHTML(eventUiText("DSQ Kommentar"))}</span>
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.dsq_reason", labelKey: "", fallback: eventUiText("Kommentar"), value: result.dsq_reason, placeholder: eventUiText("Grund oder Kommentar...") })}
         </section>
       ` : ""}
       ${showTriSplits ? `
@@ -6346,35 +6860,35 @@ function renderSeasonResultForm(event, eventKey, result, summary, distanceLabel,
       ` : ""}
       ${sportType === "ultra" ? `
         <section>
-          <span class="season-subtitle">Checkpoint-Splits</span>
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.checkpoint_splits", labelKey: "", fallback: "Checkpoint-Splits", value: result.checkpoint_splits, placeholder: "CP1 00:42, CP2 01:35..." })}
+          <span class="season-subtitle">${escapeHTML(eventUiText("Checkpoint-Splits"))}</span>
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.checkpoint_splits", labelKey: "", fallback: eventUiText("Checkpoint-Splits"), value: result.checkpoint_splits, placeholder: "CP1 00:42, CP2 01:35..." })}
         </section>
       ` : ""}
       <section>
-        <span class="season-subtitle">Platzierung</span>
+        <span class="season-subtitle">${escapeHTML(eventUiText("Platzierung"))}</span>
         <div class="season-detail-fields">
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.overall_place", labelKey: "season.overallPlace", fallback: "Gesamtplatz", value: result.overall_place, placeholder: "154", type: "number" })}
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.gender_place", labelKey: "season.genderPlace", fallback: "Gender-Platz", value: result.gender_place, placeholder: "42", type: "number" })}
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.age_group_place", labelKey: "season.ageGroupPlace", fallback: "Altersklassenplatz", value: result.age_group_place, placeholder: "8", type: "number" })}
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.category", labelKey: "season.resultCategory", fallback: "Kategorie", value: result.category, placeholder: "M35" })}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.overall_place", labelKey: "season.overallPlace", fallback: eventUiText("Gesamtplatz"), value: result.overall_place, placeholder: "154", type: "number" })}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.gender_place", labelKey: "season.genderPlace", fallback: eventUiText("Gender-Platz"), value: result.gender_place, placeholder: "42", type: "number" })}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.age_group_place", labelKey: "season.ageGroupPlace", fallback: eventUiText("Altersklassenplatz"), value: result.age_group_place, placeholder: "8", type: "number" })}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.category", labelKey: "season.resultCategory", fallback: eventUiText("Kategorie"), value: result.category, placeholder: "M35" })}
         </div>
       </section>
       <section>
-        <span class="season-subtitle">Persönliche Reflexion</span>
+        <span class="season-subtitle">${escapeHTML(eventUiText("Persönliche Reflexion"))}</span>
         <div class="season-detail-fields">
           ${renderSeasonRatingControl(eventKey, result)}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.went_well", labelKey: "", fallback: "Was lief gut?", value: result.went_well, placeholder: "Was möchtest du beibehalten?" })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.what_was_difficult", labelKey: "", fallback: "Was war schwierig?", value: result.what_was_difficult, placeholder: "Was hat Energie gekostet oder nicht funktioniert?" })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.next_time_change", labelKey: "", fallback: "Was nächstes Mal ändern?", value: result.next_time_change, placeholder: "Was würdest du anpassen?" })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.nutrition_worked", labelKey: "", fallback: "Verpflegung", value: result.nutrition_worked, placeholder: "Was hat bei der Verpflegung funktioniert?" })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.equipment_worked", labelKey: "", fallback: "Equipment", value: result.equipment_worked, placeholder: "Welches Equipment war gut oder problematisch?" })}
-          ${renderSeasonPlannerTextField({ eventKey, path: "result.would_repeat", labelKey: "", fallback: "Wieder teilnehmen?", value: result.would_repeat, placeholder: "Ja, Nein, Vielleicht..." })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.key_learnings", labelKey: "", fallback: "Wichtigste Learnings", value: result.key_learnings, placeholder: "Was nimmst du für das nächste Event mit?" })}
-          ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: "Rennbericht", value: result.race_report, placeholderKey: "season.raceReportPlaceholder", placeholder: "Wie lief das Rennen?" })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.went_well", labelKey: "", fallback: eventUiText("Was lief gut?"), value: result.went_well, placeholder: eventUiText("Was möchtest du beibehalten?") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.what_was_difficult", labelKey: "", fallback: eventUiText("Was war schwierig?"), value: result.what_was_difficult, placeholder: eventUiText("Was hat Energie gekostet oder nicht funktioniert?") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.next_time_change", labelKey: "", fallback: eventUiText("Was nächstes Mal ändern?"), value: result.next_time_change, placeholder: eventUiText("Was würdest du anpassen?") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.nutrition_worked", labelKey: "", fallback: eventUiText("Verpflegung"), value: result.nutrition_worked, placeholder: eventUiText("Was hat bei der Verpflegung funktioniert?") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.equipment_worked", labelKey: "", fallback: eventUiText("Equipment"), value: result.equipment_worked, placeholder: eventUiText("Welches Equipment war gut oder problematisch?") })}
+          ${renderSeasonPlannerTextField({ eventKey, path: "result.would_repeat", labelKey: "", fallback: eventUiText("Wieder teilnehmen?"), value: result.would_repeat, placeholder: eventUiText("Ja, Nein, Vielleicht...") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.key_learnings", labelKey: "", fallback: eventUiText("Wichtigste Learnings"), value: result.key_learnings, placeholder: eventUiText("Was nimmst du für das nächste Event mit?") })}
+          ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: eventUiText("Rennbericht"), value: result.race_report, placeholderKey: "season.raceReportPlaceholder", placeholder: eventUiText("Wie lief das Rennen?") })}
         </div>
       </section>
       <div class="season-result-actions">
-        <button type="button" data-season-result-close="${escapeHTML(eventKey)}">Ansicht speichern</button>
+        <button type="button" data-season-result-close="${escapeHTML(eventKey)}">${escapeHTML(eventUiText("Ansicht speichern"))}</button>
       </div>
     </div>
   `;
@@ -6399,8 +6913,8 @@ function renderSeasonResultPanel({
   if (!isPast && !hasResult && !editMode) {
     return `
       <div class="season-empty-detail">
-        <strong>Kann nach dem Event eingetragen werden.</strong>
-        <span>Der Ergebnisbereich bleibt bis zum Race Day bewusst kompakt.</span>
+        <strong>${escapeHTML(eventUiText("Kann nach dem Event eingetragen werden."))}</strong>
+        <span>${escapeHTML(eventUiText("Der Ergebnisbereich bleibt bis zum Race Day bewusst kompakt."))}</span>
       </div>
     `;
   }
@@ -6412,9 +6926,9 @@ function renderSeasonResultPanel({
   if (isPast && !editMode && !hasResult) {
     return `
       <div class="season-empty-detail">
-        <strong>Wie lief dein Rennen?</strong>
-        <span>Noch kein Ergebnis eingetragen.</span>
-        <button type="button" data-season-result-edit="${escapeHTML(eventKey)}">Ergebnis eintragen</button>
+        <strong>${escapeHTML(eventUiText("Wie lief dein Rennen?"))}</strong>
+        <span>${escapeHTML(eventUiText("Noch kein Ergebnis eingetragen."))}</span>
+        <button type="button" data-season-result-edit="${escapeHTML(eventKey)}">${escapeHTML(eventUiText("Ergebnis eintragen"))}</button>
       </div>
     `;
   }
@@ -6435,18 +6949,18 @@ function getSeasonTimingLabel(event) {
     getSeasonDaysUntil(event);
 
   if (daysUntil === null) {
-    return "Kein Datum";
+    return eventUiText("Kein Datum");
   }
 
   if (daysUntil < 0) {
-    return `Vor ${Math.abs(daysUntil)} Tagen`;
+    return window.getAppLanguage?.() === "de" ? `Vor ${Math.abs(daysUntil)} Tagen` : `${Math.abs(daysUntil)} days ago`;
   }
 
   if (daysUntil === 0) {
-    return "Heute";
+    return eventUiText("Heute");
   }
 
-  return `${daysUntil} Tage bis zum Rennen`;
+  return window.getAppLanguage?.() === "de" ? `${daysUntil} Tage bis zum Rennen` : `${daysUntil} days until the race`;
 }
 
 function renderSeasonPostRaceReviewPanel(summary) {
@@ -6454,7 +6968,7 @@ function renderSeasonPostRaceReviewPanel(summary) {
     <div class="season-post-race-review">
       ${renderSeasonChecklist(summary)}
       <p class="season-guidance-copy">
-        Nächster sinnvoller Schritt:
+        ${escapeHTML(eventUiText("Nächster sinnvoller Schritt:"))}
         <strong>${escapeHTML(summary.nextTask)}</strong>
       </p>
     </div>
@@ -6474,7 +6988,7 @@ function renderSeasonArchiveAction(eventKey, postRace = {}) {
       data-season-archive-value="${archived ? "false" : "true"}"
       aria-pressed="${archived ? "true" : "false"}"
     >
-      ${archived ? "Aus Archiv zurückholen" : "Im Archiv ablegen"}
+      ${archived ? eventUiText("Aus Archiv zurückholen") : eventUiText("Im Archiv ablegen")}
     </button>
   `;
 }
@@ -6501,7 +7015,7 @@ function renderSeasonPastPlanningPanels({
   notesSummaryCopy
 }) {
   return renderSeasonDetailPanel({
-    title: "Vorbereitung ansehen",
+    title: eventUiText("Vorbereitung ansehen"),
     summary: "Ziele, Logistik, Equipment und Notizen bleiben als Archiv erreichbar.",
     open: false,
     tone: "past-planning",
@@ -6519,12 +7033,12 @@ function renderSeasonPastPlanningPanels({
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Ziel & Race Strategy",
+          title: eventUiText("Ziel & Race Strategy"),
           summary: goalSummaryCopy,
           body: `
             <div class="season-status-strip">
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: "Ziel", value: goals.goal_status, doneLabel: "Geklärt" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: "Race Strategy", value: goals.strategy_status, doneLabel: "Geplant" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: eventUiText("Ziel"), value: goals.goal_status, doneLabel: eventUiText("Geklärt") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: eventUiText("Race Strategy"), value: goals.strategy_status, doneLabel: eventUiText("Geplant") })}
             </div>
             ${renderSeasonGoalTypeControl(eventKey, goals)}
             ${renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetricLabel)}
@@ -6535,28 +7049,28 @@ function renderSeasonPastPlanningPanels({
           summary: logisticsSummaryCopy,
           body: `
             <div class="season-detail-checks season-detail-checks-compact">
-              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: "Anmeldung bestätigt", checked: logistics.registration_confirmed })}
+              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: eventUiText("Anmeldung bestätigt"), checked: logistics.registration_confirmed })}
             </div>
             <div class="season-detail-fields">
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: "Reise", value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: "Gebucht" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: "Unterkunft", value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: "Gebucht" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: "Startunterlagen", value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: "Geklärt" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: eventUiText("Reise"), value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: eventUiText("Gebucht") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: eventUiText("Unterkunft"), value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: eventUiText("Gebucht") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: eventUiText("Startunterlagen"), value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: eventUiText("Geklärt") })}
             </div>
             <div class="season-detail-fields season-detail-fields-compact">
-              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: "Startnummer", value: logistics.bib_number, placeholder: "A1234" })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: "Reisenotiz", value: logistics.travel_note, placeholderKey: "season.travelNotePlaceholder", placeholder: "Hotel, Zug, Startbereich, Abholung..." })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: eventUiText("Startnummer"), value: logistics.bib_number, placeholder: "A1234" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: eventUiText("Reisenotiz"), value: logistics.travel_note, placeholderKey: "season.travelNotePlaceholder", placeholder: eventUiText("Hotel, Zug, Startbereich, Abholung...") })}
             </div>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Equipment",
+          title: eventUiText("Equipment"),
           summary: equipmentSummaryCopy,
           tone: "equipment",
           panelKey: `equipment:${eventKey}`,
           body: renderSeasonEquipmentChecklist(event, eventKey, equipment)
         })}
         ${renderSeasonDetailPanel({
-          title: "Verpflegung",
+          title: eventUiText("Verpflegung"),
           summary: nutritionSummaryCopy,
           body: renderSeasonNutritionPlanner(eventKey, nutrition)
         })}
@@ -6574,14 +7088,14 @@ function renderSeasonPastPlanningPanels({
                 eventKey,
                 path: "personal_note",
                 labelKey: "season.personalNote",
-                fallback: "Persönliche Notiz",
+                fallback: eventUiText("Persönliche Notiz"),
                 value: noteValue,
                 placeholderKey: "season.personalNotePlaceholder",
-                placeholder: "Training, Logistik, Fokus...",
+                placeholder: eventUiText("Training, Logistik, Fokus..."),
                 legacyNote: true
               })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.target_description", labelKey: "season.targetDescription", fallback: "Zielnotiz", value: goals.target_description, placeholderKey: "season.goalPlaceholder", placeholder: "Ziel, Strategie, Pacings..." })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: "Rennbericht", value: raceReport, placeholderKey: "season.raceReportPlaceholder", placeholder: "Wie lief das Rennen?" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.target_description", labelKey: "season.targetDescription", fallback: eventUiText("Zielnotiz"), value: goals.target_description, placeholderKey: "season.goalPlaceholder", placeholder: eventUiText("Ziel, Strategie, Pacings...") })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: eventUiText("Rennbericht"), value: raceReport, placeholderKey: "season.raceReportPlaceholder", placeholder: eventUiText("Wie lief das Rennen?") })}
             </div>
           `
         })}
@@ -6664,7 +7178,7 @@ function renderSeasonPlannerDetails(event, eventKey) {
       targetMetricValue ? `${resultMetricLabel} ${targetMetricValue}` : "",
       goals.target_place_age_group ? `AK-Ziel ${goals.target_place_age_group}` : ""
     ].filter(Boolean).join(" · ") ||
-    "Noch kein Zieltyp gewählt";
+    eventUiText("Noch kein Zieltyp gewählt");
   const logisticsSummaryCopy =
     [
       `${logisticsDoneCount} Punkte geklärt`,
@@ -6672,18 +7186,18 @@ function renderSeasonPlannerDetails(event, eventKey) {
     ].filter(Boolean).join(" · ");
   const equipmentSummaryCopy =
     normalizeSeasonAreaStatus(equipment.status) === "not_needed"
-      ? "Nicht benötigt"
+      ? eventUiText("Nicht benötigt")
       : normalizeSeasonAreaStatus(equipment.status) === "done" ||
         normalizeSeasonAreaStatus(equipment.status) === "planned"
-        ? "Geplant"
-        : "Noch keine Ausrüstung geplant";
+        ? eventUiText("Geplant")
+        : eventUiText("Noch keine Ausrüstung geplant");
   const nutritionSummaryCopy =
     normalizeSeasonAreaStatus(nutrition.status) === "not_needed" ||
     cleanValue(nutrition.type) === "not_needed"
-      ? "Nicht benötigt"
+      ? eventUiText("Nicht benötigt")
       : normalizeSeasonAreaStatus(nutrition.status) === "done" ||
         normalizeSeasonAreaStatus(nutrition.status) === "planned"
-        ? "Geplant"
+        ? eventUiText("Geplant")
         : cleanValue(nutrition.type)
           ? SEASON_AREA_STATUS_LABELS[nutrition.type] || "Plan begonnen"
           : "Noch kein Verpflegungsplan";
@@ -6697,12 +7211,12 @@ function renderSeasonPlannerDetails(event, eventKey) {
         ].filter(Boolean).join(" · ")
       : isSeasonEventPast(event)
         ? "Ergebnis kann eingetragen werden"
-        : "Kann nach dem Event ergänzt werden";
+        : eventUiText("Kann nach dem Event ergänzt werden");
   const notesSummaryCopy =
     [
-      noteValue ? "Persönliche Notiz" : "",
-      goalNote ? "Zielnotiz" : "",
-      raceReport ? "Rennbericht" : ""
+      noteValue ? eventUiText("Persönliche Notiz") : "",
+      goalNote ? eventUiText("Zielnotiz") : "",
+      raceReport ? eventUiText("Rennbericht") : ""
     ].filter(Boolean).join(" · ") ||
     "Noch keine Notizen";
   const resultMetricSummary =
@@ -6756,16 +7270,16 @@ function renderSeasonPlannerDetails(event, eventKey) {
         : "Noch nicht eingetragen";
     const reflectionSummary =
       hasSeasonReflection(result)
-        ? "Reflexion ergänzt"
+        ? eventUiText("Reflexion ergänzt")
         : "Reflexion noch offen";
 
     return `
       <div class="season-race-dashboard season-post-race-dashboard">
         <section class="season-race-overview-card season-post-race-overview" aria-label="${escapeHTML(event.event_name)} Rückblick">
           <div class="season-overview-copy">
-            <span class="season-overview-eyebrow">Race Review</span>
+            <span class="season-overview-eyebrow">${escapeHTML(eventUiText("Race Review"))}</span>
             <h3>${escapeHTML(event.event_name)}</h3>
-            <p>${escapeHTML(overviewFacts || "Eventdetails noch nicht vollständig")}</p>
+            <p>${escapeHTML(overviewFacts || eventUiText("Eventdetails noch nicht vollständig"))}</p>
             <div class="season-overview-chip-row">
               <span class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">
                 ${escapeHTML(getSeasonPriorityLabel(priority))}
@@ -6774,34 +7288,34 @@ function renderSeasonPlannerDetails(event, eventKey) {
                 ${escapeHTML(postStatus)}
               </span>
               <span class="season-race-chip">${escapeHTML(daysLabel)}</span>
-              ${postRace.archived ? `<span class="season-race-chip season-post-race-archive-chip">Archiv</span>` : ""}
+              ${postRace.archived ? `<span class="season-race-chip season-post-race-archive-chip">${escapeHTML(eventUiText("Archiv"))}</span>` : ""}
             </div>
           </div>
           <div class="season-overview-kpis season-post-race-kpis">
             <span class="season-overview-kpi season-overview-kpi-primary">
-              <em>${hasResult ? "Finish Time" : "Ergebnis"}</em>
+              <em>${hasResult ? "Finish Time" : eventUiText("Ergebnis")}</em>
               <strong>${escapeHTML(resultPrimaryLabel)}</strong>
             </span>
             <span class="season-overview-kpi">
-              <em>Finish Status</em>
+              <em>${escapeHTML(eventUiText("Finish Status"))}</em>
               <strong>${escapeHTML(finishStatusLabel)}</strong>
             </span>
             <span class="season-overview-kpi">
-              <em>Overall</em>
+              <em>${escapeHTML(eventUiText("Overall"))}</em>
               <strong>${escapeHTML(result.overall_place || "-")}</strong>
             </span>
             <span class="season-overview-kpi">
-              <em>Age Group</em>
+              <em>${escapeHTML(eventUiText("Age Group"))}</em>
               <strong>${escapeHTML(result.age_group_place || "-")}</strong>
             </span>
             ${result.gender_place ? `
               <span class="season-overview-kpi">
-                <em>Gender</em>
+                <em>${escapeHTML(eventUiText("Gender"))}</em>
                 <strong>${escapeHTML(result.gender_place)}</strong>
               </span>
             ` : ""}
             <span class="season-overview-kpi">
-              <em>Rating</em>
+              <em>${escapeHTML(eventUiText("Rating"))}</em>
               <strong>${escapeHTML(result.personal_rating ? `${result.personal_rating} / 5` : "-")}</strong>
             </span>
             <span class="season-overview-kpi">
@@ -6816,7 +7330,7 @@ function renderSeasonPlannerDetails(event, eventKey) {
             </span>
             ${!hasResult ? `
               <button type="button" data-season-result-edit="${escapeHTML(eventKey)}">
-                Ergebnis eintragen
+                ${escapeHTML(eventUiText("Ergebnis eintragen"))}
               </button>
             ` : ""}
           </div>
@@ -6839,25 +7353,25 @@ function renderSeasonPlannerDetails(event, eventKey) {
               })
             })}
             ${renderSeasonDetailPanel({
-              title: "Race Review",
+              title: eventUiText("Race Review"),
               summary: `${prepSummary.status} · ${prepSummary.nextTask}`,
               open: true,
               body: renderSeasonPostRaceReviewPanel(prepSummary)
             })}
             ${renderSeasonDetailPanel({
-              title: "Persönliche Reflexion",
+              title: eventUiText("Persönliche Reflexion"),
               summary: reflectionSummary,
               open: hasResult && !hasSeasonReflection(result),
               body: `
                 <div class="season-detail-fields">
                   ${renderSeasonRatingControl(eventKey, result)}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.went_well", labelKey: "", fallback: "Was lief gut?", value: result.went_well, placeholder: "Was möchtest du beibehalten?" })}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.what_was_difficult", labelKey: "", fallback: "Was war schwierig?", value: result.what_was_difficult, placeholder: "Was hat Energie gekostet oder nicht funktioniert?" })}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.next_time_change", labelKey: "", fallback: "Was nächstes Mal ändern?", value: result.next_time_change, placeholder: "Was würdest du anpassen?" })}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.nutrition_worked", labelKey: "", fallback: "Verpflegung", value: result.nutrition_worked, placeholder: "Was hat bei der Verpflegung funktioniert?" })}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.equipment_worked", labelKey: "", fallback: "Equipment", value: result.equipment_worked, placeholder: "Welches Equipment war gut oder problematisch?" })}
-                  ${renderSeasonPlannerTextField({ eventKey, path: "result.would_repeat", labelKey: "", fallback: "Wieder teilnehmen?", value: result.would_repeat, placeholder: "Ja, Nein, Vielleicht..." })}
-                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.key_learnings", labelKey: "", fallback: "Wichtigste Learnings", value: result.key_learnings, placeholder: "Was nimmst du für das nächste Event mit?" })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.went_well", labelKey: "", fallback: eventUiText("Was lief gut?"), value: result.went_well, placeholder: eventUiText("Was möchtest du beibehalten?") })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.what_was_difficult", labelKey: "", fallback: eventUiText("Was war schwierig?"), value: result.what_was_difficult, placeholder: eventUiText("Was hat Energie gekostet oder nicht funktioniert?") })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.next_time_change", labelKey: "", fallback: eventUiText("Was nächstes Mal ändern?"), value: result.next_time_change, placeholder: eventUiText("Was würdest du anpassen?") })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.nutrition_worked", labelKey: "", fallback: eventUiText("Verpflegung"), value: result.nutrition_worked, placeholder: eventUiText("Was hat bei der Verpflegung funktioniert?") })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.equipment_worked", labelKey: "", fallback: eventUiText("Equipment"), value: result.equipment_worked, placeholder: eventUiText("Welches Equipment war gut oder problematisch?") })}
+                  ${renderSeasonPlannerTextField({ eventKey, path: "result.would_repeat", labelKey: "", fallback: eventUiText("Wieder teilnehmen?"), value: result.would_repeat, placeholder: eventUiText("Ja, Nein, Vielleicht...") })}
+                  ${renderSeasonPlannerTextarea({ eventKey, path: "result.key_learnings", labelKey: "", fallback: eventUiText("Wichtigste Learnings"), value: result.key_learnings, placeholder: eventUiText("Was nimmst du für das nächste Event mit?") })}
                 </div>
               `
             })}
@@ -6883,14 +7397,14 @@ function renderSeasonPlannerDetails(event, eventKey) {
               notesSummaryCopy
             })}
           </main>
-          <aside class="season-event-planner-sidebar" aria-label="Post-Race Status">
+          <aside class="season-event-planner-sidebar" aria-label="${escapeHTML(eventUiText("Post-Race Status"))}">
             <div class="season-sidebar-card season-sidebar-card-progress">
-              <span>Post-Race Status</span>
+              <span>${escapeHTML(eventUiText("Post-Race Status"))}</span>
               <strong>${escapeHTML(prepSummary.status)}</strong>
               <em>${escapeHTML(prepSummary.openSummary)}</em>
             </div>
             <div class="season-sidebar-card">
-              <span>Nächster Schritt</span>
+              <span>${escapeHTML(eventUiText("Nächster Schritt"))}</span>
               <strong>${escapeHTML(prepSummary.nextTask)}</strong>
               <em>${escapeHTML(reflectionSummary)}</em>
             </div>
@@ -6900,9 +7414,9 @@ function renderSeasonPlannerDetails(event, eventKey) {
               <em>${escapeHTML(finishStatusLabel)}</em>
             </div>
             <div class="season-sidebar-card">
-              <span>Archiv</span>
+              <span>${escapeHTML(eventUiText("Archiv"))}</span>
               <strong>${postRace.archived ? "Archiviert" : "Aktiv sichtbar"}</strong>
-              <em>Bleibt in Past Events und Statistiken erhalten.</em>
+              <em>${escapeHTML(eventUiText("Bleibt in Past Events und Statistiken erhalten."))}</em>
               ${renderSeasonArchiveAction(eventKey, postRace)}
             </div>
           </aside>
@@ -6915,9 +7429,9 @@ function renderSeasonPlannerDetails(event, eventKey) {
     <div class="season-race-dashboard">
       <section class="season-race-overview-card" aria-label="${escapeHTML(event.event_name)} Planung">
         <div class="season-overview-copy">
-          <span class="season-overview-eyebrow">Race Overview</span>
+          <span class="season-overview-eyebrow">${escapeHTML(eventUiText("Race Overview"))}</span>
           <h3>${escapeHTML(event.event_name)}</h3>
-          <p>${escapeHTML(overviewFacts || "Eventdetails noch nicht vollständig")}</p>
+          <p>${escapeHTML(overviewFacts || eventUiText("Eventdetails noch nicht vollständig"))}</p>
           <div class="season-overview-chip-row">
             <span class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">
               ${escapeHTML(getSeasonPriorityLabel(priority))}
@@ -6935,24 +7449,24 @@ function renderSeasonPlannerDetails(event, eventKey) {
             <strong>${escapeHTML(daysLabel)}</strong>
           </span>
           <span class="season-overview-kpi">
-            <em>Trainingsphase</em>
+            <em>${escapeHTML(eventUiText("Trainingsphase"))}</em>
             <strong>${escapeHTML(trainingPhase)}</strong>
           </span>
           <span class="season-overview-kpi">
-            <em>Planungsstatus</em>
+            <em>${escapeHTML(eventUiText("Planungsstatus"))}</em>
             <strong>${escapeHTML(prepSummary.status)}</strong>
           </span>
           <span class="season-overview-kpi">
-            <em>Nächster Schritt</em>
+            <em>${escapeHTML(eventUiText("Nächster Schritt"))}</em>
             <strong>${escapeHTML(prepSummary.nextTask)}</strong>
           </span>
         </div>
         <div class="season-overview-progress">
           <span>
             <strong>${escapeHTML(prepSummary.openSummary)}</strong>
-            <em>${missingPreview.length ? `Offen: ${escapeHTML(missingPreview.join(", "))}` : "Alle wichtigen Punkte geklärt"}</em>
+            <em>${missingPreview.length ? `Offen: ${escapeHTML(missingPreview.join(", "))}` : eventUiText("Alle wichtigen Punkte geklärt")}</em>
           </span>
-          <div class="season-progress-track season-progress-track-subtle" aria-label="Dezenter Planungsfortschritt">
+          <div class="season-progress-track season-progress-track-subtle" aria-label="${escapeHTML(eventUiText("Dezenter Planungsfortschritt"))}">
             <b style="width: ${Math.max(0, Math.min(100, prepSummary.percent))}%"></b>
           </div>
         </div>
@@ -6968,7 +7482,7 @@ function renderSeasonPlannerDetails(event, eventKey) {
         ${renderSeasonDashboardMetric("Platz AK", result.age_group_place)}
         ${renderSeasonDashboardMetric("Bewertung", result.personal_rating ? `${result.personal_rating}/5` : "")}
       </div>
-      ${hasResult ? "" : `<p class="season-result-empty">Noch kein Ergebnis eingetragen.</p>`}
+      ${hasResult ? "" : `<p class="season-result-empty">${escapeHTML(eventUiText("Noch kein Ergebnis eingetragen."))}</p>`}
       ${renderSeasonSplitSummary(result)}
       <div class="season-status-strip">
         ${renderSeasonStatusChip("Anmeldung bestätigt", logistics.registration_confirmed)}
@@ -6977,12 +7491,12 @@ function renderSeasonPlannerDetails(event, eventKey) {
       </div>
       <div class="season-detail-panels">
         ${renderSeasonDetailPanel({
-          title: "Aufgaben",
+          title: eventUiText("Aufgaben"),
           summary: `${prepSummary.openSummary} · ${prepSummary.nextTask}`,
           open: true,
           body: `
             ${renderSeasonChecklist(prepSummary)}
-            <p class="season-guidance-copy">Nächster sinnvoller Schritt: <strong>${escapeHTML(prepSummary.nextTask)}</strong></p>
+            <p class="season-guidance-copy">${escapeHTML(eventUiText("Nächster sinnvoller Schritt:"))} <strong>${escapeHTML(prepSummary.nextTask)}</strong></p>
           `
         })}
         ${renderSeasonDetailPanel({
@@ -6995,17 +7509,17 @@ function renderSeasonPlannerDetails(event, eventKey) {
               ${renderSeasonDashboardMetric("Race Load", getSeasonPlanningLoadLabel(raceLoad.level), { allowEmpty: true })}
               ${renderSeasonDashboardMetric("Countdown", daysLabel, { allowEmpty: true })}
             </div>
-            <p class="season-guidance-copy">Nutze Zielzeit, Race Strategy und Notizen, um den aktuellen Block mit realistischen Erwartungen zu verbinden.</p>
+            <p class="season-guidance-copy">${escapeHTML(eventUiText("Nutze Zielzeit, Race Strategy und Notizen, um den aktuellen Block mit realistischen Erwartungen zu verbinden."))}</p>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Ziel & Race Strategy",
+          title: eventUiText("Ziel & Race Strategy"),
           summary: goalSummaryCopy,
           open: !goals.goal_type,
           body: `
             <div class="season-status-strip">
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: "Ziel", value: goals.goal_status, doneLabel: "Geklärt" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: "Race Strategy", value: goals.strategy_status, doneLabel: "Geplant" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: eventUiText("Ziel"), value: goals.goal_status, doneLabel: eventUiText("Geklärt") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: eventUiText("Race Strategy"), value: goals.strategy_status, doneLabel: eventUiText("Geplant") })}
             </div>
             ${renderSeasonGoalTypeControl(eventKey, goals)}
             ${renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetricLabel)}
@@ -7016,28 +7530,28 @@ function renderSeasonPlannerDetails(event, eventKey) {
           summary: logisticsSummaryCopy,
           body: `
             <div class="season-detail-checks season-detail-checks-compact">
-              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: "Anmeldung bestätigt", checked: logistics.registration_confirmed })}
+              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: eventUiText("Anmeldung bestätigt"), checked: logistics.registration_confirmed })}
             </div>
             <div class="season-detail-fields">
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: "Reise", value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: "Gebucht" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: "Unterkunft", value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: "Gebucht" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: "Startunterlagen", value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: "Geklärt" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: eventUiText("Reise"), value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: eventUiText("Gebucht") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: eventUiText("Unterkunft"), value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: eventUiText("Gebucht") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: eventUiText("Startunterlagen"), value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: eventUiText("Geklärt") })}
             </div>
             <div class="season-detail-fields season-detail-fields-compact">
-              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: "Startnummer", value: logistics.bib_number, placeholder: "A1234" })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: "Reisenotiz", value: logistics.travel_note, placeholderKey: "season.travelNotePlaceholder", placeholder: "Hotel, Zug, Startbereich, Abholung..." })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: eventUiText("Startnummer"), value: logistics.bib_number, placeholder: "A1234" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: eventUiText("Reisenotiz"), value: logistics.travel_note, placeholderKey: "season.travelNotePlaceholder", placeholder: eventUiText("Hotel, Zug, Startbereich, Abholung...") })}
             </div>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Equipment",
+          title: eventUiText("Equipment"),
           summary: equipmentSummaryCopy,
           tone: "equipment",
           panelKey: `equipment:${eventKey}`,
           body: renderSeasonEquipmentChecklist(event, eventKey, equipment)
         })}
         ${renderSeasonDetailPanel({
-          title: "Verpflegung",
+          title: eventUiText("Verpflegung"),
           summary: nutritionSummaryCopy,
           body: renderSeasonNutritionPlanner(eventKey, nutrition)
         })}
@@ -7062,7 +7576,7 @@ function renderSeasonPlannerDetails(event, eventKey) {
           summary: notesSummaryCopy,
           body: `
             <div class="season-status-strip">
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.notes_status", label: "Notizen", value: goals.notes_status, doneLabel: "Gepflegt" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.notes_status", label: eventUiText("Notizen"), value: goals.notes_status, doneLabel: eventUiText("Gepflegt") })}
             </div>
             <div class="season-note-preview-grid">
               ${renderSeasonCompactPreview("Persönliche Notiz", noteValue, "Noch keine persönliche Notiz.")}
@@ -7074,22 +7588,22 @@ function renderSeasonPlannerDetails(event, eventKey) {
                 eventKey,
                 path: "personal_note",
                 labelKey: "season.personalNote",
-                fallback: "Persönliche Notiz",
+                fallback: eventUiText("Persönliche Notiz"),
                 value: noteValue,
                 placeholderKey: "season.personalNotePlaceholder",
-                placeholder: "Training, Logistik, Fokus...",
+                placeholder: eventUiText("Training, Logistik, Fokus..."),
                 legacyNote: true
               })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.target_description", labelKey: "season.targetDescription", fallback: "Zielnotiz", value: goals.target_description, placeholderKey: "season.goalPlaceholder", placeholder: "Ziel, Strategie, Pacings..." })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: "Rennbericht", value: result.race_report, placeholderKey: "season.raceReportPlaceholder", placeholder: "Wie lief das Rennen?" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.target_description", labelKey: "season.targetDescription", fallback: eventUiText("Zielnotiz"), value: goals.target_description, placeholderKey: "season.goalPlaceholder", placeholder: eventUiText("Ziel, Strategie, Pacings...") })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "result.race_report", labelKey: "season.raceReport", fallback: eventUiText("Rennbericht"), value: result.race_report, placeholderKey: "season.raceReportPlaceholder", placeholder: eventUiText("Wie lief das Rennen?") })}
             </div>
           `
         })}
       </div>
         </main>
-        <aside class="season-event-planner-sidebar" aria-label="Planungsstatus">
+        <aside class="season-event-planner-sidebar" aria-label="${escapeHTML(eventUiText("Planungsstatus"))}">
           <div class="season-sidebar-card season-sidebar-card-progress">
-            <span>Planungsstatus</span>
+            <span>${escapeHTML(eventUiText("Planungsstatus"))}</span>
             <strong>${escapeHTML(prepSummary.status)}</strong>
             <em>${escapeHTML(prepSummary.openSummary)}</em>
             <div class="season-progress-track season-progress-track-subtle">
@@ -7097,18 +7611,18 @@ function renderSeasonPlannerDetails(event, eventKey) {
             </div>
           </div>
           <div class="season-sidebar-card">
-            <span>Nächster Schritt</span>
+            <span>${escapeHTML(eventUiText("Nächster Schritt"))}</span>
             <strong>${escapeHTML(prepSummary.nextTask)}</strong>
             <em>${escapeHTML(prepSummary.status)}</em>
           </div>
           <div class="season-sidebar-card">
-            <span>Race Timing</span>
+            <span>${escapeHTML(eventUiText("Race Timing"))}</span>
             <strong>${escapeHTML(daysLabel)}</strong>
             <em>${escapeHTML(trainingPhase)}</em>
           </div>
           ${prepSummary.missing.length ? `
             <div class="season-sidebar-card">
-              <span>Noch offen</span>
+              <span>${escapeHTML(eventUiText("Noch offen"))}</span>
               <div class="season-missing-list">
                 ${prepSummary.missing.slice(0, 6).map(area => `
                   <b>${escapeHTML(area.label)}</b>
@@ -7188,7 +7702,7 @@ function getSeasonPriorityLabel(priority) {
     Maybe: "Maybe"
   };
 
-  return labels[priority] || "Maybe";
+  return eventUiText(labels[priority] || "Maybe");
 }
 
 function getSeasonMonthLabel(event) {
@@ -7297,11 +7811,11 @@ function getSeasonLoadColor(percent) {
 }
 
 function getSeasonLoadLabel(percent) {
-  if (percent >= 82) return "Very demanding";
-  if (percent >= 64) return "Demanding";
-  if (percent >= 46) return "Balanced";
-  if (percent >= 26) return "Light";
-  return "Very light";
+  if (percent >= 82) return eventUiText("Very demanding");
+  if (percent >= 64) return eventUiText("Demanding");
+  if (percent >= 46) return eventUiText("Balanced");
+  if (percent >= 26) return eventUiText("Light");
+  return eventUiText("Very light");
 }
 
 function getSeasonPlanningLoadLabel(level) {
@@ -7699,9 +8213,9 @@ function getSeasonScoreSummary(eventsForSeason, closeWarnings, prioritySummary) 
   if (!eventsForSeason.length) {
     return {
       score: 0,
-      label: "Start planning",
+      label: eventUiText("Start planning"),
       className: "empty",
-      explanation: "Save races to calculate your season score."
+      explanation: eventUiText("Save races to calculate your season score.")
     };
   }
 
@@ -7839,7 +8353,7 @@ function getTrainingOpportunity(eventsForSeason) {
     return {
       days,
       phase: "Race Ready Phase",
-      text: "Race approaching. Focus on execution.",
+      text: eventUiText("Race approaching. Focus on execution."),
       event: nextARace
     };
   }
@@ -7848,7 +8362,7 @@ function getTrainingOpportunity(eventsForSeason) {
     return {
       days,
       phase: "Specific Training Phase",
-      text: "Time to sharpen race-specific fitness.",
+      text: eventUiText("Time to sharpen race-specific fitness."),
       event: nextARace
     };
   }
@@ -7856,7 +8370,7 @@ function getTrainingOpportunity(eventsForSeason) {
   return {
     days,
     phase: "Base Building Opportunity",
-    text: "Plenty of time to build fitness.",
+    text: eventUiText("Plenty of time to build fitness."),
     event: nextARace
   };
 }
@@ -8266,7 +8780,7 @@ function renderSeasonCalendarEventPill(event, closeWarnings) {
       type="button"
       class="season-calendar-event-pill ${priority === "A" ? "season-event-a-race" : ""} ${isCloseRaceEvent(event, closeWarnings) ? "season-event-close-warning" : ""}"
       data-season-open="${escapeHTML(getEventKey(event))}"
-      title="${escapeHTML(event.event_name)} · ${escapeHTML(getSeasonDisplayDistance(event))}"
+      title="${escapeHTML(event.event_name)} · ${escapeHTML(eventDisplayValue(getSeasonDisplayDistance(event)))}"
     >
       <span>${escapeHTML(getSeasonPriorityLabel(priority).charAt(0))}</span>
       <strong>${escapeHTML(event.event_name)}</strong>
@@ -8299,11 +8813,11 @@ function renderSeasonMonthCalendar(monthLabel, monthEvents, closeWarnings) {
   return `
     <section class="season-month-group season-calendar-month season-calendar-month-grid">
       <div class="season-month-title">
-        <span>${escapeHTML(monthLabel)}</span>
-        <em>${monthEvents.length} race${monthEvents.length === 1 ? "" : "s"}</em>
+        <span>${escapeHTML(eventMonthDisplay(monthLabel))}</span>
+        <em>${monthEvents.length} ${eventUiText(monthEvents.length === 1 ? "race" : "races")}</em>
       </div>
       <div class="season-calendar-weekdays" aria-hidden="true">
-        ${["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        ${(window.getAppLanguage?.() === "de" ? ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"] : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
           .map(day => `<span>${day}</span>`)
           .join("")}
       </div>
@@ -8316,7 +8830,7 @@ function renderSeasonMonthCalendar(monthLabel, monthEvents, closeWarnings) {
                 renderSeasonCalendarEventPill(event, closeWarnings)
               ).join("")}
               ${day.events.length > 2
-                ? `<span class="season-calendar-more">+${day.events.length - 2} more</span>`
+                ? `<span class="season-calendar-more">+${day.events.length - 2} ${window.getAppLanguage?.() === "de" ? "weitere" : "more"}</span>`
                 : ""}
             </div>
           </div>
@@ -8352,9 +8866,9 @@ function renderSeasonListEvent(event, closeWarnings, favoriteEvents) {
       <span class="season-calendar-day">${escapeHTML(dayLabel)}</span>
       <span class="season-event-main">
         <strong>${escapeHTML(event.event_name)}</strong>
-        <em>${escapeHTML(getEventFormatLabel(event))} · ${escapeHTML(getSeasonDisplayDistance(event))}</em>
+        <em>${escapeHTML(getEventFormatLabel(event))} · ${escapeHTML(eventDisplayValue(getSeasonDisplayDistance(event)))}</em>
       </span>
-      <span class="season-event-place">${escapeHTML(event.city)}, ${escapeHTML(event.country)}</span>
+      <span class="season-event-place">${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}</span>
       <span class="season-load-badge season-load-${raceLoad.level.toLowerCase().replace(/\s+/g, "-")}">
         ${escapeHTML(getSeasonPlanningLoadLabel(raceLoad.level))}
       </span>
@@ -8365,7 +8879,7 @@ function renderSeasonListEvent(event, closeWarnings, favoriteEvents) {
         class="season-google-event"
         data-season-google="${escapeHTML(getEventKey(event))}"
       >
-        Calendar
+        ${escapeHTML(eventUiText("Calendar"))}
       </button>
       <button
         type="button"
@@ -8610,7 +9124,7 @@ function getSeasonPreviousGapLabel(event, sortedEvents) {
     );
 
   if (index <= 0) {
-    return "Season start";
+    return eventUiText("Season start");
   }
 
   const previousDate =
@@ -8620,10 +9134,10 @@ function getSeasonPreviousGapLabel(event, sortedEvents) {
     parseSeasonDate(event.date);
 
   if (!previousDate || !currentDate) {
-    return "Gap unclear";
+    return eventUiText("Gap unclear");
   }
 
-  return `${getDaysBetweenDates(previousDate, currentDate)} days gap`;
+  return `${getDaysBetweenDates(previousDate, currentDate)} ${window.getAppLanguage?.() === "de" ? "Tage Abstand" : "days gap"}`;
 }
 
 function formatCountdown(targetDate) {
@@ -8637,7 +9151,7 @@ function formatCountdown(targetDate) {
     targetDate.getTime() - Date.now();
 
   if (diff <= 0) {
-    return "Today";
+    return eventUiText("Today");
   }
 
   const totalSeconds =
@@ -8765,7 +9279,7 @@ function updateSeasonCountdown() {
   if (nextPlace) {
     const nextPlaceText =
       nextEvent
-        ? `${nextEvent.city}, ${nextEvent.country}`
+        ? `${nextEvent.city}, ${eventDisplayValue(nextEvent.country)}`
         : "-";
 
     if (nextPlace.textContent !== nextPlaceText) {
@@ -8799,8 +9313,8 @@ function renderSeasonEventList(
   if (!favoriteEvents.length) {
     return `
       <div class="season-empty">
-        <strong>No planned races yet</strong>
-        <span>Save events from the map to build your editable season.</span>
+        <strong>${escapeHTML(eventUiText("No planned races yet"))}</strong>
+        <span>${escapeHTML(eventUiText("Save events from the map to build your editable season."))}</span>
       </div>
     `;
   }
@@ -8838,11 +9352,11 @@ function renderSeasonEventList(
       : "";
   const groupedEvents = [
     {
-      title: "Upcoming",
+      title: eventUiText("Upcoming"),
       events: upcomingEvents
     },
     {
-      title: "Results",
+      title: eventUiText("Results"),
       events:
         favoriteEvents
           .filter(event => {
@@ -8856,7 +9370,7 @@ function renderSeasonEventList(
           .sort(sortByDateDesc)
     },
     {
-      title: "Archive",
+      title: eventUiText("Archive"),
       events:
         favoriteEvents
           .filter(event => {
@@ -8869,19 +9383,19 @@ function renderSeasonEventList(
           })
           .sort(sortByDateDesc)
     },
-    { title: "Past · result pending", events: favoriteEvents.filter(event => {
+    { title: eventUiText("Past · result pending"), events: favoriteEvents.filter(event => {
       const state = getPersonalParticipationState(event);
       return state.temporal === "past" && !state.hasOutcome && !getSeasonPlannerDetails(event).post_race?.archived;
     }).sort(sortByDateDesc) },
-    { title: "Started / ongoing", events: favoriteEvents.filter(event => {
+    { title: eventUiText("Started / ongoing"), events: favoriteEvents.filter(event => {
       const state = getPersonalParticipationState(event);
       return state.temporal === "ongoing" && !state.hasOutcome;
     }) },
-    { title: "Cancelled / inactive", events: favoriteEvents.filter(event => {
+    { title: eventUiText("Cancelled / inactive"), events: favoriteEvents.filter(event => {
       const state = getPersonalParticipationState(event);
       return !state.hasOutcome && state.temporal !== "past" && ["cancelled", "inactive", "completed"].includes(state.catalog);
     }) },
-    { title: "Edition / date to confirm", events: favoriteEvents.filter(event => {
+    { title: eventUiText("Edition / date to confirm"), events: favoriteEvents.filter(event => {
       const state = getPersonalParticipationState(event);
       return (state.temporal === "unknown" || ["date_unconfirmed", "postponed"].includes(state.catalog)) && !state.hasOutcome && !["cancelled", "inactive", "completed"].includes(state.catalog);
     }) }
@@ -8902,7 +9416,7 @@ function renderSeasonEventList(
       daysUntil === null
         ? "Kein Datum"
         : daysUntil === 0
-          ? "Heute"
+          ? eventUiText("Heute")
           : daysUntil > 0
             ? `${daysUntil} Tage`
             : `Vor ${Math.abs(daysUntil)} Tagen`;
@@ -8938,7 +9452,7 @@ function renderSeasonEventList(
       >
         <span class="season-event-selector-date">${escapeHTML(compactDate)}</span>
         <span class="season-event-selector-main">
-          ${isNextRace ? `<small>Next Race</small>` : ""}
+          ${isNextRace ? `<small>${escapeHTML(eventUiText("Next Race"))}</small>` : ""}
           <strong>${escapeHTML(event.event_name)}</strong>
           <em>${escapeHTML(place)} · ${escapeHTML(getEventFormatLabel(event))}</em>
         </span>
@@ -8950,7 +9464,7 @@ function renderSeasonEventList(
             ${resultStatus && resultStatus !== postStatus ? `<b>${escapeHTML(resultStatus)}</b>` : ""}
           ` : `
             <b>${escapeHTML(timingLabel)}</b>
-            ${taskSummary.open.length ? `<b>${escapeHTML(taskSummary.open.length)} ${taskSummary.open.length === 1 ? "Aufgabe" : "Aufgaben"} offen</b>` : `<b>Planung bereit</b>`}
+            ${taskSummary.open.length ? `<b>${escapeHTML(taskSummary.open.length)} ${eventUiText(taskSummary.open.length === 1 ? "open task" : "open tasks")}</b>` : `<b>${escapeHTML(eventUiText("Planung bereit"))}</b>`}
           `}
         </span>
       </button>
@@ -8961,7 +9475,7 @@ function renderSeasonEventList(
     <div class="season-event-selector-list">
       ${groupedEvents.map(group => `
         <section class="season-event-selector-group">
-          <span>${escapeHTML(group.title)}</span>
+          <span>${escapeHTML(eventUiText(group.title))}</span>
           ${group.events.map(renderSelector).join("")}
         </section>
       `).join("")}
@@ -8976,22 +9490,22 @@ function getSeasonWorkspaceTaskSummary(event, details = {}) {
     const tasks = [
       {
         key: "result",
-        label: "Ergebnis eingetragen",
+        label: eventUiText("Ergebnis eingetragen"),
         done: hasSeasonResult(result)
       },
       {
         key: "finish_status",
-        label: "Finish Status gesetzt",
+        label: eventUiText("Finish Status gesetzt"),
         done: Boolean(finishStatus)
       },
       {
         key: "rating",
-        label: "Persönliche Bewertung ergänzt",
+        label: eventUiText("Persönliche Bewertung ergänzt"),
         done: Boolean(cleanValue(result.personal_rating))
       },
       {
         key: "reflection",
-        label: "Rennreview abgeschlossen",
+        label: eventUiText("Rennreview abgeschlossen"),
         done: hasSeasonReflection(result)
       }
     ];
@@ -9023,27 +9537,27 @@ function getSeasonWorkspaceTaskSummary(event, details = {}) {
   const tasks = [
     {
       key: "date",
-      label: "Eventdatum vorhanden",
+      label: eventUiText("Eventdatum vorhanden"),
       done: Boolean(parseSeasonDate(event.date))
     },
     {
       key: "distance",
-      label: "Distanz festgelegt",
+      label: eventUiText("Distanz festgelegt"),
       done: Boolean(cleanValue(getSeasonDisplayDistance(event)))
     },
     {
       key: "priority",
-      label: "Priorität festgelegt",
+      label: eventUiText("Priorität festgelegt"),
       done: ["A", "B", "C", "Training"].includes(priority)
     },
     {
       key: "registration",
-      label: "Anmeldung abgeschlossen",
+      label: eventUiText("Anmeldung abgeschlossen"),
       done: Boolean(logistics.registration_confirmed)
     },
     {
       key: "goal",
-      label: "Rennziel gewählt",
+      label: eventUiText("Rennziel gewählt"),
       done:
         goalStatus === "not_needed" ||
         Boolean(cleanValue(goals.goal_type))
@@ -9053,7 +9567,7 @@ function getSeasonWorkspaceTaskSummary(event, details = {}) {
   if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 42) {
     tasks.push({
       key: "bib",
-      label: "Race Guide und Startunterlagen geprüft",
+      label: eventUiText("Race Guide und Startunterlagen geprüft"),
       done:
         bibStatus === "done" ||
         bibStatus === "not_needed"
@@ -9085,9 +9599,9 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
   if (isPast) {
     if (!hasSeasonResult(result)) {
       return {
-        title: "Ergebnis eintragen",
-        description: "Halte Finish Status, offizielle Zeit und Platzierung für deinen Saisonrückblick fest.",
-        label: "Ergebnis eintragen",
+        title: eventUiText("Ergebnis eintragen"),
+        description: eventUiText("Halte Finish Status, offizielle Zeit und Platzierung für deinen Saisonrückblick fest."),
+        label: eventUiText("Ergebnis eintragen"),
         panelKey: `result-review:${eventKey}`,
         action: "result"
       };
@@ -9095,17 +9609,17 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
 
     if (!hasSeasonReflection(result)) {
       return {
-        title: "Rennen kurz reflektieren",
-        description: "Notiere, was gut lief und was du beim nächsten Rennen anders machen möchtest.",
-        label: "Review ergänzen",
+        title: eventUiText("Rennen kurz reflektieren"),
+        description: eventUiText("Notiere, was gut lief und was du beim nächsten Rennen anders machen möchtest."),
+        label: eventUiText("Review ergänzen"),
         panelKey: `result-review:${eventKey}`,
         action: "result"
       };
     }
 
     return {
-      title: "Keine offenen Schritte",
-      description: "Ergebnis und Rennreview sind vollständig dokumentiert.",
+      title: eventUiText("Keine offenen Schritte"),
+      description: eventUiText("Ergebnis und Rennreview sind vollständig dokumentiert."),
       label: "",
       panelKey: "",
       action: ""
@@ -9114,18 +9628,18 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
 
   if (!["A", "B", "C", "Training"].includes(getSeasonPriority(event))) {
     return {
-      title: "Eventpriorität festlegen",
-      description: "Ordne das Rennen als A-, B-, C- oder Trainingsrennen ein.",
-      label: "Event bearbeiten",
+      title: eventUiText("Eventpriorität festlegen"),
+      description: eventUiText("Ordne das Rennen als A-, B-, C- oder Trainingsrennen ein."),
+      label: eventUiText("Event bearbeiten"),
       action: "edit"
     };
   }
 
   if (!logistics.registration_confirmed) {
     return {
-      title: "Anmeldung abschließen",
-      description: "Prüfe den Meldestatus, bevor du weitere Reise- oder Rennplanung festlegst.",
-      label: "Anmeldung prüfen",
+      title: eventUiText("Anmeldung abschließen"),
+      description: eventUiText("Prüfe den Meldestatus, bevor du weitere Reise- oder Rennplanung festlegst."),
+      label: eventUiText("Anmeldung prüfen"),
       panelKey: `preparation:${eventKey}`,
       action: "panel"
     };
@@ -9133,9 +9647,9 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
 
   if (!cleanValue(goals.goal_type)) {
     return {
-      title: "Persönliches Rennziel festlegen",
-      description: "Lege fest, ob du auf Zeit, als Training oder einfach zum Spaß startest.",
-      label: "Ziel festlegen",
+      title: eventUiText("Persönliches Rennziel festlegen"),
+      description: eventUiText("Lege fest, ob du auf Zeit, als Training oder einfach zum Spaß startest."),
+      label: eventUiText("Ziel festlegen"),
       panelKey: `goal-strategy:${eventKey}`,
       action: "panel"
     };
@@ -9144,9 +9658,9 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
   const bibStatus = normalizeSeasonAreaStatus(logistics.bib_status);
   if (daysUntil !== null && daysUntil >= 0 && daysUntil <= 42 && bibStatus === "open") {
     return {
-      title: "Race Guide und Startunterlagen prüfen",
-      description: "Kontrolliere Ausgabe, Pflichtunterlagen und wichtige Zeiten für den Renntag.",
-      label: "Vorbereitung öffnen",
+      title: eventUiText("Race Guide und Startunterlagen prüfen"),
+      description: eventUiText("Kontrolliere Ausgabe, Pflichtunterlagen und wichtige Zeiten für den Renntag."),
+      label: eventUiText("Vorbereitung öffnen"),
       panelKey: `preparation:${eventKey}`,
       action: "panel"
     };
@@ -9159,9 +9673,9 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
     normalizeSeasonAreaStatus(equipment.status) === "open"
   ) {
     return {
-      title: "Ausrüstung planen",
-      description: "Prüfe die automatisch vorgeschlagene Packliste für dieses Event.",
-      label: "Equipment öffnen",
+      title: eventUiText("Ausrüstung planen"),
+      description: eventUiText("Prüfe die automatisch vorgeschlagene Packliste für dieses Event."),
+      label: eventUiText("Equipment öffnen"),
       panelKey: `equipment-nutrition:${eventKey}`,
       action: "panel"
     };
@@ -9174,17 +9688,17 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
     normalizeSeasonAreaStatus(nutrition.status) === "open"
   ) {
     return {
-      title: "Verpflegungsstrategie erstellen",
-      description: "Lege fest, ob und wie du dich während des Rennens verpflegen möchtest.",
-      label: "Verpflegung planen",
+      title: eventUiText("Verpflegungsstrategie erstellen"),
+      description: eventUiText("Lege fest, ob und wie du dich während des Rennens verpflegen möchtest."),
+      label: eventUiText("Verpflegung planen"),
       panelKey: `equipment-nutrition:${eventKey}`,
       action: "panel"
     };
   }
 
   return {
-    title: "Planung vollständig",
-    description: "Alle aktuell wichtigen Punkte für dieses Rennen sind geklärt.",
+    title: eventUiText("Planung vollständig"),
+    description: eventUiText("Alle aktuell wichtigen Punkte für dieses Rennen sind geklärt."),
     label: "",
     panelKey: "",
     action: ""
@@ -9193,7 +9707,7 @@ function getSeasonWorkspaceNextAction(event, details = {}) {
 
 function getSeasonWorkspaceNotice(event) {
   if (isSeasonEventPast(event)) {
-    return "Vergangene Planungsdaten bleiben in den Bereichen weiterhin erreichbar.";
+    return eventUiText("Vergangene Planungsdaten bleiben in den Bereichen weiterhin erreichbar.");
   }
 
   const eventKey = getEventKey(event);
@@ -9215,7 +9729,9 @@ function getSeasonWorkspaceNotice(event) {
     ? "Zwei A-Races liegen nah beieinander. "
     : "Kurzer Rennabstand: ";
 
-  return `${prefix}Zwischen ${warning.previous.event_name} und ${warning.current.event_name} liegen ${warning.daysBetween} Tage.`;
+  return window.getAppLanguage?.() === "de"
+    ? `${prefix}Zwischen ${warning.previous.event_name} und ${warning.current.event_name} liegen ${warning.daysBetween} Tage.`
+    : `${bothARaces ? "Two A races are close together. " : "Short race spacing: "}${warning.daysBetween} days between ${warning.previous.event_name} and ${warning.current.event_name}.`;
 }
 
 function renderSeasonEventEditPanel(event, eventKey) {
@@ -9235,7 +9751,7 @@ function renderSeasonEventEditPanel(event, eventKey) {
           <select data-season-distance="${escapeHTML(eventKey)}" data-testid="planner-distance-select">
             <option value="">${escapeHTML(seasonPlannerText("season.eventDefault", "Eventangabe verwenden"))}</option>
             ${distanceOptions.map(distance => `
-              <option value="${escapeHTML(distance)}" ${plannedDistance === distance ? "selected" : ""}>${escapeHTML(distance)}</option>
+              <option value="${escapeHTML(distance)}" ${plannedDistance === distance ? "selected" : ""}>${escapeHTML(eventDisplayValue(distance))}</option>
             `).join("")}
           </select>
         </label>
@@ -9249,8 +9765,8 @@ function renderSeasonEventEditPanel(event, eventKey) {
         </label>
       </div>
       <div class="season-workspace-edit-actions">
-        <span>Änderungen werden automatisch gespeichert.</span>
-        <button type="button" class="season-edit-done" data-season-edit-done="${escapeHTML(eventKey)}">Fertig</button>
+        <span>${escapeHTML(eventUiText("Änderungen werden automatisch gespeichert."))}</span>
+        <button type="button" class="season-edit-done" data-season-edit-done="${escapeHTML(eventKey)}">${escapeHTML(eventUiText("Fertig"))}</button>
         <button
           type="button"
           class="season-priority-remove-event season-priority-remove-icon"
@@ -9307,25 +9823,25 @@ function renderSeasonRaceWorkspace(event, eventKey) {
     .filter(Boolean)
     .join(", ") || "Ort offen";
   const goalSummary = [
-    goals.goal_type ? getSeasonGoalTypeLabel(goals.goal_type) : "Noch kein Zieltyp gewählt",
+    goals.goal_type ? getSeasonGoalTypeLabel(goals.goal_type) : eventUiText("Noch kein Zieltyp gewählt"),
     goals.target_time ? `Zielzeit ${goals.target_time}` : "",
     cleanValue(goals.race_strategy) ? "Strategie notiert" : ""
   ].filter(Boolean).join(" · ");
   const preparationSummary = [
-    logistics.registration_confirmed ? "Angemeldet" : "Anmeldung offen",
-    normalizeSeasonAreaStatus(logistics.bib_status) === "done" ? "Startunterlagen geklärt" : ""
+    logistics.registration_confirmed ? eventUiText("Angemeldet") : eventUiText("Anmeldung offen"),
+    normalizeSeasonAreaStatus(logistics.bib_status) === "done" ? eventUiText("Startunterlagen geklärt") : ""
   ].filter(Boolean).join(" · ");
   const travelStatus = normalizeSeasonAreaStatus(logistics.travel_status, logistics.travel_booked ? "done" : "open");
   const accommodationStatus = normalizeSeasonAreaStatus(logistics.accommodation_status, logistics.accommodation_booked ? "done" : "open");
   const travelSummary = [
-    travelStatus === "not_needed" ? "Keine Reise nötig" : travelStatus === "done" ? "Anreise geklärt" : "Anreise offen",
-    accommodationStatus === "not_needed" ? "Keine Unterkunft nötig" : accommodationStatus === "done" ? "Unterkunft geklärt" : "Unterkunft offen"
+    travelStatus === "not_needed" ? eventUiText("Keine Reise nötig") : travelStatus === "done" ? eventUiText("Anreise geklärt") : eventUiText("Anreise offen"),
+    accommodationStatus === "not_needed" ? eventUiText("Keine Unterkunft nötig") : accommodationStatus === "done" ? eventUiText("Unterkunft geklärt") : eventUiText("Unterkunft offen")
   ].join(" · ");
   const equipmentStatus = normalizeSeasonAreaStatus(equipment.status);
   const nutritionStatus = normalizeSeasonAreaStatus(nutrition.status);
   const equipmentSummary = [
-    equipmentStatus === "not_needed" ? "Ausrüstung nicht benötigt" : equipmentStatus === "done" || equipmentStatus === "planned" ? "Ausrüstung geplant" : "Ausrüstung offen",
-    nutritionStatus === "not_needed" || cleanValue(nutrition.type) === "not_needed" ? "Verpflegung nicht benötigt" : nutritionStatus === "done" || nutritionStatus === "planned" ? "Verpflegung geplant" : "Verpflegung offen"
+    equipmentStatus === "not_needed" ? eventUiText("Ausrüstung nicht benötigt") : equipmentStatus === "done" || equipmentStatus === "planned" ? eventUiText("Ausrüstung geplant") : eventUiText("Ausrüstung offen"),
+    nutritionStatus === "not_needed" || cleanValue(nutrition.type) === "not_needed" ? eventUiText("Verpflegung nicht benötigt") : nutritionStatus === "done" || nutritionStatus === "planned" ? eventUiText("Verpflegung geplant") : eventUiText("Verpflegung offen")
   ].join(" · ");
   const resultSummary = hasResult
     ? [
@@ -9334,12 +9850,12 @@ function renderSeasonRaceWorkspace(event, eventKey) {
         result.age_group_place ? `AK ${result.age_group_place}` : ""
       ].filter(Boolean).join(" · ")
     : isPast
-      ? "Ergebnis noch nicht eingetragen"
-      : "Nach dem Rennen verfügbar";
+      ? eventUiText("Ergebnis noch nicht eingetragen")
+      : eventUiText("Nach dem Rennen verfügbar");
   const notice = getSeasonWorkspaceNotice(event);
   const editOpen = seasonEditingEventKey === eventKey;
   const resultPanelMarkup = renderSeasonDetailPanel({
-    title: "Result & Review",
+    title: eventUiText("Result & Review"),
     summary: resultSummary,
     open: isPast && (!hasResult || !hasSeasonReflection(result)),
     tone: isPast ? "" : "is-future-result",
@@ -9363,14 +9879,14 @@ function renderSeasonRaceWorkspace(event, eventKey) {
     <div class="season-race-workspace ${isPast ? "is-past-race" : ""}">
       <header class="season-workspace-header">
         <div class="season-workspace-heading">
-          <span>${escapeHTML(event.date || "Datum offen")}</span>
+          <span>${escapeHTML(event.date || eventUiText("Datum offen"))}</span>
           <h3>${escapeHTML(event.event_name)}</h3>
-          <p>${escapeHTML(place)} · ${escapeHTML(event.sport || getSeasonSportLabel(summary.sportType))} · ${escapeHTML(getSeasonDisplayDistance(event) || "Distanz offen")}</p>
+          <p>${escapeHTML(place)} · ${escapeHTML(eventDisplayValue(event.sport || getSeasonSportLabel(summary.sportType)))} · ${escapeHTML(eventDisplayValue(getSeasonDisplayDistance(event)) || eventUiText("Distanz offen"))}</p>
           <div class="season-workspace-badges">
             <b class="season-priority-badge season-priority-${priority.toLowerCase().replace(/\s+/g, "-")}">${escapeHTML(getSeasonPriorityLabel(priority))}</b>
             <b>${escapeHTML(timingLabel)}</b>
             <b>${escapeHTML(trainingPhase)}</b>
-            <b>${logistics.registration_confirmed ? "Angemeldet" : "Anmeldung offen"}</b>
+            <b>${logistics.registration_confirmed ? eventUiText("Angemeldet") : eventUiText("Anmeldung offen")}</b>
           </div>
         </div>
         <button
@@ -9380,14 +9896,14 @@ function renderSeasonRaceWorkspace(event, eventKey) {
           data-testid="planner-event-edit-button"
           aria-expanded="${editOpen ? "true" : "false"}"
         >
-          ${editOpen ? "Bearbeitung schließen" : "Event bearbeiten"}
+          ${editOpen ? eventUiText("Bearbeitung schließen") : eventUiText("Event bearbeiten")}
         </button>
       </header>
 
       ${editOpen ? renderSeasonEventEditPanel(event, eventKey) : ""}
 
       <section class="season-next-action-card ${nextAction.action ? "has-action" : "is-complete"}" data-testid="planner-next-action">
-        <span>Nächster Schritt</span>
+        <span>${escapeHTML(eventUiText("Nächster Schritt"))}</span>
         <div>
           <strong>${escapeHTML(nextAction.title)}</strong>
           <p>${escapeHTML(nextAction.description)}</p>
@@ -9402,10 +9918,10 @@ function renderSeasonRaceWorkspace(event, eventKey) {
         ` : ""}
       </section>
 
-      <section class="season-task-progress" aria-label="Planungsstand">
+      <section class="season-task-progress" aria-label="${escapeHTML(eventUiText("Planungsstand"))}">
         <div>
-          <strong>${escapeHTML(taskSummary.done.length)} von ${escapeHTML(taskSummary.total)} wichtigen Punkten erledigt</strong>
-          <span>${taskSummary.open.length ? `${taskSummary.open.length} ${taskSummary.open.length === 1 ? "Punkt ist" : "Punkte sind"} noch offen.` : "Alle aktuell relevanten Punkte sind geklärt."}</span>
+          <strong>${escapeHTML(window.getAppLanguage?.() === "de" ? `${taskSummary.done.length} von ${taskSummary.total} wichtigen Punkten erledigt` : `${taskSummary.done.length} of ${taskSummary.total} important items complete`)}</strong>
+          <span>${taskSummary.open.length ? window.getAppLanguage?.() === "de" ? `${taskSummary.open.length} ${taskSummary.open.length === 1 ? "Punkt ist" : "Punkte sind"} noch offen.` : `${taskSummary.open.length} ${taskSummary.open.length === 1 ? "item is" : "items are"} still open.` : eventUiText("Alle aktuell relevanten Punkte sind geklärt.")}</span>
         </div>
         <div class="season-task-list">
           ${taskSummary.tasks.map(task => `
@@ -9419,67 +9935,67 @@ function renderSeasonRaceWorkspace(event, eventKey) {
       <div class="season-workspace-accordions">
         ${isPast ? resultPanelMarkup : ""}
         ${renderSeasonDetailPanel({
-          title: "Goal & Race Strategy",
+          title: eventUiText("Goal & Race Strategy"),
           summary: goalSummary,
           open: !isPast && !goals.goal_type,
           panelKey: `goal-strategy:${eventKey}`,
           body: `
             <div class="season-status-strip">
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: "Ziel", value: goals.goal_status, doneLabel: "Geklärt" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: "Race Strategy", value: goals.strategy_status, doneLabel: "Geplant" })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.goal_status", label: eventUiText("Ziel"), value: goals.goal_status, doneLabel: eventUiText("Geklärt") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "goals.strategy_status", label: eventUiText("Race Strategy"), value: goals.strategy_status, doneLabel: eventUiText("Geplant") })}
             </div>
             ${renderSeasonGoalTypeControl(eventKey, goals)}
             ${renderSeasonGoalFields(eventKey, goals, targetMetricValue, resultMetricLabel)}
             <div class="season-detail-fields">
-              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.race_strategy", labelKey: "", fallback: "Pacing und Renntaktik", value: goals.race_strategy, placeholder: "Intensität, Pacing, Schlüsselstellen..." })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "personal_note", labelKey: "season.personalNote", fallback: "Persönliche Notiz", value: details.personal_note, placeholder: "Was möchtest du dir für dieses Rennen merken?", legacyNote: true })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "goals.race_strategy", labelKey: "", fallback: eventUiText("Pacing und Renntaktik"), value: goals.race_strategy, placeholder: eventUiText("Intensität, Pacing, Schlüsselstellen...") })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "personal_note", labelKey: "season.personalNote", fallback: eventUiText("Persönliche Notiz"), value: details.personal_note, placeholder: eventUiText("Was möchtest du dir für dieses Rennen merken?"), legacyNote: true })}
             </div>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Preparation",
+          title: eventUiText("Preparation"),
           summary: preparationSummary,
           open: !isPast && !logistics.registration_confirmed,
           panelKey: `preparation:${eventKey}`,
           body: `
             <div class="season-detail-checks season-detail-checks-compact">
-              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: "Anmeldung abgeschlossen", checked: logistics.registration_confirmed })}
+              ${renderSeasonPlannerCheckbox({ eventKey, path: "logistics.registration_confirmed", labelKey: "season.registrationConfirmed", fallback: eventUiText("Anmeldung abgeschlossen"), checked: logistics.registration_confirmed })}
             </div>
             <div class="season-detail-fields">
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: "Race Guide & Startunterlagen", value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: "Geprüft" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "preparation.medical_status", label: "Medizinische Bescheinigung", value: details.preparation?.medical_status || "not_needed", doneLabel: "Vorhanden" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "preparation.course_status", label: "Streckenkenntnis", value: details.preparation?.course_status || "open", doneLabel: "Geprüft" })}
-              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: "Startnummer", value: logistics.bib_number, placeholder: "Optional" })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "preparation.note", labelKey: "", fallback: "Weitere Vorbereitung", value: details.preparation?.note, placeholder: "Race Guide, Pflichtausrüstung, eigene Punkte..." })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.bib_status", label: eventUiText("Race Guide & Startunterlagen"), value: logistics.bib_status || (logistics.bib_number ? "done" : "open"), doneLabel: eventUiText("Geprüft") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "preparation.medical_status", label: eventUiText("Medizinische Bescheinigung"), value: details.preparation?.medical_status || "not_needed", doneLabel: eventUiText("Vorhanden") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "preparation.course_status", label: eventUiText("Streckenkenntnis"), value: details.preparation?.course_status || "open", doneLabel: eventUiText("Geprüft") })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.bib_number", labelKey: "season.bibNumber", fallback: eventUiText("Startnummer"), value: logistics.bib_number, placeholder: "Optional" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "preparation.note", labelKey: "", fallback: eventUiText("Weitere Vorbereitung"), value: details.preparation?.note, placeholder: eventUiText("Race Guide, Pflichtausrüstung, eigene Punkte...") })}
             </div>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Travel & Logistics",
+          title: eventUiText("Travel & Logistics"),
           summary: travelSummary,
           panelKey: `travel-logistics:${eventKey}`,
           body: `
             <div class="season-detail-fields">
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: "Anreise", value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: "Geklärt" })}
-              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: "Unterkunft", value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: "Gebucht" })}
-              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.start_location", labelKey: "", fallback: "Startort", value: logistics.start_location, placeholder: "Ort oder Adresse" })}
-              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.parking", labelKey: "", fallback: "Parken / Transfer", value: logistics.parking, placeholder: "Optional" })}
-              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: "Logistiknotiz", value: logistics.travel_note, placeholder: "Anreise, Ausgabe, Begleitpersonen, wichtige Uhrzeiten..." })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.travel_status", label: eventUiText("Anreise"), value: logistics.travel_status || (logistics.travel_booked ? "done" : "open"), doneLabel: eventUiText("Geklärt") })}
+              ${renderSeasonStatusSelect({ eventKey, path: "logistics.accommodation_status", label: eventUiText("Unterkunft"), value: logistics.accommodation_status || (logistics.accommodation_booked ? "done" : "open"), doneLabel: eventUiText("Gebucht") })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.start_location", labelKey: "", fallback: eventUiText("Startort"), value: logistics.start_location, placeholder: eventUiText("Ort oder Adresse") })}
+              ${renderSeasonPlannerTextField({ eventKey, path: "logistics.parking", labelKey: "", fallback: eventUiText("Parken / Transfer"), value: logistics.parking, placeholder: "Optional" })}
+              ${renderSeasonPlannerTextarea({ eventKey, path: "logistics.travel_note", labelKey: "season.travelNote", fallback: eventUiText("Logistiknotiz"), value: logistics.travel_note, placeholder: eventUiText("Anreise, Ausgabe, Begleitpersonen, wichtige Uhrzeiten...") })}
             </div>
           `
         })}
         ${renderSeasonDetailPanel({
-          title: "Equipment & Nutrition",
+          title: eventUiText("Equipment & Nutrition"),
           summary: equipmentSummary,
           tone: "equipment",
           panelKey: `equipment-nutrition:${eventKey}`,
           body: `
             <section class="season-workspace-subsection">
-              <h4>Equipment</h4>
+              <h4>${escapeHTML(eventUiText("Equipment"))}</h4>
               ${renderSeasonEquipmentChecklist(event, eventKey, equipment)}
             </section>
             <section class="season-workspace-subsection">
-              <h4>Verpflegung</h4>
+              <h4>${escapeHTML(eventUiText("Verpflegung"))}</h4>
               ${renderSeasonNutritionPlanner(eventKey, nutrition)}
             </section>
           `
@@ -9494,8 +10010,8 @@ function renderSeasonEditableEvent(event) {
   if (!event) {
     return `
       <div class="season-empty">
-        <strong>Select a race</strong>
-        <span>Choose a planned race on the left to edit goals, logistics, strategy and result data.</span>
+        <strong>${escapeHTML(eventUiText("Select a race"))}</strong>
+        <span>${escapeHTML(eventUiText("Choose a planned race on the left to edit goals, logistics, strategy and result data."))}</span>
       </div>
     `;
   }
@@ -9507,12 +10023,12 @@ function renderSeasonEditableEvent(event) {
   return `
     <article class="season-event-editor-card" data-testid="planner-event-edit-card">
       ${event._planner_unresolved ? `<p role="status">${escapeHTML(event._planner_unresolved)} Referenz: ${escapeHTML(eventKey)}</p>` : ""}
-      ${event._planner_saved_facts ? `<p role="status">Gespeicherte frühere Angaben; Datum und Veranstaltungsstatus aktuell nicht bestätigt.</p>` : ""}
-      ${event._planner_owned_archive ? `<p role="status">Eigene archivierte Edition; sie erscheint nicht in der öffentlichen Eventsuche.</p>` : ""}
+      ${event._planner_saved_facts ? `<p role="status">${escapeHTML(eventUiText("Gespeicherte frühere Angaben; Datum und Veranstaltungsstatus aktuell nicht bestätigt."))}</p>` : ""}
+      ${event._planner_owned_archive ? `<p role="status">${escapeHTML(eventUiText("Eigene archivierte Edition; sie erscheint nicht in der öffentlichen Eventsuche."))}</p>` : ""}
       ${event._planner_snapshot_at ? `<p role="status">Gespeicherter öffentlicher Datenstand vom ${escapeHTML(event._planner_snapshot_at)}; Liveabruf derzeit nicht verfügbar.</p>` : ""}
       ${event._planner_lookup_warning ? `<p role="status">${escapeHTML(event._planner_lookup_warning)}</p>` : ""}
-      <p data-planner-sync-status="${escapeHTML(eventKey)}" role="status">${escapeHTML(entry._sync_message || "Eigene Planung dieser Edition. Änderungen werden zuerst auf diesem Gerät gespeichert.")}</p>
-      ${["pending", "error"].includes(entry._sync_state) ? `<button type="button" data-planner-retry="${escapeHTML(eventKey)}">Cloudspeicherung erneut versuchen</button>` : ""}
+      <p data-planner-sync-status="${escapeHTML(eventKey)}" role="status">${escapeHTML(eventUiText(entry._sync_message) || eventUiText("Eigene Planung dieser Edition. Änderungen werden zuerst auf diesem Gerät gespeichert."))}</p>
+      ${["pending", "error"].includes(entry._sync_state) ? `<button type="button" data-planner-retry="${escapeHTML(eventKey)}">${escapeHTML(eventUiText("Cloudspeicherung erneut versuchen"))}</button>` : ""}
       ${renderSeasonRaceWorkspace(event, eventKey)}
     </article>
   `;
@@ -9635,7 +10151,7 @@ function renderSeasonPlanner() {
   if (nextPlaceElement) {
     nextPlaceElement.textContent =
       nextEvent
-        ? `${nextEvent.city}, ${nextEvent.country}`
+        ? `${nextEvent.city}, ${eventDisplayValue(nextEvent.country)}`
         : "-";
   }
 
@@ -9745,7 +10261,7 @@ function renderSeasonPlanner() {
       ? closeWarnings
         .map(warning => `
           <div class="season-warning-item ${warning.severity === "high" ? "high" : ""}">
-            <strong>${warning.daysBetween} days apart · ${warning.recommendedGap} recommended</strong>
+            <strong>${warning.daysBetween} ${eventUiText(warning.daysBetween === 1 ? "day apart" : "days apart")} · ${warning.recommendedGap} ${eventUiText("recommended")}</strong>
             <span>${escapeHTML(warning.previous.event_name)} → ${escapeHTML(warning.current.event_name)}</span>
           </div>
         `)
@@ -9756,15 +10272,15 @@ function renderSeasonPlanner() {
     timeline.innerHTML = `
       <div class="season-empty">
         <strong>${window.t ? window.t("season.noSaved") : "No saved events yet"}</strong>
-        <span>Füge dein erstes Rennen hinzu.</span>
+        <span>${escapeHTML(eventUiText("Füge dein erstes Rennen hinzu."))}</span>
       </div>
     `;
 
     if (priorityList) {
       priorityList.innerHTML = `
         <div class="season-empty">
-          <strong>No race selected</strong>
-          <span>Füge dein erstes Rennen hinzu.</span>
+          <strong>${escapeHTML(eventUiText("No race selected"))}</strong>
+          <span>${escapeHTML(eventUiText("Füge dein erstes Rennen hinzu."))}</span>
         </div>
       `;
     }
@@ -9779,7 +10295,7 @@ function renderSeasonPlanner() {
 
     if (overviewARaces) {
       overviewARaces.innerHTML =
-        `<p>No A races selected yet.</p>`;
+        `<p>${escapeHTML(eventUiText("No A races selected yet."))}</p>`;
     }
 
     if (overviewWarnings) {
@@ -9790,22 +10306,22 @@ function renderSeasonPlanner() {
     if (overviewSummary) {
       overviewSummary.innerHTML = `
         <div class="season-summary-empty">
-          <strong>Build your season</strong>
-          <span>Füge dein erstes Rennen hinzu.</span>
+          <strong>${escapeHTML(eventUiText("Build your season"))}</strong>
+          <span>${escapeHTML(eventUiText("Füge dein erstes Rennen hinzu."))}</span>
         </div>
       `;
     }
 
     if (overviewSportMix) {
       overviewSportMix.innerHTML =
-        `<p>No sport mix yet.</p>`;
+        `<p>${escapeHTML(eventUiText("No sport mix yet."))}</p>`;
     }
 
     if (seasonScoreMetric) {
       seasonScoreMetric.innerHTML = `
         <strong>0 / 100</strong>
-        <em class="season-score-badge season-score-caution">Start planning</em>
-        <p>Save races to calculate your season score.</p>
+        <em class="season-score-badge season-score-caution">${escapeHTML(eventUiText("Start planning"))}</em>
+        <p>${escapeHTML(eventUiText("Save races to calculate your season score."))}</p>
       `;
     }
 
@@ -9813,8 +10329,8 @@ function renderSeasonPlanner() {
       seasonTrainingOpportunity.innerHTML = `
         <div class="season-decision-empty">
           <strong>-</strong>
-          <em>Select an A-Race</em>
-          <p>Select an A-Race to unlock this metric.</p>
+          <em>${escapeHTML(eventUiText("Select an A-Race"))}</em>
+          <p>${escapeHTML(eventUiText("Select an A-Race to unlock this metric."))}</p>
         </div>
       `;
     }
@@ -9823,8 +10339,8 @@ function renderSeasonPlanner() {
       seasonTrainingBlock.innerHTML = `
         <div class="season-decision-empty">
           <strong>-</strong>
-          <em>More races needed</em>
-          <p>Add more races to analyse training blocks.</p>
+          <em>${escapeHTML(eventUiText("More races needed"))}</em>
+          <p>${escapeHTML(eventUiText("Add more races to analyse training blocks."))}</p>
         </div>
       `;
     }
@@ -9832,8 +10348,8 @@ function renderSeasonPlanner() {
     if (seasonRecommendedEvents) {
       seasonRecommendedEvents.innerHTML = `
         <div class="season-empty">
-          <strong>No recommendations yet</strong>
-          <span>Save your first race to unlock event recommendations.</span>
+          <strong>${escapeHTML(eventUiText("No recommendations yet"))}</strong>
+          <span>${escapeHTML(eventUiText("Save your first race to unlock event recommendations."))}</span>
         </div>
       `;
     }
@@ -9841,8 +10357,8 @@ function renderSeasonPlanner() {
     if (seasonCountdownCards) {
       seasonCountdownCards.innerHTML = `
         <div class="season-empty">
-          <strong>No countdowns yet</strong>
-          <span>Save upcoming races to see your next important starts.</span>
+          <strong>${escapeHTML(eventUiText("No countdowns yet"))}</strong>
+          <span>${escapeHTML(eventUiText("Save upcoming races to see your next important starts."))}</span>
         </div>
       `;
     }
@@ -9919,25 +10435,25 @@ function renderSeasonPlanner() {
             type="button"
             data-season-month-nav="${activeMonthIndex - 1}"
             ${activeMonthIndex <= 0 ? "disabled" : ""}
-            aria-label="Previous month"
+            aria-label="${escapeHTML(eventUiText("Previous month"))}"
           >
-            Previous
+            ${escapeHTML(eventUiText("Previous"))}
           </button>
           <div>
-            <span>${escapeHTML(activeMonthGroup ? activeMonthGroup[0] : "No scheduled races")}</span>
+            <span>${escapeHTML(activeMonthGroup ? eventMonthDisplay(activeMonthGroup[0]) : eventUiText("No scheduled races"))}</span>
             <em>${
               activeMonthGroup
-                ? `${activeMonthGroup[1].length} race${activeMonthGroup[1].length === 1 ? "" : "s"}`
-                : "Add dated races to build your calendar"
+                ? `${activeMonthGroup[1].length} ${eventUiText(activeMonthGroup[1].length === 1 ? "race" : "races")}`
+                : eventUiText("Add dated races to build your calendar.")
             }</em>
           </div>
           <button
             type="button"
             data-season-month-nav="${activeMonthIndex + 1}"
             ${activeMonthIndex >= scheduledMonthGroups.length - 1 ? "disabled" : ""}
-            aria-label="Next month"
+            aria-label="${escapeHTML(eventUiText("Next month"))}"
           >
-            Next
+            ${escapeHTML(eventUiText("Next"))}
           </button>
         </div>
         ${
@@ -9949,8 +10465,8 @@ function renderSeasonPlanner() {
             )
             : `
               <div class="season-empty">
-                <strong>No scheduled races</strong>
-                <span>Add dated races to build your calendar.</span>
+                <strong>${escapeHTML(eventUiText("No scheduled races"))}</strong>
+                <span>${escapeHTML(eventUiText("Add dated races to build your calendar."))}</span>
               </div>
             `
         }
@@ -9959,8 +10475,8 @@ function renderSeasonPlanner() {
         .map(([monthLabel, monthEvents]) => `
             <section class="season-month-group season-calendar-month">
               <div class="season-month-title">
-                <span>${escapeHTML(monthLabel)}</span>
-                <em>${monthEvents.length} race${monthEvents.length === 1 ? "" : "s"}</em>
+                <span>${escapeHTML(eventMonthDisplay(monthLabel))}</span>
+                <em>${monthEvents.length} ${eventUiText(monthEvents.length === 1 ? "race" : "races")}</em>
               </div>
               <div class="season-calendar-events">
                 ${monthEvents.map(event =>
@@ -9992,8 +10508,8 @@ function renderSeasonPlanner() {
                 >
                   <span>${escapeHTML(getSeasonPriorityLabel(getSeasonPriority(event)))}</span>
                   <strong>${days === null ? "-" : days}</strong>
-                  <em>days to ${escapeHTML(event.event_name)}</em>
-                  <small>${escapeHTML(event.date)} · ${escapeHTML(event.city)}, ${escapeHTML(event.country)} · ${escapeHTML(getEventFormatLabel(event))}</small>
+                  <em>${window.getAppLanguage?.() === "de" ? "Tage bis" : "days to"} ${escapeHTML(event.event_name)}</em>
+                  <small>${escapeHTML(event.date)} · ${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))} · ${escapeHTML(getEventFormatLabel(event))}</small>
                 </button>
               `;
             }).join("")}
@@ -10001,8 +10517,8 @@ function renderSeasonPlanner() {
         `
         : `
           <div class="season-empty">
-            <strong>No additional countdowns yet</strong>
-            <span>Add more upcoming races to compare your next starts.</span>
+            <strong>${escapeHTML(eventUiText("No additional countdowns yet"))}</strong>
+            <span>${escapeHTML(eventUiText("Add more upcoming races to compare your next starts."))}</span>
           </div>
         `;
   }
@@ -10026,7 +10542,7 @@ function renderSeasonPlanner() {
             <em>${escapeHTML(event.city)}</em>
           </button>
         `).join("")
-        : `<p>No A races selected yet.</p>`;
+        : `<p>${escapeHTML(eventUiText("No A races selected yet."))}</p>`;
   }
 
   if (overviewWarnings) {
@@ -10034,7 +10550,7 @@ function renderSeasonPlanner() {
       closeWarnings.length
         ? closeWarnings.slice(0, 3).map(warning => `
           <div class="season-warning-item ${warning.severity === "high" ? "high" : ""}">
-            <strong>${warning.daysBetween} days apart · ${warning.recommendedGap} recommended</strong>
+            <strong>${warning.daysBetween} ${eventUiText(warning.daysBetween === 1 ? "day apart" : "days apart")} · ${warning.recommendedGap} ${eventUiText("recommended")}</strong>
             <span>${escapeHTML(warning.previous.event_name)} → ${escapeHTML(warning.current.event_name)}</span>
           </div>
         `).join("")
@@ -10065,23 +10581,23 @@ function renderSeasonPlanner() {
       <div class="season-orientation-panel">
         <div class="season-orientation-main">
           <div class="season-balance-heading">
-            <span>Season Balance</span>
+            <span>${escapeHTML(eventUiText("Season Balance"))}</span>
             <button
               type="button"
               id="seasonBalanceInfoBtn"
               class="season-score-info-btn"
-              title="Click for more information"
-              aria-label="Click for more information about Season Balance"
+              title="${escapeHTML(eventUiText("Click for more information"))}"
+              aria-label="${escapeHTML(eventUiText("Click for more information about Season Balance"))}"
             >
               i
             </button>
           </div>
-          <strong>${escapeHTML(loadSummary.label)}</strong>
-          <p>${escapeHTML(balanceText)}</p>
+          <strong>${escapeHTML(eventUiText(loadSummary.label))}</strong>
+          <p>${escapeHTML(eventUiText(balanceText))}</p>
           <div
             class="season-balance-meter"
             style="--balance-color: ${loadSummary.color}; --balance-percent: ${loadSummary.percent}%"
-            aria-label="Season Balance: ${escapeHTML(loadSummary.label)} at ${loadSummary.percent} percent"
+            aria-label="Season Balance: ${escapeHTML(eventUiText(loadSummary.label))} at ${loadSummary.percent} percent"
           >
             <span></span>
           </div>
@@ -10089,26 +10605,26 @@ function renderSeasonPlanner() {
 
         <div class="season-orientation-list">
           <div>
-            <span>Saved races</span>
+            <span>${escapeHTML(eventUiText("Saved races"))}</span>
             <strong>${favoriteEvents.length}</strong>
             <em>${upcomingEvents.length} upcoming</em>
           </div>
           <div>
-            <span>Average spacing</span>
+            <span>${escapeHTML(eventUiText("Average spacing"))}</span>
             <strong>${averageGap ? `${averageGap} days` : "-"}</strong>
-            <em>${escapeHTML(recoveryRiskLabel)}</em>
+            <em>${escapeHTML(eventUiText(recoveryRiskLabel))}</em>
           </div>
           <div>
-            <span>Season window</span>
+            <span>${escapeHTML(eventUiText("Season window"))}</span>
             <strong>${
               range
-                ? `${range.first.toLocaleDateString("en-US", { month: "short" })} - ${range.last.toLocaleDateString("en-US", { month: "short", year: "numeric" })}`
+                ? `${range.first.toLocaleDateString((window.getAppLanguage?.() === "de" ? "de-DE" : "en-GB"), { month: "short" })} - ${range.last.toLocaleDateString((window.getAppLanguage?.() === "de" ? "de-DE" : "en-GB"), { month: "short", year: "numeric" })}`
                 : "-"
             }</strong>
-            <em>${busiestMonth ? `Busiest: ${escapeHTML(busiestMonth[0])}` : "Add dates to compare months"}</em>
+            <em>${busiestMonth ? `Busiest: ${escapeHTML(eventMonthDisplay(busiestMonth[0]))}` : "Add dates to compare months"}</em>
           </div>
           <div>
-            <span>Next focus</span>
+            <span>${escapeHTML(eventUiText("Next focus"))}</span>
             <strong>${nextKeyRace ? escapeHTML(nextKeyRace.event_name) : "-"}</strong>
             <em>${nextKeyRace ? `${escapeHTML(getSeasonPriorityLabel(getSeasonPriority(nextKeyRace)))} · ${escapeHTML(nextKeyRace.date)}` : "Set an A or B race"}</em>
           </div>
@@ -10164,16 +10680,16 @@ function renderSeasonPlanner() {
         <div class="season-race-mix-panel">
           <div class="season-race-mix-header">
             <div>
-              <span>Race Mix</span>
+              <span>${escapeHTML(eventUiText("Race Mix"))}</span>
               <strong>${sportTotal ? `${dominantSport[0]} focus` : "No race mix yet"}</strong>
-              <em>${escapeHTML(mixInsight)}</em>
+              <em>${escapeHTML(eventUiText(mixInsight))}</em>
             </div>
             <button
               type="button"
               id="sportMixInfoBtn"
               class="season-score-info-btn"
-              title="Click for more information"
-              aria-label="Click for more information about Race Mix"
+              title="${escapeHTML(eventUiText("Click for more information"))}"
+              aria-label="${escapeHTML(eventUiText("Click for more information about Race Mix"))}"
             >
               i
             </button>
@@ -10186,40 +10702,40 @@ function renderSeasonPlanner() {
                 style="--sport-gradient: ${buildSportMixGradient(sportCounts)}"
               >
                 <strong>${sportTotal}</strong>
-                <em>Races</em>
+                <em>${escapeHTML(eventUiText("Races"))}</em>
               </div>
               <div>
-                <span>Season focus</span>
+                <span>${escapeHTML(eventUiText("Season focus"))}</span>
                 <strong>${sportTotal ? `${dominantPercent}% ${dominantSport[0]}` : "No races yet"}</strong>
-                <p>${escapeHTML(mixInsight)}</p>
+                <p>${escapeHTML(eventUiText(mixInsight))}</p>
               </div>
             </div>
 
             <div class="season-mix-bars">
-              <span>Sport distribution</span>
+              <span>${escapeHTML(eventUiText("Sport distribution"))}</span>
               ${sportEntries
                 .map(([label, count]) => `
                   <div class="season-mix-row" style="--mix-color: ${sportColors[label] || "#94a3b8"}">
-                    <em>${escapeHTML(label)}</em>
+                    <em>${escapeHTML(eventUiText(label))}</em>
                     <div><span style="width: ${getPercent(count, sportTotal)}%"></span></div>
                     <strong>${count}</strong>
                   </div>
                 `)
-                .join("") || "<p>No sport distribution yet.</p>"}
+                .join("") || `<p>${escapeHTML(eventUiText("No sport distribution yet."))}</p>`}
             </div>
 
             <div class="season-mix-bars season-distance-focus">
-              <span>Distance focus</span>
+              <span>${escapeHTML(eventUiText("Distance focus"))}</span>
               ${distanceEntries
                 .slice(0, 5)
                 .map(([label, count]) => `
                   <div class="season-mix-row" style="--mix-color: #86efac">
-                    <em>${escapeHTML(label)}</em>
+                    <em>${escapeHTML(eventUiText(label))}</em>
                     <div><span style="width: ${Math.round((count / maxDistanceCount) * 100)}%"></span></div>
                     <strong>${count}</strong>
                   </div>
                 `)
-                .join("") || "<p>No distance focus yet.</p>"}
+                .join("") || `<p>${escapeHTML(eventUiText("No distance focus yet."))}</p>`}
             </div>
           </div>
         </div>
@@ -10229,15 +10745,15 @@ function renderSeasonPlanner() {
   if (seasonScoreMetric) {
     if (seasonScoreHeading) {
       seasonScoreHeading.textContent =
-        "Season Score";
+        eventUiText("Season Score");
     }
 
     seasonScoreMetric.innerHTML = `
       <strong>${seasonScore.score} / 100</strong>
       <em class="season-score-badge season-score-${seasonScore.className}">
-        ${escapeHTML(seasonScore.label)}
+        ${escapeHTML(eventUiText(seasonScore.label))}
       </em>
-      <p>${escapeHTML(seasonScore.explanation)}</p>
+      <p>${escapeHTML(eventUiText(seasonScore.explanation))}</p>
     `;
   }
 
@@ -10246,11 +10762,11 @@ function renderSeasonPlanner() {
       trainingOpportunity
         ? `
           <div class="season-decision-value">
-            <strong>${trainingOpportunity.days} Days</strong>
-            <em>Until next A-Race</em>
+            <strong>${trainingOpportunity.days} ${eventUiText("Days")}</strong>
+            <em>${escapeHTML(eventUiText("Until next A-Race"))}</em>
           </div>
-          <p>${escapeHTML(trainingOpportunity.phase)}</p>
-          <span>${escapeHTML(trainingOpportunity.text)}</span>
+          <p>${escapeHTML(eventUiText(trainingOpportunity.phase))}</p>
+          <span>${escapeHTML(eventUiText(trainingOpportunity.text))}</span>
           <button
             type="button"
             class="season-open-event season-decision-link"
@@ -10262,8 +10778,8 @@ function renderSeasonPlanner() {
         : `
           <div class="season-decision-empty">
             <strong>-</strong>
-            <em>Select an A-Race</em>
-            <p>Select an A-Race to unlock this metric.</p>
+            <em>${escapeHTML(eventUiText("Select an A-Race"))}</em>
+            <p>${escapeHTML(eventUiText("Select an A-Race to unlock this metric."))}</p>
           </div>
         `;
   }
@@ -10274,33 +10790,33 @@ function renderSeasonPlanner() {
         ? `
           <div class="season-decision-value season-training-hero">
             <div class="season-training-hero-heading">
-              <span>Longest gap</span>
+              <span>${escapeHTML(eventUiText("Longest gap"))}</span>
               <button
                 type="button"
                 class="season-score-info-btn"
                 data-training-block-info
-                title="Click for more information"
-                aria-label="Click for more information about Training Blocks"
+                title="${escapeHTML(eventUiText("Click for more information"))}"
+                aria-label="${escapeHTML(eventUiText("Click for more information about Training Blocks"))}"
               >
                 i
               </button>
             </div>
-            <strong>${longestTrainingBlock.days} Days</strong>
-            <em>Largest time gap between two upcoming planned races</em>
+            <strong>${longestTrainingBlock.days} ${eventUiText("Days")}</strong>
+            <em>${escapeHTML(eventUiText("Largest time gap between two upcoming planned races"))}</em>
           </div>
           <div class="season-training-route">
-            <span>Between</span>
+            <span>${escapeHTML(eventUiText("Between"))}</span>
             <strong>${escapeHTML(longestTrainingBlock.previous.event_name)}</strong>
             <i aria-hidden="true">→</i>
             <strong>${escapeHTML(longestTrainingBlock.current.event_name)}</strong>
           </div>
-          <p class="season-training-summary">Best opportunity for focused training.</p>
+          <p class="season-training-summary">${escapeHTML(eventUiText("Best opportunity for focused training."))}</p>
         `
         : `
           <div class="season-decision-empty">
             <strong>-</strong>
-            <em>More races needed</em>
-            <p>Add at least two upcoming races to analyse training blocks.</p>
+            <em>${escapeHTML(eventUiText("More races needed"))}</em>
+            <p>${escapeHTML(eventUiText("Add at least two upcoming races to analyse training blocks."))}</p>
           </div>
         `;
   }
@@ -10313,9 +10829,9 @@ function renderSeasonPlanner() {
             ${trainingBlocks.slice(0, 5).map(block => `
               <div class="season-training-block-item season-training-block-${block.level}">
                 <strong>${block.days} days</strong>
-                <span>${escapeHTML(block.label)}</span>
+                <span>${escapeHTML(eventUiText(block.label))}</span>
                 <em>${escapeHTML(block.previous.event_name)} → ${escapeHTML(block.current.event_name)}</em>
-                <p>${escapeHTML(block.text)}</p>
+                <p>${escapeHTML(eventUiText(block.text))}</p>
               </div>
             `).join("")}
           </div>
@@ -10332,24 +10848,24 @@ function renderSeasonPlanner() {
               <div class="season-recommendation-card">
                 <span>${escapeHTML(event.date)}</span>
                 <strong>${escapeHTML(event.event_name)}</strong>
-                <em>${escapeHTML(event.city)}, ${escapeHTML(event.country)}</em>
-                <p>${escapeHTML(getSeasonDisplayDistance(event))}</p>
-                <small>${escapeHTML(event._seasonRecommendationReason || "Based on your current season.")}</small>
+                <em>${escapeHTML(event.city)}, ${escapeHTML(eventDisplayValue(event.country))}</em>
+                <p>${escapeHTML(eventDisplayValue(getSeasonDisplayDistance(event)))}</p>
+                <small>${escapeHTML(event._seasonRecommendationReason || eventUiText("Based on your current season."))}</small>
                 <button
                   type="button"
                   data-season-recommend="${escapeHTML(getEventKey(event))}"
                 >
-                  Add to Season
+                  ${escapeHTML(eventUiText("Add to Season"))}
                 </button>
               </div>
             `).join("")}
           </div>
-          <small>Based on your current season.</small>
+          <small>${escapeHTML(eventUiText("Based on your current season."))}</small>
         `
         : `
           <div class="season-empty">
-            <strong>No recommendations found</strong>
-            <span>Add more races or vary sport, distance and timing to improve recommendations.</span>
+            <strong>${escapeHTML(eventUiText("No recommendations found"))}</strong>
+            <span>${escapeHTML(eventUiText("Add more races or vary sport, distance and timing to improve recommendations."))}</span>
           </div>
         `;
   }
@@ -10458,8 +10974,8 @@ function renderSeasonPlanner() {
 
         if (typeof showToast === "function") {
           showToast(
-            "Auf diesem Gerät gespeichert",
-            "Cloudbestätigung und Wiederholung stehen beim Event."
+            eventUiText("Auf diesem Gerät gespeichert"),
+            eventUiText("Cloudbestätigung und Wiederholung stehen beim Event.")
           );
         }
 
@@ -10536,8 +11052,8 @@ function renderSeasonPlanner() {
 
         if (typeof showToast === "function") {
           showToast(
-            "Auf diesem Gerät gespeichert",
-            "Cloudbestätigung und Wiederholung stehen beim Event."
+            eventUiText("Auf diesem Gerät gespeichert"),
+            eventUiText("Cloudbestätigung und Wiederholung stehen beim Event.")
           );
         }
 
@@ -10908,7 +11424,7 @@ function renderSeasonPlanner() {
 
         const confirmed =
           window.confirm(
-            `${cleanValue(found.event_name) || "Dieses Event"} aus dem Season Planner entfernen?`
+            window.getAppLanguage?.() === "de" ? `${cleanValue(found.event_name) || "Dieses Event"} aus dem Saisonplaner entfernen?` : `Remove ${cleanValue(found.event_name) || "this event"} from the Season Planner?`
           );
 
         if (!confirmed) {
@@ -10991,7 +11507,7 @@ function exportSeasonCalendar() {
   if (!favoriteEvents.length) {
     if (typeof showAppMessage === "function") {
       showAppMessage(
-        "No saved events",
+        eventUiText("No saved events"),
         "Save events with the heart button before exporting your calendar."
       );
     }
@@ -11068,8 +11584,8 @@ function exportSeasonCalendar() {
 
   if (typeof showToast === "function") {
     showToast(
-      "Calendar ready",
-      "Your season calendar file was downloaded."
+      eventUiText("Calendar ready"),
+      eventUiText("Your season calendar file was downloaded.")
     );
   }
 }

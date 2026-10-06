@@ -6,6 +6,55 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const { cleanPublicEventDescription: clean } = require('../js/event-description.js');
 const maintenance = require('../js/manual-event-maintenance.js');
+const { localizeEventText, localizedField, localizedDescription } = require('../js/event-description.js');
+
+test('event content translations cover sports, countries, race labels and published rich prose in both languages', () => {
+  for (const [en, de] of [['Running', 'Laufen'], ['Germany', 'Deutschland'], ['Half Marathon', 'Halbmarathon'], ['High', 'Hoch'],
+    ['Road / asphalt', 'Straße / Asphalt'], ['18 years', '18 Jahre'], ['Wave A', 'Welle A']]) {
+    assert.equal(localizeEventText(en, 'de'), de);
+    assert.equal(localizeEventText(de, 'en'), en);
+  }
+  const catalog = require('../js/event-content-translations.js');
+  assert.ok(catalog.length >= 320);
+  for (const [en, de] of catalog) {
+    assert.equal(localizeEventText(en, 'de').toLocaleLowerCase('de'), de.toLocaleLowerCase('de'), en);
+    // Several source variants share the same German phrase; preserve meaning,
+    // and verify a round trip instead of requiring the original capitalization.
+    assert.equal(localizeEventText(localizeEventText(de, 'en'), 'de').toLocaleLowerCase('de'), de.toLocaleLowerCase('de'), de);
+  }
+});
+
+test('explicit field and description translations are used without changing source records', () => {
+  const event = Object.freeze({ description: 'Original remains unchanged.', description_de: 'Start im Park. Imported from verified staging batch.',
+    label: Object.freeze({ de: 'Halbmarathon', en: 'Half marathon' }), translations: { en: { description: 'Start in the park.' } } });
+  assert.equal(localizedDescription(event, 'de'), 'Start im Park.');
+  assert.equal(localizedDescription(event, 'en'), 'Start in the park.');
+  assert.equal(localizedField(event, 'label', 'en'), 'Half marathon');
+  assert.equal(event.description, 'Original remains unchanged.');
+  assert.equal(localizeEventText('Organizer prose with Running in its name.', 'de'), 'Organizer prose with Running in its name.');
+});
+
+test('translation catalogs loaded later in the browser are picked up on rerender', () => {
+  const context = {};
+  vm.runInNewContext(fs.readFileSync(new URL('../js/event-description.js', import.meta.url), 'utf8'), context);
+  const api = context.SportEventMapDescriptions;
+  assert.equal(api.localizeEventText('Start in the park.', 'de'), 'Start in the park.');
+  context.SportEventMapDescriptionTranslations = [['Start in the park.', 'Start im Park.']];
+  assert.equal(api.localizeEventText('Start in the park.', 'de'), 'Start im Park.');
+});
+
+test('every published description has a translation or is a language-neutral proper name', () => {
+  const archive = require('../data/event-editions-public.json').editions;
+  const neutral = new Set(['Region: Saarland', 'Region: Hamburg', 'Region: Baden-Württemberg', 'Region: Schleswig-Holstein',
+    'Region: Brandenburg', 'Region: Bremen', 'Dresden Marathon', 'Volksbank Münster Marathon', 'Ostseeman Triathlon', 'Thüringen Ultra', 'Salomon Zugspitz Ultratrail']);
+  const descriptions = [...new Set(archive.map(event => clean(event.description)).filter(Boolean))];
+  for (const value of descriptions) assert.ok(neutral.has(value)
+    || localizeEventText(value, 'de') !== value || localizeEventText(value, 'en') !== value, `Missing translation: ${value}`);
+  for (const [en, de] of [...require('../js/event-description-translations.js'), ...require('../js/event-description-translations-extra.js')]) {
+    assert.equal(localizeEventText(de, 'en'), en);
+    assert.equal(localizeEventText(en, 'de'), de);
+  }
+});
 
 test('known import-only templates and synthetic city placeholders are omitted', () => {
   for (const city of ['Mainz', 'Hofheim i. UFr.', 'Frankenberg/Sa.', 'St. Anton', 'Oettingen i. Bayern', 'St. Wolfgang', 'Gmund a. Tegernsee']) {

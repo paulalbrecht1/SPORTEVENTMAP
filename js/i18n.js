@@ -1151,7 +1151,7 @@ const I18N = {
     "season.goals": "Ziele",
     "season.goalsHint": "Was Erfolg bedeutet",
     "season.targetTime": "Zielzeit",
-    "season.targetPace": "Zielpace",
+    "season.targetPace": "Zieltempo",
     "season.hoursShort": "Std.",
     "season.minutesShort": "Min.",
     "season.secondsShort": "Sek.",
@@ -1175,15 +1175,15 @@ const I18N = {
     "season.result": "Ergebnis",
     "season.resultHintPast": "Offizielles Ergebnis ergänzen",
     "season.resultHintFuture": "Nach dem Event ausfüllen",
-    "season.finishStatus": "Finish Status",
+    "season.finishStatus": "Ergebnisstatus",
     "season.selectStatus": "Status auswählen",
     "season.statusFinisher": "Finisher",
     "season.statusCancelled": "Abgesagt",
     "season.statusOther": "Andere",
     "season.finishTime": "Zielzeit",
-    "season.finishPace": "Finish-Pace",
+    "season.finishPace": "Tempo im Ziel",
     "season.overallPlace": "Platz gesamt",
-    "season.genderPlace": "Platz Gender",
+    "season.genderPlace": "Platzierung nach Geschlecht",
     "season.ageGroupPlace": "Platz Altersklasse",
     "season.resultCategory": "Kategorie",
     "season.officialResultUrl": "Offizieller Ergebnislink",
@@ -1400,6 +1400,63 @@ const I18N = {
   }
 };
 
+const EXTRA_I18N = {
+  "profile.verified": ["Verified", "Bestätigt"],
+  "season.avgSpeed": ["Avg speed", "Durchschnittsgeschwindigkeit"],
+  "season.swimPace": ["Pace", "Tempo"],
+  "season.pace": ["Pace", "Tempo"],
+  "search.running": ["Running", "Laufen"],
+  "search.triathlon": ["Triathlon", "Triathlon"],
+  "search.ultramarathon": ["Ultramarathon", "Ultramarathon"],
+  "search.found": ["{count} found", "{count} gefunden"],
+  "search.queryLabel": ["Search: {query}", "Suche: {query}"],
+  "search.sportsLabel": ["Sports: {sports}", "Sportarten: {sports}"],
+  "search.distancesLabel": ["Distances: {distances}", "Distanzen: {distances}"],
+  "map.openTools": ["Open map tools", "Kartenwerkzeuge öffnen"],
+  "map.closeTools": ["Close map tools", "Kartenwerkzeuge schließen"]
+};
+Object.entries(EXTRA_I18N).forEach(([key, [en, de]]) => {
+  I18N.en[key] = en;
+  I18N.de[key] = de;
+});
+
+const UI_TRANSLATIONS = new Map();
+function registerUiTranslations(pairs) {
+  Object.entries(pairs).forEach(([en, de]) => {
+    const entry = { en, de };
+    UI_TRANSLATIONS.set(en, entry);
+    UI_TRANSLATIONS.set(de, entry);
+  });
+}
+registerUiTranslations(Object.fromEntries(Object.entries(I18N.en)
+  .filter(([key]) => I18N.de[key])
+  .map(([key, value]) => [value, I18N.de[key]])));
+registerUiTranslations(window.SEM_UI_TRANSLATIONS || {});
+
+function uiText(source, language = getAppLanguage()) {
+  const text = String(source ?? "");
+  return UI_TRANSLATIONS.get(text)?.[language] ?? text;
+}
+
+// Explicit bindings keep user-authored notes, names, values and source data intact.
+function applyUiLanguage(root = document) {
+  const bindings = [
+    ["data-i18n-text", null],
+    ["data-i18n-placeholder-text", "placeholder"],
+    ["data-i18n-title-text", "title"],
+    ["data-i18n-aria-label-text", "aria-label"]
+  ];
+  bindings.forEach(([binding, attribute]) => {
+    const elements = [...root.querySelectorAll(`[${binding}]`)];
+    if (root.matches?.(`[${binding}]`)) elements.unshift(root);
+    elements.forEach(element => {
+      const value = uiText(element.getAttribute(binding));
+      if (attribute) element.setAttribute(attribute, value);
+      else element.textContent = value;
+    });
+  });
+}
+
 function getAppLanguage() {
   return localStorage.getItem(LANGUAGE_STORAGE_KEY) === "de"
     ? "de"
@@ -1425,11 +1482,13 @@ function translateTemplate(key, values = {}, fallback = "") {
 
 function setText(selector, key) {
   document.querySelectorAll(selector).forEach(element => {
+    if (element.getAttribute("aria-busy") === "true") return;
     element.textContent = translate(key, element.textContent);
   });
 }
 
 function applyDataLanguageBindings() {
+  applyUiLanguage();
   document.querySelectorAll("[data-i18n]").forEach(element => {
     element.textContent = translate(
       element.dataset.i18n,
@@ -1455,6 +1514,12 @@ function applyDataLanguageBindings() {
         element.getAttribute("content") || ""
       )
     );
+  });
+
+  ["placeholder", "title"].forEach(attribute => {
+    document.querySelectorAll(`[data-i18n-${attribute}]`).forEach(element => {
+      element.setAttribute(attribute, translate(element.getAttribute(`data-i18n-${attribute}`)));
+    });
   });
 }
 
@@ -1729,7 +1794,6 @@ const TEXT_BINDINGS = [
   ["#profileModal .profile-summary div:nth-child(4) span", "profile.account"],
   ["#profileModal .profile-summary div:nth-child(5) span", "profile.planner"],
   ["#profileSecurityStatus", "profile.password"],
-  ["#profileAccountStatus", "profile.active"],
   ["#profilePlannerStatus", "profile.protected"],
   ["#profileModal .profile-section-heading h3", "profile.settings"],
   [".profile-settings-grid div:nth-child(1) span", "profile.eventLanguage"],
@@ -1952,6 +2016,15 @@ const CONTROL_LABEL_BINDINGS = [
 ];
 
 const SEM_HOME_TEXT_TRANSLATIONS = {
+  "12 Apr 2026 · Berlin": "12. Apr. 2026 · Berlin",
+  "9 May 2026 · Freiburg": "9. Mai 2026 · Freiburg",
+  "Apr – Oct": "Apr. – Okt.",
+  "26 Apr · Hamburg · 42.2 km": "26. Apr. · Hamburg · 42,2 km",
+  "17 May · Koblenz · 32 km": "17. Mai · Koblenz · 32 km",
+  "7 Jun · Berlin · Olympic": "7. Juni · Berlin · Olympische Distanz",
+  "12 Apr · Priority A": "12. Apr. · Priorität A",
+  "April · Goal 01:38": "April · Ziel 01:38",
+  "SWIM": "SCHWIMMEN", "BIKE": "RAD", "RUN": "LAUFEN",
   "Home": "Start",
   "Discovery": "Entdecken",
   "Season Planner": "Saisonplaner",
@@ -2250,46 +2323,102 @@ function applyStaticLanguage() {
     });
 }
 
-function setAppLanguage(language) {
-  const normalizedLanguage =
-    language === "de"
-      ? "de"
-      : "en";
+function languageControlIdentity(control) {
+  if (control.id) return `id:${control.id}`;
+  if (control.dataset.testid) return `test:${control.dataset.testid}`;
+  return JSON.stringify([control.tagName, control.type, control.name,
+    Object.entries(control.dataset).filter(([key]) => key.startsWith("season")).sort()]);
+}
 
-  localStorage.setItem(
-    LANGUAGE_STORAGE_KEY,
-    normalizedLanguage
-  );
+function captureLanguageDrafts(root) {
+  const controls = root?.querySelectorAll?.("input:not([type=file]), textarea, select") || [];
+  const occurrences = new Map();
+  return [...controls].map(control => {
+    const identity = languageControlIdentity(control);
+    const occurrence = occurrences.get(identity) || 0;
+    occurrences.set(identity, occurrence + 1);
+    return { control, identity, occurrence, value: control.value, checked: control.checked,
+      dirty: typeof control.defaultValue === "string" && control.value !== control.defaultValue,
+      focused: document.activeElement === control,
+      selectionStart: control.selectionStart, selectionEnd: control.selectionEnd };
+  });
+}
 
-  applyStaticLanguage();
-
-  if (typeof applyFilters === "function") {
-    applyFilters();
-  }
-
-  const seasonPlanner =
-    document.getElementById(
-      "seasonPlannerModal"
-    );
-
-  if (
-    seasonPlanner?.classList.contains("open") &&
-    typeof renderSeasonPlanner === "function"
-  ) {
-    renderSeasonPlanner();
-    applyStaticLanguage();
-  }
-
-  document.dispatchEvent(
-    new CustomEvent(
-      "app-language-changed",
-      {
-        detail: {
-          language: normalizedLanguage
+function restoreLanguageDrafts(root, drafts) {
+  const controls = root?.querySelectorAll?.("input:not([type=file]), textarea, select") || [];
+  const groups = new Map();
+  [...controls].forEach(control => {
+    const identity = languageControlIdentity(control);
+    if (!groups.has(identity)) groups.set(identity, []);
+    groups.get(identity).push(control);
+  });
+  drafts.forEach(draft => {
+    const control = groups.get(draft.identity)?.[draft.occurrence];
+    if (!control) return;
+    control.value = draft.value;
+    if (typeof draft.checked === "boolean") control.checked = draft.checked;
+    // Programmatically restoring a textarea clears native change tracking.
+    // Keep the normal save-on-blur contract, without saving during translation.
+    if (draft.dirty) {
+      let changeDelivered = false;
+      control.addEventListener("change", () => { changeDelivered = true; }, { once: true, capture: true });
+      control.addEventListener("blur", () => {
+        if (!languageRefreshInProgress && !changeDelivered && control.value !== control.defaultValue) {
+          control.dispatchEvent(new Event("change", { bubbles: true }));
         }
-      }
-    )
-  );
+      }, { once: true });
+    }
+    if (draft.focused) {
+      control.focus({ preventScroll: true });
+      if (typeof draft.selectionStart === "number") control.setSelectionRange(draft.selectionStart, draft.selectionEnd);
+    }
+  });
+}
+
+let languageRefreshInProgress = false;
+function setAppLanguage(language) {
+  const seasonPlanner = document.getElementById("seasonPlannerModal");
+  const plannerDrafts = captureLanguageDrafts(seasonPlanner);
+  const suppressDraftSave = event => event.stopImmediatePropagation();
+  plannerDrafts.forEach(({ control }) => control.addEventListener("change", suppressDraftSave, true));
+  seasonPlanner?.addEventListener("change", suppressDraftSave, true);
+  languageRefreshInProgress = true;
+  try {
+    const normalizedLanguage = language === "de" ? "de" : "en";
+
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, normalizedLanguage);
+
+    applyStaticLanguage();
+
+    if (typeof applyFilters === "function") {
+      applyFilters();
+    }
+
+    if (
+      seasonPlanner?.classList.contains("open") &&
+      typeof renderSeasonPlanner === "function"
+    ) {
+      if (typeof renderSeasonPlannerPreservingView === "function") renderSeasonPlannerPreservingView();
+      else renderSeasonPlanner();
+      applyStaticLanguage();
+      restoreLanguageDrafts(seasonPlanner, plannerDrafts);
+    }
+
+    document.dispatchEvent(
+      new CustomEvent(
+        "app-language-changed",
+        {
+          detail: {
+            language: normalizedLanguage
+          }
+        }
+      )
+    );
+  } finally {
+    languageRefreshInProgress = false;
+    plannerDrafts.forEach(({ control }) => control.removeEventListener("change", suppressDraftSave, true));
+    seasonPlanner?.removeEventListener("change", suppressDraftSave, true);
+  }
 }
 
 function initializeLanguageControls() {
@@ -2316,6 +2445,9 @@ function initializeLanguageControls() {
 }
 
 window.t = translate;
+window.uiText = uiText;
+window.registerUiTranslations = registerUiTranslations;
+window.applyUiLanguage = applyUiLanguage;
 window.tFormat = translateTemplate;
 window.getAppLanguage = getAppLanguage;
 window.setAppLanguage = setAppLanguage;

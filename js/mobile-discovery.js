@@ -38,6 +38,9 @@
     if (phone.matches) {
       apply.textContent = de ? `${count} Events anzeigen` : `Show ${count} events`;
       document.getElementById("discoveryPanelTitle").textContent = de ? "Events filtern" : "Filter events";
+    } else {
+      apply.textContent = window.t?.("filter.applyFilters") || (de ? "Filter anwenden" : "Apply filters");
+      document.getElementById("discoveryPanelTitle").textContent = de ? "Events & Filter" : "Events & filters";
     }
   }
 
@@ -75,8 +78,6 @@
     } else {
       resultAnchor.after(...resultNodes);
       actionAnchor.after(actions);
-      apply.textContent = window.t?.("filter.applyFilters") || "Apply filters";
-      document.getElementById("discoveryPanelTitle").textContent = "Events & Filter";
     }
     window.setSidebarExpanded?.(!sidebar.classList.contains("closed"), {
       animate: false, focusPanel: false, refresh: false

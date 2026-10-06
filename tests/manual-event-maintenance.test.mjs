@@ -85,7 +85,7 @@ test('status and popup runtime references leave the cached pre-v94 assets behind
       const url = new URL(reference, 'https://sporteventmap.com/');
       const asset = url.pathname.slice(1);
       if (!assets.includes(asset)) continue;
-      const expectedVersion = ({ 'js/events.js': '20261001-planner-history-v138', 'js/i18n.js': '20261001-history-labels-v139', 'js/map.js': '20260929-ui-only-v94' })[asset];
+      const expectedVersion = ({ 'js/events.js': '20261006-bilingual-v140', 'js/i18n.js': '20261006-bilingual-v140', 'js/map.js': '20261006-bilingual-v140' })[asset];
       assert.equal(url.searchParams.get('v'), expectedVersion, `${file}: ${asset} must bypass the old cached runtime`);
       seen.add(asset);
     }

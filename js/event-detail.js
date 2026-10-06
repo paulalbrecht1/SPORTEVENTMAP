@@ -34,12 +34,14 @@
     await new Promise(resolve => {
       window.sportEventMapPublicDetailReady = resolve;
       const script = document.createElement("script");
-      script.src = "/js/event-detail-live.js?v=20261001-manual-approval-v137";
+      script.src = "/js/event-detail-live.js?v=20261006-bilingual-v138";
       script.onerror = () => {
         document.documentElement.dataset.semPublicDetailState = "unavailable";
         const notice = document.createElement("p");
         notice.className = "live-detail-notice";
-        notice.textContent = "Gespeicherter Datenstand: Aktuelle Angaben konnten nicht geladen werden. Bitte beim Veranstalter prüfen.";
+        notice.textContent = document.documentElement.lang === "en"
+          ? "Saved data: Current details could not be loaded. Please check with the organizer."
+          : "Gespeicherter Datenstand: Aktuelle Angaben konnten nicht geladen werden. Bitte beim Veranstalter prüfen.";
         document.querySelector(".event-detail-header")?.after(notice);
         resolve();
       };

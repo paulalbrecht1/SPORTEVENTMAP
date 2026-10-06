@@ -39,7 +39,7 @@ function fixture() {
   vm.runInContext(plannerSource.slice(snapshotStart, plannerSource.indexOf('\n}', snapshotStart) + 2), context);
   context.window.getPersonalPlannedEvents = context.getPersonalPlannedEvents;
   context.window.getPersonalParticipationState = context.getPersonalParticipationState;
-  for (const name of ['getProfilePlannedEvents', 'getProfileParticipationState', 'getProfileFavoriteKey',
+  for (const name of ['accountUiText', 'getProfilePlannedEvents', 'getProfileParticipationState', 'getProfileFavoriteKey',
     'parseProfileDate', 'getCompletedProfileEvents', 'getProfileTrophyLabel', 'escapeProfileHTML',
     'getProfileSeasonMeta', 'getDefaultProfilePlannerDetails', 'normalizeProfilePlannerDetails',
     'getProfilePlannerEntry', 'hasProfileResult', 'getProfileCompletedArchiveEvents',

@@ -250,24 +250,30 @@ function getAuthRedirectUrl(action) {
   return url.toString();
 }
 
+function accountUiText(value) {
+  return window.uiText?.(value) ?? value;
+}
+
+function bindAccountUiText(element, value) {
+  if (!element) return;
+  element.setAttribute("data-i18n-text", value);
+  element.textContent = accountUiText(value);
+}
+
 function setButtonLoading(button, loading, loadingLabel = "Working...") {
   if (!button) {
     return;
   }
 
   if (loading) {
-    button.dataset.defaultLabel =
-      button.textContent.trim();
-    button.textContent =
-      loadingLabel;
+    button.dataset.defaultLabel = button.getAttribute("data-i18n-text") || button.textContent.trim();
+    bindAccountUiText(button, loadingLabel);
     button.disabled = true;
     button.setAttribute("aria-busy", "true");
     return;
   }
 
-  button.textContent =
-    button.dataset.defaultLabel ||
-    button.textContent;
+  bindAccountUiText(button, button.dataset.defaultLabel || button.textContent);
   button.disabled = false;
   button.removeAttribute("aria-busy");
 }
@@ -873,6 +879,8 @@ function showToast(title, message) {
   `;
 
   stack.appendChild(toast);
+  bindAccountUiText(toast.querySelector("strong"), title || "Notice");
+  bindAccountUiText(toast.querySelector("span"), message || "");
 
   requestAnimationFrame(() => {
     toast.classList.add("is-visible");
@@ -940,6 +948,9 @@ function showEventSubmitStatus(title, message, type = "error") {
         : "smooth"
   });
 
+  bindAccountUiText(status.querySelector("strong"), title || "Notice");
+  bindAccountUiText(status.querySelector("span"), message || "");
+
   return true;
 }
 
@@ -978,17 +989,14 @@ function showAppMessage(title, message) {
     !appMessageText
   ) {
 
-    alert(message || title);
+    alert(accountUiText(message || title));
 
     return;
 
   }
 
-  appMessageTitle.innerText =
-    title || "Notice";
-
-  appMessageText.innerText =
-    message || "";
+  bindAccountUiText(appMessageTitle, title || "Notice");
+  bindAccountUiText(appMessageText, message || "");
 
   appMessageModal.classList.add("open");
 
@@ -1497,21 +1505,10 @@ function getCompletedProfileEvents(plannedEvents = getProfilePlannedEvents()) {
 }
 
 function getProfileTrophyLabel(completedCount) {
-  if (completedCount >= 20) {
-    return "20 races completed";
-  }
-
-  if (completedCount >= 10) {
-    return "10 races completed";
-  }
-
-  if (completedCount >= 5) {
-    return "5 races completed";
-  }
-
-  return completedCount
-    ? `${completedCount} completed`
-    : "Start building";
+  const milestone = completedCount >= 20 ? 20 : completedCount >= 10 ? 10 : completedCount >= 5 ? 5 : completedCount;
+  return milestone
+    ? window.getAppLanguage?.() === "de" ? `${milestone} Rennen beendet` : `${milestone} races completed`
+    : accountUiText("Start building");
 }
 
 const PROFILE_ACHIEVEMENT_LEVELS = [
@@ -1560,7 +1557,7 @@ function renderProfileAchievementBadges(completedCount) {
           <article class="profile-achievement-card ${unlocked ? "is-unlocked" : "is-locked"}">
             <span class="profile-achievement-icon" aria-hidden="true">${level.icon}</span>
             <strong>${escapeProfileHTML(level.label)}</strong>
-            <small>${unlocked ? "Unlocked" : `${Math.max(level.count - completedCount, 0)} to go`}</small>
+            <small>${unlocked ? accountUiText("Unlocked") : window.getAppLanguage?.() === "de" ? `Noch ${Math.max(level.count - completedCount, 0)}` : `${Math.max(level.count - completedCount, 0)} to go`}</small>
           </article>
         `;
       })
@@ -1586,7 +1583,7 @@ function renderProfileCompletedEvents() {
 
   if (countElement) {
     countElement.textContent =
-      `${completedEvents.length} completed`;
+      window.getAppLanguage?.() === "de" ? `${completedEvents.length} beendet` : `${completedEvents.length} completed`;
   }
 
   if (trophyElement) {
@@ -1603,8 +1600,8 @@ function renderProfileCompletedEvents() {
   if (!completedEvents.length) {
     list.innerHTML = `
       <div class="profile-completed-empty">
-        <strong>No completed races yet</strong>
-        <span>Record a finished race in Season Planner. Passing the event date does not unlock achievements.</span>
+        <strong>${accountUiText("No completed races yet")}</strong>
+        <span>${accountUiText("Record a finished race in Season Planner. Passing the event date does not unlock achievements.")}</span>
       </div>
     `;
     return;
@@ -1612,8 +1609,8 @@ function renderProfileCompletedEvents() {
 
   list.innerHTML = `
     <div class="profile-completed-empty is-success">
-      <strong>${completedEvents.length} completed race${completedEvents.length === 1 ? "" : "s"}</strong>
-      <span>Your explicitly finished planned editions count toward lifetime achievement badges, including archived editions.</span>
+      <strong>${window.getAppLanguage?.() === "de" ? `${completedEvents.length} beendete Rennen` : `${completedEvents.length} completed race${completedEvents.length === 1 ? "" : "s"}`}</strong>
+      <span>${accountUiText("Your explicitly finished planned editions count toward lifetime achievement badges, including archived editions.")}</span>
     </div>
   `;
 }
@@ -2332,15 +2329,15 @@ function renderProfileCompletedArchive() {
             <div>
               <span>${escapeProfileHTML(event.date || "")}</span>
               <strong>${escapeProfileHTML(event.event_name || "")}</strong>
-              <em>${escapeProfileHTML([event.city, event.country].filter(Boolean).join(", "))}</em>
+              <em>${escapeProfileHTML([event.city, window.SportEventMapDescriptions?.localizeEventText(event.country, window.getAppLanguage?.()) ?? accountUiText(event.country)].filter(Boolean).join(", "))}</em>
             </div>
             <span class="profile-completed-status ${hasResult ? "has-result" : "needs-result"}">
-              ${escapeProfileHTML(result.finish_status || profileText("profile.noResultEntered", "No result entered yet"))}
+              ${escapeProfileHTML(accountUiText(result.finish_status) || profileText("profile.noResultEntered", "No result entered yet"))}
             </span>
           </div>
           <div class="profile-completed-context-row">
-            ${renderProfileArchiveMetric("profile.sport", "Sport", event.sport || event.sport_type)}
-            ${renderProfileArchiveMetric("profile.distance", "Distance", event.distance)}
+            ${renderProfileArchiveMetric("profile.sport", "Sport", window.SportEventMapDescriptions?.localizeEventText(event.sport || event.sport_type, window.getAppLanguage?.()) ?? accountUiText(event.sport || event.sport_type))}
+            ${renderProfileArchiveMetric("profile.distance", "Distance", window.SportEventMapDescriptions?.localizeEventText(event.distance, window.getAppLanguage?.()) ?? accountUiText(event.distance))}
           </div>
           <div class="profile-completed-result-row">
             ${renderProfilePrimaryResult("season.finishTime", "Finish time", finishTime)}
@@ -2352,7 +2349,7 @@ function renderProfileCompletedArchive() {
             ${renderProfilePlanningMetric("season.targetTime", "Target time", targetTime)}
             ${renderProfilePlanningMetric("season.targetPace", "Target pace", targetPace)}
             ${renderProfilePlanningMetric("profile.goalDelta", "Goal delta", deltaLabel)}
-            ${renderProfilePlanningMetric("profile.priority", "Priority", entry.priority || "Maybe")}
+            ${renderProfilePlanningMetric("profile.priority", "Priority", accountUiText(entry.priority || "Maybe"))}
             ${result.personal_rating ? `
               <span>
                 <em>${escapeProfileHTML(profileText("season.personalRating", "Personal rating"))}</em>
@@ -2467,8 +2464,7 @@ async function openProfileModal() {
     document.getElementById("profileRole");
 
   if (profileRole) {
-    profileRole.innerText =
-      role;
+    bindAccountUiText(profileRole, role === "admin" ? "Administrator" : role === "guest" ? "Guest" : "Member");
   }
 
   const securityStatus =
@@ -2488,14 +2484,11 @@ async function openProfileModal() {
 
   if (accountStatus) {
 
-    accountStatus.innerText =
-      user.email_confirmed_at
-        ? window.t
-          ? window.t("profile.verified")
-          : "Verified"
-        : window.t
-          ? window.t("profile.active")
-          : "Active";
+    const statusKey = user.email_confirmed_at ? "profile.verified" : "profile.active";
+    accountStatus.setAttribute("data-i18n", statusKey);
+    accountStatus.textContent = window.t
+      ? window.t(statusKey)
+      : user.email_confirmed_at ? "Verified" : "Active";
 
   }
 
@@ -3370,9 +3363,7 @@ document.addEventListener(
   "app-language-changed",
   () => {
     updateProfileCompletedArchiveToggle();
-    renderProfileCompletedArchive(
-      getProfileFavoriteEvents()
-    );
+    renderProfileCompletedEvents();
   }
 );
 
@@ -3800,14 +3791,16 @@ async function submitEvent() {
           .getElementById(id)
           ?.classList.add("event-field-invalid");
 
-        return label;
+        return accountUiText(label);
       });
 
   if (missingFields.length) {
 
     showEventSubmitError(
       "Required fields missing",
-      `Bitte fülle alle Pflichtfelder korrekt aus: ${missingFields.join(", ")}.`
+      window.getAppLanguage?.() === "de"
+        ? `Bitte fülle alle Pflichtfelder korrekt aus: ${missingFields.join(", ")}.`
+        : `Please complete all required fields: ${missingFields.join(", ")}.`
     );
 
     return;
@@ -4259,7 +4252,7 @@ function updateEventSubmitPreview() {
       ? `${typeof window.t === "function" ? window.t("event.participants", "Participants") : "Participants"}: ${participants}`
       : "",
     course
-      ? `${typeof window.t === "function" ? window.t("event.courseProfile", "Course") : "Course"}: ${course}${elevation ? ` (${elevation} m)` : ""}`
+      ? `${typeof window.t === "function" ? window.t("event.courseProfile", "Course") : "Course"}: ${accountUiText(course)}${elevation ? ` (${elevation} m)` : ""}`
       : elevation
         ? `${typeof window.t === "function" ? window.t("event.elevation", "Elevation gain") : "Elevation gain"}: ${elevation} m`
         : "",
@@ -4270,7 +4263,7 @@ function updateEventSubmitPreview() {
 
   preview.innerHTML = `
     <strong>${escapeAdminHTML(name)}</strong>
-    <span>${escapeAdminHTML(sport)} · ${escapeAdminHTML(date)} · ${escapeAdminHTML(city)}</span>
+    <span>${escapeAdminHTML(accountUiText(sport))} · ${escapeAdminHTML(date)} · ${escapeAdminHTML(city)}</span>
     ${
       stats.length
         ? `<ul>${stats.map(item => `<li>${escapeAdminHTML(item)}</li>`).join("")}</ul>`
@@ -4318,6 +4311,31 @@ function updateEventSubmitPreview() {
 
 const adminModal =
   document.getElementById("adminModal");
+
+function adminUiMarkup(source) {
+  return `<span data-i18n-text="${escapeAdminHTML(source)}">${escapeAdminHTML(accountUiText(source))}</span>`;
+}
+
+function adminUiFormatted(english, german, values = {}) {
+  const format = template => template.replace(/\{(\w+)\}/g, (_match, key) => String(values[key] ?? ""));
+  const en = format(english), de = format(german);
+  window.registerUiTranslations?.({ [en]: de });
+  return accountUiText(en);
+}
+
+function adminStatusLabel(value) {
+  const labels = { official: "Official", trusted: "Trusted", community: "Community", estimated: "Estimated", unknown: "Unknown",
+    pending: "Pending", queued: "Queued", processing: "Processing", running: "In progress", retry_scheduled: "Retry scheduled", completed: "Completed",
+    changed: "Changed", unchanged: "Unchanged", unreachable: "Unreachable", failed: "Failed", dead_letter: "Dead Letter",
+    inactive: "Inactive", paused: "Paused", active: "Active", open: "Open", closed: "Closed", resolved: "Resolved",
+    scheduled: "Scheduled", cancelled: "Cancelled", postponed: "Postponed", date_unconfirmed: "Date unconfirmed",
+    draft: "Draft", published: "Published", needs_review: "Needs review", confirmed: "Confirmed", rejected: "Rejected", approved: "Approved",
+    auto_apply: "Apply automatically", review: "Review", block: "Block", observe: "Observe", correct: "Correct",
+    partially_correct: "Partially correct", incorrect: "Incorrect", outdated: "Outdated", duplicate: "Duplicate",
+    source_unsuitable: "Unsuitable source", unclear: "Unclear", manual_review_required: "Manual review required",
+    rate_limited: "Rate limited", high: "High", medium: "Medium", low: "Low", passed: "Passed", pilot_observation: "Pilot observation" };
+  return labels[value] || String(value ?? "--");
+}
 
 const wtStartDate =
   document.getElementById("wtStartDate");
@@ -4660,28 +4678,28 @@ function ensureDataOpsReviewWorkspace() {
     review.setAttribute("aria-labelledby", "editionLifecycleTitle");
     review.innerHTML = `
       <div class="admin-data-operations-section-heading admin-review-inbox-heading">
-        <div><span class="admin-eyebrow">Review Inbox</span><h4 id="editionLifecycleTitle">Jetzt zu pruefen</h4><p>Offizielle Quellen und erkannte Aenderungen lassen sich hier mit sichtbarer Evidenz kontrolliert bestaetigen.</p></div>
+        <div><span class="admin-eyebrow"><span data-i18n-text="Review Inbox">Review Inbox</span></span><h4 id="editionLifecycleTitle"><span data-i18n-text="Jetzt zu pruefen">Jetzt zu pruefen</span></h4><p><span data-i18n-text="Offizielle Quellen und erkannte Aenderungen lassen sich hier mit sichtbarer Evidenz kontrolliert bestaetigen.">Offizielle Quellen und erkannte Aenderungen lassen sich hier mit sichtbarer Evidenz kontrolliert bestaetigen.</span></p></div>
         <p id="editionLifecycleStatus" class="admin-section-status" aria-live="polite"></p>
       </div>
-      <div class="edition-lifecycle-kpis" aria-label="Review Inbox Kennzahlen">
-        <div><span>Jetzt entscheiden</span><strong id="editionLifecycleDecisions">0</strong></div>
-        <div><span>Wartet automatisch</span><strong id="editionLifecycleWaiting">0</strong></div>
-        <div><span>Sammelfreigabe</span><strong id="editionLifecycleBatch">0</strong></div>
-        <div><span>Blockiert / kritisch</span><strong id="editionLifecycleBlocked">0</strong></div>
+      <div class="edition-lifecycle-kpis" aria-label="Review Inbox Kennzahlen" data-i18n-aria-label-text="Review Inbox Kennzahlen">
+        <div><span><span data-i18n-text="Jetzt entscheiden">Jetzt entscheiden</span></span><strong id="editionLifecycleDecisions">0</strong></div>
+        <div><span><span data-i18n-text="Wartet automatisch">Wartet automatisch</span></span><strong id="editionLifecycleWaiting">0</strong></div>
+        <div><span><span data-i18n-text="Sammelfreigabe">Sammelfreigabe</span></span><strong id="editionLifecycleBatch">0</strong></div>
+        <div><span><span data-i18n-text="Blockiert / kritisch">Blockiert / kritisch</span></span><strong id="editionLifecycleBlocked">0</strong></div>
       </div>
       <div class="edition-lifecycle-toolbar admin-review-inbox-toolbar">
-        <label>Ansicht
+        <label><span data-i18n-text="Ansicht">Ansicht</span>
           <select id="editionLifecycleFilter">
-            <option value="action">Jetzt zu pruefen</option>
-            <option value="waiting">Wartet auf Automatik</option>
-            <option value="blocked">Blockiert / kritisch</option>
-            <option value="all">Alle Ausnahmen</option>
+            <option value="action" data-i18n-text="Jetzt zu pruefen">Jetzt zu pruefen</option>
+            <option value="waiting" data-i18n-text="Wartet auf Automatik">Wartet auf Automatik</option>
+            <option value="blocked" data-i18n-text="Blockiert / kritisch">Blockiert / kritisch</option>
+            <option value="all" data-i18n-text="Alle Ausnahmen">Alle Ausnahmen</option>
           </select>
         </label>
-        <button type="button" data-lifecycle-action="select-all">Pruefbare waehlen</button>
-        <button type="button" data-lifecycle-action="approve-selected">Auswahl bestaetigen</button>
-        <button type="button" data-lifecycle-action="select-freshness">Bis zu 25 Frischeprüfungen wählen</button>
-        <button type="button" data-lifecycle-action="review-freshness-selected">Frischeauswahl prüfen</button>
+        <button type="button" data-lifecycle-action="select-all"><span data-i18n-text="Pruefbare waehlen">Pruefbare waehlen</span></button>
+        <button type="button" data-lifecycle-action="approve-selected"><span data-i18n-text="Auswahl bestaetigen">Auswahl bestaetigen</span></button>
+        <button type="button" data-lifecycle-action="select-freshness"><span data-i18n-text="Bis zu 25 Frischeprüfungen wählen">Bis zu 25 Frischeprüfungen wählen</span></button>
+        <button type="button" data-lifecycle-action="review-freshness-selected"><span data-i18n-text="Frischeauswahl prüfen">Frischeauswahl prüfen</span></button>
       </div>
       <div id="editionLifecycleList" class="edition-lifecycle-list" aria-live="polite"></div>`;
     operationsRoot.insertBefore(review, operationsRoot.querySelector(".admin-data-operations-kpis"));
@@ -4691,7 +4709,7 @@ function ensureDataOpsReviewWorkspace() {
     const inventory = document.createElement("details");
     inventory.id = "dataOpsInventoryDetails";
     inventory.className = "admin-secondary-details";
-    inventory.innerHTML = `<summary><span><strong>Alle Events &amp; manuelle Suche</strong><small>Gesamtbestand, Filter und Einzelfallverwaltung</small></span><span id="dataOpsInventorySummaryCount">Bestand laden</span></summary><div class="admin-secondary-details-body"></div>`;
+    inventory.innerHTML = `<summary><span><strong><span data-i18n-text="Alle Events &amp; manuelle Suche">Alle Events &amp; manuelle Suche</span></strong><small><span data-i18n-text="Gesamtbestand, Filter und Einzelfallverwaltung">Gesamtbestand, Filter und Einzelfallverwaltung</span></small></span><span id="dataOpsInventorySummaryCount"><span data-i18n-text="Bestand laden">Bestand laden</span></span></summary><div class="admin-secondary-details-body"></div>`;
     const firstInventoryNode = operationsRoot.querySelector(".admin-data-operations-kpis");
     operationsRoot.insertBefore(inventory, firstInventoryNode);
     const body = inventory.querySelector(".admin-secondary-details-body");
@@ -4711,50 +4729,50 @@ function ensureDataOpsReviewWorkspace() {
     freshness.innerHTML = `
       <div class="data-freshness-heading">
         <div>
-          <span class="admin-eyebrow">Aktualitätslage</span>
-          <h4 id="dataFreshnessTitle">Was Nutzer gerade sehen</h4>
-          <p id="dataFreshnessSummary">Katalog, Prüfstände und Quellenbetrieb werden zusammengeführt.</p>
+          <span class="admin-eyebrow"><span data-i18n-text="Aktualitätslage">Aktualitätslage</span></span>
+          <h4 id="dataFreshnessTitle"><span data-i18n-text="Was Nutzer gerade sehen">Was Nutzer gerade sehen</span></h4>
+          <p id="dataFreshnessSummary"><span data-i18n-text="Katalog, Prüfstände und Quellenbetrieb werden zusammengeführt.">Katalog, Prüfstände und Quellenbetrieb werden zusammengeführt.</span></p>
         </div>
-        <span id="dataFreshnessState" class="data-freshness-state">Wird geprüft</span>
+        <span id="dataFreshnessState" class="data-freshness-state"><span data-i18n-text="Wird geprüft">Wird geprüft</span></span>
       </div>
-      <div class="data-freshness-grid" aria-label="Aktualitätskennzahlen">
+      <div class="data-freshness-grid" aria-label="Aktualitätskennzahlen" data-i18n-aria-label-text="Aktualitätskennzahlen">
         <article>
-          <span>Öffentlicher Katalog</span>
+          <span><span data-i18n-text="Öffentlicher Katalog">Öffentlicher Katalog</span></span>
           <strong id="dataFreshnessCatalog">–</strong>
-          <small id="dataFreshnessCatalogDetail">Quelle wird ermittelt</small>
+          <small id="dataFreshnessCatalogDetail"><span data-i18n-text="Quelle wird ermittelt">Quelle wird ermittelt</span></small>
         </article>
         <article>
-          <span>Aktuelle Austragungen</span>
+          <span><span data-i18n-text="Aktuelle Austragungen">Aktuelle Austragungen</span></span>
           <strong id="dataFreshnessRate">–</strong>
-          <small id="dataFreshnessRateDetail">Verifizierung wird berechnet</small>
+          <small id="dataFreshnessRateDetail"><span data-i18n-text="Verifizierung wird berechnet">Verifizierung wird berechnet</span></small>
         </article>
         <article>
-          <span>Prüfplan</span>
+          <span><span data-i18n-text="Prüfplan">Prüfplan</span></span>
           <strong id="dataFreshnessDue">–</strong>
-          <small id="dataFreshnessDueDetail">Fälligkeit wird berechnet</small>
+          <small id="dataFreshnessDueDetail"><span data-i18n-text="Fälligkeit wird berechnet">Fälligkeit wird berechnet</span></small>
         </article>
         <article>
-          <span>Betriebsprobleme</span>
+          <span><span data-i18n-text="Betriebsprobleme">Betriebsprobleme</span></span>
           <strong id="dataFreshnessProblems">–</strong>
-          <small id="dataFreshnessProblemsDetail">Quellen und Alarme werden geprüft</small>
+          <small id="dataFreshnessProblemsDetail"><span data-i18n-text="Quellen und Alarme werden geprüft">Quellen und Alarme werden geprüft</span></small>
         </article>
       </div>
       <div class="data-freshness-priorities">
-        <strong>Datenqualität und Freigabe</strong>
-        <p id="catalogQualityDefinition">Katalogmessung nicht ermittelt.</p>
+        <strong><span data-i18n-text="Datenqualität und Freigabe">Datenqualität und Freigabe</span></strong>
+        <p id="catalogQualityDefinition"><span data-i18n-text="Katalogmessung nicht ermittelt.">Katalogmessung nicht ermittelt.</span></p>
         <dl id="catalogQualityDetails" class="catalog-quality-details"></dl>
-        <p id="catalogQualityBlockers">Freigabeblocker nicht ermittelt.</p>
-        <button type="button" id="downloadCatalogQualityReport">Prüfbericht herunterladen</button>
+        <p id="catalogQualityBlockers"><span data-i18n-text="Freigabeblocker nicht ermittelt.">Freigabeblocker nicht ermittelt.</span></p>
+        <button type="button" id="downloadCatalogQualityReport"><span data-i18n-text="Prüfbericht herunterladen">Prüfbericht herunterladen</span></button>
       </div>
       <div class="data-freshness-priorities">
-        <strong>Nächste Prioritäten</strong>
-        <ul id="dataFreshnessPriorityList"><li>Daten werden geladen.</li></ul>
+        <strong><span data-i18n-text="Nächste Prioritäten">Nächste Prioritäten</span></strong>
+        <ul id="dataFreshnessPriorityList"><li><span data-i18n-text="Daten werden geladen.">Daten werden geladen.</span></li></ul>
       </div>
       <div class="data-freshness-actions">
-        <button type="button" data-freshness-action="inventory">Eventbestand prüfen</button>
-        <button type="button" data-freshness-action="sources">Quellenbetrieb öffnen</button>
-        <button type="button" data-freshness-action="review">Alarme &amp; Vorschläge</button>
-        <button type="button" data-freshness-action="refresh">Neu berechnen</button>
+        <button type="button" data-freshness-action="inventory"><span data-i18n-text="Eventbestand prüfen">Eventbestand prüfen</span></button>
+        <button type="button" data-freshness-action="sources"><span data-i18n-text="Quellenbetrieb öffnen">Quellenbetrieb öffnen</span></button>
+        <button type="button" data-freshness-action="review"><span data-i18n-text="Alarme &amp; Vorschläge">Alarme &amp; Vorschläge</span></button>
+        <button type="button" data-freshness-action="refresh"><span data-i18n-text="Neu berechnen">Neu berechnen</span></button>
       </div>`;
     operationsRoot.insertBefore(
       freshness,
@@ -4772,32 +4790,32 @@ function ensureSourceMonitorSection() {
   section.id = "sourceMonitorSection";
   section.className = "source-monitor-section admin-secondary-details";
   section.innerHTML = `
-    <summary><span><strong>Source Monitor &amp; Systemstatus</strong><small>Crawls, Erreichbarkeit, Retries und technische Details</small></span><span id="sourceMonitorSummaryStatus">Technik</span></summary>
+    <summary><span><strong><span data-i18n-text="Source Monitor &amp; Systemstatus">Source Monitor &amp; Systemstatus</span></strong><small><span data-i18n-text="Crawls, Erreichbarkeit, Retries und technische Details">Crawls, Erreichbarkeit, Retries und technische Details</span></small></span><span id="sourceMonitorSummaryStatus"><span data-i18n-text="Technik">Technik</span></span></summary>
     <div class="admin-secondary-details-body source-monitor-content">
       <div class="admin-data-operations-section-heading">
-        <div><span class="admin-eyebrow">Source Monitor</span><h4>Technische Quellenpruefung</h4><p>Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</p></div>
+        <div><span class="admin-eyebrow"><span data-i18n-text="Source Monitor">Source Monitor</span></span><h4><span data-i18n-text="Technische Quellenpruefung">Technische Quellenpruefung</span></h4><p><span data-i18n-text="Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.">Erreichbarkeit, Content-Hashes, Queue, Retries und manuelle Pruefung.</span></p></div>
         <p id="sourceMonitorStatus" class="admin-section-status" aria-live="polite"></p>
       </div>
-      <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen">
-        <div><span>Heute geprueft</span><strong id="sourceMonitorCheckedToday">0</strong></div>
-        <div><span>Unveraendert</span><strong id="sourceMonitorUnchanged">0</strong></div>
-        <div><span>Veraendert</span><strong id="sourceMonitorChanged">0</strong></div>
-        <div><span>Nicht erreichbar</span><strong id="sourceMonitorUnreachable">0</strong></div>
-        <div><span>Fehlgeschlagen</span><strong id="sourceMonitorFailed">0</strong></div>
-        <div><span>Wiederholungen</span><strong id="sourceMonitorRetries">0</strong></div>
-        <div><span>Dead Letter</span><strong id="sourceMonitorDeadLetter">0</strong></div>
-        <div><span>Durchschnitt</span><strong id="sourceMonitorAverageTime">--</strong></div>
-        <div><span>Ueberfaellig</span><strong id="sourceMonitorOverdue">0</strong></div>
-        <div><span>Ohne Prueftermin</span><strong id="sourceMonitorNoSchedule">0</strong></div>
+      <div class="source-monitor-kpis" aria-label="Source Monitor Kennzahlen" data-i18n-aria-label-text="Source Monitor Kennzahlen">
+        <div><span><span data-i18n-text="Heute geprueft">Heute geprueft</span></span><strong id="sourceMonitorCheckedToday">0</strong></div>
+        <div><span><span data-i18n-text="Unveraendert">Unveraendert</span></span><strong id="sourceMonitorUnchanged">0</strong></div>
+        <div><span><span data-i18n-text="Veraendert">Veraendert</span></span><strong id="sourceMonitorChanged">0</strong></div>
+        <div><span><span data-i18n-text="Nicht erreichbar">Nicht erreichbar</span></span><strong id="sourceMonitorUnreachable">0</strong></div>
+        <div><span><span data-i18n-text="Fehlgeschlagen">Fehlgeschlagen</span></span><strong id="sourceMonitorFailed">0</strong></div>
+        <div><span><span data-i18n-text="Wiederholungen">Wiederholungen</span></span><strong id="sourceMonitorRetries">0</strong></div>
+        <div><span><span data-i18n-text="Dead Letter">Dead Letter</span></span><strong id="sourceMonitorDeadLetter">0</strong></div>
+        <div><span><span data-i18n-text="Durchschnitt">Durchschnitt</span></span><strong id="sourceMonitorAverageTime">--</strong></div>
+        <div><span><span data-i18n-text="Ueberfaellig">Ueberfaellig</span></span><strong id="sourceMonitorOverdue">0</strong></div>
+        <div><span><span data-i18n-text="Ohne Prueftermin">Ohne Prueftermin</span></span><strong id="sourceMonitorNoSchedule">0</strong></div>
       </div>
       <div class="source-monitor-table-wrap">
         <table class="source-monitor-table">
-          <thead><tr><th>Event / Austragung</th><th>Quelle</th><th>Letzter Status</th><th>Pruefplan</th><th>Review</th><th>Aktionen</th></tr></thead>
+          <thead><tr><th><span data-i18n-text="Event / Austragung">Event / Austragung</span></th><th><span data-i18n-text="Quelle">Quelle</span></th><th><span data-i18n-text="Letzter Status">Letzter Status</span></th><th><span data-i18n-text="Pruefplan">Pruefplan</span></th><th><span data-i18n-text="Review">Review</span></th><th><span data-i18n-text="Aktionen">Aktionen</span></th></tr></thead>
           <tbody id="sourceMonitorTableBody"></tbody>
         </table>
       </div>
       <section id="sourceMonitorHistory" class="source-monitor-history" hidden>
-        <div class="admin-data-operations-section-heading"><div><h5>Crawl-Historie</h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history">Schliessen</button></div>
+        <div class="admin-data-operations-section-heading"><div><h5><span data-i18n-text="Crawl-Historie">Crawl-Historie</span></h5><p id="sourceMonitorHistoryTitle"></p></div><button type="button" data-source-action="close-history"><span data-i18n-text="Schliessen">Schliessen</span></button></div>
         <div id="sourceMonitorHistoryList" class="admin-data-operations-list"></div>
       </section>
     </div>`;
@@ -4813,51 +4831,51 @@ function ensureStageFourOperationsSection() {
   section.setAttribute("aria-labelledby", "stageFourTitle");
   section.innerHTML = `
     <div class="stage-four-heading">
-      <div><span class="admin-eyebrow">Stage 4 · Phase A</span><h4 id="stageFourTitle">Data Operations Center</h4><p>Policy-Simulation, Quellenzuverlässigkeit, Discovery, Dubletten, Geocoding und Länderqualität – ohne automatische Veröffentlichung.</p></div>
-      <div class="stage-four-actions"><button type="button" data-stage-four-action="refresh-metrics">Kennzahlen neu berechnen</button><button type="button" data-stage-four-action="simulate-pending">Offene Vorschläge simulieren</button></div>
+      <div><span class="admin-eyebrow"><span data-i18n-text="Stage 4 · Phase A">Stage 4 · Phase A</span></span><h4 id="stageFourTitle"><span data-i18n-text="Data Operations Center">Data Operations Center</span></h4><p><span data-i18n-text="Policy-Simulation, Quellenzuverlässigkeit, Discovery, Dubletten, Geocoding und Länderqualität – ohne automatische Veröffentlichung.">Policy-Simulation, Quellenzuverlässigkeit, Discovery, Dubletten, Geocoding und Länderqualität – ohne automatische Veröffentlichung.</span></p></div>
+      <div class="stage-four-actions"><button type="button" data-stage-four-action="refresh-metrics"><span data-i18n-text="Kennzahlen neu berechnen">Kennzahlen neu berechnen</span></button><button type="button" data-stage-four-action="simulate-pending"><span data-i18n-text="Offene Vorschläge simulieren">Offene Vorschläge simulieren</span></button></div>
     </div>
     <div id="stageFourSafetyBanner" class="stage-four-safety" role="status">Stage-4-Konfiguration wird geladen.</div>
     <p id="stageFourStatus" class="admin-section-status" aria-live="polite"></p>
-    <div class="stage-four-kpis" aria-label="Stage-4-Kennzahlen">
-      <div><span>Simulationen</span><strong id="stageFourDecisionCount">0</strong></div>
-      <div><span>Würde automatisch</span><strong id="stageFourWouldApplyCount">0</strong></div>
-      <div><span>Neue Kandidaten</span><strong id="stageFourDiscoveryCount">0</strong></div>
-      <div><span>Mögliche Dubletten</span><strong id="stageFourDuplicateCount">0</strong></div>
-      <div><span>Geocoding offen</span><strong id="stageFourGeocodingCount">0</strong></div>
-      <div><span>Ø Datenqualität</span><strong id="stageFourQualityScore">–</strong></div>
+    <div class="stage-four-kpis" aria-label="Stage-4-Kennzahlen" data-i18n-aria-label-text="Stage-4-Kennzahlen">
+      <div><span><span data-i18n-text="Simulationen">Simulationen</span></span><strong id="stageFourDecisionCount">0</strong></div>
+      <div><span><span data-i18n-text="Würde automatisch">Würde automatisch</span></span><strong id="stageFourWouldApplyCount">0</strong></div>
+      <div><span><span data-i18n-text="Neue Kandidaten">Neue Kandidaten</span></span><strong id="stageFourDiscoveryCount">0</strong></div>
+      <div><span><span data-i18n-text="Mögliche Dubletten">Mögliche Dubletten</span></span><strong id="stageFourDuplicateCount">0</strong></div>
+      <div><span><span data-i18n-text="Geocoding offen">Geocoding offen</span></span><strong id="stageFourGeocodingCount">0</strong></div>
+      <div><span><span data-i18n-text="Ø Datenqualität">Ø Datenqualität</span></span><strong id="stageFourQualityScore">–</strong></div>
     </div>
     <div class="stage-four-grid">
-      <section><div class="stage-four-section-title"><h5>Policies &amp; Zuverlässigkeit</h5><span id="stageFourReliabilityCount">0 Metriken</span></div><div id="stageFourPoliciesList" class="stage-four-list"></div></section>
-      <section><div class="stage-four-section-title"><h5>Discovery &amp; Dubletten</h5><span id="stageFourDiscoverySummary">0 offen</span></div><div id="stageFourDiscoveryList" class="stage-four-list"></div></section>
-      <section><div class="stage-four-section-title"><h5>Länder &amp; Datenqualität</h5><span>DE → AT → CH</span></div><div id="stageFourCountriesList" class="stage-four-country-grid"></div></section>
-      <section><div class="stage-four-section-title"><h5>Geocoding &amp; Limits</h5><span>Cache + Rate Limits</span></div><div id="stageFourGeocodingList" class="stage-four-list"></div></section>
+      <section><div class="stage-four-section-title"><h5><span data-i18n-text="Policies &amp; Zuverlässigkeit">Policies &amp; Zuverlässigkeit</span></h5><span id="stageFourReliabilityCount"><span data-i18n-text="0 Metriken">0 Metriken</span></span></div><div id="stageFourPoliciesList" class="stage-four-list"></div></section>
+      <section><div class="stage-four-section-title"><h5><span data-i18n-text="Discovery &amp; Dubletten">Discovery &amp; Dubletten</span></h5><span id="stageFourDiscoverySummary"><span data-i18n-text="0 offen">0 offen</span></span></div><div id="stageFourDiscoveryList" class="stage-four-list"></div></section>
+      <section><div class="stage-four-section-title"><h5><span data-i18n-text="Länder &amp; Datenqualität">Länder &amp; Datenqualität</span></h5><span><span data-i18n-text="DE → AT → CH">DE → AT → CH</span></span></div><div id="stageFourCountriesList" class="stage-four-country-grid"></div></section>
+      <section><div class="stage-four-section-title"><h5><span data-i18n-text="Geocoding &amp; Limits">Geocoding &amp; Limits</span></h5><span><span data-i18n-text="Cache + Rate Limits">Cache + Rate Limits</span></span></div><div id="stageFourGeocodingList" class="stage-four-list"></div></section>
     </div>
     <section class="stage-four-observation-workspace" aria-labelledby="stageFourObservationTitle">
-      <div class="stage-four-section-title"><div><h5 id="stageFourObservationTitle">Deutsche Beobachtungsphase</h5><p>Echte Quellen, Shadow-Entscheidungen und manuelle Kalibrierung. Keine öffentliche Mutation.</p></div><div class="stage-four-actions"><button type="button" data-stage-four-action="enqueue-observations">Fällige Piloten einplanen</button><button type="button" data-stage-four-action="refresh-phase-a">Evaluation aktualisieren</button></div></div>
+      <div class="stage-four-section-title"><div><h5 id="stageFourObservationTitle"><span data-i18n-text="Deutsche Beobachtungsphase">Deutsche Beobachtungsphase</span></h5><p><span data-i18n-text="Echte Quellen, Shadow-Entscheidungen und manuelle Kalibrierung. Keine öffentliche Mutation.">Echte Quellen, Shadow-Entscheidungen und manuelle Kalibrierung. Keine öffentliche Mutation.</span></p></div><div class="stage-four-actions"><button type="button" data-stage-four-action="enqueue-observations"><span data-i18n-text="Fällige Piloten einplanen">Fällige Piloten einplanen</span></button><button type="button" data-stage-four-action="refresh-phase-a"><span data-i18n-text="Evaluation aktualisieren">Evaluation aktualisieren</span></button></div></div>
       <div class="stage-four-kpis stage-four-observation-kpis">
-        <div><span>Pilotprofile</span><strong id="stageFourPilotCount">0</strong></div>
-        <div><span>Beobachtungen</span><strong id="stageFourObservationCount">0</strong></div>
-        <div><span>Review-Rückstand</span><strong id="stageFourObservationBacklog">0</strong></div>
-        <div><span>Precision</span><strong id="stageFourObservationPrecision">–</strong></div>
-        <div><span>Review-Fallzahl</span><strong id="stageFourObservationSample">0</strong></div>
-        <div><span>Phase-B-Readiness</span><strong id="stageFourReadinessState">NICHT BEREIT</strong></div>
+        <div><span><span data-i18n-text="Pilotprofile">Pilotprofile</span></span><strong id="stageFourPilotCount">0</strong></div>
+        <div><span><span data-i18n-text="Beobachtungen">Beobachtungen</span></span><strong id="stageFourObservationCount">0</strong></div>
+        <div><span><span data-i18n-text="Review-Rückstand">Review-Rückstand</span></span><strong id="stageFourObservationBacklog">0</strong></div>
+        <div><span><span data-i18n-text="Precision">Precision</span></span><strong id="stageFourObservationPrecision">–</strong></div>
+        <div><span><span data-i18n-text="Review-Fallzahl">Review-Fallzahl</span></span><strong id="stageFourObservationSample">0</strong></div>
+        <div><span><span data-i18n-text="Phase-B-Readiness">Phase-B-Readiness</span></span><strong id="stageFourReadinessState"><span data-i18n-text="NICHT BEREIT">NICHT BEREIT</span></strong></div>
       </div>
       <div class="stage-four-grid stage-four-observation-grid">
-        <section><div class="stage-four-section-title"><h5>Pilotübersicht &amp; Quellen</h5><span id="stageFourPilotSummary">0 aktiv</span></div><div id="stageFourPilotSourcesList" class="stage-four-list"><p class="admin-quality-empty">Pilotprofile werden geladen.</p></div></section>
-        <section><div class="stage-four-section-title"><h5>Beobachtungen &amp; Review</h5><span>Training/Kalibrierung</span></div><div id="stageFourObservationsList" class="stage-four-list"><p class="admin-quality-empty">Beobachtungen werden geladen.</p></div></section>
-        <section><div class="stage-four-section-title"><h5>Evaluation &amp; Readiness</h5><span>nur theoretisch</span></div><div id="stageFourEvaluationList" class="stage-four-list"><p class="admin-quality-empty">Evaluation wird geladen.</p></div></section>
-        <section><div class="stage-four-section-title"><h5>Policy Shadow-Modus</h5><span>was würde passieren?</span></div><div id="stageFourShadowDecisionsList" class="stage-four-list"><p class="admin-quality-empty">Shadow-Entscheidungen werden geladen.</p></div></section>
-        <section><div class="stage-four-section-title"><h5>Golden Dataset</h5><span id="stageFourGoldenSummary">0 Fälle</span></div><div id="stageFourGoldenCasesList" class="stage-four-list"><p class="admin-quality-empty">Golden Dataset wird geladen.</p></div></section>
-        <section><div class="stage-four-section-title"><h5>Läufe &amp; Monitoring</h5><span>abbruch- und fortsetzbar</span></div><div id="stageFourObservationRunsList" class="stage-four-list"><p class="admin-quality-empty">Läufe werden geladen.</p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Pilotübersicht &amp; Quellen">Pilotübersicht &amp; Quellen</span></h5><span id="stageFourPilotSummary"><span data-i18n-text="0 aktiv">0 aktiv</span></span></div><div id="stageFourPilotSourcesList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Pilotprofile werden geladen.">Pilotprofile werden geladen.</span></p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Beobachtungen &amp; Review">Beobachtungen &amp; Review</span></h5><span><span data-i18n-text="Training/Kalibrierung">Training/Kalibrierung</span></span></div><div id="stageFourObservationsList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Beobachtungen werden geladen.">Beobachtungen werden geladen.</span></p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Evaluation &amp; Readiness">Evaluation &amp; Readiness</span></h5><span><span data-i18n-text="nur theoretisch">nur theoretisch</span></span></div><div id="stageFourEvaluationList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Evaluation wird geladen.">Evaluation wird geladen.</span></p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Policy Shadow-Modus">Policy Shadow-Modus</span></h5><span><span data-i18n-text="was würde passieren?">was würde passieren?</span></span></div><div id="stageFourShadowDecisionsList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Shadow-Entscheidungen werden geladen.">Shadow-Entscheidungen werden geladen.</span></p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Golden Dataset">Golden Dataset</span></h5><span id="stageFourGoldenSummary"><span data-i18n-text="0 Fälle">0 Fälle</span></span></div><div id="stageFourGoldenCasesList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Golden Dataset wird geladen.">Golden Dataset wird geladen.</span></p></div></section>
+        <section><div class="stage-four-section-title"><h5><span data-i18n-text="Läufe &amp; Monitoring">Läufe &amp; Monitoring</span></h5><span><span data-i18n-text="abbruch- und fortsetzbar">abbruch- und fortsetzbar</span></span></div><div id="stageFourObservationRunsList" class="stage-four-list"><p class="admin-quality-empty"><span data-i18n-text="Läufe werden geladen.">Läufe werden geladen.</span></p></div></section>
       </div>
     </section>
     <section class="stage-four-bulk">
-      <div class="stage-four-section-title"><div><h5>Sichere Sammelaktion</h5><p>Erst Vorschau, dann explizite Bestätigung; Phase A simuliert ausschließlich.</p></div><span>max. 100</span></div>
+      <div class="stage-four-section-title"><div><h5><span data-i18n-text="Sichere Sammelaktion">Sichere Sammelaktion</span></h5><p><span data-i18n-text="Erst Vorschau, dann explizite Bestätigung; Phase A simuliert ausschließlich.">Erst Vorschau, dann explizite Bestätigung; Phase A simuliert ausschließlich.</span></p></div><span><span data-i18n-text="max. 100">max. 100</span></span></div>
       <div class="stage-four-bulk-form">
-        <label>Aktion<select id="stageFourBulkAction"><option value="">Bitte wählen</option><option value="confirm_unchanged_sources">Unveränderte Quellen bestätigen</option><option value="accept_safe_registration_changes">Sichere Registrierungsänderungen</option><option value="complete_past_editions">Vergangene Austragungen schließen</option><option value="retry_selected_sources">Quellen erneut prüfen</option><option value="reject_discovery_candidates">Kandidaten ablehnen</option><option value="assign_candidates_to_event">Kandidaten zuordnen</option><option value="reschedule_next_check">Nächste Prüfung verschieben</option></select></label>
-        <label>Datensatztyp<select id="stageFourBulkItemType"><option value="source">Quelle</option><option value="proposal">Vorschlag</option><option value="edition">Austragung</option><option value="discovery_candidate">Eventkandidat</option><option value="event">Event</option></select></label>
-        <label class="stage-four-bulk-ids">IDs, eine pro Zeile<textarea id="stageFourBulkIds" rows="3" placeholder="UUID oder Event-ID"></textarea></label>
-        <button type="button" data-stage-four-action="preview-bulk">Auswirkungen anzeigen</button>
+        <label><span data-i18n-text="Aktion">Aktion</span><select id="stageFourBulkAction"><option value="" data-i18n-text="Bitte wählen">Bitte wählen</option><option value="confirm_unchanged_sources" data-i18n-text="Unveränderte Quellen bestätigen">Unveränderte Quellen bestätigen</option><option value="accept_safe_registration_changes" data-i18n-text="Sichere Registrierungsänderungen">Sichere Registrierungsänderungen</option><option value="complete_past_editions" data-i18n-text="Vergangene Austragungen schließen">Vergangene Austragungen schließen</option><option value="retry_selected_sources" data-i18n-text="Quellen erneut prüfen">Quellen erneut prüfen</option><option value="reject_discovery_candidates" data-i18n-text="Kandidaten ablehnen">Kandidaten ablehnen</option><option value="assign_candidates_to_event" data-i18n-text="Kandidaten zuordnen">Kandidaten zuordnen</option><option value="reschedule_next_check" data-i18n-text="Nächste Prüfung verschieben">Nächste Prüfung verschieben</option></select></label>
+        <label><span data-i18n-text="Datensatztyp">Datensatztyp</span><select id="stageFourBulkItemType"><option value="source" data-i18n-text="Quelle">Quelle</option><option value="proposal" data-i18n-text="Vorschlag">Vorschlag</option><option value="edition" data-i18n-text="Austragung">Austragung</option><option value="discovery_candidate" data-i18n-text="Eventkandidat">Eventkandidat</option><option value="event" data-i18n-text="Event">Event</option></select></label>
+        <label class="stage-four-bulk-ids"><span data-i18n-text="IDs, eine pro Zeile">IDs, eine pro Zeile</span><textarea id="stageFourBulkIds" rows="3" placeholder="UUID oder Event-ID"></textarea></label>
+        <button type="button" data-stage-four-action="preview-bulk"><span data-i18n-text="Auswirkungen anzeigen">Auswirkungen anzeigen</span></button>
       </div>
       <div id="stageFourBulkPreview" class="stage-four-bulk-preview" hidden></div>
     </section>`;
@@ -5090,7 +5108,7 @@ async function loadAdminTab(tabName, options = {}) {
     if (!panel || panel.dataset.maintenanceMounted === "true") return;
     try {
       if (!await isCurrentUserAdmin()) throw new Error("Für die Eventpflege ist eine Adminanmeldung erforderlich.");
-      await import("./manual-event-maintenance.js?v=20261001-faq-readback-v141");
+      await import("./manual-event-maintenance.js?v=20261006-bilingual-v142");
       window.SemManualEventMaintenance.mount({
         root: panel,
         client: supabaseClient,
@@ -5161,7 +5179,7 @@ async function loadAdminTab(tabName, options = {}) {
 function setDataOpsStatus(message, type = "") {
   if (!dataOpsElements.status) return;
   dataOpsElements.status.className = `admin-section-status ${type}`.trim();
-  dataOpsElements.status.textContent = message;
+  bindAccountUiText(dataOpsElements.status, message);
 }
 function dataOpsText(key, fallback = "", values = null) {
   if (values && typeof window.tFormat === "function") {
@@ -5188,7 +5206,7 @@ function setDataOpsKpi(name, value) {
 function populateDataOpsSelect(element, values) {
   if (!element) return;
   const selected = element.value;
-  const first = element.options[0]?.outerHTML || '<option value="">All</option>';
+  const first = element.options[0]?.outerHTML || '<option value="" data-i18n-text="All">All</option>';
   element.innerHTML = first + [...new Set(values.filter(Boolean))]
     .sort((left, right) => left.localeCompare(right))
     .map(value => `<option value="${escapeAdminHTML(value)}">${escapeAdminHTML(value)}</option>`)
@@ -5263,7 +5281,7 @@ function renderDataOpsEvents(rows) {
   dataOpsElements.eventResultCount.textContent = `${rows.length} / ${dataOpsEvents.length}`;
 
   if (!rows.length) {
-    dataOpsElements.eventsList.innerHTML = '<p class="admin-quality-empty">Keine Events für diese Filter.</p>';
+    dataOpsElements.eventsList.innerHTML = '<p class="admin-quality-empty"><span data-i18n-text="Keine Events für diese Filter.">Keine Events für diese Filter.</span></p>';
     return;
   }
 
@@ -5299,12 +5317,12 @@ function renderDataOpsEvents(rows) {
               <strong>${formatDataOpsDate(edition.start_date)}</strong>
               ${edition.id === currentEdition?.id ? '<em>aktuell</em>' : ''}
             </div>
-          `).join("") || '<p>Keine Austragung vorhanden.</p>'}
+          `).join("") || '<p><span data-i18n-text="Keine Austragung vorhanden.">Keine Austragung vorhanden.</span></p>'}
         </div>
         <div class="admin-data-operations-card-actions">
           ${officialUrl ? `<a href="${officialUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEvent", "Open event")}</a>` : ''}
           ${editionUrl ? `<a href="${editionUrl}" target="_blank" rel="noopener noreferrer">${dataOpsText("admin.dataOps.openEdition", "Open edition")}</a>` : ''}
-          ${freshnessReview ? `<button type="button" data-dataops-action="open-freshness" data-item-id="${escapeAdminHTML(freshnessReview.item_id)}" data-item-type="freshness_review">In Review Inbox pruefen</button>` : ""}
+          ${freshnessReview ? `<button type="button" data-dataops-action="open-freshness" data-item-id="${escapeAdminHTML(freshnessReview.item_id)}" data-item-type="freshness_review"><span data-i18n-text="In Review Inbox pruefen">In Review Inbox pruefen</span></button>` : ""}
           ${currentEdition ? `<button type="button" data-dataops-action="review-edition" data-edition-id="${currentEdition.id}">${dataOpsText("admin.dataOps.markReview", "Needs review")}</button>` : ""}
           <button type="button" data-dataops-action="history" data-entity-type="event" data-entity-id="${event.id}" data-entity-label="${escapeAdminHTML(event.canonical_name || event.event_name)}">${dataOpsText("admin.dataOps.history", "History")}</button>
         </div>
@@ -5321,7 +5339,7 @@ function renderDataOpsIssues() {
   );
   dataOpsElements.issueResultCount.textContent = `${issues.length} offen`;
   if (!issues.length) {
-    dataOpsElements.issuesList.innerHTML = '<p class="admin-quality-empty">Keine offenen Validierungsprobleme.</p>';
+    dataOpsElements.issuesList.innerHTML = '<p class="admin-quality-empty"><span data-i18n-text="Keine offenen Validierungsprobleme.">Keine offenen Validierungsprobleme.</span></p>';
     return;
   }
   const eventById = new Map(dataOpsEvents.map(event => [String(event.id), event]));
@@ -5349,11 +5367,11 @@ function renderLegacyDataOpsProposals() {
       <p>${escapeAdminHTML(proposal.reason || "Automatisch erkannte Änderung")}</p>
       <pre>${escapeAdminHTML(JSON.stringify(hasApplicableChanges ? changes : proposal.observed_values || {}, null, 2))}</pre>
       <div class="admin-data-operations-proposal-actions">
-        <button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}" ${hasApplicableChanges ? "" : "disabled"}>Prüfen &amp; übernehmen</button>
+        <button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}" ${hasApplicableChanges ? "" : "disabled"}><span data-i18n-text="Prüfen &amp; übernehmen">Prüfen &amp; übernehmen</span></button>
         <button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">${hasApplicableChanges ? "Ablehnen" : "Als geprüft schließen"}</button>
       </div>
     </article>`;
-  }).join("") || '<p class="admin-quality-empty">Keine offenen Änderungsvorschläge.</p>';
+  }).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Keine offenen Änderungsvorschläge.">Keine offenen Änderungsvorschläge.</span></p>';
 }
 
 function renderDataOpsProposals() {
@@ -5402,17 +5420,17 @@ function renderDataOpsProposals() {
     const warnings = proposal.validation_warnings || [];
     return `<article class="admin-data-operations-proposal proposal-review-card is-${escapeAdminHTML(proposal.priority || "medium")}">
       <div class="proposal-review-heading"><div><span class="admin-data-operations-status is-${escapeAdminHTML(proposal.priority || "medium")}">${escapeAdminHTML(proposal.change_type || proposal.rule_code)}</span><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</strong><small>${escapeAdminHTML(edition?.edition_year || "Event")} · ${escapeAdminHTML(proposal.field_name || "—")}</small></div><b>${(Number(proposal.confidence || 0) * 100).toFixed(1)}%</b></div>
-      <div class="proposal-review-diff"><div><span>Alt</span><del>${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</del></div><div><span>Vorschlag</span><strong>${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value))}</strong></div></div>
-      <dl class="proposal-review-meta"><div><dt>Methode</dt><dd>${escapeAdminHTML(proposal.extraction_method || "—")}</dd></div><div><dt>Quelle</dt><dd>${escapeAdminHTML(source?.source_type || "—")} · ${escapeAdminHTML(source?.source_host || "—")}</dd></div><div><dt>Erkannt</dt><dd>${formatDataOpsDate(proposal.detected_at, true)}</dd></div><div><dt>Status</dt><dd>${escapeAdminHTML(proposal.proposal_status)}</dd></div></dl>
-      ${proposal.source_context ? `<details class="proposal-review-evidence"><summary>Evidenz anzeigen</summary><p>${escapeAdminHTML(proposal.source_context)}</p></details>` : ""}
-      ${warnings.length ? `<div class="proposal-review-warnings"><strong>Validierungswarnungen</strong>${warnings.map(item => `<span>${escapeAdminHTML(item)}</span>`).join("")}</div>` : ""}
+      <div class="proposal-review-diff"><div><span><span data-i18n-text="Alt">Alt</span></span><del>${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</del></div><div><span><span data-i18n-text="Vorschlag">Vorschlag</span></span><strong>${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value))}</strong></div></div>
+      <dl class="proposal-review-meta"><div><dt><span data-i18n-text="Methode">Methode</span></dt><dd>${escapeAdminHTML(proposal.extraction_method || "—")}</dd></div><div><dt><span data-i18n-text="Quelle">Quelle</span></dt><dd>${escapeAdminHTML(source?.source_type || "—")} · ${escapeAdminHTML(source?.source_host || "—")}</dd></div><div><dt><span data-i18n-text="Erkannt">Erkannt</span></dt><dd>${formatDataOpsDate(proposal.detected_at, true)}</dd></div><div><dt><span data-i18n-text="Status">Status</span></dt><dd>${escapeAdminHTML(proposal.proposal_status)}</dd></div></dl>
+      ${proposal.source_context ? `<details class="proposal-review-evidence"><summary><span data-i18n-text="Evidenz anzeigen">Evidenz anzeigen</span></summary><p>${escapeAdminHTML(proposal.source_context)}</p></details>` : ""}
+      ${warnings.length ? `<div class="proposal-review-warnings"><strong><span data-i18n-text="Validierungswarnungen">Validierungswarnungen</span></strong>${warnings.map(item => `<span>${escapeAdminHTML(item)}</span>`).join("")}</div>` : ""}
       <div class="admin-data-operations-proposal-actions source-monitor-actions">
-        ${isPending ? `<button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}">Übernehmen</button><button type="button" data-dataops-action="edit-proposal" data-proposal-id="${proposal.id}">Bearbeiten &amp; übernehmen</button><button type="button" data-dataops-action="supersede-proposal" data-proposal-id="${proposal.id}">Bereits umgesetzt</button><button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}">Ablehnen</button><button type="button" data-dataops-action="defer-proposal" data-proposal-id="${proposal.id}">Später prüfen</button><button type="button" data-dataops-action="lock-proposal-field" data-proposal-id="${proposal.id}">Feld sperren</button><button type="button" data-dataops-action="approve-similar" data-proposal-id="${proposal.id}">Ähnliche übernehmen</button>` : ""}
-        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a>` : ""}
-        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event öffnen</a>` : ""}
+        ${isPending ? `<button type="button" data-dataops-action="approve-proposal" data-proposal-id="${proposal.id}"><span data-i18n-text="Übernehmen">Übernehmen</span></button><button type="button" data-dataops-action="edit-proposal" data-proposal-id="${proposal.id}"><span data-i18n-text="Bearbeiten &amp; übernehmen">Bearbeiten &amp; übernehmen</span></button><button type="button" data-dataops-action="supersede-proposal" data-proposal-id="${proposal.id}"><span data-i18n-text="Bereits umgesetzt">Bereits umgesetzt</span></button><button type="button" data-dataops-action="reject-proposal" data-proposal-id="${proposal.id}"><span data-i18n-text="Ablehnen">Ablehnen</span></button><button type="button" data-dataops-action="defer-proposal" data-proposal-id="${proposal.id}"><span data-i18n-text="Später prüfen">Später prüfen</span></button><button type="button" data-dataops-action="lock-proposal-field" data-proposal-id="${proposal.id}"><span data-i18n-text="Feld sperren">Feld sperren</span></button><button type="button" data-dataops-action="approve-similar" data-proposal-id="${proposal.id}"><span data-i18n-text="Ähnliche übernehmen">Ähnliche übernehmen</span></button>` : ""}
+        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Quelle öffnen">Quelle öffnen</span></a>` : ""}
+        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Event öffnen">Event öffnen</span></a>` : ""}
       </div>
     </article>`;
-  }).join("") || '<p class="admin-quality-empty">Keine Änderungsvorschläge für diese Filter.</p>';
+  }).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Keine Änderungsvorschläge für diese Filter.">Keine Änderungsvorschläge für diese Filter.</span></p>';
 }
 
 function renderDataOpsAlerts() {
@@ -5424,8 +5442,8 @@ function renderDataOpsAlerts() {
       <strong>${escapeAdminHTML(alert.title)}</strong>
       <p>${escapeAdminHTML(alert.description)}</p>
       <p>${formatDataOpsDate(alert.last_detected_at, true)} · ${Number(alert.occurrence_count || 1)}× erkannt</p>
-      <button type="button" data-dataops-action="resolve-alert" data-alert-id="${alert.id}">Alarm schließen</button>
-    </article>`).join("") || '<p class="admin-quality-empty">Keine offenen Workflow-Alarme.</p>';
+      <button type="button" data-dataops-action="resolve-alert" data-alert-id="${alert.id}"><span data-i18n-text="Alarm schließen">Alarm schließen</span></button>
+    </article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Keine offenen Workflow-Alarme.">Keine offenen Workflow-Alarme.</span></p>';
 }
 
 function renderCatalogQualityReport() {
@@ -5732,7 +5750,7 @@ function renderDataOperations() {
 function setSourceMonitorStatus(message, type = "") {
   if (!sourceMonitorElements.status) return;
   sourceMonitorElements.status.className = `admin-section-status ${type}`.trim();
-  sourceMonitorElements.status.textContent = message;
+  bindAccountUiText(sourceMonitorElements.status, message);
 }
 
 function setSourceMonitorKpi(name, value) {
@@ -5742,7 +5760,7 @@ function setSourceMonitorKpi(name, value) {
 function setEditionLifecycleStatus(message, type = "") {
   if (!editionLifecycleElements.status) return;
   editionLifecycleElements.status.className = `admin-section-status ${type}`.trim();
-  editionLifecycleElements.status.textContent = message;
+  bindAccountUiText(editionLifecycleElements.status, message);
 }
 
 function normalizeDataOpsEventId(value) {
@@ -5893,7 +5911,7 @@ function renderReviewInboxDiff(row) {
   const keys = [...new Set([...Object.keys(oldValues), ...Object.keys(newValues)])]
     .filter(key => JSON.stringify(oldValues[key]) !== JSON.stringify(newValues[key]));
   if (!keys.length) return "";
-  return `<div class="admin-review-diff" aria-label="Erkannte Aenderungen">${keys.map(key => `
+  return `<div class="admin-review-diff" aria-label="Erkannte Aenderungen" data-i18n-aria-label-text="Erkannte Aenderungen">${keys.map(key => `
     <div><span>${escapeAdminHTML(key.replaceAll("_", " "))}</span><del>${escapeAdminHTML(formatReviewInboxValue(oldValues[key]))}</del><strong>${escapeAdminHTML(formatReviewInboxValue(newValues[key]))}</strong></div>
   `).join("")}</div>`;
 }
@@ -5904,12 +5922,12 @@ function renderContentVerificationEvidence(row) {
   if (row.item_type === "freshness_review") {
     const selectedSource = getEligibleFreshnessReviewSource(row);
     const storedValues = getFreshnessVerificationStoredValues(row);
-    return `<div class="admin-review-evidence" aria-label="Freshness-Evidenz">
-      <span><strong>Letzter Quellenabruf</strong>${escapeAdminHTML(formatDataOpsDate(selectedSource?.last_fetched_at, true))}</span>
-      <span><strong>Ausgewaehlte Quelle stabil</strong>${selectedSource ? "Ja" : "Nein"}</span>
-      <span><strong>Zuletzt verifiziert</strong>${escapeAdminHTML(formatDataOpsDate(metadata.last_verified_at, true))}</span>
-      <span><strong>Pruefung faellig</strong>${escapeAdminHTML(formatDataOpsDate(metadata.next_check_at, true))}</span>
-      <span class="is-wide"><strong>Zu bestaetigen</strong>${escapeAdminHTML(Object.keys(storedValues).join(", ") || "Keine Feldwerte verfuegbar")}</span>
+    return `<div class="admin-review-evidence" aria-label="Freshness-Evidenz" data-i18n-aria-label-text="Freshness-Evidenz">
+      <span><strong><span data-i18n-text="Letzter Quellenabruf">Letzter Quellenabruf</span></strong>${escapeAdminHTML(formatDataOpsDate(selectedSource?.last_fetched_at, true))}</span>
+      <span><strong><span data-i18n-text="Ausgewaehlte Quelle stabil">Ausgewaehlte Quelle stabil</span></strong>${selectedSource ? "Ja" : "Nein"}</span>
+      <span><strong><span data-i18n-text="Zuletzt verifiziert">Zuletzt verifiziert</span></strong>${escapeAdminHTML(formatDataOpsDate(metadata.last_verified_at, true))}</span>
+      <span><strong><span data-i18n-text="Pruefung faellig">Pruefung faellig</span></strong>${escapeAdminHTML(formatDataOpsDate(metadata.next_check_at, true))}</span>
+      <span class="is-wide"><strong><span data-i18n-text="Zu bestaetigen">Zu bestaetigen</span></strong>${escapeAdminHTML(Object.keys(storedValues).join(", ") || "Keine Feldwerte verfuegbar")}</span>
     </div>`;
   }
   const confidenceLabels = { high: "deutlich", medium: "mittel", low: "gering" };
@@ -5922,12 +5940,12 @@ function renderContentVerificationEvidence(row) {
     ? reasons.map(reason => reasonLabels[reason] || String(reason).replaceAll("_", " ")).join("; ")
     : "Aenderungsgrund nicht klassifiziert";
   const changeConfidence = confidenceLabels[metadata.change_confidence] || metadata.change_confidence || "unbekannt";
-  return `<div class="admin-review-evidence" aria-label="Quellen-Evidenz">
-    <span><strong>Abruf</strong>${escapeAdminHTML(formatDataOpsDate(metadata.fetched_at, true))}</span>
-    <span><strong>HTTP</strong>${escapeAdminHTML(metadata.http_status || "—")}</span>
-    <span><strong>Aenderung</strong>${escapeAdminHTML(changeConfidence)}</span>
-    <span class="is-wide"><strong>Signal</strong>${escapeAdminHTML(reasonText)}</span>
-    <span class="is-wide"><strong>Zu bestätigen</strong>${escapeAdminHTML(Object.keys(metadata.stored_values || {}).join(", ") || "Keine Feldwerte verfügbar")}</span>
+  return `<div class="admin-review-evidence" aria-label="Quellen-Evidenz" data-i18n-aria-label-text="Quellen-Evidenz">
+    <span><strong><span data-i18n-text="Abruf">Abruf</span></strong>${escapeAdminHTML(formatDataOpsDate(metadata.fetched_at, true))}</span>
+    <span><strong><span data-i18n-text="HTTP">HTTP</span></strong>${escapeAdminHTML(metadata.http_status || "—")}</span>
+    <span><strong><span data-i18n-text="Aenderung">Aenderung</span></strong>${escapeAdminHTML(changeConfidence)}</span>
+    <span class="is-wide"><strong><span data-i18n-text="Signal">Signal</span></strong>${escapeAdminHTML(reasonText)}</span>
+    <span class="is-wide"><strong><span data-i18n-text="Zu bestätigen">Zu bestätigen</span></strong>${escapeAdminHTML(Object.keys(metadata.stored_values || {}).join(", ") || "Keine Feldwerte verfügbar")}</span>
   </div>`;
 }
 
@@ -5938,7 +5956,7 @@ function renderReviewPriorityContext(row) {
   const affectedFields = Array.isArray(metadata.affected_fields) ? metadata.affected_fields : [];
   const recommendation = metadata.recommended_action;
   if (!tier && !affectedFields.length && !recommendation) return "";
-  return `<div class="admin-review-priority-context" aria-label="Review-Priorisierung">
+  return `<div class="admin-review-priority-context" aria-label="Review-Priorisierung" data-i18n-aria-label-text="Review-Priorisierung">
     ${tier ? `<span><strong>${escapeAdminHTML(tier)}</strong>${Number.isFinite(score) ? ` · Score ${score}` : ""}</span>` : ""}
     ${affectedFields.length ? `<span>Felder: ${escapeAdminHTML(affectedFields.join(", "))}</span>` : ""}
     ${recommendation ? `<span class="is-wide">${escapeAdminHTML(recommendation)}</span>` : ""}
@@ -6050,16 +6068,16 @@ function openProposalCloseDialog(proposal, action) {
     <form class="content-verification-form" novalidate>
       <h2 id="proposalCloseTitle">${title}</h2>
       <p class="content-verification-event">${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</p>
-      <p><strong>Feld:</strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
-      <p><strong>Vorschlag:</strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value ?? proposal.proposed_changes))}</p>
+      <p><strong><span data-i18n-text="Feld:">Feld:</span></strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
+      <p><strong><span data-i18n-text="Vorschlag:">Vorschlag:</span></strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.normalized_value ?? proposal.proposed_value ?? proposal.proposed_changes))}</p>
       <p id="proposalCloseHelp">${alreadyApplied
         ? "Beschreibe, wo und wie der geprüfte Wert bereits umgesetzt wurde. Diese Aktion schließt nur diesen Vorschlag; die Eventdaten werden dabei nicht erneut geändert."
         : "Begründe, warum dieser Quellenvorschlag nicht übernommen wird. Die Begründung wird für spätere gleiche Vorschläge gespeichert."}</p>
-      <label for="proposalCloseNotes">Begründung (mindestens 12 Zeichen)</label>
+      <label for="proposalCloseNotes"><span data-i18n-text="Begründung (mindestens 12 Zeichen)">Begründung (mindestens 12 Zeichen)</span></label>
       <textarea id="proposalCloseNotes" name="notes" rows="4" minlength="12" required></textarea>
       <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
       <div class="content-verification-actions">
-        <button type="button" data-proposal-close-cancel>Abbrechen</button>
+        <button type="button" data-proposal-close-cancel><span data-i18n-text="Abbrechen">Abbrechen</span></button>
         <button type="submit">${alreadyApplied ? "Als bereits umgesetzt schließen" : "Mit Begründung ablehnen"}</button>
       </div>
     </form>`;
@@ -6086,13 +6104,14 @@ function openProposalCloseDialog(proposal, action) {
         const current = dataOpsProposals.find(row => String(row.id) === String(proposal.id));
         finish(buildProposalCloseRequest(current, action, form.elements.notes.value));
       } catch (error) {
-        errorMessage.textContent = error.message;
+        bindAccountUiText(errorMessage, error.message);
         errorMessage.hidden = false;
         errorMessage.focus();
       }
     });
     document.body.append(dialog);
     try {
+      window.observeAdminUiTranslations?.(dialog);
       dialog.showModal();
       dialog.querySelector("[data-proposal-close-cancel]").focus();
     } catch (error) {
@@ -6125,22 +6144,22 @@ function openProposalEditDialog(proposal) {
   dialog.setAttribute("aria-describedby", "proposalEditHelp");
   dialog.innerHTML = `
     <form class="content-verification-form" novalidate>
-      <h2 id="proposalEditTitle">Quellenvorschlag bearbeiten und übernehmen</h2>
+      <h2 id="proposalEditTitle"><span data-i18n-text="Quellenvorschlag bearbeiten und übernehmen">Quellenvorschlag bearbeiten und übernehmen</span></h2>
       <p class="content-verification-event">${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${proposal.event_id}`)}</p>
-      <p><strong>Feld:</strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
-      <p><strong>Bisheriger Wert:</strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</p>
-      <p><strong>Quelle:</strong> ${sourceUrl !== "#" ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">${escapeAdminHTML(sourceValue)}</a>` : "Keine sichere Quellen-URL hinterlegt"}</p>
-      <p id="proposalEditHelp">Vergleiche den bearbeiteten Wert mit der Quelle und begründe die Korrektur. Mit dem Absenden wird genau dieser Vorschlag geprüft und übernommen.</p>
-      <label for="proposalEditFormat">Wertformat</label>
-      <select id="proposalEditFormat" name="valueFormat"><option value="text">Text</option><option value="json">JSON</option></select>
-      <label for="proposalEditValue">Zu übernehmender Wert</label>
+      <p><strong><span data-i18n-text="Feld:">Feld:</span></strong> ${escapeAdminHTML(proposal.field_name || proposal.rule_code || "Datensatz")}</p>
+      <p><strong><span data-i18n-text="Bisheriger Wert:">Bisheriger Wert:</span></strong> ${escapeAdminHTML(formatReviewInboxValue(proposal.old_value))}</p>
+      <p><strong><span data-i18n-text="Quelle:">Quelle:</span></strong> ${sourceUrl !== "#" ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">${escapeAdminHTML(sourceValue)}</a>` : "Keine sichere Quellen-URL hinterlegt"}</p>
+      <p id="proposalEditHelp"><span data-i18n-text="Vergleiche den bearbeiteten Wert mit der Quelle und begründe die Korrektur. Mit dem Absenden wird genau dieser Vorschlag geprüft und übernommen.">Vergleiche den bearbeiteten Wert mit der Quelle und begründe die Korrektur. Mit dem Absenden wird genau dieser Vorschlag geprüft und übernommen.</span></p>
+      <label for="proposalEditFormat"><span data-i18n-text="Wertformat">Wertformat</span></label>
+      <select id="proposalEditFormat" name="valueFormat"><option value="text" data-i18n-text="Text">Text</option><option value="json" data-i18n-text="JSON">JSON</option></select>
+      <label for="proposalEditValue"><span data-i18n-text="Zu übernehmender Wert">Zu übernehmender Wert</span></label>
       <textarea id="proposalEditValue" name="editedValue" rows="6" required></textarea>
-      <label for="proposalEditNotes">Begründung (mindestens 12 Zeichen)</label>
+      <label for="proposalEditNotes"><span data-i18n-text="Begründung (mindestens 12 Zeichen)">Begründung (mindestens 12 Zeichen)</span></label>
       <textarea id="proposalEditNotes" name="notes" rows="3" minlength="12" required></textarea>
       <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
       <div class="content-verification-actions">
-        <button type="button" data-proposal-edit-cancel>Abbrechen</button>
-        <button type="submit">Bearbeiteten Wert übernehmen</button>
+        <button type="button" data-proposal-edit-cancel><span data-i18n-text="Abbrechen">Abbrechen</span></button>
+        <button type="submit"><span data-i18n-text="Bearbeiteten Wert übernehmen">Bearbeiteten Wert übernehmen</span></button>
       </div>
     </form>`;
   const form = dialog.querySelector("form");
@@ -6173,13 +6192,14 @@ function openProposalEditDialog(proposal) {
         }
         finish(request);
       } catch (error) {
-        errorMessage.textContent = error.message;
+        bindAccountUiText(errorMessage, error.message);
         errorMessage.hidden = false;
         errorMessage.focus();
       }
     });
     document.body.append(dialog);
     try {
+      window.observeAdminUiTranslations?.(dialog);
       dialog.showModal();
       dialog.querySelector("[data-proposal-edit-cancel]").focus();
     } catch (error) {
@@ -6240,20 +6260,20 @@ function openContentVerificationDialog(context, validateCurrentReview) {
   dialog.setAttribute("aria-describedby", "contentVerificationHelp");
   dialog.innerHTML = `
     <form class="content-verification-form" novalidate>
-      <h2 id="contentVerificationTitle">Feldprüfung bestätigen</h2>
+      <h2 id="contentVerificationTitle"><span data-i18n-text="Feldprüfung bestätigen">Feldprüfung bestätigen</span></h2>
       <p class="content-verification-event">${escapeAdminHTML(context.eventName)}</p>
-      <p><strong>Offizielle Quelle:</strong>
+      <p><strong><span data-i18n-text="Offizielle Quelle:">Offizielle Quelle:</span></strong>
         <a href="${escapeAdminHTML(safeAdminUrl(context.sourceUrl))}" target="_blank" rel="noopener noreferrer">${escapeAdminHTML(context.sourceUrl)}</a>
       </p>
       <p id="contentVerificationHelp">Vergleiche alle ${context.requiredFields.length} Felder mit der aktuellen offiziellen Ausgabe. Die JSON-Vorlage zeigt den gespeicherten Stand. Trage extern beobachtete Abweichungen exakt ein; sie bleiben im Review.</p>
-      <label for="contentVerificationObserved">Extern beobachtete Werte (JSON)</label>
+      <label for="contentVerificationObserved"><span data-i18n-text="Extern beobachtete Werte (JSON)">Extern beobachtete Werte (JSON)</span></label>
       <textarea id="contentVerificationObserved" name="observed" rows="12" spellcheck="false" required aria-describedby="contentVerificationHelp"></textarea>
-      <label for="contentVerificationUncertain">Unsichere Felder (kommagetrennt)</label>
+      <label for="contentVerificationUncertain"><span data-i18n-text="Unsichere Felder (kommagetrennt)">Unsichere Felder (kommagetrennt)</span></label>
       <input id="contentVerificationUncertain" name="uncertain" type="text" autocomplete="off" aria-describedby="contentVerificationUncertainHelp">
-      <p id="contentVerificationUncertainHelp">Nur leer lassen, wenn jedes Feld eindeutig belegt ist. Mit Unsicherheiten bleibt die Prüfung offen.</p>
-      <label for="contentVerificationConfidence">Confidence (0,80 bis 1,00)</label>
+      <p id="contentVerificationUncertainHelp"><span data-i18n-text="Nur leer lassen, wenn jedes Feld eindeutig belegt ist. Mit Unsicherheiten bleibt die Prüfung offen.">Nur leer lassen, wenn jedes Feld eindeutig belegt ist. Mit Unsicherheiten bleibt die Prüfung offen.</span></p>
+      <label for="contentVerificationConfidence"><span data-i18n-text="Confidence (0,80 bis 1,00)">Confidence (0,80 bis 1,00)</span></label>
       <input id="contentVerificationConfidence" name="confidence" type="text" inputmode="decimal" autocomplete="off" required>
-      <label for="contentVerificationNotes">Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen)</label>
+      <label for="contentVerificationNotes"><span data-i18n-text="Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen)">Nachvollziehbare Prüfnotiz (mindestens 12 Zeichen)</span></label>
       <textarea id="contentVerificationNotes" name="notes" rows="3" minlength="12" required></textarea>
       <label class="content-verification-confirmation">
         <input name="confirmed" type="checkbox" required>
@@ -6261,8 +6281,8 @@ function openContentVerificationDialog(context, validateCurrentReview) {
       </label>
       <p class="content-verification-error" role="alert" tabindex="-1" hidden></p>
       <div class="content-verification-actions">
-        <button type="button" data-verification-cancel>Abbrechen</button>
-        <button type="submit">Feldprüfung verbindlich bestätigen</button>
+        <button type="button" data-verification-cancel><span data-i18n-text="Abbrechen">Abbrechen</span></button>
+        <button type="submit"><span data-i18n-text="Feldprüfung verbindlich bestätigen">Feldprüfung verbindlich bestätigen</span></button>
       </div>
     </form>`;
   const form = dialog.querySelector("form");
@@ -6299,13 +6319,14 @@ function openContentVerificationDialog(context, validateCurrentReview) {
         });
         finish(evidence);
       } catch (error) {
-        errorMessage.textContent = error.message;
+        bindAccountUiText(errorMessage, error.message);
         errorMessage.hidden = false;
         errorMessage.focus();
       }
     });
     document.body.append(dialog);
     try {
+      window.observeAdminUiTranslations?.(dialog);
       dialog.showModal();
       dialog.querySelector("[data-verification-cancel]").focus();
     } catch (error) {
@@ -6393,13 +6414,13 @@ function renderEditionLifecycleInbox() {
   if (focusedIndex > 0) displayedRows.unshift(...displayedRows.splice(focusedIndex, 1));
 
   if (!rows.length) {
-    editionLifecycleElements.list.innerHTML = '<div class="admin-review-inbox-empty"><strong>Keine Entscheidung offen</strong><p>Archivierung, Quellenpruefung und sichere Lifecycle-Aktualisierungen laufen automatisch.</p></div>';
+    editionLifecycleElements.list.innerHTML = '<div class="admin-review-inbox-empty"><strong><span data-i18n-text="Keine Entscheidung offen">Keine Entscheidung offen</span></strong><p><span data-i18n-text="Archivierung, Quellenpruefung und sichere Lifecycle-Aktualisierungen laufen automatisch.">Archivierung, Quellenpruefung und sichere Lifecycle-Aktualisierungen laufen automatisch.</span></p></div>';
     return;
   }
   if (!visibleRows.length) {
     editionLifecycleElements.list.innerHTML = selectedFilter === "action"
-      ? '<div class="admin-review-inbox-empty"><strong>Jetzt ist nichts zu pruefen</strong><p>Offene Routinefaelle warten auf ihre automatische Quellenbestaetigung.</p></div>'
-      : '<p class="admin-quality-empty">Keine Eintraege in dieser Ansicht.</p>';
+      ? '<div class="admin-review-inbox-empty"><strong><span data-i18n-text="Jetzt ist nichts zu pruefen">Jetzt ist nichts zu pruefen</span></strong><p><span data-i18n-text="Offene Routinefaelle warten auf ihre automatische Quellenbestaetigung.">Offene Routinefaelle warten auf ihre automatische Quellenbestaetigung.</span></p></div>'
+      : '<p class="admin-quality-empty"><span data-i18n-text="Keine Eintraege in dieser Ansicht.">Keine Eintraege in dieser Ansicht.</span></p>';
     return;
   }
 
@@ -6421,16 +6442,16 @@ function renderEditionLifecycleInbox() {
     return `<article class="edition-lifecycle-card is-${escapeAdminHTML(row.priority)}" data-lifecycle-item-id="${escapeAdminHTML(row.item_id)}" data-lifecycle-item-type="${escapeAdminHTML(row.item_type)}">
       ${canPublish ? `<label class="edition-lifecycle-select"><input type="checkbox" data-lifecycle-select value="${escapeAdminHTML(row.item_id)}"> Auswahl</label>` : ""}
       ${canVerifyFreshness ? `<label class="edition-lifecycle-select"><input type="checkbox" data-freshness-select value="${escapeAdminHTML(row.edition_id)}"> Für Frischepaket wählen</label>` : ""}
-      <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${row.metadata?.review_tier ? `<span class="admin-review-tier">${escapeAdminHTML(row.metadata.review_tier)}</span>` : ""}${isWaiting ? '<span class="admin-review-automation-badge">Automatik wartet</span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewPriorityContext(row)}${renderReviewInboxDiff(row)}${renderContentVerificationEvidence(row)}</div>
-      <dl><div><dt>Status</dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt>Konfidenz</dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt>Bestaetigungen</dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt>Erkannt</dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
+      <div class="admin-review-card-main"><div class="admin-review-card-badges"><span class="admin-data-operations-status is-${escapeAdminHTML(row.priority)}">${escapeAdminHTML(typeLabels[row.item_type] || row.item_type)}</span>${row.metadata?.review_tier ? `<span class="admin-review-tier">${escapeAdminHTML(row.metadata.review_tier)}</span>` : ""}${isWaiting ? '<span class="admin-review-automation-badge"><span data-i18n-text="Automatik wartet">Automatik wartet</span></span>' : ""}</div><h6>${escapeAdminHTML(row.title)}</h6><p><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${row.event_id}`)}</strong> · ${escapeAdminHTML(row.description)}</p>${renderReviewPriorityContext(row)}${renderReviewInboxDiff(row)}${renderContentVerificationEvidence(row)}</div>
+      <dl><div><dt><span data-i18n-text="Status">Status</span></dt><dd>${escapeAdminHTML(isWaiting ? "Bestaetigung ausstehend" : row.status)}</dd></div><div><dt><span data-i18n-text="Konfidenz">Konfidenz</span></dt><dd>${row.confidence == null ? "—" : `${(Number(row.confidence) * 100).toFixed(1)}%`}</dd></div>${requiredConfirmations ? `<div><dt><span data-i18n-text="Bestaetigungen">Bestaetigungen</span></dt><dd>${confirmations} / ${requiredConfirmations}</dd></div>` : ""}<div><dt><span data-i18n-text="Erkannt">Erkannt</span></dt><dd>${formatDataOpsDate(row.created_at, true)}</dd></div></dl>
       <div class="source-monitor-actions">
-        ${canPublish ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Freigeben</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Ablehnen</button>` : ""}
-        ${canVerifyContent ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="content_verification">Feldweise bestaetigen</button>` : ""}
-        ${canVerifyFreshness ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="freshness_review">Edition feldweise bestaetigen</button>` : ""}
-        ${canApproveProposal ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Aenderung uebernehmen</button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal">Ablehnen</button>` : ""}
-        ${["source", "validation", "workflow"].includes(row.item_type) ? `<button type="button" data-lifecycle-action="resolve-exception" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}">Als erledigt markieren</button>` : ""}
-        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
-        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Austragung oeffnen</a>` : ""}
+        ${canPublish ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}"><span data-i18n-text="Freigeben">Freigeben</span></button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}"><span data-i18n-text="Ablehnen">Ablehnen</span></button>` : ""}
+        ${canVerifyContent ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="content_verification"><span data-i18n-text="Feldweise bestaetigen">Feldweise bestaetigen</span></button>` : ""}
+        ${canVerifyFreshness ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="freshness_review"><span data-i18n-text="Edition feldweise bestaetigen">Edition feldweise bestaetigen</span></button>` : ""}
+        ${canApproveProposal ? `<button type="button" data-lifecycle-action="approve-one" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal"><span data-i18n-text="Aenderung uebernehmen">Aenderung uebernehmen</span></button><button type="button" data-lifecycle-action="reject" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="proposal"><span data-i18n-text="Ablehnen">Ablehnen</span></button>` : ""}
+        ${["source", "validation", "workflow"].includes(row.item_type) ? `<button type="button" data-lifecycle-action="resolve-exception" data-item-id="${escapeAdminHTML(row.item_id)}" data-item-type="${escapeAdminHTML(row.item_type)}"><span data-i18n-text="Als erledigt markieren">Als erledigt markieren</span></button>` : ""}
+        ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Quelle oeffnen">Quelle oeffnen</span></a>` : ""}
+        ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Austragung oeffnen">Austragung oeffnen</span></a>` : ""}
       </div>
     </article>`;
   }).join("");
@@ -6837,7 +6858,9 @@ function renderSourceMonitor() {
   setSourceMonitorKpi("noSchedule", dataOpsSources.filter(row => row.is_active && !row.next_fetch_at).length);
   const technicalProblemCount = technicalProblemKeys.size;
   const sourceSummary = document.getElementById("sourceMonitorSummaryStatus");
-  if (sourceSummary) sourceSummary.textContent = technicalProblemCount ? `${technicalProblemCount} technische Probleme` : `${todayResults.length} heute geprueft`;
+  if (sourceSummary) bindAccountUiText(sourceSummary, technicalProblemCount
+    ? adminUiFormatted("{count} technical issues", "{count} technische Probleme", { count: technicalProblemCount })
+    : adminUiFormatted("{count} checked today", "{count} heute geprüft", { count: todayResults.length }));
 
   const resultBySource = sourceMonitorLatestBy(sourceMonitorResults, "source_id");
   const jobBySource = sourceMonitorLatestBy(sourceMonitorJobs, "source_id");
@@ -6865,24 +6888,24 @@ function renderSourceMonitor() {
       const sourceUrl = safeAdminUrl(source.source_url || "");
       const eventUrl = edition?.edition_slug ? `/event/${encodeURIComponent(edition.edition_slug)}/` : event?.slug ? `/event/${encodeURIComponent(event.slug)}/` : "";
       return `<tr data-source-id="${source.id}">
-        <td data-label="Event / Austragung"><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${source.event_id}`)}</strong><span>${escapeAdminHTML(edition ? `${edition.edition_year} | ${edition.edition_status}` : "Eventquelle")}</span></td>
-        <td data-label="Quelle"><strong>${escapeAdminHTML(source.source_host || "--")}</strong><span>${escapeAdminHTML(source.source_type || "--")}</span></td>
-        <td data-label="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} Fehler</span><span>Confidence ${escapeAdminHTML(result?.change_confidence || "--")} | IP ${escapeAdminHTML(result?.pinned_ip || source.last_pinned_ip || "--")}</span></td>
-        <td data-label="Pruefplan"><span>${formatDataOpsDate(source.last_fetched_at, true)}</span><label>Naechster Crawl<input type="datetime-local" data-source-next value="${toDateTimeLocal(source.next_fetch_at)}"></label></td>
-        <td data-label="Review"><strong>${escapeAdminHTML(review?.priority || "--")}</strong><span>${escapeAdminHTML(review?.title || job?.status || "kein offenes Review")}</span></td>
-        <td data-label="Aktionen"><div class="source-monitor-actions">
-          <button type="button" data-source-action="check" data-source-id="${source.id}">Jetzt pruefen</button>
-          <button type="button" data-source-action="schedule" data-source-id="${source.id}">Termin setzen</button>
-          <button type="button" data-source-action="${source.is_active ? "pause" : "activate"}" data-source-id="${source.id}">${source.is_active ? "Pausieren" : "Reaktivieren"}</button>
-          <button type="button" data-source-action="history" data-source-id="${source.id}" data-source-label="${escapeAdminHTML(event?.canonical_name || event?.event_name || source.source_host)}">Historie</button>
-          ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer">Quelle oeffnen</a>` : ""}
-          ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer">Event oeffnen</a>` : ""}
-          ${review ? `<button type="button" data-source-action="reviewed" data-task-id="${review.id}">Als geprueft markieren</button>` : ""}
-          <button type="button" data-source-action="reset" data-source-id="${source.id}">Fehler zuruecksetzen</button>
-          ${job?.status === "dead_letter" || job?.status === "failed" ? `<button type="button" data-source-action="retry" data-source-id="${source.id}" data-job-id="${job.id}">Crawl erneut</button>` : ""}
+        <td data-label="Event / Austragung" data-i18n-label-text="Event / Austragung"><strong>${escapeAdminHTML(event?.canonical_name || event?.event_name || `Event ${source.event_id}`)}</strong><span>${edition ? `${escapeAdminHTML(edition.edition_year)} | ${adminUiMarkup(adminStatusLabel(edition.edition_status))}` : adminUiMarkup("Event source")}</span></td>
+        <td data-label="Quelle" data-i18n-label-text="Quelle"><strong>${escapeAdminHTML(source.source_host || "--")}</strong><span>${adminUiMarkup(adminStatusLabel(source.source_type))}</span></td>
+        <td data-label="Letzter Status" data-i18n-label-text="Letzter Status"><span class="admin-data-operations-status is-${escapeAdminHTML(result?.change_status || source.last_change_status || source.crawl_status)}">${adminUiMarkup(adminStatusLabel(result?.change_status || source.last_change_status || source.crawl_status))}</span><span>HTTP ${escapeAdminHTML(result?.http_status ?? source.last_http_status ?? "--" )} | ${Number(source.consecutive_failures || 0)} ${adminUiMarkup("Errors")}</span><span>${adminUiMarkup("Confidence")} ${escapeAdminHTML(result?.change_confidence || "--")} | IP ${escapeAdminHTML(result?.pinned_ip || source.last_pinned_ip || "--")}</span></td>
+        <td data-label="Pruefplan" data-i18n-label-text="Pruefplan"><span>${formatDataOpsDate(source.last_fetched_at, true)}</span><label><span data-i18n-text="Naechster Crawl">Naechster Crawl</span><input type="datetime-local" data-source-next value="${toDateTimeLocal(source.next_fetch_at)}"></label></td>
+        <td data-label="Review" data-i18n-label-text="Review"><strong>${adminUiMarkup(adminStatusLabel(review?.priority))}</strong><span>${review?.title ? escapeAdminHTML(review.title) : adminUiMarkup(job?.status ? adminStatusLabel(job.status) : "No pending review")}</span></td>
+        <td data-label="Aktionen" data-i18n-label-text="Aktionen"><div class="source-monitor-actions">
+          <button type="button" data-source-action="check" data-source-id="${source.id}"><span data-i18n-text="Jetzt pruefen">Jetzt pruefen</span></button>
+          <button type="button" data-source-action="schedule" data-source-id="${source.id}"><span data-i18n-text="Termin setzen">Termin setzen</span></button>
+          <button type="button" data-source-action="${source.is_active ? "pause" : "activate"}" data-source-id="${source.id}">${adminUiMarkup(source.is_active ? "Pause" : "Reactivate")}</button>
+          <button type="button" data-source-action="history" data-source-id="${source.id}" data-source-label="${escapeAdminHTML(event?.canonical_name || event?.event_name || source.source_host)}"><span data-i18n-text="Historie">Historie</span></button>
+          ${sourceUrl ? `<a href="${sourceUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Quelle oeffnen">Quelle oeffnen</span></a>` : ""}
+          ${eventUrl ? `<a href="${eventUrl}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Event oeffnen">Event oeffnen</span></a>` : ""}
+          ${review ? `<button type="button" data-source-action="reviewed" data-task-id="${review.id}"><span data-i18n-text="Als geprueft markieren">Als geprueft markieren</span></button>` : ""}
+          <button type="button" data-source-action="reset" data-source-id="${source.id}"><span data-i18n-text="Fehler zuruecksetzen">Fehler zuruecksetzen</span></button>
+          ${job?.status === "dead_letter" || job?.status === "failed" ? `<button type="button" data-source-action="retry" data-source-id="${source.id}" data-job-id="${job.id}"><span data-i18n-text="Crawl erneut">Crawl erneut</span></button>` : ""}
         </div></td>
       </tr>`;
-    }).join("") || '<tr><td colspan="6">Keine Quellen vorhanden.</td></tr>';
+    }).join("") || '<tr><td colspan="6"><span data-i18n-text="Keine Quellen vorhanden.">Keine Quellen vorhanden.</span></td></tr>';
 }
 
 async function showSourceMonitorHistory(sourceId, label) {
@@ -6893,13 +6916,13 @@ async function showSourceMonitorHistory(sourceId, label) {
   if (error) { setSourceMonitorStatus(getFriendlyErrorMessage(error, "Historie konnte nicht geladen werden."), "error"); return; }
   sourceMonitorElements.historyTitle.textContent = label || sourceId;
   sourceMonitorElements.historyList.innerHTML = (data || []).map(row => `<article class="admin-data-operations-history-row">
-    <div><strong>${escapeAdminHTML(row.change_status)} | HTTP ${escapeAdminHTML(row.http_status ?? "--")}</strong><span>${formatDataOpsDate(row.fetched_at, true)} | ${escapeAdminHTML(row.worker_version)}</span></div>
+    <div><strong>${adminUiMarkup(adminStatusLabel(row.change_status))} | HTTP ${escapeAdminHTML(row.http_status ?? "--")}</strong><span>${formatDataOpsDate(row.fetched_at, true)} | ${escapeAdminHTML(row.worker_version)}</span></div>
     <p>${escapeAdminHTML(row.final_url || row.error_message || "Keine Zusatzinformation")}</p>
     <code>${escapeAdminHTML(JSON.stringify({ redirects: row.redirect_count, duration_ms: row.response_time_ms, content_type: row.content_type, content_length: row.content_length, pinned_ip: row.pinned_ip, normalization: row.normalization_version, confidence: row.change_confidence, reasons: row.change_reasons, previous_hash: row.previous_content_hash, hash: row.content_hash, previous_semantic_hash: row.previous_semantic_hash, semantic_hash: row.semantic_hash, processing: row.processing_status, error: row.error_type }, null, 2))}</code>
-  </article>`).join("") || '<p class="admin-quality-empty">Noch keine Crawl-Ergebnisse.</p>';
+  </article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine Crawl-Ergebnisse.">Noch keine Crawl-Ergebnisse.</span></p>';
   sourceMonitorElements.history.hidden = false;
   sourceMonitorElements.history.scrollIntoView({ behavior: "smooth", block: "start" });
-  setSourceMonitorStatus(`${(data || []).length} Historieneintraege geladen.`, "success");
+  setSourceMonitorStatus(adminUiFormatted("Loaded {count} history entries.", "{count} Historieneinträge geladen.", { count: (data || []).length }), "success");
 }
 
 async function runSourceNow(sourceId) {
@@ -6944,7 +6967,7 @@ async function handleSourceMonitorAction(button) {
 function setStageFourStatus(message, type = "") {
   if (!stageFourElements.status) return;
   stageFourElements.status.className = `admin-section-status ${type}`.trim();
-  stageFourElements.status.textContent = message;
+  bindAccountUiText(stageFourElements.status, message);
 }
 
 function setStageFourKpi(key, value) {
@@ -6954,14 +6977,15 @@ function setStageFourKpi(key, value) {
 function renderStageFourOperations() {
   if (!stageFourElements.section) return;
   if (!stageFourSettings) {
-    stageFourElements.safety.textContent = "Stage 4 ist noch nicht migriert oder für diesen Admin nicht verfügbar. Stufen 1–3 bleiben uneingeschränkt nutzbar.";
+    bindAccountUiText(stageFourElements.safety, "Stage 4 ist noch nicht migriert oder für diesen Admin nicht verfügbar. Stufen 1–3 bleiben uneingeschränkt nutzbar.");
     stageFourElements.safety.className = "stage-four-safety is-unavailable";
     return;
   }
   const dryRun = stageFourSettings.dry_run !== false;
   const stopped = stageFourSettings.global_emergency_stop || !stageFourSettings.automation_enabled;
   stageFourElements.safety.className = `stage-four-safety ${dryRun || stopped ? "is-safe" : "is-live"}`;
-  stageFourElements.safety.innerHTML = `<strong>${dryRun ? "DRY-RUN AKTIV" : "LIVE-MODUS"}</strong><span>Phase ${escapeAdminHTML(stageFourSettings.rollout_phase)} · Automatik ${stageFourSettings.automation_enabled ? "aktiviert" : "deaktiviert"} · Beobachtung ${stageFourSettings.observation_enabled ? "aktiv" : "gestoppt"} · Scheduler ${stageFourSettings.observation_scheduler_enabled ? "aktiv" : "gestoppt"}</span><small>Nur ${escapeAdminHTML(stageFourSettings.observation_country_code || "DE")} · ${Number(stageFourSettings.daily_crawl_limit || 0)} Crawls/Tag · Geocoding-Provider aus · öffentliche Mutationen 0</small>`;
+  stageFourElements.safety.removeAttribute("data-i18n-text");
+  stageFourElements.safety.innerHTML = `<strong>${adminUiMarkup(dryRun ? "DRY RUN ACTIVE" : "LIVE MODE")}</strong><span>Phase ${escapeAdminHTML(stageFourSettings.rollout_phase)} · ${adminUiMarkup("Automation")} ${adminUiMarkup(stageFourSettings.automation_enabled ? "Enabled" : "Disabled")} · ${adminUiMarkup("Observation")} ${adminUiMarkup(stageFourSettings.observation_enabled ? "Active" : "Stopped")} · ${adminUiMarkup("Scheduler")} ${adminUiMarkup(stageFourSettings.observation_scheduler_enabled ? "Active" : "Stopped")}</span><small>${adminUiMarkup(adminUiFormatted("Only {country} · {count} crawls/day · geocoding provider off · public changes 0", "Nur {country} · {count} Crawls/Tag · Geocoding-Provider aus · öffentliche Mutationen 0", { country: stageFourSettings.observation_country_code || "DE", count: Number(stageFourSettings.daily_crawl_limit || 0) }))}</small>`;
 
   const openCandidates = stageFourDiscoveryCandidates.filter(row => row.review_status === "pending");
   const openDuplicates = stageFourDuplicates.filter(row => row.review_status === "pending");
@@ -6978,31 +7002,31 @@ function renderStageFourOperations() {
   setStageFourKpi("geocoding", openGeocoding.length);
   setStageFourKpi("quality", qualityScores.length ? `${(qualityScores.reduce((a, b) => a + b, 0) / qualityScores.length).toFixed(1)}` : "–");
 
-  stageFourElements.reliabilityCount.textContent = `${stageFourReliability.length} Metriken`;
+  bindAccountUiText(stageFourElements.reliabilityCount, adminUiFormatted("{count} metrics", "{count} Metriken", { count: stageFourReliability.length }));
   const policiesHtml = stageFourPolicies.sort((a, b) => Number(a.priority) - Number(b.priority)).map(policy => `
     <article class="stage-four-card"><div><strong>${escapeAdminHTML(policy.name)}</strong><span class="stage-four-decision is-${escapeAdminHTML(policy.decision)}">${escapeAdminHTML(policy.decision)}</span></div><p>${escapeAdminHTML(policy.description)}</p><small>${escapeAdminHTML(policy.policy_code)} · Phase ${escapeAdminHTML(policy.minimum_phase)} · v${Number(policy.policy_version || 1)}</small></article>`).join("");
   const reliabilityHtml = [...stageFourReliability].sort((a, b) => Number(b.source_reliability_score) - Number(a.source_reliability_score)).slice(0, 8).map(metric => `
     <article class="stage-four-card stage-four-reliability"><div><strong>${escapeAdminHTML(metric.source_host || metric.source_type || "Quelle")}</strong><b>${(Number(metric.source_reliability_score || 0) * 100).toFixed(1)}%</b></div><p>${escapeAdminHTML(metric.field_name || "alle Felder")} · ${Number(metric.reviewed_count || 0)} Reviews · ${(Number(metric.error_rate || 0) * 100).toFixed(1)}% Fehler</p><small>${escapeAdminHTML(metric.extractor_version || "ohne Extraktorversion")} · ${escapeAdminHTML(metric.country_code || "–")}</small></article>`).join("");
-  stageFourElements.policies.innerHTML = policiesHtml + reliabilityHtml || '<p class="admin-quality-empty">Noch keine Policy- oder Zuverlässigkeitsdaten.</p>';
+  stageFourElements.policies.innerHTML = policiesHtml + reliabilityHtml || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine Policy- oder Zuverlässigkeitsdaten.">Noch keine Policy- oder Zuverlässigkeitsdaten.</span></p>';
 
-  stageFourElements.discoverySummary.textContent = `${openCandidates.length} Kandidaten · ${openDuplicates.length} Dubletten`;
+  bindAccountUiText(stageFourElements.discoverySummary, adminUiFormatted("{candidates} candidates · {duplicates} duplicates", "{candidates} Kandidaten · {duplicates} Dubletten", { candidates: openCandidates.length, duplicates: openDuplicates.length }));
   const eventById = new Map(dataOpsEvents.map(row => [String(row.id), row]));
   stageFourElements.discovery.innerHTML = openCandidates.slice(0, 12).map(candidate => {
     const matched = eventById.get(String(candidate.possible_event_id));
     return `<article class="stage-four-card stage-four-discovery-card"><div><strong>${escapeAdminHTML(candidate.detected_event_name)}</strong><b>${(Number(candidate.confidence || 0) * 100).toFixed(0)}%</b></div><p>${escapeAdminHTML(candidate.possible_start_date || "Datum offen")} · ${escapeAdminHTML(candidate.city || "Ort offen")} · ${escapeAdminHTML(candidate.country_code)} · ${escapeAdminHTML(candidate.sport)}</p><small>${escapeAdminHTML(candidate.match_status)}${matched ? ` · möglicher Treffer: ${escapeAdminHTML(matched.canonical_name || matched.event_name)}` : ""}</small></article>`;
-  }).join("") || '<p class="admin-quality-empty">Keine offenen Discovery-Kandidaten.</p>';
+  }).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Keine offenen Discovery-Kandidaten.">Keine offenen Discovery-Kandidaten.</span></p>';
 
   stageFourElements.countries.innerHTML = stageFourCountries.map(country => `
-    <article class="stage-four-country-card is-${escapeAdminHTML(country.rollout_status)}"><div><strong>${escapeAdminHTML(country.country_code)} · ${escapeAdminHTML(country.country_name)}</strong><span>${escapeAdminHTML(country.rollout_status)}</span></div><b>${country.data_quality_score == null ? "–" : `${Number(country.data_quality_score).toFixed(1)}/100`}</b><dl><div><dt>Events</dt><dd>${Number(country.event_count || 0)}</dd></div><div><dt>Discovery</dt><dd>${Number(country.open_discovery_candidates || 0)}</dd></div><div><dt>Geo-Probleme</dt><dd>${Number(country.open_geocoding_jobs || 0)}</dd></div><div><dt>Kritisch</dt><dd>${Number(country.open_critical_issues || 0)}</dd></div></dl></article>`).join("") || '<p class="admin-quality-empty">Länderstatus noch nicht berechnet.</p>';
+    <article class="stage-four-country-card is-${escapeAdminHTML(country.rollout_status)}"><div><strong>${escapeAdminHTML(country.country_code)} · ${escapeAdminHTML(country.country_name)}</strong><span>${escapeAdminHTML(country.rollout_status)}</span></div><b>${country.data_quality_score == null ? "–" : `${Number(country.data_quality_score).toFixed(1)}/100`}</b><dl><div><dt><span data-i18n-text="Events">Events</span></dt><dd>${Number(country.event_count || 0)}</dd></div><div><dt><span data-i18n-text="Discovery">Discovery</span></dt><dd>${Number(country.open_discovery_candidates || 0)}</dd></div><div><dt><span data-i18n-text="Geo-Probleme">Geo-Probleme</span></dt><dd>${Number(country.open_geocoding_jobs || 0)}</dd></div><div><dt><span data-i18n-text="Kritisch">Kritisch</span></dt><dd>${Number(country.open_critical_issues || 0)}</dd></div></dl></article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Länderstatus noch nicht berechnet.">Länderstatus noch nicht berechnet.</span></p>';
 
   const usageToday = stageFourUsage.filter(row => row.usage_date === new Date().toISOString().slice(0, 10));
   const geocodesToday = usageToday.reduce((sum, row) => sum + Number(row.geocoding_requests || 0), 0);
-  stageFourElements.geocoding.innerHTML = `<article class="stage-four-card"><div><strong>Tagesbudget</strong><b>${geocodesToday}/${Number(stageFourSettings.daily_geocoding_limit || 0)}</b></div><p>Provider-Aufrufe werden gecacht; deaktivierte Länder und überschrittene Limits werden als rate_limited gespeichert.</p></article>` + openGeocoding.slice(0, 8).map(job => `
+  stageFourElements.geocoding.innerHTML = `<article class="stage-four-card"><div><strong><span data-i18n-text="Tagesbudget">Tagesbudget</span></strong><b>${geocodesToday}/${Number(stageFourSettings.daily_geocoding_limit || 0)}</b></div><p><span data-i18n-text="Provider-Aufrufe werden gecacht; deaktivierte Länder und überschrittene Limits werden als rate_limited gespeichert.">Provider-Aufrufe werden gecacht; deaktivierte Länder und überschrittene Limits werden als rate_limited gespeichert.</span></p></article>` + openGeocoding.slice(0, 8).map(job => `
     <article class="stage-four-card"><div><strong>${escapeAdminHTML(job.original_location_text)}</strong><span class="stage-four-decision is-review">${escapeAdminHTML(job.job_status)}</span></div><p>${escapeAdminHTML(job.normalized_address)} · ${escapeAdminHTML(job.country_code)} · ${escapeAdminHTML(job.provider)}</p><small>${escapeAdminHTML((job.validation_warnings || []).join(", ") || job.error_message || "wartet auf Verarbeitung")}</small></article>`).join("");
 }
 
 function setStageFourObservationKpi(key, value) {
-  if (stageFourElements.observationKpis[key]) stageFourElements.observationKpis[key].textContent = value;
+  if (stageFourElements.observationKpis[key]) bindAccountUiText(stageFourElements.observationKpis[key], String(value));
 }
 
 function renderStageFourObservationWorkspace() {
@@ -7023,33 +7047,33 @@ function renderStageFourObservationWorkspace() {
   setStageFourObservationKpi("precision", metrics.precision == null ? "–" : `${(Number(metrics.precision) * 100).toFixed(1)}%`);
   setStageFourObservationKpi("sample", `${Number(metrics.reviewed_sample || 0)}${metrics.sample_sufficient ? "" : " ⚠"}`);
   setStageFourObservationKpi("readiness", theoreticallyReady ? "THEORETISCH BEREIT" : "NICHT BEREIT");
-  stageFourElements.pilotSummary.textContent = `${activePilots.length} aktiv · ${stageFourPilotSources.filter(row => row.pilot_status === "paused").length} pausiert`;
-  stageFourElements.goldenSummary.textContent = `${stageFourGoldenCases.length} Fälle`;
+  bindAccountUiText(stageFourElements.pilotSummary, adminUiFormatted("{active} active · {paused} paused", "{active} aktiv · {paused} pausiert", { active: activePilots.length, paused: stageFourPilotSources.filter(row => row.pilot_status === "paused").length }));
+  bindAccountUiText(stageFourElements.goldenSummary, adminUiFormatted("{count} cases", "{count} Fälle", { count: stageFourGoldenCases.length }));
 
   stageFourElements.pilotSources.innerHTML = stageFourPilotSources.map(pilot => {
     const source = dataOpsSources.find(row => String(row.id) === String(pilot.event_source_id));
     const candidateSources = dataOpsSources.filter(row => String(row.source_host || "").replace(/^www\./, "") === String(pilot.domain).replace(/^www\./, ""));
-    const binding = source ? `<small>Gebunden: ${escapeAdminHTML(source.source_url)}</small>` : `<label class="stage-four-inline-field">Bestehende Eventquelle<select data-pilot-binding><option value="">nicht gebunden</option>${candidateSources.map(item => `<option value="${escapeAdminHTML(item.id)}">${escapeAdminHTML(item.source_url)}</option>`).join("")}</select></label>`;
+    const binding = source ? `<small>Gebunden: ${escapeAdminHTML(source.source_url)}</small>` : `<label class="stage-four-inline-field"><span data-i18n-text="Bestehende Eventquelle">Bestehende Eventquelle</span><select data-pilot-binding><option value="" data-i18n-text="nicht gebunden">nicht gebunden</option>${candidateSources.map(item => `<option value="${escapeAdminHTML(item.id)}">${escapeAdminHTML(item.source_url)}</option>`).join("")}</select></label>`;
     const controls = source
-      ? `<button type="button" data-stage-four-action="pilot-status" data-pilot-id="${pilot.id}" data-pilot-status="${pilot.pilot_status === "paused" ? "pilot_observation" : "paused"}">${pilot.pilot_status === "paused" ? "Beobachtung fortsetzen" : "Quelle pausieren"}</button>`
-      : `<button type="button" data-stage-four-action="bind-pilot" data-pilot-id="${pilot.id}">Sicher binden</button>`;
-    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(pilot.source_name)}</strong><span class="stage-four-decision is-${pilot.pilot_status === "pilot_observation" ? "review" : "block"}">${escapeAdminHTML(pilot.pilot_status)}</span></div><p>${escapeAdminHTML(pilot.source_type)} · DE · ${escapeAdminHTML(pilot.domain)} · ${(Number(pilot.initial_reliability) * 100).toFixed(0)}% Startwert</p>${binding}<small>Intervall ${Number(pilot.check_interval_minutes)} min · ${Number(pilot.requests_per_minute)}/min · ${Number(pilot.requests_per_day)}/Tag · ${escapeAdminHTML(pilot.parser_version)}</small><div class="stage-four-card-actions">${controls}<a href="${escapeAdminHTML(pilot.source_url)}" target="_blank" rel="noopener noreferrer">Quelle öffnen</a></div></article>`;
-  }).join("") || '<p class="admin-quality-empty">Keine deutschen Pilotprofile konfiguriert.</p>';
+      ? `<button type="button" data-stage-four-action="pilot-status" data-pilot-id="${pilot.id}" data-pilot-status="${pilot.pilot_status === "paused" ? "pilot_observation" : "paused"}">${adminUiMarkup(pilot.pilot_status === "paused" ? "Resume observation" : "Pause source")}</button>`
+      : `<button type="button" data-stage-four-action="bind-pilot" data-pilot-id="${pilot.id}"><span data-i18n-text="Sicher binden">Sicher binden</span></button>`;
+    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(pilot.source_name)}</strong><span class="stage-four-decision is-${pilot.pilot_status === "pilot_observation" ? "review" : "block"}">${escapeAdminHTML(pilot.pilot_status)}</span></div><p>${escapeAdminHTML(pilot.source_type)} · DE · ${escapeAdminHTML(pilot.domain)} · ${(Number(pilot.initial_reliability) * 100).toFixed(0)}% Startwert</p>${binding}<small>Intervall ${Number(pilot.check_interval_minutes)} min · ${Number(pilot.requests_per_minute)}/min · ${Number(pilot.requests_per_day)}/Tag · ${escapeAdminHTML(pilot.parser_version)}</small><div class="stage-four-card-actions">${controls}<a href="${escapeAdminHTML(pilot.source_url)}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Quelle öffnen">Quelle öffnen</span></a></div></article>`;
+  }).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Keine deutschen Pilotprofile konfiguriert.">Keine deutschen Pilotprofile konfiguriert.</span></p>';
 
   stageFourElements.observations.innerHTML = [...stageFourObservations].sort((a, b) => String(b.observed_at).localeCompare(String(a.observed_at))).slice(0, 30).map(observation => {
     const review = reviewsByObservation.get(String(observation.id));
     const decision = `${observation.decision_mode}: ${observation.policy_result}${observation.would_execute ? " · würde ausführen" : ""}`;
     const reviewControl = review
       ? `<small>Bewertet: ${escapeAdminHTML(review.review_result)} · ${escapeAdminHTML(review.rationale)}</small>`
-      : `<div class="stage-four-review-control"><select data-observation-review><option value="correct">korrekt</option><option value="partially_correct">teilweise korrekt</option><option value="incorrect">falsch</option><option value="outdated">veraltet</option><option value="duplicate">Dublette</option><option value="source_unsuitable">Quelle ungeeignet</option><option value="unclear">unklar</option><option value="manual_review_required">manuelle Prüfung notwendig</option></select><button type="button" data-stage-four-action="review-observation" data-observation-id="${observation.id}">Bewertung speichern</button></div>`;
-    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(observation.field_name)}</strong><span class="stage-four-decision is-${observation.policy_result === "block" ? "block" : "review"}">${escapeAdminHTML(decision)}</span></div><p>${escapeAdminHTML(observation.change_status)} · Confidence ${observation.confidence == null ? "–" : `${(Number(observation.confidence) * 100).toFixed(0)}%`} · Reliability ${(Number(observation.source_reliability) * 100).toFixed(0)}%</p><small>${escapeAdminHTML(observation.blocked_reason || (observation.parsing_warnings || []).join(", ") || "keine Warnung")} · Parser ${escapeAdminHTML(observation.parser_version)} · Policy ${escapeAdminHTML(observation.policy_version)}</small>${reviewControl}${review ? `<button type="button" data-stage-four-action="promote-golden" data-observation-id="${observation.id}">Als Golden Case markieren</button>` : ""}</article>`;
-  }).join("") || '<p class="admin-quality-empty">Noch keine realen Beobachtungen vorhanden.</p>';
+      : `<div class="stage-four-review-control"><select data-observation-review><option value="correct" data-i18n-text="korrekt">korrekt</option><option value="partially_correct" data-i18n-text="teilweise korrekt">teilweise korrekt</option><option value="incorrect" data-i18n-text="falsch">falsch</option><option value="outdated" data-i18n-text="veraltet">veraltet</option><option value="duplicate" data-i18n-text="Dublette">Dublette</option><option value="source_unsuitable" data-i18n-text="Quelle ungeeignet">Quelle ungeeignet</option><option value="unclear" data-i18n-text="unklar">unklar</option><option value="manual_review_required" data-i18n-text="manuelle Prüfung notwendig">manuelle Prüfung notwendig</option></select><button type="button" data-stage-four-action="review-observation" data-observation-id="${observation.id}"><span data-i18n-text="Bewertung speichern">Bewertung speichern</span></button></div>`;
+    return `<article class="stage-four-card"><div><strong>${escapeAdminHTML(observation.field_name)}</strong><span class="stage-four-decision is-${observation.policy_result === "block" ? "block" : "review"}">${escapeAdminHTML(decision)}</span></div><p>${escapeAdminHTML(observation.change_status)} · Confidence ${observation.confidence == null ? "–" : `${(Number(observation.confidence) * 100).toFixed(0)}%`} · Reliability ${(Number(observation.source_reliability) * 100).toFixed(0)}%</p><small>${escapeAdminHTML(observation.blocked_reason || (observation.parsing_warnings || []).join(", ") || "keine Warnung")} · Parser ${escapeAdminHTML(observation.parser_version)} · Policy ${escapeAdminHTML(observation.policy_version)}</small>${reviewControl}${review ? `<button type="button" data-stage-four-action="promote-golden" data-observation-id="${observation.id}"><span data-i18n-text="Als Golden Case markieren">Als Golden Case markieren</span></button>` : ""}</article>`;
+  }).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine realen Beobachtungen vorhanden.">Noch keine realen Beobachtungen vorhanden.</span></p>';
 
-  stageFourElements.evaluation.innerHTML = `<article class="stage-four-card"><div><strong>Manuell bewertete Vorschläge</strong><b>${Number(metrics.reviewed_sample || 0)}</b></div><p>Precision ${metrics.precision == null ? "–" : `${(Number(metrics.precision) * 100).toFixed(2)}%`} · False Positives ${metrics.false_positive_rate == null ? "–" : `${(Number(metrics.false_positive_rate) * 100).toFixed(2)}%`} · Konflikte ${metrics.conflict_rate == null ? "–" : `${(Number(metrics.conflict_rate) * 100).toFixed(1)}%`}</p><small>${metrics.sample_sufficient ? "Stichprobe für operative Metrik ausreichend" : "Kleine Stichprobe: Kennzahlen nicht als Freigabe interpretieren"}</small></article>` + readinessRows.map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.dimension_type)} · ${escapeAdminHTML(row.dimension_key)}</strong><span class="stage-four-decision is-${row.theoretically_ready ? "review" : "block"}">${row.theoretically_ready ? "theoretisch bereit" : "nicht bereit"}</span></div><p>${Number(row.reviewed_count)} Reviews · Precision ${row.precision == null ? "–" : `${(Number(row.precision) * 100).toFixed(2)}%`}</p><small>${escapeAdminHTML((row.blockers || []).join(", ") || "Kriterien rechnerisch erfüllt")} · Phase B wird niemals automatisch aktiviert</small></article>`).join("");
+  stageFourElements.evaluation.innerHTML = `<article class="stage-four-card"><div><strong><span data-i18n-text="Manuell bewertete Vorschläge">Manuell bewertete Vorschläge</span></strong><b>${Number(metrics.reviewed_sample || 0)}</b></div><p>Precision ${metrics.precision == null ? "–" : `${(Number(metrics.precision) * 100).toFixed(2)}%`} · False Positives ${metrics.false_positive_rate == null ? "–" : `${(Number(metrics.false_positive_rate) * 100).toFixed(2)}%`} · Konflikte ${metrics.conflict_rate == null ? "–" : `${(Number(metrics.conflict_rate) * 100).toFixed(1)}%`}</p><small>${metrics.sample_sufficient ? "Stichprobe für operative Metrik ausreichend" : "Kleine Stichprobe: Kennzahlen nicht als Freigabe interpretieren"}</small></article>` + readinessRows.map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.dimension_type)} · ${escapeAdminHTML(row.dimension_key)}</strong><span class="stage-four-decision is-${row.theoretically_ready ? "review" : "block"}">${row.theoretically_ready ? "theoretisch bereit" : "nicht bereit"}</span></div><p>${Number(row.reviewed_count)} Reviews · Precision ${row.precision == null ? "–" : `${(Number(row.precision) * 100).toFixed(2)}%`}</p><small>${escapeAdminHTML((row.blockers || []).join(", ") || "Kriterien rechnerisch erfüllt")} · Phase B wird niemals automatisch aktiviert</small></article>`).join("");
 
-  stageFourElements.shadowDecisions.innerHTML = [...stageFourDecisions].filter(row => row.decision_mode === "shadow" || row.dry_run).slice(0, 20).map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.policy_code || "default_review")}</strong><span class="stage-four-decision is-${escapeAdminHTML(row.effective_decision)}">${escapeAdminHTML(row.effective_decision)}</span></div><p>${escapeAdminHTML(row.action_code)} · würde ausführen: ${row.would_execute ? "ja" : "nein"} · tatsächlich: ${row.actually_executed ? "JA" : "nein"}</p><small>${escapeAdminHTML((row.prerequisites_unmet || row.decision_reasons || []).join(", ") || row.blocked_reason || "Voraussetzungen erfüllt")}</small></article>`).join("") || '<p class="admin-quality-empty">Noch keine Shadow-Entscheidungen.</p>';
-  stageFourElements.goldenCases.innerHTML = stageFourGoldenCases.slice(0, 20).map(item => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(item.case_type)}</strong><span class="stage-four-decision is-${item.regression_status === "passed" ? "auto_apply" : "review"}">${escapeAdminHTML(item.regression_status)}</span></div><p>Parser ${escapeAdminHTML(item.parser_version)} · Policy ${escapeAdminHTML(item.policy_version)}</p><small>${escapeAdminHTML(item.notes || "Manuell geprüfter Regressionsfall")}</small></article>`).join("") || '<p class="admin-quality-empty">Golden Dataset wartet auf manuell geprüfte reale Fälle.</p>';
-  stageFourElements.observationRuns.innerHTML = stageFourObservationRuns.slice(0, 20).map(run => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(run.run_status)} · ${String(run.id).slice(0, 8)}</strong><span>${Number(run.observation_count)} Beobachtungen</span></div><p>${escapeAdminHTML(run.trigger_source)} · ${escapeAdminHTML(run.parser_version)} · ${escapeAdminHTML(run.policy_version)}</p><small>${escapeAdminHTML(run.error_message || run.idempotency_key)}</small>${["queued", "running"].includes(run.run_status) ? `<button type="button" data-stage-four-action="stop-observation-run" data-run-id="${run.id}">Lauf stoppen</button>` : ""}${run.run_status === "paused" ? `<button type="button" data-stage-four-action="resume-observation-run" data-run-id="${run.id}">Lauf fortsetzen</button>` : ""}</article>`).join("") || '<p class="admin-quality-empty">Noch keine Beobachtungsläufe.</p>';
+  stageFourElements.shadowDecisions.innerHTML = [...stageFourDecisions].filter(row => row.decision_mode === "shadow" || row.dry_run).slice(0, 20).map(row => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(row.policy_code || "default_review")}</strong><span class="stage-four-decision is-${escapeAdminHTML(row.effective_decision)}">${escapeAdminHTML(row.effective_decision)}</span></div><p>${escapeAdminHTML(row.action_code)} · würde ausführen: ${row.would_execute ? "ja" : "nein"} · tatsächlich: ${row.actually_executed ? "JA" : "nein"}</p><small>${escapeAdminHTML((row.prerequisites_unmet || row.decision_reasons || []).join(", ") || row.blocked_reason || "Voraussetzungen erfüllt")}</small></article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine Shadow-Entscheidungen.">Noch keine Shadow-Entscheidungen.</span></p>';
+  stageFourElements.goldenCases.innerHTML = stageFourGoldenCases.slice(0, 20).map(item => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(item.case_type)}</strong><span class="stage-four-decision is-${item.regression_status === "passed" ? "auto_apply" : "review"}">${escapeAdminHTML(item.regression_status)}</span></div><p>Parser ${escapeAdminHTML(item.parser_version)} · Policy ${escapeAdminHTML(item.policy_version)}</p><small>${escapeAdminHTML(item.notes || "Manuell geprüfter Regressionsfall")}</small></article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Golden Dataset wartet auf manuell geprüfte reale Fälle.">Golden Dataset wartet auf manuell geprüfte reale Fälle.</span></p>';
+  stageFourElements.observationRuns.innerHTML = stageFourObservationRuns.slice(0, 20).map(run => `<article class="stage-four-card"><div><strong>${escapeAdminHTML(run.run_status)} · ${String(run.id).slice(0, 8)}</strong><span>${Number(run.observation_count)} Beobachtungen</span></div><p>${escapeAdminHTML(run.trigger_source)} · ${escapeAdminHTML(run.parser_version)} · ${escapeAdminHTML(run.policy_version)}</p><small>${escapeAdminHTML(run.error_message || run.idempotency_key)}</small>${["queued", "running"].includes(run.run_status) ? `<button type="button" data-stage-four-action="stop-observation-run" data-run-id="${run.id}"><span data-i18n-text="Lauf stoppen">Lauf stoppen</span></button>` : ""}${run.run_status === "paused" ? `<button type="button" data-stage-four-action="resume-observation-run" data-run-id="${run.id}"><span data-i18n-text="Lauf fortsetzen">Lauf fortsetzen</span></button>` : ""}</article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine Beobachtungsläufe.">Noch keine Beobachtungsläufe.</span></p>';
 }
 
 async function loadStageFourRecent(table, columns, orderColumn, limit = 1000) {
@@ -7204,7 +7228,7 @@ async function handleStageFourAction(button) {
       const { data, error } = await supabaseClient.rpc("prepare_stage_four_bulk_operation", { p_action_code: actionCode, p_item_type: itemType, p_item_ids: ids, p_impact_summary: impact });
       if (error) throw error;
       stageFourElements.bulkPreview.hidden = false;
-      stageFourElements.bulkPreview.innerHTML = `<strong>Vorschau: ${Number(data.affected_count)} Datensätze</strong><p>${escapeAdminHTML(data.impact_summary)}</p><ul><li>Transaktional</li><li>Explizite Bestätigung erforderlich</li><li>${data.dry_run ? "Nur Simulation" : "Live-Ausführung"}</li><li>Fehler führen zum Rollback</li></ul><button type="button" data-stage-four-action="execute-bulk" data-operation-id="${data.id}" data-preview-hash="${escapeAdminHTML(data.preview_hash)}">Simulation bestätigen</button>`;
+      stageFourElements.bulkPreview.innerHTML = `<strong>Vorschau: ${Number(data.affected_count)} Datensätze</strong><p>${escapeAdminHTML(data.impact_summary)}</p><ul><li><span data-i18n-text="Transaktional">Transaktional</span></li><li><span data-i18n-text="Explizite Bestätigung erforderlich">Explizite Bestätigung erforderlich</span></li><li>${data.dry_run ? "Nur Simulation" : "Live-Ausführung"}</li><li><span data-i18n-text="Fehler führen zum Rollback">Fehler führen zum Rollback</span></li></ul><button type="button" data-stage-four-action="execute-bulk" data-operation-id="${data.id}" data-preview-hash="${escapeAdminHTML(data.preview_hash)}"><span data-i18n-text="Simulation bestätigen">Simulation bestätigen</span></button>`;
     }
     if (action === "execute-bulk") {
       const operation = stageFourBulkOperations.find(row => String(row.id) === String(button.dataset.operationId));
@@ -7329,7 +7353,7 @@ async function showDataOpsHistory(entityType, entityId, label) {
       <div><strong>${escapeAdminHTML(row.field_name)}</strong><span>${escapeAdminHTML(row.change_source)} · ${formatDataOpsDate(row.created_at, true)}</span></div>
       <p>${escapeAdminHTML(row.reason || "Keine Begründung hinterlegt")}</p>
       <code>${escapeAdminHTML(JSON.stringify(row.old_value))} → ${escapeAdminHTML(JSON.stringify(row.new_value))}</code>
-    </article>`).join("") || '<p class="admin-quality-empty">Noch keine protokollierten Änderungen.</p>';
+    </article>`).join("") || '<p class="admin-quality-empty"><span data-i18n-text="Noch keine protokollierten Änderungen.">Noch keine protokollierten Änderungen.</span></p>';
   dataOpsElements.historyPanel.hidden = false;
   dataOpsElements.historyPanel.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -7458,7 +7482,20 @@ async function handleDataOpsAction(button) {
 ].filter(Boolean).forEach(element => element.addEventListener("change", renderDataOpsProposals));
 
 document.addEventListener("app-language-changed", () => {
-  if (dataOpsElements.panel && !dataOpsElements.panel.hidden) renderDataOperations();
+  if (!dataOpsElements.panel || dataOpsElements.panel.hidden) return;
+  // A language-only redraw must not discard draft schedules or review choices.
+  const controls = [...dataOpsElements.panel.querySelectorAll("input, select, textarea")];
+  const drafts = controls.map(control => ({ id: control.id, name: control.name, type: control.type, value: control.value, checked: control.checked }));
+  const focusedIndex = controls.indexOf(document.activeElement);
+  renderDataOperations();
+  const refreshed = [...dataOpsElements.panel.querySelectorAll("input, select, textarea")];
+  drafts.forEach((draft, index) => {
+    const control = draft.id ? document.getElementById(draft.id) : refreshed[index];
+    if (!control || control.name !== draft.name || control.type !== draft.type || control.type === "file") return;
+    control.value = draft.value;
+    if (control.type === "checkbox" || control.type === "radio") control.checked = draft.checked;
+  });
+  if (focusedIndex >= 0) refreshed[focusedIndex]?.focus({ preventScroll: true });
 });
 dataOpsElements.refresh?.addEventListener("click", loadDataOperations);
 dataOpsElements.validate?.addEventListener("click", runDataOperationsValidation);
@@ -7566,8 +7603,7 @@ function setKnowledgeStatus(message, type = "") {
 
   knowledgeElements.status.className =
     `admin-section-status ${type}`.trim();
-  knowledgeElements.status.textContent =
-    message;
+  bindAccountUiText(knowledgeElements.status, message);
 }
 
 function setKnowledgeResearchStatus(message, type = "") {
@@ -7577,8 +7613,7 @@ function setKnowledgeResearchStatus(message, type = "") {
 
   knowledgeResearchElements.status.className =
     `admin-section-status ${type}`.trim();
-  knowledgeResearchElements.status.textContent =
-    message;
+  bindAccountUiText(knowledgeResearchElements.status, message);
 }
 
 function getKnowledgeResearchCommand() {
@@ -7927,7 +7962,7 @@ function renderKnowledgeEventOptions() {
       });
 
   knowledgeElements.eventSelect.innerHTML =
-    `<option value="">Event auswählen</option>` +
+    `<option value="" data-i18n-text="Event auswählen">Event auswählen</option>` +
     sorted.map(event => {
       const label =
         `${event.event_name || "Untitled"} · ${event.date || "-"} · ${event.city || "-"}`;
@@ -8016,20 +8051,21 @@ function fillKnowledgeForm(data = {}) {
 }
 
 function getKnowledgeSourceTemplate(source = {}) {
+  const sourceTypeLabels = { official: "Official", trusted: "Trusted", community: "Community", estimated: "Estimated", unknown: "Unknown" };
   return `
     <article class="admin-knowledge-row" data-knowledge-source>
-      <label>Label<input data-source-field="source_label" value="${escapeAdminHTML(source.source_label || "")}" /></label>
-      <label>URL<input data-source-field="source_url" type="url" value="${escapeAdminHTML(source.source_url || "")}" /></label>
-      <label>Field<input data-source-field="field_path" value="${escapeAdminHTML(source.field_path || "")}" placeholder="race_day.start_time" /></label>
-      <label>Type<select data-source-field="source_type">
+      <label><span data-i18n-text="Label">Label</span><input data-source-field="source_label" value="${escapeAdminHTML(source.source_label || "")}" /></label>
+      <label><span data-i18n-text="URL">URL</span><input data-source-field="source_url" type="url" value="${escapeAdminHTML(source.source_url || "")}" /></label>
+      <label><span data-i18n-text="Field">Field</span><input data-source-field="field_path" value="${escapeAdminHTML(source.field_path || "")}" placeholder="race_day.start_time" /></label>
+      <label><span data-i18n-text="Type">Type</span><select data-source-field="source_type">
         ${["official", "trusted", "community", "estimated", "unknown"].map(type =>
-          `<option value="${type}" ${source.source_type === type ? "selected" : ""}>${type}</option>`
+          `<option value="${type}" ${source.source_type === type ? "selected" : ""} data-i18n-text="${sourceTypeLabels[type]}">${window.uiText?.(sourceTypeLabels[type]) ?? sourceTypeLabels[type]}</option>`
         ).join("")}
       </select></label>
-      <label>Verified<input data-source-field="last_verified" type="date" value="${escapeAdminHTML(normalizeKnowledgeDate(source.last_verified))}" /></label>
-      <label>Confidence<input data-source-field="confidence_score" inputmode="decimal" value="${escapeAdminHTML(source.confidence_score ?? "")}" /></label>
-      <label>Note<textarea data-source-field="verification_note" rows="2">${escapeAdminHTML(source.verification_note || "")}</textarea></label>
-      <button type="button" data-remove-knowledge-row>Remove</button>
+      <label><span data-i18n-text="Verified">Verified</span><input data-source-field="last_verified" type="date" value="${escapeAdminHTML(normalizeKnowledgeDate(source.last_verified))}" /></label>
+      <label><span data-i18n-text="Confidence">Confidence</span><input data-source-field="confidence_score" inputmode="decimal" value="${escapeAdminHTML(source.confidence_score ?? "")}" /></label>
+      <label><span data-i18n-text="Note">Note</span><textarea data-source-field="verification_note" rows="2">${escapeAdminHTML(source.verification_note || "")}</textarea></label>
+      <button type="button" data-remove-knowledge-row><span data-i18n-text="Remove">Remove</span></button>
     </article>`;
 }
 
@@ -8050,11 +8086,11 @@ function renderKnowledgeSources(sources = []) {
 function getKnowledgeFaqTemplate(faq = {}) {
   return `
     <article class="admin-knowledge-row" data-knowledge-faq>
-      <label>Question<input data-faq-field="question" value="${escapeAdminHTML(faq.question || "")}" /></label>
-      <label>Answer<textarea data-faq-field="answer" rows="2">${escapeAdminHTML(faq.answer || "")}</textarea></label>
-      <label>Sort<input data-faq-field="sort_order" inputmode="numeric" value="${escapeAdminHTML(faq.sort_order || "100")}" /></label>
-      <label>Source URL<input data-faq-field="source_url" type="url" value="${escapeAdminHTML(faq.source_url || "")}" /></label>
-      <button type="button" data-remove-knowledge-row>Remove</button>
+      <label><span data-i18n-text="Question">Question</span><input data-faq-field="question" value="${escapeAdminHTML(faq.question || "")}" /></label>
+      <label><span data-i18n-text="Answer">Answer</span><textarea data-faq-field="answer" rows="2">${escapeAdminHTML(faq.answer || "")}</textarea></label>
+      <label><span data-i18n-text="Sort">Sort</span><input data-faq-field="sort_order" inputmode="numeric" value="${escapeAdminHTML(faq.sort_order || "100")}" /></label>
+      <label><span data-i18n-text="Source URL">Source URL</span><input data-faq-field="source_url" type="url" value="${escapeAdminHTML(faq.source_url || "")}" /></label>
+      <button type="button" data-remove-knowledge-row><span data-i18n-text="Remove">Remove</span></button>
     </article>`;
 }
 
@@ -8585,8 +8621,7 @@ function setKnowledgeAuditStatus(message, type = "") {
 
   knowledgeAuditElements.status.className =
     `admin-section-status ${type}`.trim();
-  knowledgeAuditElements.status.textContent =
-    message;
+  bindAccountUiText(knowledgeAuditElements.status, message);
 }
 
 async function fetchKnowledgeWorkflowJson(url, fallback) {
@@ -9029,7 +9064,7 @@ function renderKnowledgeAuditAdmin() {
 
   if (!rows.length) {
     knowledgeAuditElements.list.innerHTML =
-      `<p class="admin-empty-state">No Knowledge audit rows match the current filter.</p>`;
+      `<p class="admin-empty-state"><span data-i18n-text="No Knowledge audit rows match the current filter.">No Knowledge audit rows match the current filter.</span></p>`;
     return;
   }
 
@@ -9073,27 +9108,27 @@ function renderKnowledgeAuditAdmin() {
                     <strong>${escapeAdminHTML(status)}</strong>
                   </div>
                   <div class="admin-knowledge-review-field-actions">
-                    <button type="button" data-knowledge-review-action="accept" data-review-field-name="${escapeAdminHTML(field)}">Accept</button>
-                    <button type="button" data-knowledge-review-action="reject" data-review-field-name="${escapeAdminHTML(field)}">Reject</button>
-                    <button type="button" data-knowledge-review-action="edit" data-review-field-name="${escapeAdminHTML(field)}">Edit</button>
+                    <button type="button" data-knowledge-review-action="accept" data-review-field-name="${escapeAdminHTML(field)}"><span data-i18n-text="Accept">Accept</span></button>
+                    <button type="button" data-knowledge-review-action="reject" data-review-field-name="${escapeAdminHTML(field)}"><span data-i18n-text="Reject">Reject</span></button>
+                    <button type="button" data-knowledge-review-action="edit" data-review-field-name="${escapeAdminHTML(field)}"><span data-i18n-text="Edit">Edit</span></button>
                   </div>
                 </div>
                 <div class="admin-knowledge-review-field-grid">
-                  <label>Value<textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="value" rows="2">${escapeAdminHTML(formatKnowledgeReviewValue(value))}</textarea></label>
-                  <label>Source URL<input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_url" type="url" value="${escapeAdminHTML(sourceUrl)}" /></label>
-                  <label>Source title<input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_title" value="${escapeAdminHTML(sourceTitle)}" /></label>
-                  <label>Confidence<input data-review-field="${escapeAdminHTML(field)}" data-review-input="confidence" inputmode="decimal" value="${escapeAdminHTML(confidence)}" /></label>
-                  <label>Status<select data-review-field="${escapeAdminHTML(field)}" data-review-input="verification_status">
+                  <label><span data-i18n-text="Value">Value</span><textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="value" rows="2">${escapeAdminHTML(formatKnowledgeReviewValue(value))}</textarea></label>
+                  <label><span data-i18n-text="Source URL">Source URL</span><input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_url" type="url" value="${escapeAdminHTML(sourceUrl)}" /></label>
+                  <label><span data-i18n-text="Source title">Source title</span><input data-review-field="${escapeAdminHTML(field)}" data-review-input="source_title" value="${escapeAdminHTML(sourceTitle)}" /></label>
+                  <label><span data-i18n-text="Confidence">Confidence</span><input data-review-field="${escapeAdminHTML(field)}" data-review-input="confidence" inputmode="decimal" value="${escapeAdminHTML(confidence)}" /></label>
+                  <label><span data-i18n-text="Status">Status</span><select data-review-field="${escapeAdminHTML(field)}" data-review-input="verification_status">
                     ${["needs_review", "verified_official_source", "partially_verified", "rejected", "needs_research"].map(option =>
                       `<option value="${option}" ${verificationStatus === option ? "selected" : ""}>${option}</option>`
                     ).join("")}
                   </select></label>
-                  <label>Last checked<input data-review-field="${escapeAdminHTML(field)}" data-review-input="last_checked" type="date" value="${escapeAdminHTML(lastChecked)}" /></label>
-                  <label>Note<textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="note" rows="2">${escapeAdminHTML(note)}</textarea></label>
+                  <label><span data-i18n-text="Last checked">Last checked</span><input data-review-field="${escapeAdminHTML(field)}" data-review-input="last_checked" type="date" value="${escapeAdminHTML(lastChecked)}" /></label>
+                  <label><span data-i18n-text="Note">Note</span><textarea data-review-field="${escapeAdminHTML(field)}" data-review-input="note" rows="2">${escapeAdminHTML(note)}</textarea></label>
                 </div>
               </article>`;
           }).join("")
-          : `<p class="admin-empty-state">No enrichment task yet. Run npm run enrich:event-knowledge for this priority.</p>`;
+          : `<p class="admin-empty-state"><span data-i18n-text="No enrichment task yet. Run npm run enrich:event-knowledge for this priority.">No enrichment task yet. Run npm run enrich:event-knowledge for this priority.</span></p>`;
 
       return `
         <article class="admin-knowledge-audit-card" data-knowledge-audit-slug="${escapeAdminHTML(row.event_slug)}">
@@ -9109,11 +9144,11 @@ function renderKnowledgeAuditAdmin() {
             </div>
           </div>
           <div class="admin-knowledge-audit-missing">
-            ${row.review_only ? "<span>Private review task; completeness not audited</span>" : missing || "<span>Complete</span>"}
+            ${row.review_only ? '<span data-i18n-text="Private review task; completeness not audited">Private review task; completeness not audited</span>' : missing || '<span data-i18n-text="Complete">Complete</span>'}
           </div>
           <div class="admin-knowledge-audit-actions">
-            <a href="${escapeAdminHTML(row.official_url || "#")}" target="_blank" rel="noopener noreferrer">Official source</a>
-            <button type="button" data-knowledge-audit-action="review" ${task ? "" : "disabled"}>Review enrichment</button>
+            <a href="${escapeAdminHTML(row.official_url || "#")}" target="_blank" rel="noopener noreferrer"><span data-i18n-text="Official source">Official source</span></a>
+            <button type="button" data-knowledge-audit-action="review" ${task ? "" : "disabled"}><span data-i18n-text="Review enrichment">Review enrichment</span></button>
           </div>
           <div class="admin-knowledge-review-fields">
             ${fieldRows}

@@ -115,3 +115,48 @@ test("language choice stays synchronized between Home and Discovery", async ({ p
   await expect(page.locator("#sem-home-title"))
     .toContainText("Find your next race.");
 });
+
+test("event inputs and selected values survive language changes and the preview follows the language", async ({ page }) => {
+  await prepareApp(page);
+  await page.evaluate(async () => {
+    await window.ensureSupabaseFeaturesLoaded();
+    document.getElementById("eventModal").classList.add("open");
+  });
+  await page.locator("#eventNameInput").fill("Mein persönlicher Lauf / My own race");
+  await page.locator("#eventCountryInput").fill("Deutschland");
+  await page.locator("#eventSportInput").selectOption("Running");
+  await page.locator("#eventCourseTypeInput").selectOption("Flat course");
+  await page.locator("#eventHighlightInput").fill("My unchanged notes – unveränderte Notizen");
+  for (const language of ["de", "en", "de"]) {
+    await page.evaluate(language => window.setAppLanguage(language), language);
+    const de = language === "de";
+    await expect(page.locator("#eventNameInput").locator("..")).toContainText(de ? "Eventname" : "Event Name");
+    await expect(page.locator("#eventCountryInput")).toHaveAttribute("placeholder", de ? "Deutschland" : "Germany");
+    await expect(page.locator("#eventSportInput option:checked")).toHaveText(de ? "Laufen" : "Running");
+    await expect(page.locator("#eventCourseTypeInput option:checked")).toHaveText(de ? "Flache Strecke" : "Flat course");
+    await expect(page.locator("#eventSubmitPreview")).toContainText(de ? "Laufen" : "Running");
+    await expect(page.locator("#eventSubmitPreview")).toContainText(de ? "Flache Strecke" : "Flat course");
+    await expect(page.locator("#eventNameInput")).toHaveValue("Mein persönlicher Lauf / My own race");
+    await expect(page.locator("#eventCountryInput")).toHaveValue("Deutschland");
+    await expect(page.locator("#eventSportInput")).toHaveValue("Running");
+    await expect(page.locator("#eventCourseTypeInput")).toHaveValue("Flat course");
+    await expect(page.locator("#eventHighlightInput")).toHaveValue("My unchanged notes – unveränderte Notizen");
+  }
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("lang", "de");
+});
+
+test("profile, knowledge fields and account messages translate in both directions", async ({ page }) => {
+  await prepareApp(page);
+  await page.evaluate(() => window.ensureSupabaseFeaturesLoaded());
+  for (const language of ["de", "en"]) {
+    const de = language === "de";
+    await page.evaluate(language => window.setAppLanguage(language), language);
+    await expect(page.locator("#profileEmailBtn")).toHaveText(de ? "E-Mail-Adresse ändern" : "Change Email");
+    await expect(page.locator('[name="surface"][data-knowledge-table="course"]').locator("..")).toContainText(de ? "Untergrund" : "Surface");
+    await expect(page.locator('[name="lottery_available"] option[value="true"]')).toHaveText(de ? "Ja" : "Yes");
+    await page.evaluate(() => window.showToast("Password too short", "Please use at least 8 characters."));
+    await expect(page.locator(".app-toast").last()).toContainText(de ? "Passwort zu kurz" : "Password too short");
+    await expect(page.locator(".app-toast").last()).toContainText(de ? "Bitte verwende mindestens 8 Zeichen." : "Please use at least 8 characters.");
+  }
+});

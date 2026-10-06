@@ -118,6 +118,57 @@ const DISTANCE_FILTER_LABELS = {
   "tri-full": "Full Tri"
 };
 
+const DISTANCE_FILTER_TRANSLATIONS = {
+  half: "filter.half",
+  "tri-sprint": "filter.triSprint",
+  "tri-olympic": "filter.triOlympic",
+  "tri-middle": "filter.triMiddle",
+  "tri-full": "filter.triFull"
+};
+
+// Search vocabulary is independent of the display language and source language.
+const SEARCH_COUNTRIES = [
+  ["DE", "Germany", "Deutschland"],
+  ["AT", "Austria", "Österreich", "Osterreich"],
+  ["CH", "Switzerland", "Schweiz"],
+  ["FR", "France", "Frankreich"],
+  ["IT", "Italy", "Italien"],
+  ["ES", "Spain", "Spanien"],
+  ["PT", "Portugal"],
+  ["NL", "Netherlands", "The Netherlands", "Niederlande", "Holland"],
+  ["BE", "Belgium", "Belgien"],
+  ["DK", "Denmark", "Dänemark"],
+  ["PL", "Poland", "Polen"],
+  ["CZ", "Czech Republic", "Czechia", "Tschechien"],
+  ["SE", "Sweden", "Schweden"],
+  ["NO", "Norway", "Norwegen"],
+  ["FI", "Finland", "Finnland"],
+  ["GB", "UK", "United Kingdom", "Great Britain", "Großbritannien", "Vereinigtes Königreich"],
+  ["IE", "Ireland", "Irland"],
+  ["US", "USA", "United States", "Vereinigte Staaten"],
+  ["GR", "Greece", "Griechenland"],
+  ["HU", "Hungary", "Ungarn"],
+  ["HR", "Croatia", "Kroatien"],
+  ["SI", "Slovenia", "Slowenien"],
+  ["SK", "Slovakia", "Slowakei"],
+  ["LU", "Luxembourg", "Luxemburg"]
+];
+const SEARCH_COUNTRY_NAMES = new Map(SEARCH_COUNTRIES.flatMap(names =>
+  names.map(name => [normalizeSmartSearchText(name), names])
+));
+// Aliases apply only to exact city values, never to names or description prose.
+const SEARCH_CITY_NAMES = new Map([
+  ["München", "Munich"],
+  ["Köln", "Cologne"],
+  ["Nürnberg", "Nuremberg"],
+  ["Hannover", "Hanover"],
+  ["Konstanz", "Constance"]
+].flatMap(names => names.map(name => [normalizeSmartSearchText(name), names])));
+
+function getSearchCityNames(city) {
+  return SEARCH_CITY_NAMES.get(normalizeSmartSearchText(city)) || [city];
+}
+
 const SEARCH_MONTHS = {
   january: 0,
   januar: 0,
@@ -168,6 +219,14 @@ const SEARCH_STOP_WORDS =
     "dem",
     "und",
     "and",
+    "or",
+    "oder",
+    "on",
+    "at",
+    "of",
+    "for",
+    "fuer",
+    "von",
     "the",
     "event",
     "events",
@@ -220,6 +279,18 @@ function getSearchMonthLabel(month) {
   );
 }
 
+function getSearchDistanceLabel(filter) {
+  const fallback = DISTANCE_FILTER_LABELS[filter] || filter;
+  return DISTANCE_FILTER_TRANSLATIONS[filter]
+    ? getSearchTranslation(DISTANCE_FILTER_TRANSLATIONS[filter], fallback)
+    : fallback;
+}
+
+function getSearchSportLabel(sport) {
+  const keys = { Running: "search.running", Triathlon: "search.triathlon", Ultramarathon: "search.ultramarathon" };
+  return getSearchTranslation(keys[sport] || sport, sport);
+}
+
 function normalizeSmartSearchText(value) {
   return String(value || "")
     .toLowerCase()
@@ -227,7 +298,13 @@ function normalizeSmartSearchText(value) {
     .replace(/ö/g, "oe")
     .replace(/ü/g, "ue")
     .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    // Decimal distances must survive punctuation cleanup (70.3, 21,1 km).
+    .replace(/(\d)[.,](?=\d)/g, "$1\u0000")
     .replace(/[.,;:!?()[\]{}]/g, " ")
+    .replace(/\u0000/g, ".")
+    .replace(/[-–—_/]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -257,7 +334,8 @@ function parseSmartSearch(query) {
     months: [],
     years: [],
     sports: [],
-    distances: []
+    distances: [],
+    statuses: []
   };
 
   if (!text) {
@@ -280,50 +358,70 @@ function parseSmartSearch(query) {
     return " ";
   });
 
+  const statusRules = [
+    ["registration_cancelled", /\b(registration cancelled|registration canceled|anmeldung abgesagt)\b/g],
+    ["registration_not_open", /\b(registration not open|registration closed|anmeldung (?:noch )?nicht (?:offen|geoeffnet)|anmeldung geschlossen)\b/g],
+    ["registration_open", /\b(registration open|anmeldung offen|anmeldung geoeffnet)\b/g],
+    ["sold_out", /\b(sold out|ausverkauft|ausgebucht)\b/g],
+    ["cancelled", /\b(cancelled|canceled|abgesagt)\b/g],
+    ["postponed", /\b(postponed|verschoben)\b/g],
+    ["date_unconfirmed", /\b(date (?:not confirmed|unconfirmed)|datum unbestaetigt|termin unbestaetigt)\b/g],
+    ["completed", /\b(completed|beendet)\b/g],
+    ["scheduled", /\b(scheduled|geplant)\b/g],
+    ["unclear", /\b(unclear|unklar)\b/g]
+  ];
+
+  statusRules.forEach(([status, pattern]) => {
+    if (pattern.test(text)) {
+      addUnique(parsed.statuses, status);
+      text = removeSmartPattern(text, pattern);
+    }
+  });
+
   const distanceRules = [
     {
       filter: "tri-middle",
-      pattern: /\b(70\.3|middle tri|middle distance|mitteldistanz|half ironman)\b/g,
+      pattern: /\b(70\.3|middle(?: distance)? triathlon|middle tri|middle distance|mitteldistanz|half ironman)\b/g,
       sport: "Triathlon"
     },
     {
       filter: "tri-sprint",
-      pattern: /\b(sprint tri|sprint triathlon)\b/g,
+      pattern: /\b(sprint triathlon|sprint tri|sprintdistanz|sprinttriathlon)\b/g,
       sport: "Triathlon"
     },
     {
       filter: "tri-olympic",
-      pattern: /\b(olympic tri|olympic triathlon|standard distance|kurzdistanz)\b/g,
+      pattern: /\b(olympic(?: distance)? triathlon|olympic tri|olympic distance|olympische(?:r|s)? (?:distanz|triathlon)|standard distance|kurzdistanz)\b/g,
       sport: "Triathlon"
     },
     {
       filter: "tri-full",
-      pattern: /\b(full tri|full triathlon|full distance|ironman)\b/g,
+      pattern: /\b(full triathlon|full tri|full distance|long distance|langdistanz|ironman)\b/g,
       sport: "Triathlon"
     },
     {
       filter: "half",
-      pattern: /\b(half marathon|halbmarathon|21\s?km|21\s?kilometer|13\.1\s?miles?)\b/g,
+      pattern: /\b(half marathons?|halbmarathons?|21(?:\.0?97[0-9]*|\.1)?\s?(?:km|k|kilomet(?:er|re)s?)|13\.1\s?miles?)\b/g,
       sport: "Running"
     },
     {
       filter: "5k",
-      pattern: /\b(5\s?k|5\s?km|5\s?kilometer|5 kilometer|3\.1\s?miles?)\b/g,
+      pattern: /\b(5\s?(?:km|k|kilomet(?:er|re)s?)|3\.1\s?miles?)\b/g,
       sport: "Running"
     },
     {
       filter: "10k",
-      pattern: /\b(10\s?k|10\s?km|10\s?kilometer|10 kilometer|6\.2\s?miles?)\b/g,
+      pattern: /\b(10\s?(?:km|k|kilomet(?:er|re)s?)|6\.2\s?miles?)\b/g,
       sport: "Running"
     },
     {
       filter: "ultra",
-      pattern: /\b(ultra|ultramarathon|backyard|50\s?km|100\s?km|100\s?miles?)\b/g,
+      pattern: /\b(ultra running|ultras?|ultramarathons?|ultralauf|ultralaeufe|backyard|50\s?km|100\s?km|100\s?(?:miles?|meilen))\b/g,
       sport: "Ultramarathon"
     },
     {
       filter: "marathon",
-      pattern: /\bmarathon\b/g,
+      pattern: /\b(marathons?|42(?:\.195|\.2)?\s?(?:km|k|kilomet(?:er|re)s?)|26\.2\s?miles?)\b/g,
       sport: "Running"
     }
   ];
@@ -339,15 +437,15 @@ function parseSmartSearch(query) {
   const sportRules = [
     {
       sport: "Triathlon",
-      pattern: /\b(triathlon|tri)\b/g
+      pattern: /\b(triathlons?|tri)\b/g
     },
     {
       sport: "Ultramarathon",
-      pattern: /\b(ultra|ultramarathon|trailrunning|trail)\b/g
+      pattern: /\b(ultra|ultramarathon|trail running|trail runs?|trail laeufe|trail lauf|trailrunning|traillauf|traillaeufe|trails?)\b/g
     },
     {
       sport: "Running",
-      pattern: /\b(running|run|lauf|laufen)\b/g
+      pattern: /\b(road running|road races?|road runs?|running|runs?|lauf|laufen|laeufe|laufevents?|strassenlaeufe|strassenlauf|strasse|road)\b/g
     }
   ];
 
@@ -375,14 +473,20 @@ function eventMatchesSmartSearch(event, smartSearch) {
     return true;
   }
 
-  const searchable =
-    normalizeSmartSearchText(`
-      ${event.event_name}
-      ${event.city}
-      ${event.country}
-      ${event.sport}
-      ${event.distance}
-    `);
+  const country = normalizeSmartSearchText(event.country);
+  const countryNames = SEARCH_COUNTRY_NAMES.get(country) || [event.country];
+  const raceFormats = Array.isArray(event.race_formats) ? event.race_formats : [];
+  const descriptions = window.SportEventMapDescriptions;
+  const displayedDescriptions = typeof descriptions?.localizedDescription === "function"
+    ? [descriptions.localizedDescription(event, "de"), descriptions.localizedDescription(event, "en")]
+    : [];
+  const searchable = normalizeSmartSearchText([
+    event.event_name, ...getSearchCityNames(event.city), ...countryNames, event.sport, event.distance,
+    event.description, event.description_de, event.description_en,
+    ...displayedDescriptions,
+    event.distance_de, event.distance_en,
+    ...raceFormats.map(format => format?.label)
+  ].filter(Boolean).join(" "));
 
   const matchesText =
     smartSearch.textTokens.length === 0 ||
@@ -395,10 +499,18 @@ function eventMatchesSmartSearch(event, smartSearch) {
   }
 
   if (smartSearch.sports.length) {
-    const sport =
-      String(event.sport || "");
+    const sport = normalizeSearchSport(event.sport);
 
     if (!smartSearch.sports.includes(sport)) {
+      return false;
+    }
+  }
+
+  if (smartSearch.statuses?.length) {
+    const status = typeof getEventStatusConfig === "function"
+      ? getEventStatusConfig(event).status
+      : "unclear";
+    if (!smartSearch.statuses.includes(status)) {
       return false;
     }
   }
@@ -457,6 +569,14 @@ function eventMatchesSmartSearch(event, smartSearch) {
   return true;
 }
 
+function normalizeSearchSport(value) {
+  const sport = normalizeSmartSearchText(value);
+  if (/^(running|run|laufen|lauf|laeufe|strassenlauf|road running)$/.test(sport)) return "Running";
+  if (/^(ultramarathon|ultralauf|ultra|ultra running|trail|trailrunning|trail running|traillauf)$/.test(sport)) return "Ultramarathon";
+  if (/^(triathlon|triathlons|tri)$/.test(sport)) return "Triathlon";
+  return String(value || "");
+}
+
 function escapeSuggestionHTML(value) {
   return String(value || "")
     .replace(/&/g, "&amp;")
@@ -476,16 +596,14 @@ function getSmartSearchTitle(smartSearch, fallback) {
   if (smartSearch.distances.length) {
     parts.push(
       smartSearch.distances
-        .map(filter =>
-          DISTANCE_FILTER_LABELS[filter] || filter
-        )
+        .map(getSearchDistanceLabel)
         .join(` ${orLabel} `)
     );
   }
 
   else if (smartSearch.sports.length) {
     parts.push(
-      smartSearch.sports.join(` ${orLabel} `)
+      smartSearch.sports.map(getSearchSportLabel).join(` ${orLabel} `)
     );
   }
 
@@ -501,6 +619,12 @@ function getSmartSearchTitle(smartSearch, fallback) {
     parts.push(
       smartSearch.years.join(` ${orLabel} `)
     );
+  }
+
+  if (smartSearch.statuses?.length) {
+    parts.push(smartSearch.statuses.map(status =>
+      getSearchTranslation(`status.${status}`, status.replaceAll("_", " "))
+    ).join(` ${orLabel} `));
   }
 
   if (!parts.length) {
@@ -527,7 +651,8 @@ function getSearchSuggestionItems(query) {
     smartSearch.distances.length ||
     smartSearch.months.length ||
     smartSearch.years.length ||
-    smartSearch.sports.length
+    smartSearch.sports.length ||
+    smartSearch.statuses.length
   ) {
     suggestions.push({
       type: getSearchTranslation(
@@ -574,7 +699,10 @@ function getSearchSuggestionItems(query) {
         meta: [
           event.date,
           event.city,
-          event.distance
+          typeof window.SportEventMapDescriptions?.localizeEventText === "function"
+            ? window.SportEventMapDescriptions.localizeEventText(event.distance,
+                typeof window.getAppLanguage === "function" ? window.getAppLanguage() : "en")
+            : event.distance
         ].filter(Boolean).join(" · "),
         query: event.event_name
       });
@@ -597,8 +725,9 @@ function getSearchSuggestionItems(query) {
       String(event.city).trim();
 
     if (
-      normalizeSmartSearchText(city)
-        .includes(normalizedQuery) &&
+      getSearchCityNames(city).some(name =>
+        normalizeSmartSearchText(name).includes(normalizedQuery)
+      ) &&
       !citySuggestions.includes(city)
     ) {
       citySuggestions.push(city);
@@ -791,17 +920,19 @@ function initFilterAccordions() {
 }
 
 function normalizeDistanceSearchText(event) {
-  return String(event.distance || "")
-    .toLowerCase()
-    .replace(/,/g, ".")
-    .replace(/\s+/g, " ");
+  const formats = Array.isArray(event.race_formats) ? event.race_formats : [];
+  return normalizeSmartSearchText([
+    event.distance,
+    ...formats.flatMap(format => [format?.label,
+      typeof format?.distance_km === "number" ? `${format.distance_km} km` : ""])
+  ].filter(Boolean).join(" "));
 }
 
 function normalizeDistanceContextText(event) {
   return `
     ${event.event_name || ""}
     ${event.sport || ""}
-    ${event.distance || ""}
+    ${normalizeDistanceSearchText(event)}
   `
     .toLowerCase()
     .replace(/,/g, ".")
@@ -819,18 +950,18 @@ function hasMiddleTriSignal(text) {
 function distanceTextMatchesFilter(distanceText, contextText, filter) {
   switch (filter) {
     case "5k":
-      return /(^|[^0-9])5\s?(k|km|kilometer)([^0-9]|$)/i.test(distanceText) ||
+      return /(^|[^0-9.])5\s?(km|k|kilomet(?:er|re)s?)\b/i.test(distanceText) ||
         /\b3\.1\s?miles?\b/i.test(distanceText);
 
     case "10k":
-      return /(^|[^0-9])10\s?(k|km|kilometer)([^0-9]|$)/i.test(distanceText) ||
+      return /(^|[^0-9.])10\s?(km|k|kilomet(?:er|re)s?)\b/i.test(distanceText) ||
         /\b6\.2\s?miles?\b/i.test(distanceText);
 
     case "half":
-      return /\bhalf marathon\b|\bhalbmarathon\b|\b21\s?(k|km|kilometer)\b|\b13\.1\s?miles?\b/i.test(distanceText);
+      return /\bhalf marathons?\b|\bhalbmarathons?\b|\b21(?:\.0?97[0-9]*|\.1)?\s?(km|k|kilomet(?:er|re)s?)\b|\b13\.1\s?miles?\b/i.test(distanceText);
 
     case "marathon":
-      return /\b42\s?(k|km|kilometer)\b|\b26\.2\s?miles?\b/i.test(distanceText) ||
+      return /\b42(?:\.195|\.2)?\s?(km|k|kilomet(?:er|re)s?)\b|\b26\.2\s?miles?\b/i.test(distanceText) ||
         /\bmarathon\b/i.test(
           distanceText.replace(
             /\bhalf marathon\b|\bhalbmarathon\b/g,
@@ -842,11 +973,11 @@ function distanceTextMatchesFilter(distanceText, contextText, filter) {
       return /\bultra\b|\bultramarathon\b|\btrail\b|backyard|\b\d{1,2}\s?h\b|\bmiles?\b|\b50\s?(k|km|kilometer)\b|\b60\s?(k|km|kilometer)\b|\b80\s?(k|km|kilometer)\b|\b100\s?(k|km|kilometer)\b|\b160\s?(k|km|kilometer)\b/i.test(contextText);
 
     case "tri-sprint":
-      return /\bsprint\b/i.test(contextText) &&
+      return /\bsprint\b|\bsprintdistanz\b|\bsprinttriathlon\b/i.test(contextText) &&
         hasTriathlonSignal(contextText);
 
     case "tri-olympic":
-      return /\bolympic\b|\bstandard distance\b|\bkurzdistanz\b/i.test(contextText) &&
+      return /\bolympic\b|\bolympische(?:r|s)?\b|\bstandard distance\b|\bkurzdistanz\b/i.test(contextText) &&
         hasTriathlonSignal(contextText);
 
     case "tri-middle":
@@ -1028,11 +1159,11 @@ function getActiveFilterLabels(resultCount = null) {
     document.getElementById("countryFilter")?.value || "all";
 
   if (resultCount !== null) {
-    labels.push(`${resultCount} found`);
+    labels.push(getSearchTranslation("search.found", "{count} found", { count: resultCount }));
   }
 
   if (searchValue) {
-    labels.push(`Search: ${searchValue}`);
+    labels.push(getSearchTranslation("search.queryLabel", "Search: {query}", { query: searchValue }));
   }
 
   if (country !== "all") {
@@ -1048,17 +1179,17 @@ function getActiveFilterLabels(resultCount = null) {
 
   if (sportFilters.length) {
     labels.push(
-      `Sports: ${sportFilters.join(", ")}`
+      getSearchTranslation("search.sportsLabel", "Sports: {sports}", {
+        sports: sportFilters.map(getSearchSportLabel).join(", ")
+      })
     );
   }
 
   if (selectedDistanceFilters.length) {
     labels.push(
-      `Distances: ${selectedDistanceFilters
-        .map(filter =>
-          DISTANCE_FILTER_LABELS[filter] || filter
-        )
-        .join(", ")}`
+      getSearchTranslation("search.distancesLabel", "Distances: {distances}", {
+        distances: selectedDistanceFilters.map(getSearchDistanceLabel).join(", ")
+      })
     );
   }
 
@@ -1073,7 +1204,7 @@ function getActiveFilterLabels(resultCount = null) {
 
   if (dateFrom || dateTo) {
     labels.push(
-      `${dateFrom || "Any"} - ${dateTo || "Any"}`
+      `${dateFrom || getSearchTranslation("filter.any", "Any")} - ${dateTo || getSearchTranslation("filter.any", "Any")}`
     );
   }
 
@@ -1546,8 +1677,8 @@ function initSearch() {
 
         const actionLabel =
           isOpen
-            ? "Kartenwerkzeuge schließen"
-            : "Kartenwerkzeuge öffnen";
+            ? getSearchTranslation("map.closeTools", "Close map tools")
+            : getSearchTranslation("map.openTools", "Open map tools");
 
         mapToolsToggle.setAttribute(
           "aria-label",
@@ -1572,7 +1703,7 @@ function initSearch() {
         ];
 
       mapStyleBtn.title =
-        `Map style: ${currentOption.textContent.trim()}`;
+        `${getSearchTranslation("map.style", "Map style")}: ${currentOption.textContent.trim()}`;
 
       mapStyleBtn.setAttribute(
         "aria-label",
@@ -1581,6 +1712,8 @@ function initSearch() {
     };
 
     updateMapStyleButtonTitle();
+
+    document.addEventListener("app-language-changed", updateMapStyleButtonTitle);
 
     mapStyleBtn.addEventListener(
       "click",
@@ -1702,7 +1835,7 @@ function applyFilters(zoom = false) {
 
       const matchesFilter =
         sportFilters.length === 0 ||
-        sportFilters.includes(event.sport);
+        sportFilters.includes(normalizeSearchSport(event.sport));
 
       const matchesDistance =
         eventMatchesDistanceFilters(event);

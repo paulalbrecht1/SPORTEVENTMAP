@@ -11,12 +11,18 @@ const nextId = "22222222-2222-4222-8222-222222222222";
 const field = (page, name) => page.locator(`[data-maintenance-field="${name}"]`);
 const modal = page => page.locator('dialog[data-maintenance-preview-box]');
 
-async function fixture(page, mode = "success", viewport) {
+async function fixture(page, mode = "success", viewport, language) {
   if (viewport) await page.setViewportSize(viewport);
   await page.route("**/maintenance-fixture", route => route.fulfill({ contentType: "text/html; charset=utf-8", body: '<html lang="de" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><main id="root"></main></body></html>' }));
   await page.goto("/maintenance-fixture");
   await page.addStyleTag({ content: styles });
   await page.addScriptTag({ content: descriptions });
+  if (language) {
+    await page.evaluate(value => localStorage.setItem("sportEventMapLanguage", value), language);
+    await page.addScriptTag({ content: fs.readFileSync(new URL("../../js/ui-translations.js", import.meta.url), "utf8") });
+    await page.addScriptTag({ content: fs.readFileSync(new URL("../../js/i18n.js", import.meta.url), "utf8") });
+    await page.evaluate(value => window.setAppLanguage(value), language);
+  }
   await page.addScriptTag({ content: script });
   await page.evaluate(async ({ mode, editionId, nextId }) => {
     window.db = { event: { id: 7, canonical_name: "Berliner Prüflauf", event_name: "Berliner Prüflauf", sport: "Running", city: "Berlin", country: "Germany", address: "Startstraße 10", latitude: 52.52, longitude: 13.4, description: "Offizieller Lauf über mehrere angebotene Distanzen in Berlin.", official_url: "https://example.test/event", organizer_name: "Laufverein", organizer_url: "https://example.test" }, editions: [{ id: editionId, event_id: 7, edition_year: 2026, edition_key: "main", start_date: "2026-10-10", end_date: "2026-10-10", edition_status: "scheduled", registration_status: "registration_open", registration_url: "https://example.test/register", source_url: "https://example.test/2026", publication_status: mode === "publication" ? "draft" : "published", race_formats: [{ label: "10 km", distance_km: 10, surface: "road" }], legacy_distance: "10 km" }], sources: [], candidates: [], version: "one" };
@@ -139,6 +145,54 @@ test("manual: legacy race proposals remain readable and escaped in the review pr
   expect(await page.evaluate(() => window.previewInjected)).toBeUndefined();
   expect(await page.evaluate(() => window.calls)).toEqual([]);
   expect(await page.evaluate(() => window.db.proposals[0].normalized_value)).toEqual(formats);
+});
+
+test("manual: German and English switches preserve unsaved values, selection, checkboxes and focus", async ({ page }) => {
+  await fixture(page, "success", { width: 390, height: 844 }, "de");
+  const description = "Running / Datum / Meine unveränderte Beschreibung";
+  await field(page, "event.description").evaluate(input => { input.closest("details").open = true; });
+  await field(page, "event.description").fill(description);
+  await field(page, "edition.registration_status").selectOption("sold_out");
+  await page.locator('[data-maintenance-clear="event.address"]').check();
+  await field(page, "event.description").focus();
+  const before = await page.evaluate(() => {
+    window.languageInput = document.activeElement;
+    return [...document.querySelectorAll("#root input,#root select,#root textarea")].map(input => ({
+      id: input.id, value: input.value, checked: input.checked, disabled: input.disabled
+    }));
+  });
+  await page.evaluate(() => window.setAppLanguage("en"));
+  await expect(page.locator("#maintenanceTitle")).toHaveText("Maintain events");
+  await expect(page.locator('label[for="maintenance-event-description"]')).toContainText("Description");
+  await expect(page.locator('[data-maintenance-search]')).toHaveAttribute("placeholder", "Event name");
+  await expect(field(page, "edition.registration_status").locator("option:checked")).toHaveText("Sold out");
+  expect(await page.evaluate(() => [...document.querySelectorAll("#root input,#root select,#root textarea")].map(input => ({
+    id: input.id, value: input.value, checked: input.checked, disabled: input.disabled
+  })))).toEqual(before);
+  expect(await page.evaluate(() => document.activeElement === window.languageInput)).toBe(true);
+  await expect(field(page, "event.description")).toHaveValue(description);
+  expect(await page.evaluate(() => window.calls)).toEqual([]);
+
+  await page.evaluate(() => window.setAppLanguage("de"));
+  await expect(page.locator("#maintenanceTitle")).toHaveText("Events pflegen");
+  await expect(field(page, "edition.registration_status").locator("option:checked")).toHaveText("Ausgebucht");
+  await expect(page.locator('[data-maintenance-clear="event.address"]')).toBeChecked();
+  await expect(field(page, "event.description")).toHaveValue(description);
+  expect(await page.evaluate(() => document.activeElement === window.languageInput)).toBe(true);
+  await preview(page);
+  await page.evaluate(() => window.setAppLanguage("en"));
+  await expect(modal(page).locator("#maintenanceConfirmTitle")).toHaveText("Apply changes?");
+  await expect(modal(page).locator("[data-maintenance-save]")).toHaveText("Apply and save");
+  expect(await page.evaluate(() => ({ calls: window.calls.length, commits: window.commits }))).toEqual({ calls: 0, commits: 0 });
+  await modal(page).locator("[data-maintenance-back]").click();
+  await expect(field(page, "event.description")).toHaveValue(description);
+  await page.locator("[data-maintenance-preview]").click();
+  await modal(page).locator("[data-maintenance-save]").click();
+  await expect.poll(() => page.evaluate(() => window.commits)).toBe(1);
+  const request = await page.evaluate(() => window.calls[0]);
+  expect(request.event_patch.description).toBe(description);
+  expect(request.edition_patch.registration_status).toBe("sold_out");
+  expect(request.clear_fields).toContain("event.address");
 });
 
 test('manual: cancelling or escaping the approval modal sends no request and preserves the edits', async ({ page }) => {

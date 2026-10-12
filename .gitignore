@@ -27,6 +27,8 @@ coverage/
 .tmp-supabase-edition-staging/
 
 # Local test and browser artifacts
+.playwright-cli/
+/output/playwright/
 .playwright-browsers/
 test-results/
 test-results-*/

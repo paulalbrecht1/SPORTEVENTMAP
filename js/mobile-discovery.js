@@ -108,5 +108,6 @@
     childList: true, characterData: true, subtree: true
   });
   document.addEventListener("app-language-changed", translateControls);
+  window.mobileDiscoveryView = { get: () => view, set: setView };
   adaptToViewport();
 })();

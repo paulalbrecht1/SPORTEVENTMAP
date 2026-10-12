@@ -907,6 +907,7 @@ function showPlatformRoute(routeInfo, options = {}) {
   }
 
   if (route === "discovery") {
+    window.discoveryContext?.prepareReturn();
     stabilizeDiscoveryShellForEntry();
     setPlatformRouteClasses("discovery");
     showPlatformPage("");
@@ -925,6 +926,7 @@ function showPlatformRoute(routeInfo, options = {}) {
       skipWelcome: true
     });
 
+    window.discoveryContext?.restoreLayout();
     resetDiscoveryMapAfterLayout(180, {
       restoreEventView: Boolean(options.restoreEventView)
     });
@@ -1249,6 +1251,7 @@ window.preparePlatformDiscoveryForEvent = function preparePlatformDiscoveryForEv
 
 window.closePlatformEventRoute = function closePlatformEventRoute() {
   if (window.location.hash.startsWith("#/event/")) {
+    window.discoveryContext?.prepareReturn();
     navigateToPlatformRoute("discovery", {
       replace: true,
       restoreEventView: true
@@ -1265,6 +1268,7 @@ function goToAppHome(event) {
 }
 
 function applyLandingSearch(query) {
+  window.discoveryContext?.discardPending();
   const searchInput =
     document.getElementById("searchInput");
 
@@ -1951,6 +1955,173 @@ syncEventListFavoritesToggle();
 
 document.addEventListener("app-language-changed", syncEventListFavoritesToggle);
 
+
+// Keep discovery context in this tab when a standalone event page replaces the
+// document. Store controls, not catalog rows: returned results use current data.
+window.discoveryContext = (() => {
+  const storageKey = "sportEventMap.discoveryContext.v1";
+  const historyKey = "sportEventMapDiscovery";
+  const validState = state => state?.version === 1 &&
+    state.filters && typeof state.filters === "object" &&
+    state.layout && typeof state.layout === "object";
+  const boundedNumber = (value, max, fallback = 0) =>
+    Number.isFinite(value) ? Math.max(0, Math.min(value, max)) : fallback;
+  const isDiscovery = () => getPlatformHashRoute().route === "discovery";
+  const isDiscoverySurface = () => ["discovery", "event"].includes(getPlatformHashRoute().route);
+  let pending = null;
+  let beforeEvent = null;
+  let revision = 0;
+  let restoreFrame = 0;
+
+  try {
+    const state = history.state?.[historyKey] ||
+      JSON.parse(sessionStorage.getItem(storageKey) || "null");
+    if (validState(state)) pending = state;
+  } catch {
+    // Private browsing, blocked storage or an outdated snapshot must not block search.
+  }
+
+  function capture() {
+    const center = typeof map !== "undefined" && map?.getCenter?.();
+    return {
+      version: 1,
+      filters: getDiscoverySearchState(),
+      layout: {
+        panelOpen: !sidebar.classList.contains("closed"),
+        fullscreen: document.body.classList.contains("event-list-fullscreen"),
+        mobileView: window.mobileDiscoveryView?.get() || "map",
+        page: eventListPage,
+        scrollTop: document.getElementById("eventList")?.scrollTop || 0,
+        filterScrollTop: document.getElementById("sidebar-header")?.scrollTop || 0
+      },
+      map: center ? { center: [center.lat, center.lng], zoom: map.getZoom() } : null
+    };
+  }
+
+  function save() {
+    if (!isDiscoverySurface() && !beforeEvent) return;
+    const state = beforeEvent || pending || capture();
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(state));
+    } catch {
+      // History still supports browser Back when session storage is unavailable.
+    }
+    try {
+      history.replaceState({ ...history.state, [historyKey]: state }, "");
+    } catch {
+      // Some embedded browsers disallow history writes.
+    }
+  }
+
+  function restoreLayout(layout) {
+    const fullscreen = !isPhoneViewport() && layout.fullscreen === true;
+    document.body.classList.toggle("event-list-fullscreen", fullscreen);
+    document.body.classList.remove("fullscreen-drawer-open");
+    setSidebarExpanded(!isPhoneViewport() && (layout.panelOpen === true || fullscreen), {
+      animate: false, focusPanel: false, refresh: false
+    });
+    window.mobileDiscoveryView?.set(layout.mobileView === "list" ? "list" : "map");
+  }
+
+  function restore() {
+    if (!pending || !isDiscovery() || !window.isDiscoveryMapReady?.()) return;
+    const state = pending;
+    pending = null;
+    beforeEvent = null;
+    const currentRevision = revision;
+    const frame = ++restoreFrame;
+    const layout = state.layout;
+
+    restoreDiscoverySearchState(state.filters);
+    restoreLayout(layout);
+    eventListPage = Math.floor(boundedNumber(layout.page, 100000, 1)) || 1;
+    applyFilters(false, { preserveListPosition: true });
+
+    // Sidebar opening and phone node relocation both finish on animation frames.
+    // Restore scroll only after the correct page and final layout exist.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (frame !== restoreFrame || revision !== currentRevision || !isDiscovery()) return;
+      document.getElementById("eventList").scrollTop = boundedNumber(layout.scrollTop, 10000000);
+      document.getElementById("sidebar-header").scrollTop = boundedNumber(layout.filterScrollTop, 10000000);
+      const savedMap = state.map;
+      if (typeof map !== "undefined" && map &&
+          Array.isArray(savedMap?.center) && savedMap.center.length === 2 &&
+          savedMap.center.every(Number.isFinite) && Number.isFinite(savedMap.zoom) &&
+          Math.abs(savedMap.center[0]) <= 90 && Math.abs(savedMap.center[1]) <= 180 &&
+          savedMap.zoom >= 0 && savedMap.zoom <= 22) {
+        window.restoreDiscoveryMapViewBeforeEvent?.();
+        map.stop?.();
+        map.invalidateSize({ animate: false, pan: false });
+        map.setView(savedMap.center, savedMap.zoom, { animate: false });
+      }
+    }));
+  }
+
+  function userChangedContext(event) {
+    if (!isDiscoverySurface()) return;
+    const target = event.target;
+    const controls = "#searchInput, #sidebar input, #sidebar select, #sidebar button, #toggleSidebar, #mobileMapViewBtn, #mobileListViewBtn, #eventListPagination button";
+    const mapGesture = event.type === "pointerdown" && target.closest?.("#map");
+    const discoveryScroll = event.type === "wheel" && target.closest?.("#eventList, #sidebar-header, #map");
+    if (discoveryScroll || mapGesture || target.closest?.(controls)) {
+      revision += 1;
+      pending = null;
+      beforeEvent = null;
+    }
+  }
+
+  // Capture phase includes title/status links whose handlers stop propagation,
+  // as well as links in a popup or drawer. Modified clicks remain native links.
+  document.addEventListener("click", event => {
+    const link = event.target.closest?.("a[href]");
+    if (!link || (!isDiscoverySurface() && !beforeEvent)) return;
+    const url = new URL(link.href, location.href);
+    if (url.origin === location.origin &&
+        (/\/event\/[^/]+\/?$/.test(url.pathname) || /\/event-detail\.html$/.test(url.pathname))) save();
+  }, true);
+  for (const type of ["input", "change", "click", "wheel", "pointerdown"]) {
+    document.addEventListener(type, userChangedContext, { capture: true, passive: true });
+  }
+  window.addEventListener("pagehide", save);
+  window.addEventListener("sport-event-map-discovery-ready", restore);
+  // A page restored from the browser cache already has its DOM and map state.
+  window.addEventListener("pageshow", event => {
+    if (event.persisted) {
+      pending = null;
+    }
+  });
+  if (pending) {
+    restoreDiscoverySearchState(pending.filters);
+    if (isDiscovery()) restoreLayout(pending.layout);
+  }
+  requestAnimationFrame(restore);
+
+  return {
+    discardPending() {
+      revision += 1;
+      pending = null;
+      beforeEvent = null;
+    },
+    rememberBeforeEvent() {
+      if (isDiscovery() && !beforeEvent && !pending) beforeEvent = capture();
+    },
+    prepareReturn() {
+      if (beforeEvent) pending = beforeEvent;
+      else if (!pending && (getPlatformHashRoute().route === "event" ||
+          document.getElementById("eventDrawer")?.classList.contains("open"))) pending = capture();
+    },
+    restoreLayout() {
+      // Restore visible controls within the route change. A delayed map paint
+      // must not change the panel between a user's pointer press and click.
+      if (pending && isDiscovery()) restoreLayout(pending.layout);
+    },
+    beforeCatalogRefresh() {
+      // Existing results stay usable during a background reload. The renderer
+      // preserves their latest page and scroll position synchronously.
+      return !pending && isDiscovery() && Boolean(window.isDiscoveryMapReady?.());
+    }
+  };
+})();
 
 // LOCATE USER
 document

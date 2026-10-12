@@ -1051,7 +1051,7 @@ function applyRemotePlanningState(state = {}) {
     events.length
   ) {
     if (typeof applyFilters === "function") {
-      applyFilters();
+      applyFilters(false, { preserveListPosition: true });
     } else {
       renderEventList(events);
     }

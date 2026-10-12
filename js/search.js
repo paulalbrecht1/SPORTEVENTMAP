@@ -9,6 +9,38 @@ let searchUiInitialized = false;
 let filterApplicationFrame = 0;
 let pendingFilterZoom = false;
 
+function getDiscoverySearchState() {
+  return {
+    query: document.getElementById("searchInput")?.value || "",
+    ...getActiveFilterAnalytics()
+  };
+}
+
+function restoreDiscoverySearchState(state) {
+  if (!state || typeof state !== "object") return;
+  const fields = {
+    query: "searchInput", sort: "sortSelect", country: "countryFilter",
+    date: "dateFilter", from: "dateFromFilter", to: "dateToFilter"
+  };
+  Object.entries(fields).forEach(([key, id]) => {
+    const field = document.getElementById(id);
+    const value = state[key];
+    if (!field || typeof value !== "string") return;
+    if (field.tagName === "SELECT" && !Array.from(field.options).some(option => option.value === value)) return;
+    field.value = value;
+  });
+  const selectedValues = (values, selector, key) => {
+    const allowed = new Set(Array.from(document.querySelectorAll(selector), button => button.dataset[key]));
+    return Array.isArray(values) ? [...new Set(values.filter(value => value !== "All" && allowed.has(value)))] : [];
+  };
+  selectedSportFilters = selectedValues(state.sports, ".filter-chip", "filter");
+  selectedDistanceFilters = selectedValues(state.distances, ".distance-filter-chip", "distanceFilter");
+  syncSportFilterButtons();
+  syncDistanceFilterButtons();
+  updateDateRangeState();
+  updateDiscoveryFilterCount();
+}
+
 function getActiveFilterAnalytics() {
   return {
     sports:
@@ -1795,7 +1827,7 @@ function initSearch() {
 }
 
 
-function applyFilters(zoom = false) {
+function applyFilters(zoom = false, options = {}) {
   if (
     typeof allMarkers === "undefined" ||
     !Array.isArray(allMarkers)
@@ -2040,11 +2072,15 @@ if (sort === "date") {
   updateDiscoveryFilterCount();
 
   if (typeof renderEventList === "function") {
+    const list = document.getElementById("eventList");
+    const scrollTop = list?.scrollTop || 0;
     renderEventList(
       filtered.map(
         item => item.data
-      )
+      ),
+      { preservePage: Boolean(options.preserveListPosition) }
     );
+    if (options.preserveListPosition && list) list.scrollTop = scrollTop;
   }
 
 

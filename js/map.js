@@ -128,6 +128,7 @@ function getDiscoveryDefaultMapZoom() {
 }
 
 function rememberDiscoveryMapViewBeforeEvent() {
+  window.discoveryContext?.rememberBeforeEvent();
   if (
     discoveryMapViewBeforeEvent ||
     typeof map === "undefined" ||
@@ -993,6 +994,8 @@ function resetMapFilters() {
 function refreshEvents(options = {}) {
 
   console.log("Refreshing events");
+  const preserveListPosition = !options.resetFilters &&
+    Boolean(window.discoveryContext?.beforeCatalogRefresh());
 
   const refreshToken =
     ++eventsRefreshToken;
@@ -1006,7 +1009,7 @@ function refreshEvents(options = {}) {
   const list =
     document.getElementById("eventList");
 
-  if (list) {
+  if (list && !preserveListPosition) {
     list.innerHTML = `
       <div class="event-list-empty event-list-loading">
         <strong data-i18n-text="Loading events">Loading events</strong>
@@ -1067,7 +1070,7 @@ function refreshEvents(options = {}) {
 
       }
 
-      applyFilters();
+      applyFilters(false, { preserveListPosition });
 
     }
     else {

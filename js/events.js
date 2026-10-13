@@ -1266,16 +1266,24 @@ function clearPendingSeasonAdd() {
 }
 
 async function processPendingSeasonAdd() {
-  const pending =
+  const initialPending =
     getPendingSeasonAdd();
 
   if (
-    !pending ||
+    !initialPending ||
     !Array.isArray(events) ||
     !events.length
   ) {
     return;
   }
+  // The CSV bootstrap may precede sign-in and the current edition catalog.
+  // Retain the request until authenticated; cancellation may remove it while
+  // the SDK is loading, so read it again after the access check.
+  try {
+    if (typeof canOpenSeasonPlanner !== "function" || !await canOpenSeasonPlanner()) return;
+  } catch { return; }
+  const pending = getPendingSeasonAdd();
+  if (!pending) return;
 
   const pendingKey =
     cleanValue(pending.event_key);
@@ -1285,10 +1293,12 @@ async function processPendingSeasonAdd() {
   const found =
     events.find(event =>
       getEventKey(event) === pendingKey ||
+      (pendingSlug && event.edition_slug === pendingSlug) ||
       getEventDetailSlug(event) === pendingSlug
     );
 
   if (!found) {
+    if (window.eventCatalogSource !== "supabase") return;
     clearPendingSeasonAdd();
 
     if (typeof showToast === "function") {
@@ -1329,15 +1339,20 @@ async function addEventToSeasonPlanner(event, options = {}) {
   }
 
   if (!isSignedIn) {
-    if (typeof showAppMessage === "function") {
+    try {
+      localStorage.setItem("pendingSeasonAdd", JSON.stringify({
+        event_key: getEventKey(event),
+        event_slug: event.edition_slug || getEventDetailSlug(event),
+        requested_at: new Date().toISOString()
+      }));
+    } catch { /* Sign-in remains available when browser storage is blocked. */ }
+    if (typeof openAuthModal === "function") {
+      openAuthModal("login");
+    } else if (typeof showAppMessage === "function") {
       showAppMessage(
         "Login required",
         "Bitte logge dich ein, um dieses Event in deinem Season Planner zu speichern."
       );
-    }
-
-    if (typeof openAuthModal === "function") {
-      openAuthModal("login");
     }
 
     return false;

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { useSignedInDetailCloud } from "./helpers/detail-auth.mjs";
 import fs from 'node:fs';
 const archive = JSON.parse(fs.readFileSync(new URL('../../data/event-editions-public.json', import.meta.url), 'utf8')).editions;
 const liveRow = { ...archive.find(row => row.edition_slug === '10-charity-lauf-koldingen-2026'), official_url: 'https://official.example/koldingen' };
@@ -53,7 +54,7 @@ async function prepareDetailPage(page, options = {}) {
   await page.route('https://detail-behavior.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([liveRow]) }));
   await page.route('https://detail-behavior.test/rest/v1/rpc/get_public_event_freshness_guard', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify({ decisions: { [liveRow.edition_id]: false } }) }));
 
-  await page.addInitScript(({ favorites, cloud }) => {
+  await page.addInitScript(({ favorites }) => {
     localStorage.setItem('sportEventMapLanguage', 'en');
     if (
       localStorage.getItem("sportEventMap.detailE2ESeeded") !== "true"
@@ -68,90 +69,18 @@ async function prepareDetailPage(page, options = {}) {
       );
     }
 
-    if (!cloud) {
-      return;
-    }
-
-    const operationLog = [];
-
-    window.__detailCloudOperationLog =
-      operationLog;
-    window.__sportEventMapDetailSupabaseClient = {
-      auth: {
-        async getUser() {
-          return {
-            data: {
-              user: {
-                id: "detail-test-user"
-              }
-            }
-          };
-        }
-      },
-      from(table) {
-        let operation = "select";
-
-        const builder = {
-          select() {
-            operation = "select";
-            return this;
-          },
-          delete() {
-            operation = "delete";
-            return this;
-          },
-          eq() {
-            return this;
-          },
-          limit() {
-            return Promise.resolve({
-              data:
-                cloud.remoteSaved
-                  ? [{ event_id: "saved" }]
-                  : [],
-              error: null
-            });
-          },
-          async upsert() {
-            operationLog.push({
-              table,
-              operation: "upsert"
-            });
-
-            return {
-              data: null,
-              error:
-                cloud.failTable === table
-                  ? { message: "forced detail sync failure" }
-                  : null
-            };
-          },
-          then(resolve) {
-            operationLog.push({
-              table,
-              operation
-            });
-            resolve({
-              data: [],
-              error: null
-            });
-          }
-        };
-
-        return builder;
-      }
-    };
   }, {
-    favorites,
-    cloud
+    favorites
   });
+
+  if (cloud) await useSignedInDetailCloud(page, cloud);
 
   await page.goto(detailPath);
   await expect(page.locator("html")).toHaveAttribute("data-sem-public-detail-state", "verified");
 }
 
-test("Season button adds, survives reload, prevents duplicates and removes", async ({ page }) => {
-  await prepareDetailPage(page);
+test("Signed-in Season button adds, survives remote readback on reload, prevents duplicates and removes", async ({ page }) => {
+  await prepareDetailPage(page, { cloud: {} });
 
   const button =
     page.locator("#addDetailEventToSeason");
@@ -176,6 +105,9 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
     );
 
   expect(favorites).toHaveLength(1);
+  expect(await page.evaluate(() =>
+    window.__detailCloudOperationLog.filter(item => item.operation === "upsert")
+  )).toHaveLength(1);
 
   await page.reload();
   await expect(button).toHaveText("In your season");
@@ -191,6 +123,7 @@ test("Season button adds, survives reload, prevents duplicates and removes", asy
     );
 
   expect(favorites).toEqual([]);
+  expect(await page.evaluate(() => Object.values(window.__detailCloudSavedRows))).toEqual([]);
 });
 
 test("signed-in state loads from the existing Season Planner table", async ({ page }) => {

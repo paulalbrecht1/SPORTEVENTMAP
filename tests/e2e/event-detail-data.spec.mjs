@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { useSignedInDetailCloud } from './helpers/detail-auth.mjs';
 import { createRequire } from 'node:module';
 import fs from 'node:fs';
 const require = createRequire(import.meta.url);
@@ -107,6 +108,7 @@ test('live page loads exact edition details lazily, keeps genuine source dates s
   const slug = 'bmw-berlin-marathon-2026';
   const event = archive.find(row => row.edition_slug === slug);
   await isolate(page);
+  await useSignedInDetailCloud(page);
   await page.route('https://detail-data.test/rest/v1/public_event_archive?**', route => route.fulfill({ contentType: 'application/json', body: JSON.stringify([{ ...event, description: '', organizer_name: 'SCC EVENTS', start_time: null }]) }));
   await page.goto(`/event-detail.html?event=${slug}`);
   await expect(page.locator('#registration')).toBeVisible();
@@ -120,6 +122,7 @@ test('live page loads exact edition details lazily, keeps genuine source dates s
   await expect(page.locator('#addDetailEventToSeason')).toBeEnabled();
   await page.locator('#addDetailEventToSeason').click();
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => Object.values(window.__detailCloudSavedRows)[0].edition_id)).toBe(event.edition_id);
   await page.locator('#eventDetailLanguageSelect').selectOption('en');
   await expect(page.locator('#race-day h2')).toHaveText('Race day');
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
@@ -165,6 +168,7 @@ test('regular static URL renders current canonical fields and a settled anonymou
     price_min: 25, price_max: 65, currency: 'EUR', participant_limit: 750, last_checked: '2026-09-29T10:00:00Z',
     race_formats: [{ label: 'Triathlon', swim_km: 1.5, bike_km: 40, run_km: 10, elevation_gain_m: 320 }, { label: 'Lauf', distance_km: 21.097 }] };
   await isolate(page);
+  await useSignedInDetailCloud(page);
   let requests = 0;
   let releaseGuard;
   const guardWait = new Promise(resolve => { releaseGuard = resolve; });
@@ -203,6 +207,9 @@ test('regular static URL renders current canonical fields and a settled anonymou
   await expect(page.locator('#addDetailEventToSeason')).toBeEnabled();
   await page.locator('#addDetailEventToSeason').click();
   await expect(page.locator('#addDetailEventToSeason')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => Object.values(window.__detailCloudSavedRows)[0])).toMatchObject({
+    user_id: 'detail-test-user', event_id: staticSeasonKey, edition_id: event.edition_id
+  });
   await page.locator('#eventDetailLanguageSelect').selectOption('en');
   await expect(page.locator('[data-public-detail-field="price"]')).toContainText('Price');
   await expect(page.locator('#competitions')).toContainText('21.097 km');

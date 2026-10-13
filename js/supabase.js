@@ -1028,9 +1028,13 @@ function openAuthModal(mode) {
   authMode = mode;
 
   authModal.classList.add("open");
+  syncAuthMode();
+}
+
+function syncAuthMode() {
 
   authTitle.innerText =
-    mode === "login"
+    authMode === "login"
     ? (
         typeof window.t === "function"
           ? window.t("auth.welcome", "Welcome Back")
@@ -1042,12 +1046,29 @@ function openAuthModal(mode) {
           : "Create Account"
       );
 
+  authPassword.setAttribute("autocomplete", authMode === "register" ? "new-password" : "current-password");
+  authSubmitBtn.textContent = authMode === "register"
+    ? (window.t?.("auth.create", "Create Account") || "Create Account")
+    : (window.uiText?.("Login") || "Login");
+  const resetButton = document.getElementById("passwordResetBtn");
+  if (resetButton) resetButton.hidden = authMode === "register";
+  const modeSwitch = document.getElementById("authModeSwitchBtn");
+  if (modeSwitch) modeSwitch.textContent = authMode === "login"
+    ? (window.t?.("auth.create", "Create Account") || "Create Account")
+    : (window.uiText?.("Login") || "Login");
 }
 
+document.getElementById("authModeSwitchBtn")?.addEventListener("click", () => {
+  authPassword.value = "";
+  openAuthModal(authMode === "login" ? "register" : "login");
+});
+document.addEventListener("app-language-changed", syncAuthMode);
 
-function closeAuthModal() {
+
+function closeAuthModal(options = {}) {
 
   authModal.classList.remove("open");
+  if (!options.keepPendingSeasonAdd && typeof clearPendingSeasonAdd === "function") clearPendingSeasonAdd();
 
 }
 
@@ -1074,6 +1095,7 @@ async function handleAuth() {
       ? "Creating account..."
       : "Signing in..."
   );
+  document.getElementById("authModeSwitchBtn")?.setAttribute("disabled", "");
 
   try {
     if (authMode === "register") {
@@ -1149,7 +1171,7 @@ async function handleAuth() {
     }
 
     authPassword.value = "";
-    closeAuthModal();
+    closeAuthModal({ keepPendingSeasonAdd: true });
     await updateAuthUI();
   } catch (error) {
     console.error("Authentication request failed:", error);
@@ -1165,6 +1187,8 @@ async function handleAuth() {
       authSubmitBtn,
       false
     );
+    document.getElementById("authModeSwitchBtn")?.removeAttribute("disabled");
+    syncAuthMode();
   }
 
 }
@@ -3304,6 +3328,9 @@ async function updateAuthUI() {
 
   }
 
+  if (window.location?.hash === "#/planner" && typeof openSeasonPlanner === "function") {
+    await openSeasonPlanner();
+  }
 }
 
 document

@@ -4248,7 +4248,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   </script>
   <script src="../../js/config.js"></script>
   <script defer src="../../js/supabase-loader.js" data-supabase-src="../../js/event-detail-supabase.js?v=20260725-publish-runtime-v96"></script>
-  <script defer src="../../js/event-detail.js?v=20261006-bilingual-v138"></script>
+  <script defer src="../../js/event-detail.js?v=20261013-season-auth-v145"></script>
   ${mapScript(event)}
 </body>
 </html>

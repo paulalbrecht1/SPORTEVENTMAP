@@ -6,6 +6,7 @@ import vm from "node:vm";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { fixtureEventsCsv, fixtureEvents } from "./e2e/helpers/fixtures.mjs";
+import { useSignedInDetailCloud } from "./e2e/helpers/detail-auth.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = name => fs.readFileSync(path.join(root, name), "utf8");
@@ -374,8 +375,9 @@ test("actual browser resolves missing routes, preserves static pages and hides c
       } finally { await context.close(); }
     });
 
-    await t.test('live detail uses anonymous public data, escapes content, validates links and preserves Season identity', async () => {
+    await t.test('live detail uses anonymous public data, escapes content, validates links and preserves authenticated Season identity', async () => {
       const { page, context } = await newPage();
+      await useSignedInDetailCloud(page);
       const publicRow = { ...fixtureEvents[0], event_name: '<img src=x onerror=alert(1)> Public Run', edition_slug: eventSlug, date: '20.09.2030', city: 'Hamburg', description: '<script>unsafe()</script>', event_url: 'javascript:alert(1)', source_url: 'https://organizer.example/race', race_formats: [{ label: '5 km' }, { label: '10 km' }], last_checked: null };
       let requests = 0;
       await context.route('**/js/config.js', route => route.fulfill({ contentType: 'text/javascript', body: 'window.SPORT_EVENT_MAP_CONFIG={supabaseUrl:"https://public-detail.test",supabasePublishableKey:"public-fixture"};' }));

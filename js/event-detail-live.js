@@ -611,7 +611,7 @@
     render();
     if (!staticPage) {
       const script = document.createElement('script');
-      script.src = '/js/event-detail.js?v=20260929-google-maps-v133';
+      script.src = '/js/event-detail.js?v=20261013-season-auth-v145';
       script.onerror = () => { byId('detailActionStatus').textContent = t('detail.saveUnavailable'); };
       document.head.append(script);
     }

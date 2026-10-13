@@ -34,7 +34,7 @@
     await new Promise(resolve => {
       window.sportEventMapPublicDetailReady = resolve;
       const script = document.createElement("script");
-      script.src = "/js/event-detail-live.js?v=20261006-bilingual-v138";
+      script.src = "/js/event-detail-live.js?v=20261013-season-auth-v145";
       script.onerror = () => {
         document.documentElement.dataset.semPublicDetailState = "unavailable";
         const notice = document.createElement("p");
@@ -62,8 +62,16 @@
   let initialStatePromise = Promise.resolve();
   let lastStatusKey = "";
   let lastStatusTone = "";
+  const seasonAuthCopy = {
+    "detail.loginRequired": { de: "Melde dich an oder erstelle ein Konto, um dieses Event in deiner Saison zu speichern.", en: "Sign in or create an account to save this event in your season." },
+    "detail.login": { de: "Anmelden", en: "Sign in" },
+    "detail.register": { de: "Konto erstellen", en: "Create account" }
+  };
 
   function translate(key) {
+    if (seasonAuthCopy[key]) {
+      return seasonAuthCopy[key][document.documentElement?.lang === "en" ? "en" : "de"];
+    }
     if (
       window.sportEventMapDetailI18n &&
       typeof window.sportEventMapDetailI18n.translate === "function"
@@ -115,19 +123,6 @@
     return Array.isArray(parsed)
       ? parsed
       : [];
-  }
-
-  function hasLocalSeasonEntry() {
-    const seasonKey =
-      getSeasonKey();
-
-    try {
-      return readFavorites().some(item =>
-        normalizeFavoriteKey(item) === seasonKey
-      );
-    } catch (_error) {
-      return false;
-    }
   }
 
   function writeLocalSeasonState(saved) {
@@ -225,6 +220,18 @@
       : "";
     actionStatus.dataset.tone =
       lastStatusTone;
+    if (key === "detail.loginRequired" && typeof document.createElement === "function" && actionStatus.append) {
+      const actions = document.createElement("span");
+      actions.className = "event-detail-action-group";
+      for (const mode of ["login", "register"]) {
+        const link = document.createElement("a");
+        link.href = `/index.html?auth=${mode}#/planner`;
+        link.className = "event-detail-secondary";
+        link.textContent = translate(`detail.${mode}`);
+        actions.append(link);
+      }
+      actionStatus.append(document.createElement("br"), actions);
+    }
   }
 
   async function getCloudContext() {
@@ -336,6 +343,11 @@
       const { client, user } =
         await getCloudContext();
 
+      if (!user) {
+        isSaved = false;
+        setStatus("detail.loginRequired", "info");
+        return;
+      }
       if (!client || !user) {
         return;
       }
@@ -388,13 +400,17 @@
       const { client, user } =
         await getCloudContext();
 
-      if (client && user) {
-        await syncCloudState(
-          client,
-          user,
-          nextSaved
-        );
+      if (!client || !user) {
+        localStorage.setItem("pendingSeasonAdd", JSON.stringify({
+          event_key: getSeasonKey(),
+          event_slug: detailEvent.edition_slug || detailEvent.event_slug || "",
+          requested_at: new Date().toISOString()
+        }));
+        isSaved = false;
+        setStatus("detail.loginRequired", "info");
+        return;
       }
+      await syncCloudState(client, user, nextSaved);
 
       writeLocalSeasonState(nextSaved);
       isSaved = nextSaved;
@@ -427,7 +443,8 @@
       return;
     }
 
-    isSaved = hasLocalSeasonEntry();
+    // A local cache cannot establish ownership or prove an authenticated save.
+    isSaved = false;
     renderButton();
     seasonButton.addEventListener(
       "click",

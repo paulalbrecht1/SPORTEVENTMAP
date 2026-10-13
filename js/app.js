@@ -1141,6 +1141,10 @@ function initPlatformShell() {
 
       document.getElementById("loginBtn")?.click();
     });
+  document.getElementById("plannerAuthRegisterBtn")?.addEventListener("click", () => {
+    if (typeof openAuthModal === "function") openAuthModal("register");
+    else document.getElementById("registerBtn")?.click();
+  });
 
   document
     .getElementById("eventWikiSearchFocusBtn")
@@ -1753,6 +1757,10 @@ function initLandingPage() {
 initLandingPage();
 
 initPlatformShell();
+const seasonAuthEntry = new URL(location.href).searchParams.get("auth");
+if (["login", "register"].includes(seasonAuthEntry)) {
+  requestAnimationFrame(() => document.getElementById(seasonAuthEntry === "register" ? "registerBtn" : "loginBtn")?.click());
+}
 
 initBetaBannerDismissal();
 

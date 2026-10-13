@@ -48,6 +48,7 @@ function createCloud(options = {}) {
   } = options;
 
   const calls = [];
+  let currentSaved = remoteSaved;
   return {
     calls,
     auth: {
@@ -80,13 +81,14 @@ function createCloud(options = {}) {
         limit() {
           return Promise.resolve({
             data:
-              remoteSaved
+              currentSaved
                 ? [{ event_id: eventKey }]
                 : [],
             error: null
           });
         },
         async upsert() {
+          if (failTable !== table) currentSaved = true;
           return {
             data: null,
             error:
@@ -96,6 +98,7 @@ function createCloud(options = {}) {
           };
         },
         then(resolve) {
+          if (operation === "delete" && failTable !== table) currentSaved = false;
           resolve({
             data: [],
             error:
@@ -150,6 +153,7 @@ async function createHarness(options = {}) {
       warn() {}
     },
     document: {
+      documentElement: { lang: "en" },
       getElementById(id) {
         if (id === "addDetailEventToSeason") {
           return button;
@@ -211,8 +215,23 @@ async function createHarness(options = {}) {
 }
 
 {
+  const anonymous = await createHarness();
+  await anonymous.click();
+  assert.equal(anonymous.button.textContent, "+ Add to Season");
+  assert.equal(anonymous.attributes.get("aria-pressed"), "false");
+  assert.match(anonymous.status.textContent, /Sign in or create an account/);
+  assert.equal(anonymous.store.has("seasonPlannerEvents"), false);
+  assert.equal(anonymous.store.has("lastSeasonPlannerAdd"), false);
+  assert.equal(JSON.parse(anonymous.store.get("pendingSeasonAdd")).event_key, eventKey);
+
+  const cached = await createHarness({ store: new Map([["seasonPlannerEvents", JSON.stringify([eventKey])]]) });
+  assert.equal(cached.attributes.get("aria-pressed"), "false", "A local entry cannot prove ownership or sign-in.");
+}
+
+{
+  const cloud = createCloud();
   const harness =
-    await createHarness();
+    await createHarness({ cloud });
 
   assert.equal(
     harness.button.textContent,
@@ -247,7 +266,8 @@ async function createHarness(options = {}) {
 
   const reloaded =
     await createHarness({
-      store: harness.store
+      store: harness.store,
+      cloud
     });
 
   assert.equal(

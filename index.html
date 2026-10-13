@@ -737,6 +737,7 @@
           >
             Log in to Season Planner
           </button>
+          <button id="plannerAuthRegisterBtn" type="button" class="auth-secondary-btn" data-i18n-text="Create Account">Create Account</button>
         </div>
       </section>
     </div>
@@ -1444,7 +1445,7 @@
 
 
 <!-- AUTH MODAL -->
-<div id="authModal">
+<div id="authModal" role="dialog" aria-modal="true" aria-labelledby="authTitle">
 
   <div class="auth-card">
 
@@ -1452,7 +1453,7 @@
       &times;
     </button>
 
-    <h2 id="authTitle" data-i18n-text="Login">
+    <h2 id="authTitle">
       Login
     </h2>
 
@@ -1461,6 +1462,7 @@
       <input
         type="email"
         id="authEmail"
+        autocomplete="email"
         placeholder="you@example.com">
     </label>
 
@@ -1469,6 +1471,7 @@
       <input
         type="password"
         id="authPassword"
+        autocomplete="current-password"
         placeholder="Password"
       data-i18n-placeholder-text="Password">
     </label>
@@ -1476,6 +1479,7 @@
     <button id="authSubmitBtn" data-i18n-text="Continue">
       Continue
     </button>
+    <button id="authModeSwitchBtn" type="button" class="auth-secondary-btn">Create Account</button>
 
     <button
       id="passwordResetBtn"
@@ -3533,7 +3537,7 @@
 <script
   defer
   src="js/supabase-loader.js?v=20260706-header-nav-v67"
-  data-supabase-src="js/supabase.js?v=20261006-bilingual-v142"
+  data-supabase-src="js/supabase.js?v=20261013-season-auth-v145"
 ></script>
 
 <script defer src="js/data-freshness-health.js?v=20260810-freshness-overview-v1"></script>
@@ -3543,11 +3547,11 @@
 <script defer src="js/event-description-translations.js?v=20261006-bilingual-v140"></script>
 <script defer src="js/event-description-translations-extra.js?v=20261006-bilingual-v140"></script>
 <script defer src="js/event-description.js?v=20261006-bilingual-v140"></script>
-<script defer src="js/events.js?v=20261012-favorites-v144"></script>
+<script defer src="js/events.js?v=20261013-season-auth-v145"></script>
 <script defer src="js/event-marker-types.js?v=20260725-publish-runtime-v96"></script>
 <script defer src="js/map.js?v=20261009-discovery-context-v143"></script>
 <script defer src="js/search.js?v=20261012-favorites-v144"></script>
-<script defer src="js/app.js?v=20261012-favorites-v144"></script>
+<script defer src="js/app.js?v=20261013-season-auth-v145"></script>
 <script defer src="js/mobile-discovery.js?v=20261009-discovery-context-v143"></script>
 
 </body>

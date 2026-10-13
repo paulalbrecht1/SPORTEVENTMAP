@@ -1838,67 +1838,17 @@ document.addEventListener("keydown", event => {
 // FAVORITES VIEW
 let showingFavorites = false;
 
+window.isDiscoveryFavoritesActive = () => showingFavorites;
+window.setDiscoveryFavorites = active => {
+  showingFavorites = Boolean(active);
+  syncEventListFavoritesToggle();
+};
+
 document
   .getElementById("favoritesBtn")
   .addEventListener("click", () => {
-
-    showingFavorites =
-      !showingFavorites;
-
-    const btn =
-      document.getElementById(
-        "favoritesBtn"
-      );
-
-    if (showingFavorites) {
-
-      btn.classList.add("active");
-      btn.innerHTML =
-        "&#10084;";
-
-      const filtered =
-        allMarkers.filter(item =>
-          isFavorite(item.data)
-        );
-
-      if (typeof setVisibleMapMarkers === "function") {
-        setVisibleMapMarkers(filtered);
-      }
-      else {
-        markerLayer.clearLayers();
-
-        filtered.forEach(item => {
-
-          markerLayer.addLayer(
-            item.marker
-          );
-
-        });
-      }
-
-      renderEventList(
-        filtered.map(
-          item => item.data
-        ),
-        {
-          emptyTitle: appUiText("No favorites yet"),
-          emptyText: appUiText("Save events using the heart icon."),
-          showReset: false
-        }
-      );
-
-    }
-
-    else {
-
-      btn.classList.remove("active");
-      btn.innerHTML =
-        "&#9825;";
-
-      applyFilters();
-
-    }
-
+    window.setDiscoveryFavorites(!showingFavorites);
+    applyFilters();
   });
 
 
@@ -1914,19 +1864,18 @@ function syncEventListFavoritesToggle() {
     return;
   }
 
-  const active =
-    sourceButton.classList.contains("active");
+  const active = showingFavorites;
+  const label = window.getAppLanguage?.() === "de" ? "Nur Favoriten anzeigen" : "Show favorites only";
+  sourceButton.classList.toggle("active", active);
+  for (const button of [sourceButton, listButton]) {
+    button.setAttribute("aria-pressed", String(active));
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  }
 
   listButton.classList.toggle("active", active);
-  listButton.setAttribute(
-    "aria-pressed",
-    active ? "true" : "false"
-  );
 
-  listButton.innerHTML =
-    active
-      ? `<span aria-hidden="true">&#10084;</span> ${window.getAppLanguage?.() === "de" ? "Alle Events" : "All races"}`
-      : `<span aria-hidden="true">&#9825;</span> ${window.getAppLanguage?.() === "de" ? "Favoriten" : "Favorites"}`;
+  listButton.innerHTML = `<span aria-hidden="true">${active ? "&#10084;" : "&#9825;"}</span> ${window.getAppLanguage?.() === "de" ? "Favoriten" : "Favorites"}`;
 }
 
 document
@@ -1935,25 +1884,12 @@ document
     document
       .getElementById("favoritesBtn")
       ?.click();
-
-    window.setTimeout(
-      syncEventListFavoritesToggle,
-      0
-    );
-  });
-
-document
-  .getElementById("favoritesBtn")
-  ?.addEventListener("click", () => {
-    window.setTimeout(
-      syncEventListFavoritesToggle,
-      0
-    );
   });
 
 syncEventListFavoritesToggle();
 
 document.addEventListener("app-language-changed", syncEventListFavoritesToggle);
+document.addEventListener("DOMContentLoaded", syncEventListFavoritesToggle);
 
 
 // Keep discovery context in this tab when a standalone event page replaces the
@@ -2060,7 +1996,7 @@ window.discoveryContext = (() => {
   function userChangedContext(event) {
     if (!isDiscoverySurface()) return;
     const target = event.target;
-    const controls = "#searchInput, #sidebar input, #sidebar select, #sidebar button, #toggleSidebar, #mobileMapViewBtn, #mobileListViewBtn, #eventListPagination button";
+    const controls = "#searchInput, #sidebar input, #sidebar select, #sidebar button, #toggleSidebar, #mobileMapViewBtn, #mobileListViewBtn, #eventListPagination button, #favoritesBtn, #eventListFavoritesToggle";
     const mapGesture = event.type === "pointerdown" && target.closest?.("#map");
     const discoveryScroll = event.type === "wheel" && target.closest?.("#eventList, #sidebar-header, #map");
     if (discoveryScroll || mapGesture || target.closest?.(controls)) {

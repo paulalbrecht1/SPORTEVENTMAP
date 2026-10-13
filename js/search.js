@@ -12,12 +12,14 @@ let pendingFilterZoom = false;
 function getDiscoverySearchState() {
   return {
     query: document.getElementById("searchInput")?.value || "",
+    favoritesOnly: Boolean(window.isDiscoveryFavoritesActive?.()),
     ...getActiveFilterAnalytics()
   };
 }
 
 function restoreDiscoverySearchState(state) {
   if (!state || typeof state !== "object") return;
+  window.setDiscoveryFavorites?.(state.favoritesOnly === true);
   const fields = {
     query: "searchInput", sort: "sortSelect", country: "countryFilter",
     date: "dateFilter", from: "dateFromFilter", to: "dateToFilter"
@@ -1197,6 +1199,9 @@ function getActiveFilterLabels(resultCount = null) {
   if (searchValue) {
     labels.push(getSearchTranslation("search.queryLabel", "Search: {query}", { query: searchValue }));
   }
+  if (window.isDiscoveryFavoritesActive?.()) {
+    labels.push(window.getAppLanguage?.() === "de" ? "Favoriten" : "Favorites");
+  }
 
   if (country !== "all") {
     labels.push(
@@ -1286,7 +1291,8 @@ function updateDiscoveryFilterCount() {
     selectedSportFilters.length +
     selectedDistanceFilters.length +
     Number(countryFilter !== "all") +
-    Number(dateFilter !== "all" || hasCustomDate);
+    Number(dateFilter !== "all" || hasCustomDate) +
+    Number(Boolean(window.isDiscoveryFavoritesActive?.()));
 
   if (countBadge) {
     countBadge.textContent = String(activeCount);
@@ -1331,6 +1337,7 @@ function flushFilterApplication(zoom = false) {
 }
 
 function resetAllFilters() {
+  window.setDiscoveryFavorites?.(false);
   const searchInput =
     document.getElementById("searchInput");
   const sortSelect =
@@ -1849,6 +1856,7 @@ function applyFilters(zoom = false, options = {}) {
 
   const smartSearch =
     parseSmartSearch(searchQuery);
+  const favoritesOnly = Boolean(window.isDiscoveryFavoritesActive?.());
 
   // SEARCH + SPORT FILTER
   let filtered =
@@ -1875,7 +1883,8 @@ function applyFilters(zoom = false, options = {}) {
       return (
         matchesSearch &&
         matchesFilter &&
-        matchesDistance
+        matchesDistance &&
+        (!favoritesOnly || isFavorite(event))
       );
 
     });
@@ -2074,11 +2083,19 @@ if (sort === "date") {
   if (typeof renderEventList === "function") {
     const list = document.getElementById("eventList");
     const scrollTop = list?.scrollTop || 0;
+    const emptyFavorites = favoritesOnly && favorites.length === 0;
     renderEventList(
       filtered.map(
         item => item.data
       ),
-      { preservePage: Boolean(options.preserveListPosition) }
+      {
+        preservePage: Boolean(options.preserveListPosition),
+        ...(favoritesOnly ? {
+          emptyTitle: eventUiText(emptyFavorites ? "No favorites yet" : "No matching favorites found"),
+          emptyText: eventUiText(emptyFavorites ? "Save events using the heart icon." : "Adjust your search or filters."),
+          showReset: !emptyFavorites
+        } : {})
+      }
     );
     if (options.preserveListPosition && list) list.scrollTop = scrollTop;
   }

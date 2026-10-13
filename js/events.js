@@ -101,6 +101,9 @@ const EVENT_UI_TEXT_PAIRS = [
   ["This race was added to your favorites.","Dieses Rennen wurde zu deinen Favoriten hinzugefügt."],
   ["This race was removed from your saved events.","Dieses Rennen wurde aus deinen Favoriten entfernt."],
   ["No matching events found","Keine passenden Events gefunden"],
+  ["No favorites yet","Noch keine Favoriten"],
+  ["No matching favorites found","Keine passenden Favoriten gefunden"],
+  ["Save events using the heart icon.","Speichere Events über das Herzsymbol."],
   ["Adjust your search or filters.","Passe deine Suche oder Filter an."],
   ["Reset filters","Filter zurücksetzen"],
   ["Collapse list and show map","Liste verkleinern und Karte anzeigen"],
@@ -1044,6 +1047,10 @@ function applyRemotePlanningState(state = {}) {
   );
   notifyPersonalPlanningChange();
   if (!state.clear && (!Array.isArray(state.plannedEvents) || plannedEditions.some(key => !state.plannedEditions?.includes(key)))) void refreshPersonalPlannedCatalog();
+  if (typeof currentDrawerEvent !== "undefined" && currentDrawerEvent &&
+      document.getElementById("eventDrawer")?.classList.contains("open")) {
+    updateFavoriteButtons(currentDrawerEvent);
+  }
 
   if (
     typeof renderEventList === "function" &&
@@ -2722,6 +2729,7 @@ function renderEventList(events, options = {}) {
           class="favorite-btn ${isFavorite(event) ? "active" : ""}"
           type="button"
           aria-label="${escapeHTML(eventUiText("Toggle favorite"))}"
+          aria-pressed="${isFavorite(event)}"
           data-testid="event-card-favorite"
         >
           ${isFavorite(event) ? "&#10084;" : "&#9825;"}
@@ -2976,6 +2984,7 @@ function openDrawer(event, options = {}) {
         class="drawer-favorite-btn ${isFavorite(event) ? "active" : ""}"
         type="button"
         aria-label="${escapeHTML(eventUiText("Toggle favorite"))}"
+        aria-pressed="${isFavorite(event)}"
         data-event-key="${escapeHTML(getEventKey(event))}"
         data-testid="drawer-favorite"
       >
@@ -3318,35 +3327,7 @@ function toggleFavorite(event) {
     typeof showingFavorites !== "undefined" &&
     showingFavorites
   ) {
-
-    const favoriteMarkers =
-      allMarkers.filter(item =>
-        isFavorite(item.data)
-      );
-
-    if (typeof setVisibleMapMarkers === "function") {
-      setVisibleMapMarkers(favoriteMarkers);
-    }
-    else {
-      markerLayer.clearLayers();
-
-      favoriteMarkers.forEach(item => {
-
-        markerLayer.addLayer(
-          item.marker
-        );
-
-      });
-    }
-
-    renderEventList(
-      favoriteMarkers.map(
-        item => item.data
-      )
-    );
-
-    return;
-
+    applyFilters(false, { preserveListPosition: true });
   }
 
 }
@@ -3413,6 +3394,7 @@ function updateFavoriteButtons(event) {
       }
 
       button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
       button.innerHTML =
         active
           ? "&#10084;"
@@ -3431,6 +3413,7 @@ function updateFavoriteButtons(event) {
       }
 
       button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
       button.innerHTML =
         active
           ? "&#10084;"

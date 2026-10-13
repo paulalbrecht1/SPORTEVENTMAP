@@ -46969,3 +46969,13 @@ body.event-detail-page .race-guide-fact-card > strong { font-size: max(1rem, 16p
 .event-detail-page .live-detail-footer { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; margin-top: 24px; }
 .event-detail-page .live-detail-footer a { display: inline-flex; align-items: center; min-height: 44px; color: inherit; font-weight: 600; }
 @media (max-width: 620px) { .event-detail-page .live-detail-competitions { grid-template-columns: minmax(0, 1fr); } }
+
+/* Published facts in the event preview. */
+.drawer-detail-facts { margin: 0; }
+.drawer-detail-facts > div { padding: 10px 0; }
+.drawer-detail-facts dt { font-size: .78rem; opacity: .75; margin-bottom: 4px; }
+.drawer-detail-facts dd { margin: 0; font-weight: 650; overflow-wrap: anywhere; }
+.drawer-description { white-space: pre-line; line-height: 1.65; overflow-wrap: anywhere; }
+.drawer-competitions { margin: 0; padding-left: 20px; }
+.drawer-competitions li { padding: 8px 0; overflow-wrap: anywhere; }
+.drawer-competitions p { margin: 5px 0 0; line-height: 1.5; }

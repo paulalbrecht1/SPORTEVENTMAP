@@ -79,10 +79,23 @@ const EVENT_UI_TEXT_PAIRS = [
   ["Participants","Teilnehmer"],
   ["Course","Strecke"],
   ["Highlight","Besonderheit"],
-  ["More event details will be added soon.","Weitere Eventdetails werden bald ergänzt."],
+  ["Description","Beschreibung"],
+  ["Event details","Eventdetails"],
+  ["Start time","Startzeit"],
+  ["Entry fee","Startgebühr"],
+  ["Organizer","Veranstalter"],
+  ["Entry limit","Teilnahmelimit"],
+  ["Competitions","Wettbewerbe"],
+  ["Swim","Schwimmen"],
+  ["Bike","Radfahren"],
+  ["Run","Laufen"],
+  ["Elevation gain","Höhenmeter"],
+  ["from","ab"],
+  ["up to","bis"],
   ["Previous","Zurück"],
   ["Next","Weiter"],
   ["Official Website","Offizielle Website"],
+  ["Register","Zur Anmeldung"],
   ["Toggle favorite","Favorit umschalten"],
   ["Close event details","Eventdetails schließen"],
   ["Saved in Season","In der Saison gespeichert"],
@@ -1458,276 +1471,39 @@ function getEventSpecificImageUrl(event) {
 }
 
 
-function getCleanEventDescription(event) {
-  const description =
-    cleanValue(event.description);
-
-  const lowerDescription =
-    description.toLowerCase();
-
-  const isImportNote =
-    !description ||
-    lowerDescription.includes("imported from") ||
-    lowerDescription.includes("source listing") ||
-    lowerDescription.includes("marathon.de");
-
-  const name =
-    cleanValue(event.event_name);
-
-  const city =
-    cleanValue(event.city);
-
-  const sport =
-    cleanValue(event.sport);
-
-  const lowerName =
-    name.toLowerCase();
-
-  if (lowerName.includes("berlin marathon")) {
-    return "A fast World Marathon Major through Berlin. The official course is known for very little elevation gain and passes many of the city sights.";
-  }
-
-  if (lowerName.includes("köln marathon") || lowerName.includes("koln marathon")) {
-    return "Generali Cologne Marathon is a city road race with a flat and fast marathon course and a strong party atmosphere along the route.";
-  }
-
-  if (lowerName.includes("ironman hamburg")) {
-    return "IRONMAN Hamburg combines an Alster swim, a bike course through Hamburg and the surrounding region, and a marathon run finishing in the city center.";
-  }
-
-  if (lowerName.includes("köln triathlon") || lowerName.includes("koln triathlon")) {
-    return "Cologne Triathlon offers multiple race formats around the Rheinpark area, including sprint, Olympic and middle-distance triathlon racing.";
-  }
-
-  if (!isImportNote) {
-    return description;
-  }
-
-  if (sport === "Triathlon") {
-    return `${name} is a triathlon event in ${city} with swim, bike and run racing. Check the official event page for course details and registration.`;
-  }
-
-  if (sport === "Ultramarathon") {
-    return `${name} is an ultramarathon or trail-style endurance event in ${city}. Check the official event page for terrain, elevation and aid station details.`;
-  }
-
-  return `${name} is a running event in ${city}. Check the official event page for course profile, start area and registration details.`;
+// Only canonical published values are used here. A name never proves race facts.
+function drawerNumber(value) {
+  if (!["string", "number"].includes(typeof value) || String(value).trim() === "" || !Number.isFinite(Number(value)) || Number(value) < 0) return "";
+  return new Intl.NumberFormat(window.getAppLanguage?.() === "de" ? "de-DE" : "en-GB", { maximumFractionDigits: 4 }).format(Number(value));
 }
 
-
-function parseEventStatDescription(description) {
-  const stats = {};
-
-  cleanValue(description)
-    .split(/\n|;/)
-    .map(line => line.trim())
-    .filter(Boolean)
-    .forEach(line => {
-      const separatorIndex =
-        line.indexOf(":");
-
-      if (separatorIndex === -1) {
-        return;
-      }
-
-      const key =
-        line
-          .slice(0, separatorIndex)
-          .trim()
-          .toLowerCase();
-
-      const value =
-        line
-          .slice(separatorIndex + 1)
-          .trim();
-
-      if (!value) {
-        return;
-      }
-
-      if (key.includes("participant") || key.includes("teilnehmer")) {
-        stats.participants = value;
-      }
-
-      if (key.includes("course") || key.includes("strecke")) {
-        stats.course = value;
-      }
-
-      if (key.includes("highlight") || key.includes("info") || key.includes("besonderheit")) {
-        stats.highlight = value;
-      }
-    });
-
-  return stats;
-}
-
-
-function getEventStats(event) {
-  const parsedStats =
-    parseEventStatDescription(event.description);
-
-  const name =
-    cleanValue(event.event_name)
-      .toLowerCase();
-
-  const knownStats = [
-    {
-      match: ["berlin", "marathon"],
-      stats: {
-        participants:
-          eventUiText("Around 60,000 athletes"),
-        course:
-          eventUiText("Flat course with very little elevation gain"),
-        highlight:
-          eventUiText("World Marathon Major through Berlin, finishing near Brandenburg Gate")
-      }
-    },
-    {
-      match: ["köln", "marathon"],
-      stats: {
-        participants:
-          eventUiText("37,000+ participants across the race weekend"),
-        course:
-          eventUiText("Flat and fast city course"),
-        highlight:
-          eventUiText("Cologne city race with a strong party atmosphere along the route")
-      }
-    },
-    {
-      match: ["koln", "marathon"],
-      stats: {
-        participants:
-          eventUiText("37,000+ participants across the race weekend"),
-        course:
-          eventUiText("Flat and fast city course"),
-        highlight:
-          eventUiText("Cologne city race with a strong party atmosphere along the route")
-      }
-    },
-    {
-      match: ["ironman", "hamburg"],
-      stats: {
-        course:
-          eventUiText("Alster swim, city bike course and marathon run around the Alster"),
-        highlight:
-          eventUiText("Full-distance IRONMAN race finishing in central Hamburg")
-      }
-    },
-    {
-      match: ["köln", "triathlon"],
-      stats: {
-        course:
-          eventUiText("Rhine/Rheinpark race area with swim, bike and run formats"),
-        highlight:
-          eventUiText("Sprint, Olympic and middle-distance racing in Cologne")
-      }
-    },
-    {
-      match: ["koln", "triathlon"],
-      stats: {
-        course:
-          eventUiText("Rhine/Rheinpark race area with swim, bike and run formats"),
-        highlight:
-          eventUiText("Sprint, Olympic and middle-distance racing in Cologne")
-      }
-    },
-    {
-      match: ["hamburg", "marathon"],
-      stats: {
-        highlight:
-          eventUiText("Germany's largest spring marathon")
-      }
-    },
-    {
-      match: ["münchen", "marathon"],
-      stats: {
-        course:
-          eventUiText("One-lap course through Munich"),
-        highlight:
-          eventUiText("World Athletics Road Race Label event")
-      }
-    },
-    {
-      match: ["munich", "marathon"],
-      stats: {
-        course:
-          eventUiText("One-lap course through Munich"),
-        highlight:
-          eventUiText("World Athletics Road Race Label event")
-      }
-    },
-    {
-      match: ["frankfurt", "marathon"],
-      stats: {
-        course:
-          eventUiText("Flat circular road course along both sides of the River Main"),
-        highlight:
-          eventUiText("Fast city marathon in Germany's financial capital")
-      }
-    }
-  ];
-
-  const known =
-    knownStats.find(item =>
-      item.match.every(word =>
-        name.includes(word)
-      )
-    );
-
-  return {
-    ...(known ? known.stats : {}),
-    ...parsedStats
-  };
-}
-
-
-function createEventStatsMarkup(event) {
-  const stats =
-    getEventStats(event);
-
+function createDrawerDetailsMarkup(event) {
+  const description = window.SportEventMapDescriptions?.localizedDescription(event, window.getAppLanguage?.() || "en") || "";
+  const time = cleanValue(event.start_time).match(/^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d(?:\.\d+)?)?$/);
+  const minimum = drawerNumber(event.price_min);
+  const maximum = drawerNumber(event.price_max);
+  const prices = [...new Set([minimum, maximum].filter(value => value !== ""))];
+  const fee = prices.length ? ((minimum === "" ? eventUiText("up to") + " " : maximum === "" ? eventUiText("from") + " " : "") + prices.join(" – ") + (cleanValue(event.currency) ? " " + cleanValue(event.currency) : "")) : "";
   const rows = [
-    stats.participants
-      ? {
-          icon: "👥",
-          label: eventUiText("Participants"),
-          value: stats.participants
-        }
-      : null,
-    stats.course
-      ? {
-          icon: "↗",
-          label: eventUiText("Course"),
-          value: stats.course
-        }
-      : null,
-    stats.highlight
-      ? {
-          icon: "✨",
-          label: eventUiText("Highlight"),
-          value: stats.highlight
-        }
-      : null
-  ].filter(Boolean);
-
-  if (!rows.length) {
-    return `
-      <div class="event-stats-empty">
-        ${escapeHTML(eventUiText("More event details will be added soon."))}
-      </div>
-    `;
-  }
-
-  return rows
-    .map(row => `
-      <div class="event-stat-row">
-        <span class="event-stat-icon">${row.icon}</span>
-        <div>
-          <strong>${escapeHTML(eventUiText(row.label))}</strong>
-          <p>${escapeHTML(eventDisplayValue(eventUiText(row.value)))}</p>
-        </div>
-      </div>
-    `)
-    .join("");
+    ["Start time", time ? time[1].padStart(2, "0") + ":" + time[2] : ""],
+    ["Entry fee", fee],
+    ["Organizer", cleanValue(event.organizer_name)],
+    ["Entry limit", drawerNumber(event.participant_limit)]
+  ].filter(([, value]) => value !== "");
+  const formats = normalizeRaceFormats(event.race_formats).flatMap(format => {
+    const label = eventDisplayValue(format.label) || "";
+    const hasLegs = ["swim_km", "bike_km", "run_km"].filter(field => drawerNumber(format[field]) !== "").length > 1;
+    const details = [["distance_km", "", "km"], ["swim_km", "Swim", "km"], ["bike_km", "Bike", "km"], ["run_km", "Run", "km"], ["elevation_gain_m", "Elevation gain", "m"]]
+      .flatMap(([field, name, unit]) => {
+        const amount = drawerNumber(format[field]);
+        return amount !== "" && !(field === "distance_km" && hasLegs) ? [(name ? eventUiText(name) + ": " : "") + amount + " " + unit] : [];
+      });
+    if (!label && !details.length) return [];
+    return ['<li><strong>' + escapeHTML(label) + '</strong>' + (details.length ? '<p>' + escapeHTML(details.join(" · ")) + '</p>' : '') + '</li>'];
+  });
+  return (rows.length ? '<section class="drawer-section" data-testid="drawer-event-facts"><div class="drawer-label">' + escapeHTML(eventUiText("Event details")) + '</div><dl class="drawer-detail-facts">' + rows.map(([label, value]) => '<div><dt>' + escapeHTML(eventUiText(label)) + '</dt><dd>' + escapeHTML(value) + '</dd></div>').join("") + '</dl></section>' : "") +
+    (formats.length ? '<section class="drawer-section" data-testid="drawer-competitions"><div class="drawer-label">' + escapeHTML(eventUiText("Competitions")) + '</div><ol class="drawer-competitions">' + formats.join("") + '</ol></section>' : "") +
+    (description ? '<section class="drawer-section"><div class="drawer-label">' + escapeHTML(eventUiText("Description")) + '</div><p class="drawer-description" data-testid="drawer-description">' + escapeHTML(description) + '</p></section>' : "");
 }
 
 let currentRenderedEvents = [];
@@ -2923,6 +2699,10 @@ function openDrawer(event, options = {}) {
   const detailUrl =
     getEventDetailUrl(event);
 
+  const primaryOfficialUrl = safeUrl(event.official_url);
+  const officialUrl = primaryOfficialUrl !== "#" ? primaryOfficialUrl : safeUrl(event.event_url);
+  const registrationUrl = safeUrl(event.registration_url);
+
   const now =
     Date.now();
 
@@ -3067,17 +2847,7 @@ function openDrawer(event, options = {}) {
     </div>
 
 
-    <div class="drawer-section">
-
-      <div class="drawer-label">
-        ${window.t ? window.t("event.stats") : "Event stats"}
-      </div>
-
-      <div class="event-stats-list">
-        ${createEventStatsMarkup(event)}
-      </div>
-
-    </div>
+    ${createDrawerDetailsMarkup(event)}
 
     <div class="drawer-trust-note">
       <strong>${escapeHTML(eventUiText("Verify before registering"))}</strong>
@@ -3098,14 +2868,9 @@ function openDrawer(event, options = {}) {
     }
 
 
-    <a
-      class="drawer-button"
-      href="${safeUrl(event.event_url)}"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      ${window.t ? window.t("event.officialWebsite") : eventUiText("Official Website")}
-    </a>
+    ${registrationUrl !== "#" ? `<a class="drawer-register-button drawer-detail-button" href="${escapeHTML(registrationUrl)}" target="_blank" rel="noopener noreferrer">${escapeHTML(eventUiText("Register"))}</a>` : ""}
+
+    ${officialUrl !== "#" ? `<a class="drawer-button" href="${escapeHTML(officialUrl)}" target="_blank" rel="noopener noreferrer">${window.t ? window.t("event.officialWebsite") : eventUiText("Official Website")}</a>` : ""}
 
   `;
 
@@ -3122,7 +2887,7 @@ function openDrawer(event, options = {}) {
             sport: event.sport || "",
             url_host: (() => {
               try {
-                return new URL(event.event_url).hostname;
+                return new URL(officialUrl).hostname;
               } catch (_error) {
                 return "invalid_url";
               }

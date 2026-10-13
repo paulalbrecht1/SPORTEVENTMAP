@@ -4209,7 +4209,7 @@ function buildEventPage(event, slug, detailRows = [], knowledge = null, richDeta
   <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="stylesheet" href="../../css/style.css?v=20260929-detail-layout-v130" />
+  <link rel="stylesheet" href="../../css/style.css?v=20261013-detail-summary-v146" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html,
